@@ -119,10 +119,13 @@
 98. [x] `modules/ROOT/pages/servlet/saml2/login/authentication.adoc`
 99. [x] `modules/ROOT/pages/servlet/saml2/logout.adoc`
 100. [x] `modules/ROOT/pages/servlet/saml2/metadata.adoc`
+101. [x] `modules/ROOT/pages/servlet/saml2/saml-extension-migration.adoc`
+102. [x] `modules/ROOT/pages/servlet/exploits/index.adoc`
+103. [x] `modules/ROOT/pages/servlet/exploits/csrf.adoc`
 
 ## Trang tiếp theo
 
-1. [ ] `modules/ROOT/pages/servlet/saml2/saml-extension-migration.adoc`
+1. [ ] `modules/ROOT/pages/servlet/exploits/headers.adoc`
 
 ## Kiểm tra chất lượng
 
