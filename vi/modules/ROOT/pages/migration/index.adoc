@@ -1,38 +1,37 @@
 [[migration]]
-= Migrating to 7.0
+= Di chuyển sang 7.0
 
-Spring Security 6.5 is the last release in the 6.x generation of Spring Security.
-It provides strategies for configuring breaking changes to use the 7.0 way before updating.
-We recommend you use 6.5 and {site-url}/6.5/migration-7/index.html[its preparation steps] to simplify updating to 7.0.
+Spring Security 6.5 là bản phát hành cuối cùng trong thế hệ 6.x của Spring Security.
+Phiên bản này cung cấp các chiến lược cấu hình những thay đổi gây mất tương thích để sử dụng cách thức của 7.0 trước khi cập nhật.
+Chúng tôi khuyến nghị bạn sử dụng 6.5 và {site-url}/6.5/migration-7/index.html[các bước chuẩn bị] của phiên bản này để đơn giản hóa việc cập nhật lên 7.0.
 
-After updating to 6.5, follow this guide to perform any remaining migration or cleanup steps.
+Sau khi cập nhật lên 6.5, hãy làm theo hướng dẫn này để thực hiện mọi bước di chuyển hoặc dọn dẹp còn lại.
 
-And recall that if you run into trouble, the preparation guide includes opt-out steps to revert to 5.x behaviors.
+Hãy nhớ rằng nếu gặp vấn đề, hướng dẫn chuẩn bị có các bước opt-out để quay lại các hành vi của 5.x.
 
-== Update to Spring Security 7
+== Cập nhật lên Spring Security 7
 
-The first step is to ensure you are the latest patch release of Spring Boot 4.0.
-Next, you should ensure you are on the latest patch release of Spring Security 7.
-For directions, on how to update to Spring Security 7 visit the xref:getting-spring-security.adoc[] section of the reference guide.
+Bước đầu tiên là bảo đảm bạn đang sử dụng bản phát hành patch mới nhất của Spring Boot 4.0.
+Tiếp theo, bạn nên bảo đảm mình đang sử dụng bản phát hành patch mới nhất của Spring Security 7.
+Để xem hướng dẫn cập nhật lên Spring Security 7, hãy truy cập phần xref:getting-spring-security.adoc[] của tài liệu tham khảo.
 
-=== Migrate from Jackson 2 to Jackson 3
+=== Di chuyển từ Jackson 2 sang Jackson 3
 
-The configuration of Jackson 2 `ObjectMapper` with `SecurityJackson2Modules` should be replaced by the configuration of
-Jackson 3 `JsonMapper.Builder` with `SecurityJacksonModules`. See the
-https://github.com/FasterXML/jackson/blob/main/jackson3/MIGRATING_TO_JACKSON_3.md[Jackson 3 Migration Guide] for more details.
+Cấu hình `ObjectMapper` của Jackson 2 với `SecurityJackson2Modules` nên được thay thế bằng cấu hình
+`JsonMapper.Builder` của Jackson 3 với `SecurityJacksonModules`. Xem
+https://github.com/FasterXML/jackson/blob/main/jackson3/MIGRATING_TO_JACKSON_3.md[Hướng dẫn di chuyển Jackson 3] để biết thêm chi tiết.
 
-It is recommended to replace the configuration of
-individual modules like `CoreJacksonModule` by the module detection from `SecurityJacksonModules` as it enables
-automatic inclusion of type information and configure a `PolymorphicTypeValidator` that handles the validation of class
-names.
+Bạn nên thay thế cấu hình các module riêng lẻ như `CoreJacksonModule` bằng cơ chế phát hiện module từ
+`SecurityJacksonModules`, vì cơ chế này cho phép tự động đưa thông tin kiểu vào và cấu hình một
+`PolymorphicTypeValidator` xử lý việc xác thực tên class.
 
-The Jackson 3 support uses a format compatible with the now deprecated Jackson 2 one, so class instances serialized with
-Jackson 2 should be deserializable with the Jackson 3 support.
+Phần hỗ trợ Jackson 3 sử dụng định dạng tương thích với phần hỗ trợ Jackson 2 hiện đã deprecated, vì vậy các instance của class được serialize bằng
+Jackson 2 phải có thể deserialize bằng phần hỗ trợ Jackson 3.
 
-`spring-security-oauth2-authorization-server` now uses Jackson 3 by default. If you want to continue
-to use the deprecated Jackson 2 support, the transitive dependency on Jackson 3 (`tools.jackson.core:jackson-databind`)
-should be excluded and a dependency on Jackson 2 (`com.fasterxml.jackson.core:jackson-databind`) should be added.
+`spring-security-oauth2-authorization-server` hiện sử dụng Jackson 3 theo mặc định. Nếu muốn tiếp tục
+sử dụng phần hỗ trợ Jackson 2 đã deprecated, dependency bắc cầu trên Jackson 3 (`tools.jackson.core:jackson-databind`)
+nên được loại trừ và dependency trên Jackson 2 (`com.fasterxml.jackson.core:jackson-databind`) nên được thêm vào.
 
-== Perform Application-Specific Steps
+== Thực hiện các bước dành riêng cho ứng dụng
 
-Next, there are steps you need to perform based on whether it is a xref:migration/servlet/index.adoc[Servlet] or xref:migration/reactive.adoc[Reactive] application.
+Tiếp theo, có những bước bạn cần thực hiện tùy thuộc vào việc đó là ứng dụng xref:migration/servlet/index.adoc[Servlet] hay xref:migration/reactive.adoc[Reactive].
