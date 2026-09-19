@@ -7,9 +7,9 @@ Phần này trình bày chi tiết cách authentication dựa trên form hoạt 
 // FIXME: mô tả authenticationentrypoint, authenticationfailurehandler, authenticationsuccesshandler
 
 Phần này xem xét cách Form Login dựa trên form hoạt động trong Spring Security.
-Trước hết, hãy xem cách người dùng được chuyển hướng đến form đăng nhập:
+Trước hết, hãy xem cách người dùng được redirect đến form đăng nhập:
 
-.Chuyển hướng đến trang đăng nhập
+.Redirect đến trang đăng nhập
 [.invert-dark]
 image::{figures}/loginurlauthenticationentrypoint.png[]
 
@@ -22,7 +22,7 @@ image:{icondir}/number_2.png[] xref:servlet/authorization/authorize-http-request
 image:{icondir}/number_3.png[] Vì người dùng chưa authentication, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] khởi tạo __Bắt đầu authentication__ và gửi redirect đến trang đăng nhập với xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] đã cấu hình.
 Trong hầu hết trường hợp, `AuthenticationEntryPoint` là một instance của javadoc:org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint[].
 
-image:{icondir}/number_4.png[] Trình duyệt gửi request đến trang đăng nhập mà nó được chuyển hướng tới.
+image:{icondir}/number_4.png[] Trình duyệt gửi request đến trang đăng nhập mà nó được redirect tới.
 
 image:{icondir}/number_5.png[] Một thành phần nào đó trong application phải <<servlet-authentication-form-custom,render trang đăng nhập>>.
 
@@ -61,7 +61,7 @@ Xem class javadoc:org.springframework.security.web.context.SecurityContextPersis
 Nếu remember-me chưa được cấu hình, thao tác này không làm gì.
 Xem interface javadoc:org.springframework.security.web.authentication.RememberMeServices[] trong Javadoc.
 . `ApplicationEventPublisher` xuất bản một `InteractiveAuthenticationSuccessEvent`.
-. `AuthenticationSuccessHandler` được gọi. Thông thường, đây là một `SimpleUrlAuthenticationSuccessHandler`, chuyển hướng đến request được xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] lưu lại khi chúng ta chuyển hướng đến trang đăng nhập.
+. `AuthenticationSuccessHandler` được gọi. Thông thường, đây là một `SimpleUrlAuthenticationSuccessHandler`, redirect đến request được xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] lưu lại khi chúng ta redirect đến trang đăng nhập.
 
 [[servlet-authentication-form-min]]
 Theo mặc định, Form Login của Spring Security được bật.
@@ -157,7 +157,7 @@ open fun filterChain(http: HttpSecurity): SecurityFilterChain {
 
 [NOTE]
 ====
-URI được truyền cho `loginPage` (và cho `loginProcessingUrl`, nếu được đặt riêng) được đối sánh và chuyển hướng nguyên văn.
+URI được truyền cho `loginPage` (và cho `loginProcessingUrl`, nếu được đặt riêng) được đối sánh và redirect nguyên văn.
 Nếu trang đăng nhập tùy chỉnh của bạn được phục vụ bởi một application Servlet được mapping dưới một base path, hãy include prefix đó trong URI bạn truyền cho DSL.
 Ví dụ, nếu dispatcher của bạn ở `/api/*`:
 
