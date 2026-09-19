@@ -1,16 +1,16 @@
 [[oauth2Client-core-interface-class]]
-= Core Interfaces and Classes
+= Interface và Class cốt lõi
 
-This section describes the OAuth2 core interfaces and classes that Spring Security offers.
+Phần này mô tả các interface và class cốt lõi của OAuth2 mà Spring Security cung cấp.
 
 [[oauth2Client-client-registration]]
 == ClientRegistration
 
-`ClientRegistration` is a representation of a client registered with an OAuth 2.0 or OpenID Connect 1.0 Provider.
+`ClientRegistration` là biểu diễn của một client được đăng ký với một Provider OAuth 2.0 hoặc OpenID Connect 1.0.
 
-A `ClientRegistration` object holds information, such as client id, client secret, authorization grant type, redirect URI, scope(s), authorization URI, token URI, and other details.
+Một object `ClientRegistration` chứa các thông tin như client ID, client secret, loại authorization grant, redirect URI, scope, authorization URI, token URI và các chi tiết khác.
 
-`ClientRegistration` and its properties are defined as follows:
+`ClientRegistration` và các thuộc tính của nó được định nghĩa như sau:
 
 [source,java]
 ----
@@ -46,34 +46,34 @@ public final class ClientRegistration {
 	}
 }
 ----
-<1> `registrationId`: The ID that uniquely identifies the `ClientRegistration`.
-<2> `clientId`: The client identifier.
-<3> `clientSecret`: The client secret.
-<4> `clientAuthenticationMethod`: The method used to authenticate the Client with the Provider.
-The supported values are *client_secret_basic*, *client_secret_post*, *private_key_jwt*, *client_secret_jwt* and *none* https://tools.ietf.org/html/rfc6749#section-2.1[(public clients)].
-<5> `authorizationGrantType`: The OAuth 2.0 Authorization Framework defines four https://tools.ietf.org/html/rfc6749#section-1.3[Authorization Grant] types.
- The supported values are `authorization_code`, `client_credentials`, as well as, extension grant type `urn:ietf:params:oauth:grant-type:jwt-bearer`.
-<6> `redirectUri`: The client's registered redirect URI that the _Authorization Server_ redirects the end-user's user-agent
- to after the end-user has authenticated and authorized access to the client.
-<7> `scopes`: The scope(s) requested by the client during the Authorization Request flow, such as openid, email, or profile.
-<8> `clientName`: A descriptive name used for the client.
-The name may be used in certain scenarios, such as when displaying the name of the client in the auto-generated login page.
-<9> `authorizationUri`: The Authorization Endpoint URI for the Authorization Server.
-<10> `tokenUri`: The Token Endpoint URI for the Authorization Server.
-<11> `jwkSetUri`: The URI used to retrieve the https://tools.ietf.org/html/rfc7517[JSON Web Key (JWK)] Set from the Authorization Server,
-which contains the cryptographic key(s) used to verify the https://tools.ietf.org/html/rfc7515[JSON Web Signature (JWS)] of the ID Token and (optionally) the UserInfo Response.
-<12> `issuerUri`: Returns the issuer identifier URI for the OpenID Connect 1.0 provider or the OAuth 2.0 Authorization Server.
-<13> `configurationMetadata`: The https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig[OpenID Provider Configuration Information].
-This information is available only if the Spring Boot property `spring.security.oauth2.client.provider.[providerId].issuerUri` is configured.
-<14> `(userInfoEndpoint)uri`: The UserInfo Endpoint URI used to access the claims and attributes of the authenticated end-user.
-<15> `(userInfoEndpoint)authenticationMethod`: The authentication method used when sending the access token to the UserInfo Endpoint.
-The supported values are *header*, *form*, and *query*.
-<16> `userNameAttributeName`: The name of the attribute returned in the UserInfo Response that references the Name or Identifier of the end-user.
-<17> [[oauth2Client-client-registration-requireProofKey]]`requireProofKey`: If `true` or if `clientAuthenticationMethod` is `none`, then PKCE will be enabled. Defaults to `true` for `authorization_code` grant type and `false` for other grant types.
+<1> `registrationId`: ID xác định duy nhất `ClientRegistration`.
+<2> `clientId`: Mã định danh client.
+<3> `clientSecret`: Client secret.
+<4> `clientAuthenticationMethod`: Phương thức được dùng để thực hiện authentication cho Client với Provider.
+Các giá trị được hỗ trợ là *client_secret_basic*, *client_secret_post*, *private_key_jwt*, *client_secret_jwt* và *none* https://tools.ietf.org/html/rfc6749#section-2.1[(các client public)].
+<5> `authorizationGrantType`: OAuth 2.0 Authorization Framework định nghĩa bốn loại https://tools.ietf.org/html/rfc6749#section-1.3[Authorization Grant].
+ Các giá trị được hỗ trợ là `authorization_code`, `client_credentials` và extension grant type `urn:ietf:params:oauth:grant-type:jwt-bearer`.
+<6> `redirectUri`: Redirect URI đã đăng ký của client mà _Authorization Server_ dùng để redirect user-agent của end-user
+  đến đó sau khi end-user đã authentication và cấp quyền truy cập cho client.
+<7> `scopes`: Các scope được client yêu cầu trong flow Authorization Request, chẳng hạn như openid, email hoặc profile.
+<8> `clientName`: Tên mô tả được dùng cho client.
+Tên này có thể được sử dụng trong một số tình huống, chẳng hạn khi hiển thị tên client trên trang đăng nhập được tạo tự động.
+<9> `authorizationUri`: URI của Authorization Endpoint dành cho Authorization Server.
+<10> `tokenUri`: URI của Token Endpoint dành cho Authorization Server.
+<11> `jwkSetUri`: URI được dùng để lấy https://tools.ietf.org/html/rfc7517[JSON Web Key (JWK)] Set từ Authorization Server,
+chứa các khóa mật mã được dùng để xác minh https://tools.ietf.org/html/rfc7515[JSON Web Signature (JWS)] của ID Token và (tùy chọn) UserInfo Response.
+<12> `issuerUri`: Trả về URI định danh issuer của Provider OpenID Connect 1.0 hoặc OAuth 2.0 Authorization Server.
+<13> `configurationMetadata`: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig[Thông tin cấu hình OpenID Provider].
+Thông tin này chỉ khả dụng khi property Spring Boot `spring.security.oauth2.client.provider.[providerId].issuerUri` được cấu hình.
+<14> `(userInfoEndpoint)uri`: URI của UserInfo Endpoint được dùng để truy cập các claim và thuộc tính của end-user đã authentication.
+<15> `(userInfoEndpoint)authenticationMethod`: Phương thức authentication được dùng khi gửi access token đến UserInfo Endpoint.
+Các giá trị được hỗ trợ là *header*, *form* và *query*.
+<16> `userNameAttributeName`: Tên của thuộc tính được trả về trong UserInfo Response, tham chiếu đến Name hoặc Identifier của end-user.
+<17> [[oauth2Client-client-registration-requireProofKey]]`requireProofKey`: Nếu `true` hoặc nếu `clientAuthenticationMethod` là `none` thì PKCE sẽ được bật. Mặc định là `true` cho grant type `authorization_code` và `false` cho các grant type khác.
 
-You can initially configure a `ClientRegistration` by using discovery of an OpenID Connect Provider's https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig[Configuration endpoint] or an Authorization Server's https://tools.ietf.org/html/rfc8414#section-3[Metadata endpoint].
+Bạn có thể cấu hình ban đầu một `ClientRegistration` bằng cách sử dụng cơ chế discovery của https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig[endpoint cấu hình] của OpenID Connect Provider hoặc https://tools.ietf.org/html/rfc8414#section-3[endpoint metadata] của Authorization Server.
 
-`ClientRegistrations` provides convenience methods for configuring a `ClientRegistration` in this way, as follows:
+`ClientRegistrations` cung cấp các method tiện ích để cấu hình `ClientRegistration` theo cách này, như sau:
 
 [tabs]
 ======
@@ -93,31 +93,31 @@ val clientRegistration = ClientRegistrations.fromIssuerLocation("https://idp.exa
 ----
 ======
 
-The preceding code queries, in series, `https://idp.example.com/issuer/.well-known/openid-configuration`, `https://idp.example.com/.well-known/openid-configuration/issuer`, and `https://idp.example.com/.well-known/oauth-authorization-server/issuer`, stopping at the first to return a 200 response.
+Đoạn code trước đó lần lượt truy vấn `https://idp.example.com/issuer/.well-known/openid-configuration`, `https://idp.example.com/.well-known/openid-configuration/issuer` và `https://idp.example.com/.well-known/oauth-authorization-server/issuer`, rồi dừng ở endpoint đầu tiên trả về response 200.
 
-As an alternative, you can use `ClientRegistrations.fromOidcIssuerLocation()` to query only the OpenID Connect Provider's Configuration endpoint.
+Ngoài ra, bạn có thể sử dụng `ClientRegistrations.fromOidcIssuerLocation()` để chỉ query Configuration endpoint của OpenID Connect Provider.
 
 [[oauth2Client-client-registration-repo]]
 == ClientRegistrationRepository
 
-The `ClientRegistrationRepository` serves as a repository for OAuth 2.0 / OpenID Connect 1.0 `ClientRegistration`(s).
+`ClientRegistrationRepository` đóng vai trò repository cho các `ClientRegistration` của OAuth 2.0 / OpenID Connect 1.0.
 
 [NOTE]
 ====
-Client registration information is ultimately stored and owned by the associated Authorization Server.
-This repository provides the ability to retrieve a subset of the primary client registration information, which is stored with the Authorization Server.
+Thông tin đăng ký client cuối cùng được lưu trữ và sở hữu bởi Authorization Server tương ứng.
+Repository này cho phép lấy một tập con của thông tin đăng ký client chính được lưu trữ với Authorization Server.
 ====
 
-Spring Boot auto-configuration binds each of the properties under `spring.security.oauth2.client.registration._[registrationId]_` to an instance of `ClientRegistration` and then composes each of the `ClientRegistration` instance(s) within a `ClientRegistrationRepository`.
+Auto-configuration của Spring Boot bind từng property dưới `spring.security.oauth2.client.registration._[registrationId]_` vào một instance `ClientRegistration`, sau đó tập hợp các instance `ClientRegistration` vào một `ClientRegistrationRepository`.
 
 [NOTE]
 ====
-The default implementation of `ClientRegistrationRepository` is `InMemoryClientRegistrationRepository`.
+Implementation mặc định của `ClientRegistrationRepository` là `InMemoryClientRegistrationRepository`.
 ====
 
-The auto-configuration also registers the `ClientRegistrationRepository` as a `@Bean` in the `ApplicationContext` so that it is available for dependency injection, if needed by the application.
+Auto-configuration cũng đăng ký `ClientRegistrationRepository` dưới dạng `@Bean` trong `ApplicationContext` để application có thể sử dụng nó cho dependency injection nếu cần.
 
-The following listing shows an example:
+Listing sau đây minh họa một ví dụ:
 
 [tabs]
 ======
@@ -169,20 +169,20 @@ class OAuth2ClientController {
 [[oauth2Client-authorized-client]]
 == OAuth2AuthorizedClient
 
-`OAuth2AuthorizedClient` is a representation of an Authorized Client.
-A client is considered to be authorized when the end-user (the Resource Owner) has granted authorization to the client to access its protected resources.
+`OAuth2AuthorizedClient` là biểu diễn của một Authorized Client.
+Một client được xem là đã hoàn tất authorization khi end-user (Resource Owner) đã cấp quyền cho client truy cập các protected resource của mình.
 
-`OAuth2AuthorizedClient` serves the purpose of associating an `OAuth2AccessToken` (and optional `OAuth2RefreshToken`) to a `ClientRegistration` (client) and resource owner, who is the `Principal` end-user that granted the authorization.
+`OAuth2AuthorizedClient` dùng để liên kết một `OAuth2AccessToken` (và `OAuth2RefreshToken` tùy chọn) với một `ClientRegistration` (client) và resource owner, là end-user `Principal` đã cấp quyền.
 
 
 [[oauth2Client-authorized-repo-service]]
-== OAuth2AuthorizedClientRepository and OAuth2AuthorizedClientService
+== OAuth2AuthorizedClientRepository và OAuth2AuthorizedClientService
 
-`OAuth2AuthorizedClientRepository` is responsible for persisting `OAuth2AuthorizedClient`(s) between web requests, whereas the primary role of `OAuth2AuthorizedClientService` is to manage `OAuth2AuthorizedClient`(s) at the application-level.
+`OAuth2AuthorizedClientRepository` chịu trách nhiệm lưu trữ các `OAuth2AuthorizedClient` giữa các web request, trong khi vai trò chính của `OAuth2AuthorizedClientService` là quản lý các `OAuth2AuthorizedClient` ở cấp application.
 
-From a developer perspective, the `OAuth2AuthorizedClientRepository` or `OAuth2AuthorizedClientService` provides the ability to look up an `OAuth2AccessToken` associated with a client so that it can be used to initiate a protected resource request.
+Từ góc nhìn của developer, `OAuth2AuthorizedClientRepository` hoặc `OAuth2AuthorizedClientService` cho phép tra cứu `OAuth2AccessToken` liên kết với một client để token này có thể được dùng khởi tạo request đến protected resource.
 
-The following listing shows an example:
+Listing sau đây minh họa một ví dụ:
 
 [tabs]
 ======
@@ -236,39 +236,39 @@ class OAuth2ClientController {
 
 [NOTE]
 ====
-Spring Boot auto-configuration registers an `OAuth2AuthorizedClientRepository` or an `OAuth2AuthorizedClientService` `@Bean` in the `ApplicationContext`.
-However, the application can override and register a custom `OAuth2AuthorizedClientRepository` or `OAuth2AuthorizedClientService` `@Bean`.
+Auto-configuration của Spring Boot đăng ký một `OAuth2AuthorizedClientRepository` hoặc `OAuth2AuthorizedClientService` `@Bean` trong `ApplicationContext`.
+Tuy nhiên, application có thể override và đăng ký một `OAuth2AuthorizedClientRepository` hoặc `OAuth2AuthorizedClientService` `@Bean` tùy chỉnh.
 ====
 
-The default implementation of `OAuth2AuthorizedClientService` is `InMemoryOAuth2AuthorizedClientService`, which stores `OAuth2AuthorizedClient` objects in-memory.
+Implementation mặc định của `OAuth2AuthorizedClientService` là `InMemoryOAuth2AuthorizedClientService`, lưu trữ các object `OAuth2AuthorizedClient` trong memory.
 
-Alternatively, you can configure the JDBC implementation `JdbcOAuth2AuthorizedClientService` to persist `OAuth2AuthorizedClient` instances in a database.
+Ngoài ra, bạn có thể cấu hình implementation JDBC `JdbcOAuth2AuthorizedClientService` để lưu trữ các instance `OAuth2AuthorizedClient` trong database.
 
 [NOTE]
 ====
-`JdbcOAuth2AuthorizedClientService` depends on the table definition described in xref:servlet/appendix/database-schema.adoc#dbschema-oauth2-client[ OAuth 2.0 Client Schema].
+`JdbcOAuth2AuthorizedClientService` phụ thuộc vào định nghĩa bảng được mô tả trong xref:servlet/appendix/database-schema.adoc#dbschema-oauth2-client[ Schema Client OAuth 2.0].
 ====
 
 
 [[oauth2Client-authorized-manager-provider]]
-== OAuth2AuthorizedClientManager and OAuth2AuthorizedClientProvider
+== OAuth2AuthorizedClientManager và OAuth2AuthorizedClientProvider
 
-The `OAuth2AuthorizedClientManager` is responsible for the overall management of `OAuth2AuthorizedClient`(s).
+`OAuth2AuthorizedClientManager` chịu trách nhiệm quản lý tổng thể các `OAuth2AuthorizedClient`.
 
-The primary responsibilities include:
+Các trách nhiệm chính bao gồm:
 
-* Authorizing (or re-authorizing) an OAuth 2.0 Client, by using an `OAuth2AuthorizedClientProvider`.
-* Delegating the persistence of an `OAuth2AuthorizedClient`, typically by using an `OAuth2AuthorizedClientService` or `OAuth2AuthorizedClientRepository`.
-* Delegating to an `OAuth2AuthorizationSuccessHandler` when an OAuth 2.0 Client has been successfully authorized (or re-authorized).
-* Delegating to an `OAuth2AuthorizationFailureHandler` when an OAuth 2.0 Client fails to authorize (or re-authorize).
+* Thực hiện authorization (hoặc re-authorization) cho một OAuth 2.0 Client bằng cách sử dụng `OAuth2AuthorizedClientProvider`.
+* Ủy quyền việc lưu trữ một `OAuth2AuthorizedClient`, thường bằng cách sử dụng `OAuth2AuthorizedClientService` hoặc `OAuth2AuthorizedClientRepository`.
+* Ủy quyền cho `OAuth2AuthorizationSuccessHandler` khi OAuth 2.0 Client được authorization (hoặc re-authorization) thành công.
+* Ủy quyền cho `OAuth2AuthorizationFailureHandler` khi OAuth 2.0 Client không thể authorization (hoặc re-authorization).
 
-An `OAuth2AuthorizedClientProvider` implements a strategy for authorizing (or re-authorizing) an OAuth 2.0 Client.
-Implementations typically implement an authorization grant type, such as `authorization_code`, `client_credentials`, and others.
+Một `OAuth2AuthorizedClientProvider` triển khai một strategy để authorization (hoặc re-authorization) cho một OAuth 2.0 Client.
+Các implementation thường triển khai một loại authorization grant, chẳng hạn như `authorization_code`, `client_credentials` và các loại khác.
 
-The default implementation of `OAuth2AuthorizedClientManager` is `DefaultOAuth2AuthorizedClientManager`, which is associated with an `OAuth2AuthorizedClientProvider` that may support multiple authorization grant types using a delegation-based composite.
-You can use `OAuth2AuthorizedClientProviderBuilder` to configure and build the delegation-based composite.
+Implementation mặc định của `OAuth2AuthorizedClientManager` là `DefaultOAuth2AuthorizedClientManager`, được liên kết với một `OAuth2AuthorizedClientProvider` có thể hỗ trợ nhiều loại authorization grant bằng một composite dựa trên delegation.
+Bạn có thể sử dụng `OAuth2AuthorizedClientProviderBuilder` để cấu hình và xây dựng composite dựa trên delegation.
 
-The following code shows an example of how to configure and build an `OAuth2AuthorizedClientProvider` composite that provides support for the `authorization_code`, `refresh_token` and `client_credentials` authorization grant types:
+Đoạn code sau minh họa cách cấu hình và xây dựng một composite `OAuth2AuthorizedClientProvider` hỗ trợ các loại authorization grant `authorization_code`, `refresh_token` và `client_credentials`:
 
 [tabs]
 ======
@@ -318,14 +318,14 @@ fun authorizedClientManager(
 ----
 ======
 
-When an authorization attempt succeeds, the `DefaultOAuth2AuthorizedClientManager` delegates to the `OAuth2AuthorizationSuccessHandler`, which (by default) saves the `OAuth2AuthorizedClient` through the `OAuth2AuthorizedClientRepository`.
-In the case of a re-authorization failure (for example, a refresh token is no longer valid), the previously saved `OAuth2AuthorizedClient` is removed from the `OAuth2AuthorizedClientRepository` through the `RemoveAuthorizedClientOAuth2AuthorizationFailureHandler`.
-You can customize the default behavior through `setAuthorizationSuccessHandler(OAuth2AuthorizationSuccessHandler)` and `setAuthorizationFailureHandler(OAuth2AuthorizationFailureHandler)`.
+Khi một lần authorization thành công, `DefaultOAuth2AuthorizedClientManager` ủy quyền cho `OAuth2AuthorizationSuccessHandler`, handler này (theo mặc định) lưu `OAuth2AuthorizedClient` thông qua `OAuth2AuthorizedClientRepository`.
+Trong trường hợp re-authorization thất bại (ví dụ refresh token không còn hợp lệ), `OAuth2AuthorizedClient` đã được lưu trước đó sẽ bị xóa khỏi `OAuth2AuthorizedClientRepository` thông qua `RemoveAuthorizedClientOAuth2AuthorizationFailureHandler`.
+Bạn có thể tùy chỉnh hành vi mặc định thông qua `setAuthorizationSuccessHandler(OAuth2AuthorizationSuccessHandler)` và `setAuthorizationFailureHandler(OAuth2AuthorizationFailureHandler)`.
 
-The `DefaultOAuth2AuthorizedClientManager` is also associated with a `contextAttributesMapper` of type `Function<OAuth2AuthorizeRequest, Map<String, Object>>`, which is responsible for mapping attribute(s) from the `OAuth2AuthorizeRequest` to a `Map` of attributes to be associated to the `OAuth2AuthorizationContext`.
-This can be useful when you need to supply an `OAuth2AuthorizedClientProvider` with required (supported) attribute(s).
+`DefaultOAuth2AuthorizedClientManager` cũng được liên kết với một `contextAttributesMapper` có kiểu `Function<OAuth2AuthorizeRequest, Map<String, Object>>`, chịu trách nhiệm ánh xạ các attribute từ `OAuth2AuthorizeRequest` sang một `Map` các attribute được liên kết với `OAuth2AuthorizationContext`.
+Điều này hữu ích khi bạn cần cung cấp cho `OAuth2AuthorizedClientProvider` các attribute bắt buộc (được hỗ trợ).
 
-The following code shows an example of the `contextAttributesMapper`:
+Đoạn code sau minh họa `contextAttributesMapper`:
 
 [tabs]
 ======
@@ -411,14 +411,14 @@ private fun contextAttributesMapper(): Function<OAuth2AuthorizeRequest, MutableM
 ----
 ======
 
-The `DefaultOAuth2AuthorizedClientManager` is designed to be used _within_ the context of a `HttpServletRequest`.
-When operating _outside_ of a `HttpServletRequest` context, use `AuthorizedClientServiceOAuth2AuthorizedClientManager` instead.
+`DefaultOAuth2AuthorizedClientManager` được thiết kế để sử dụng _bên trong_ context của một `HttpServletRequest`.
+Khi hoạt động _bên ngoài_ context của `HttpServletRequest`, hãy sử dụng `AuthorizedClientServiceOAuth2AuthorizedClientManager` thay thế.
 
-A service application is a common use case for when to use an `AuthorizedClientServiceOAuth2AuthorizedClientManager`.
-Service applications often run in the background, without any user interaction, and typically run under a system-level account instead of a user account.
-An OAuth 2.0 Client configured with the `client_credentials` grant type can be considered a type of service application.
+Service application là một use case phổ biến để sử dụng `AuthorizedClientServiceOAuth2AuthorizedClientManager`.
+Service application thường chạy ở background, không có tương tác của user và thường chạy dưới một system-level account thay vì user account.
+Một OAuth 2.0 Client được cấu hình với grant type `client_credentials` có thể được xem là một loại service application.
 
-The following code shows an example of how to configure an `AuthorizedClientServiceOAuth2AuthorizedClientManager` that provides support for the `client_credentials` grant type:
+Đoạn code sau minh họa cách cấu hình `AuthorizedClientServiceOAuth2AuthorizedClientManager` hỗ trợ grant type `client_credentials`:
 
 [tabs]
 ======
