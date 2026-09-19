@@ -49,7 +49,7 @@ image:{icondir}/number_3.png[] Nếu authentication thất bại thì __Thất b
 
 . xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder] được xóa.
 . `RememberMeServices.loginFail` được gọi.
-Nếu remember me chưa được cấu hình thì đây là no-op.
+Nếu `remember-me` chưa được cấu hình thì đây là no-op.
 Xem interface javadoc:org.springframework.security.web.authentication.RememberMeServices[] trong Javadoc.
 . `AuthenticationEntryPoint` được gọi để kích hoạt việc gửi lại WWW-Authenticate.
 Xem interface javadoc:org.springframework.security.web.AuthenticationEntryPoint[] trong Javadoc.
@@ -59,7 +59,7 @@ image:{icondir}/number_4.png[] Nếu authentication thành công thì __Thành c
 * Mọi `Authentication` đã được authentication trước đó trong xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] được load và các authority của nó được thêm vào xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] được trả về.
 . xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication] được set trên xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder].
 . `RememberMeServices.loginSuccess` được gọi.
-Nếu remember me chưa được cấu hình thì đây là no-op.
+Nếu `remember-me` chưa được cấu hình thì đây là no-op.
 Xem interface javadoc:org.springframework.security.web.authentication.RememberMeServices[] trong Javadoc.
 . `BasicAuthenticationFilter` gọi `FilterChain.doFilter(request,response)` để tiếp tục phần logic còn lại của ứng dụng.
 Xem Class javadoc:org.springframework.security.web.authentication.www.BasicAuthenticationFilter[] trong Javadoc.
