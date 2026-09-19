@@ -1,8 +1,8 @@
 [[test-logout]]
-= Testing Logout
+= Kiểm thử logout
 
-While fairly trivial using standard Spring MVC Test, you can use Spring Security's testing support to make testing log out easier.
-For example, the following `logout` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`] will submit a POST to "/logout" with a valid CSRF token:
+Mặc dù việc này khá đơn giản khi sử dụng Spring MVC Test tiêu chuẩn, bạn có thể sử dụng hỗ trợ kiểm thử của Spring Security để việc kiểm thử logout dễ dàng hơn.
+Ví dụ, `logout` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`] sau sẽ gửi một POST đến "/logout" kèm token CSRF hợp lệ:
 
 [tabs]
 ======
@@ -23,8 +23,8 @@ mvc
 ----
 ======
 
-You can also customize the URL to post to.
-For example, the snippet below will submit a POST to "/signout" with a valid CSRF token:
+Bạn cũng có thể tùy chỉnh URL đích của POST.
+Ví dụ, đoạn mã dưới đây sẽ gửi một POST đến "/signout" kèm token CSRF hợp lệ:
 
 [tabs]
 ======
