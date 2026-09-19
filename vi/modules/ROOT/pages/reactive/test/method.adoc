@@ -1,8 +1,8 @@
 [[test-erms]]
-= Testing Method Security
+= Kiểm thử method security
 
-For example, we can test our example from xref:reactive/authorization/method.adoc#jc-erms[EnableReactiveMethodSecurity] by using the same setup and annotations that we used in xref:servlet/test/method.adoc#test-method[Testing Method Security].
-The following minimal sample shows what we can do:
+Ví dụ, chúng ta có thể kiểm thử ví dụ về xref:reactive/authorization/method.adoc#jc-erms[EnableReactiveMethodSecurity] bằng cách sử dụng cùng thiết lập và các annotation mà chúng ta đã sử dụng trong xref:servlet/test/method.adoc#test-method[Kiểm thử method security].
+Mẫu tối thiểu sau đây cho thấy những gì chúng ta có thể thực hiện:
 
 [tabs]
 ======
