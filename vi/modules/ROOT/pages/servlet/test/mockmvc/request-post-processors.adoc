@@ -1,9 +1,9 @@
 [[test-mockmvc-smmrpp]]
 = SecurityMockMvcRequestPostProcessors
 :page-section-summary-toc: 1
-Spring MVC Test provides a convenient interface (`RequestPostProcessor`) that you can use to modify a request.
-Spring Security provides a number of `RequestPostProcessor` implementations that make testing easier.
-To use Spring Security's `RequestPostProcessor` implementations, use the following static import:
+Spring MVC Test cung cấp một interface thuận tiện (`RequestPostProcessor`) mà bạn có thể sử dụng để sửa đổi request.
+Spring Security cung cấp một số implementation của `RequestPostProcessor` giúp việc testing dễ dàng hơn.
+Để sử dụng các implementation của `RequestPostProcessor` trong Spring Security, hãy sử dụng static import sau:
 
 [tabs]
 ======
