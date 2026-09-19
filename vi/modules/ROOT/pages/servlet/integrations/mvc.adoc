@@ -1,29 +1,29 @@
 [[mvc]]
-= Spring MVC Integration
+= Tích hợp Spring MVC
 
-Spring Security provides a number of optional integrations with Spring MVC.
-This section covers the integration in further detail.
+Spring Security cung cấp một số tích hợp tùy chọn với Spring MVC.
+Phần này trình bày chi tiết hơn về việc tích hợp.
 
 [[mvc-enablewebmvcsecurity]]
 [[mvc-enablewebsecurity]]
 == @EnableWebSecurity
 
-To enable Spring Security integration with Spring MVC, add the `@EnableWebSecurity` annotation to your configuration.
+Để bật việc tích hợp Spring Security với Spring MVC, hãy thêm annotation `@EnableWebSecurity` vào cấu hình của bạn.
 
 [NOTE]
 ====
-Spring Security provides the configuration by using Spring MVC's {spring-framework-reference-url}web/webmvc/mvc-config/customize.html[`WebMvcConfigurer`].
-This means that, if you use more advanced options, such as integrating with `WebMvcConfigurationSupport` directly, you need to manually provide the Spring Security configuration.
+Spring Security cung cấp cấu hình bằng cách sử dụng {spring-framework-reference-url}web/webmvc/mvc-config/customize.html[`WebMvcConfigurer`] của Spring MVC.
+Điều này có nghĩa là nếu bạn sử dụng các tùy chọn nâng cao hơn, chẳng hạn tích hợp trực tiếp với `WebMvcConfigurationSupport`, bạn cần tự cung cấp cấu hình Spring Security.
 ====
 
 [[mvc-requestmatcher]]
 == PathPatternRequestMatcher
 
-Spring Security provides deep integration with how Spring MVC matches on URLs with `PathPatternRequestMatcher`.
-This is helpful to ensure that your Security rules match the logic used to handle your requests.
+Spring Security cung cấp tích hợp sâu với cách Spring MVC so khớp URL bằng `PathPatternRequestMatcher`.
+Điều này giúp đảm bảo các quy tắc Security của bạn khớp với logic được dùng để xử lý các request.
 
-`PathPatternRequestMatcher` must use the same `PathPatternParser` as Spring MVC.
-If you are not customizing the `PathPatternParser`, then you can do:
+`PathPatternRequestMatcher` phải sử dụng cùng `PathPatternParser` với Spring MVC.
+Nếu bạn không tùy chỉnh `PathPatternParser`, bạn có thể làm như sau:
 
 [tabs]
 ======
@@ -55,27 +55,27 @@ Xml::
 ----
 ======
 
-and Spring Security will find the appropriate Spring MVC configuration for you.
+và Spring Security sẽ tìm cấu hình Spring MVC phù hợp cho bạn.
 
-If you *are* customizing Spring MVC's `PathPatternParser` instance, you will need to <<security-mvc-same-application-context, configure Spring Security and Spring MVC in the same `ApplicationContext`>>.
+Nếu bạn *có* tùy chỉnh instance `PathPatternParser` của Spring MVC, bạn sẽ cần <<security-mvc-same-application-context, cấu hình Spring Security và Spring MVC trong cùng một `ApplicationContext`>>.
 
 [NOTE]
 ====
-We always recommend that you provide authorization rules by matching on the `HttpServletRequest` and method security.
+Chúng tôi luôn khuyến nghị bạn cung cấp các quy tắc authorization bằng cách so khớp trên `HttpServletRequest` và method security.
 
-Providing authorization rules by matching on `HttpServletRequest` is good, because it happens very early in the code path and helps reduce the https://en.wikipedia.org/wiki/Attack_surface[attack surface].
-Method security ensures that, if someone has bypassed the web authorization rules, your application is still secured.
-This is known as https://en.wikipedia.org/wiki/Defense_in_depth_(computing)[Defense in Depth]
+Việc cung cấp các quy tắc authorization bằng cách so khớp trên `HttpServletRequest` là hữu ích, vì việc này diễn ra rất sớm trong code path và giúp giảm https://en.wikipedia.org/wiki/Attack_surface[bề mặt tấn công].
+Method security đảm bảo rằng nếu ai đó đã vượt qua các quy tắc web authorization, ứng dụng của bạn vẫn được bảo vệ.
+Điều này được gọi là https://en.wikipedia.org/wiki/Defense_in_depth_(computing)[Defense in Depth]
 ====
 
-Now that Spring MVC is integrated with Spring Security, you are ready to write some xref:servlet/authorization/authorize-http-requests.adoc[authorization rules] that will use `PathPatternRequestMatcher`.
+Giờ đây Spring MVC đã được tích hợp với Spring Security, bạn đã sẵn sàng viết một số xref:servlet/authorization/authorize-http-requests.adoc[quy tắc authorization] sử dụng `PathPatternRequestMatcher`.
 
 [[mvc-authentication-principal]]
 == @AuthenticationPrincipal
 
-Spring Security provides `AuthenticationPrincipalArgumentResolver`, which can automatically resolve the current `Authentication.getPrincipal()` for Spring MVC arguments.
-By using `@EnableWebSecurity`, you automatically have this added to your Spring MVC configuration.
-If you use XML-based configuration, you must add this yourself:
+Spring Security cung cấp `AuthenticationPrincipalArgumentResolver`, có thể tự động resolve `Authentication.getPrincipal()` hiện tại cho các argument của Spring MVC.
+Khi sử dụng `@EnableWebSecurity`, thành phần này sẽ tự động được thêm vào cấu hình Spring MVC của bạn.
+Nếu sử dụng cấu hình dựa trên XML, bạn phải tự thêm thành phần này:
 
 [source,xml]
 ----
@@ -86,9 +86,9 @@ If you use XML-based configuration, you must add this yourself:
 </mvc:annotation-driven>
 ----
 
-Once you have properly configured `AuthenticationPrincipalArgumentResolver`, you can entirely decouple from Spring Security in your Spring MVC layer.
+Sau khi đã cấu hình đúng `AuthenticationPrincipalArgumentResolver`, bạn có thể hoàn toàn tách Spring Security khỏi layer Spring MVC của mình.
 
-Consider a situation where a custom `UserDetailsService` returns an `Object` that implements `UserDetails` and your own `CustomUser` `Object`. The `CustomUser` of the currently authenticated user could be accessed by using the following code:
+Hãy xét tình huống một `UserDetailsService` tùy chỉnh trả về một `Object` triển khai `UserDetails` và `Object` `CustomUser` của riêng bạn. Có thể truy cập `CustomUser` của user đã authentication hiện tại bằng đoạn code sau:
 
 [tabs]
 ======
@@ -120,7 +120,7 @@ open fun findMessagesForUser(): ModelAndView {
 ----
 ======
 
-As of Spring Security 3.2, we can resolve the argument more directly by adding an annotation:
+Kể từ Spring Security 3.2, chúng ta có thể resolve argument trực tiếp hơn bằng cách thêm một annotation:
 
 [tabs]
 ======
@@ -151,9 +151,9 @@ open fun findMessagesForUser(@AuthenticationPrincipal customUser: CustomUser?): 
 ----
 ======
 
-Sometimes, you may need to transform the principal in some way.
-For example, if `CustomUser` needed to be final, it could not be extended.
-In this situation, the `UserDetailsService` might return an `Object` that implements `UserDetails` and provides a method named `getCustomUser` to access `CustomUser`:
+Đôi khi bạn có thể cần biến đổi principal theo một cách nào đó.
+Ví dụ, nếu `CustomUser` cần là final thì nó không thể được kế thừa.
+Trong tình huống này, `UserDetailsService` có thể trả về một `Object` triển khai `UserDetails` và cung cấp method có tên `getCustomUser` để truy cập `CustomUser`:
 
 [tabs]
 ======
@@ -184,7 +184,7 @@ class CustomUserUserDetails(
 ----
 ======
 
-We could then access the `CustomUser` by using a {spring-framework-reference-url}core/expressions.html[SpEL expression] that uses `Authentication.getPrincipal()` as the root object:
+Sau đó chúng ta có thể truy cập `CustomUser` bằng cách sử dụng {spring-framework-reference-url}core/expressions.html[biểu thức SpEL] lấy `Authentication.getPrincipal()` làm root object:
 
 [tabs]
 ======
@@ -219,8 +219,8 @@ open fun findMessagesForUser(@AuthenticationPrincipal(expression = "customUser")
 ----
 ======
 
-We can also refer to beans in our SpEL expressions.
-For example, we could use the following if we were using JPA to manage our users and if we wanted to modify and save a property on the current user:
+Chúng ta cũng có thể tham chiếu đến các bean trong biểu thức SpEL.
+Ví dụ, chúng ta có thể sử dụng đoạn sau nếu dùng JPA để quản lý user và muốn sửa đổi rồi lưu một property trên user hiện tại:
 
 [tabs]
 ======
@@ -265,13 +265,13 @@ open fun updateName(
 ----
 ======
 
-We can further remove our dependency on Spring Security by making `@AuthenticationPrincipal` a meta-annotation on our own annotation.
-The next example demonstrates how we could do so on an annotation named `@CurrentUser`.
+Chúng ta có thể loại bỏ thêm dependency vào Spring Security bằng cách biến `@AuthenticationPrincipal` thành meta-annotation trên annotation của riêng mình.
+Ví dụ tiếp theo minh họa cách thực hiện điều này trên annotation có tên `@CurrentUser`.
 
 [NOTE]
 ====
-To remove the dependency on Spring Security, it is the consuming application that would create `@CurrentUser`.
-This step is not strictly required but assists in isolating your dependency to Spring Security to a more central location.
+Để loại bỏ dependency vào Spring Security, chính consuming application sẽ tạo `@CurrentUser`.
+Bước này không bắt buộc nghiêm ngặt nhưng giúp cô lập dependency của bạn vào Spring Security ở một vị trí tập trung hơn.
 ====
 
 [tabs]
@@ -299,8 +299,8 @@ annotation class CurrentUser
 ----
 ======
 
-We have isolated our dependency on Spring Security to a single file.
-Now that `@CurrentUser` has been specified, we can use it to signal to resolve our `CustomUser` of the currently authenticated user:
+Chúng ta đã cô lập dependency vào Spring Security trong một file duy nhất.
+Giờ đây `@CurrentUser` đã được xác định, chúng ta có thể dùng nó để báo rằng cần resolve `CustomUser` của user đã authentication hiện tại:
 
 [tabs]
 ======
@@ -327,10 +327,10 @@ open fun findMessagesForUser(@CurrentUser customUser: CustomUser?): ModelAndView
 ----
 ======
 
-Once it is a meta-annotation, parameterization is also available to you.
+Khi đã là một meta-annotation, bạn cũng có thể truyền parameter cho nó.
 
-For example, consider when you have a JWT as your principal and you want to say which claim to retrieve.
-As a meta-annotation, you might do:
+Ví dụ, hãy xét trường hợp bạn có JWT làm principal và muốn chỉ định claim nào cần truy xuất.
+Là một meta-annotation, bạn có thể viết như sau:
 
 [tabs]
 ======
@@ -357,10 +357,10 @@ annotation class CurrentUser
 ----
 ======
 
-which is already quite powerful.
-But, it is also limited to retrieving the `sub` claim.
+Điều này đã khá mạnh.
+Tuy nhiên, nó cũng bị giới hạn ở việc truy xuất claim `sub`.
 
-To make this more flexible, first publish the `AnnotationTemplateExpressionDefaults` bean like so:
+Để linh hoạt hơn, trước tiên hãy publish bean `AnnotationTemplateExpressionDefaults` như sau:
 
 [tabs]
 ======
@@ -392,7 +392,7 @@ Xml::
 ----
 ======
 
-and then you can supply a parameter to `@CurrentUser` like so:
+và sau đó bạn có thể cung cấp parameter cho `@CurrentUser` như sau:
 
 [tabs]
 ======
@@ -421,7 +421,7 @@ annotation class CurrentUser(val claim: String = "sub")
 ----
 ======
 
-This will allow you more flexibility across your set of applications in the following way:
+Điều này cho phép bạn linh hoạt hơn giữa các application của mình theo cách sau:
 
 [tabs]
 ======
@@ -451,9 +451,9 @@ open fun findMessagesForUser(@CurrentUser("user_id") userId: String?): ModelAndV
 [[mvc-current-security-context]]
 == @CurrentSecurityContext
 
-Spring Security provides `CurrentSecurityContextArgumentResolver`, which can automatically resolve the current `SecurityContext` for Spring MVC arguments.
-By using `@EnableWebSecurity`, you automatically have this added to your Spring MVC configuration.
-If you use XML-based configuration, you must add this yourself:
+Spring Security cung cấp `CurrentSecurityContextArgumentResolver`, có thể tự động resolve `SecurityContext` hiện tại cho các argument của Spring MVC.
+Khi sử dụng `@EnableWebSecurity`, thành phần này sẽ tự động được thêm vào cấu hình Spring MVC của bạn.
+Nếu sử dụng cấu hình dựa trên XML, bạn phải tự thêm thành phần này:
 
 [source,xml]
 ----
@@ -464,7 +464,7 @@ If you use XML-based configuration, you must add this yourself:
 </mvc:annotation-driven>
 ----
 
-Once `CurrentSecurityContextArgumentResolver` is configured, you can access the `SecurityContext` directly:
+Sau khi cấu hình `CurrentSecurityContextArgumentResolver`, bạn có thể truy cập trực tiếp `SecurityContext`:
 
 [tabs]
 ======
@@ -489,7 +489,7 @@ fun me(@CurrentSecurityContext context: SecurityContext): String {
 ----
 ======
 
-You can also use a SpEL expression that is rooted at the `SecurityContext`:
+Bạn cũng có thể sử dụng biểu thức SpEL có root là `SecurityContext`:
 
 [tabs]
 ======
@@ -515,11 +515,11 @@ fun me(@CurrentSecurityContext(expression = "authentication") authentication: Au
 ======
 
 [[mvc-async]]
-== Spring MVC Async Integration
+== Tích hợp Async của Spring MVC
 
-Spring Web MVC 3.2+ has excellent support for {spring-framework-reference-url}web/webmvc/mvc-ann-async.html[Asynchronous Request Processing].
-With no additional configuration, Spring Security automatically sets up the `SecurityContext` to the `Thread` that invokes a `Callable` returned by your controllers.
-For example, the following method automatically has its `Callable` invoked with the `SecurityContext` that was available when the `Callable` was created:
+Spring Web MVC 3.2+ hỗ trợ rất tốt {spring-framework-reference-url}web/webmvc/mvc-ann-async.html[xử lý request bất đồng bộ].
+Không cần cấu hình bổ sung, Spring Security tự động thiết lập `SecurityContext` cho `Thread` gọi một `Callable` được controller của bạn trả về.
+Ví dụ, method sau đây tự động có `Callable` được gọi với `SecurityContext` đã có tại thời điểm `Callable` được tạo:
 
 [tabs]
 ======
@@ -554,26 +554,26 @@ open fun processUpload(file: MultipartFile?): Callable<String> {
 ======
 
 
-.Associating SecurityContext to Callable's
+.Liên kết SecurityContext với các Callable
 [NOTE]
 ====
-More technically speaking, Spring Security integrates with `WebAsyncManager`.
-The `SecurityContext` that is used to process the `Callable` is the `SecurityContext` that exists on the `SecurityContextHolder` when `startCallableProcessing` is invoked.
+Nói chính xác hơn về mặt kỹ thuật, Spring Security tích hợp với `WebAsyncManager`.
+`SecurityContext` được dùng để xử lý `Callable` là `SecurityContext` tồn tại trên `SecurityContextHolder` khi `startCallableProcessing` được gọi.
 ====
 
-There is no automatic integration with a `DeferredResult` that is returned by controllers.
-This is because `DeferredResult` is processed by the users and, thus, there is no way of automatically integrating with it.
-However, you can still use xref:features/integrations/concurrency.adoc#concurrency[Concurrency Support] to provide transparent integration with Spring Security.
+Không có tích hợp tự động với `DeferredResult` được controller trả về.
+Điều này là vì `DeferredResult` được user xử lý, do đó không có cách nào tích hợp tự động với nó.
+Tuy nhiên, bạn vẫn có thể sử dụng xref:features/integrations/concurrency.adoc#concurrency[Hỗ trợ Concurrency] để cung cấp tích hợp minh bạch với Spring Security.
 
 [[mvc-csrf]]
-== Spring MVC and CSRF Integration
+== Tích hợp Spring MVC và CSRF
 
-Spring Security integrates with Spring MVC to add CSRF protection.
+Spring Security tích hợp với Spring MVC để bổ sung cơ chế bảo vệ CSRF.
 
-=== Automatic Token Inclusion
+=== Tự động đưa Token vào
 
-Spring Security automatically xref:servlet/exploits/csrf.adoc#csrf-integration-form[include the CSRF Token] within forms that use the {spring-framework-reference-url}web/webmvc-view/mvc-jsp.html#mvc-view-jsp-formtaglib-formtag[Spring MVC form tag].
-Consider the following JSP:
+Spring Security tự động xref:servlet/exploits/csrf.adoc#csrf-integration-form[đưa CSRF Token vào] các form sử dụng {spring-framework-reference-url}web/webmvc-view/mvc-jsp.html#mvc-view-jsp-formtaglib-formtag[form tag của Spring MVC].
+Hãy xét JSP sau:
 
 [source,xml]
 ----
@@ -599,7 +599,7 @@ Consider the following JSP:
 </jsp:root>
 ----
 
-The preceding example output HTMLs that is similar to the following:
+Ví dụ trên xuất ra HTML tương tự như sau:
 
 [source,xml]
 ----
@@ -614,13 +614,13 @@ The preceding example output HTMLs that is similar to the following:
 ----
 
 [[mvc-csrf-resolver]]
-=== Resolving the CsrfToken
+=== Resolve CsrfToken
 
-Spring Security provides `CsrfTokenArgumentResolver`, which can automatically resolve the current `CsrfToken` for Spring MVC arguments.
-By using xref:servlet/configuration/java.adoc#jc-hello-wsca[@EnableWebSecurity], you automatically have this added to your Spring MVC configuration.
-If you use XML-based configuration, you must add this yourself.
+Spring Security cung cấp `CsrfTokenArgumentResolver`, có thể tự động resolve `CsrfToken` hiện tại cho các argument của Spring MVC.
+Khi sử dụng xref:servlet/configuration/java.adoc#jc-hello-wsca[@EnableWebSecurity], thành phần này sẽ tự động được thêm vào cấu hình Spring MVC của bạn.
+Nếu sử dụng cấu hình dựa trên XML, bạn phải tự thêm thành phần này.
 
-Once `CsrfTokenArgumentResolver` is properly configured, you can expose the `CsrfToken` to your static HTML based application:
+Sau khi cấu hình đúng `CsrfTokenArgumentResolver`, bạn có thể expose `CsrfToken` cho application dựa trên HTML tĩnh của mình:
 
 [tabs]
 ======
@@ -652,17 +652,17 @@ class CsrfController {
 ----
 ======
 
-It is important to keep the `CsrfToken` a secret from other domains.
-This means that, if you use https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS[Cross Origin Sharing (CORS)], you should *NOT* expose the `CsrfToken` to any external domains.
+Điều quan trọng là phải giữ bí mật `CsrfToken` với các domain khác.
+Điều này có nghĩa là nếu sử dụng https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS[Cross Origin Sharing (CORS)], bạn *KHÔNG* nên expose `CsrfToken` cho bất kỳ domain bên ngoài nào.
 
 [[security-mvc-same-application-context]]
-== Configuring Spring MVC and Spring Security in the Same Application Context
+== Cấu hình Spring MVC và Spring Security trong cùng một Application Context
 
-If you are using Boot, Spring MVC and Spring Security are in the same application context by default.
+Nếu sử dụng Boot, theo mặc định Spring MVC và Spring Security nằm trong cùng một application context.
 
-Otherwise, for Java Config, including both `@EnableWebMvc` and `@EnableWebSecurity` will construct Spring Security and Spring MVC components in the same context.
+Nếu không, đối với Java Config, việc bao gồm cả `@EnableWebMvc` và `@EnableWebSecurity` sẽ tạo các component của Spring Security và Spring MVC trong cùng context.
 
-Of, if you are using ``ServletListener``s you can do:
+Hoặc nếu sử dụng ``ServletListener``s, bạn có thể làm như sau:
 
 [tabs]
 ======
@@ -714,7 +714,7 @@ class SecurityInitializer : AbstractAnnotationConfigDispatcherServletInitializer
 ----
 ======
 
-And finally for a `web.xml` file, you configure the `DispatcherServlet` like so:
+Cuối cùng, đối với file `web.xml`, bạn cấu hình `DispatcherServlet` như sau:
 
 [source,xml]
 ----
@@ -744,5 +744,5 @@ And finally for a `web.xml` file, you configure the `DispatcherServlet` like so:
 </servlet-mapping>
 ----
 
-The following `WebSecurityConfiguration` in placed in the  `ApplicationContext` of the `DispatcherServlet`.
+`WebSecurityConfiguration` sau đây được đặt trong `ApplicationContext` của `DispatcherServlet`.
 
