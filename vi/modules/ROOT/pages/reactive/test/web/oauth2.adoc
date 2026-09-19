@@ -1,9 +1,9 @@
 [[webflux-testing-oauth2]]
-= Testing OAuth 2.0
+= Kiểm thử OAuth 2.0
 
-When it comes to OAuth 2.0, xref:reactive/test/method.adoc#test-erms[the same principles covered earlier still apply]: Ultimately, it depends on what your method under test is expecting to be in the `SecurityContextHolder`.
+Đối với OAuth 2.0, xref:reactive/test/method.adoc#test-erms[các nguyên tắc đã trình bày trước đó vẫn được áp dụng]: Cuối cùng, điều này phụ thuộc vào những gì method đang được kiểm thử mong đợi có trong `SecurityContextHolder`.
 
-Consider the following example of a controller:
+Xét ví dụ sau về một controller:
 
 [tabs]
 ======
@@ -28,9 +28,9 @@ fun foo(user: Principal): Mono<String> {
 ----
 ======
 
-Nothing about it is OAuth2-specific, so you can xref:reactive/test/method.adoc#test-erms[use `@WithMockUser`] and be fine.
+Không có gì trong đó dành riêng cho OAuth2, vì vậy bạn có thể xref:reactive/test/method.adoc#test-erms[sử dụng `@WithMockUser`] mà không gặp vấn đề gì.
 
-However, consider a case where your controller is bound to some aspect of Spring Security's OAuth 2.0 support:
+Tuy nhiên, hãy xét trường hợp controller của bạn gắn với một khía cạnh nào đó trong phần hỗ trợ OAuth 2.0 của Spring Security:
 
 [tabs]
 ======
@@ -55,15 +55,15 @@ fun foo(@AuthenticationPrincipal user: OidcUser): Mono<String> {
 ----
 ======
 
-In that case, Spring Security's test support is handy.
+Trong trường hợp đó, phần hỗ trợ kiểm thử của Spring Security rất hữu ích.
 
 [[webflux-testing-oidc-login]]
-== Testing OIDC Login
+== Kiểm thử đăng nhập OIDC
 
-Testing the method shown in the <<webflux-testing-oauth2,preceding section>> with `WebTestClient` requires simulating some kind of grant flow with an authorization server.
-This is a daunting task, which is why Spring Security ships with support for removing this boilerplate.
+Kiểm thử method được trình bày trong <<webflux-testing-oauth2,phần trước>> bằng `WebTestClient` yêu cầu mô phỏng một dạng grant flow nào đó với một authorization server.
+Đây là một nhiệm vụ khó khăn, đó là lý do Spring Security cung cấp phần hỗ trợ để loại bỏ boilerplate này.
 
-For example, we can tell Spring Security to include a default `OidcUser` by using the `SecurityMockServerConfigurers#oidcLogin` method:
+Ví dụ, chúng ta có thể yêu cầu Spring Security bao gồm một `OidcUser` mặc định bằng cách sử dụng method `SecurityMockServerConfigurers#oidcLogin`:
 
 [tabs]
 ======
@@ -86,9 +86,9 @@ client
 ----
 ======
 
-That line configures the associated `MockServerRequest` with an `OidcUser` that includes a simple `OidcIdToken`, an `OidcUserInfo`, and a `Collection` of granted authorities.
+Dòng đó cấu hình `MockServerRequest` liên kết với một `OidcUser` bao gồm một `OidcIdToken` đơn giản, một `OidcUserInfo` và một `Collection` các authority được cấp.
 
-Specifically, it includes an `OidcIdToken` with a `sub` claim set to `user`:
+Cụ thể, nó bao gồm một `OidcIdToken` có claim `sub` được đặt thành `user`:
 
 [tabs]
 ======
@@ -107,7 +107,7 @@ assertThat(user.idToken.getClaim<String>("sub")).isEqualTo("user")
 ----
 ======
 
-It also includes an `OidcUserInfo` with no claims set:
+Nó cũng bao gồm một `OidcUserInfo` không có claim nào được thiết lập:
 
 [tabs]
 ======
@@ -126,7 +126,7 @@ assertThat(user.userInfo.claims).isEmpty()
 ----
 ======
 
-It also includes a `Collection` of authorities with just one authority, `SCOPE_read`:
+Nó cũng bao gồm một `Collection` authority chỉ có một authority là `SCOPE_read`:
 
 [tabs]
 ======
@@ -147,17 +147,17 @@ assertThat(user.authorities).containsExactly(SimpleGrantedAuthority("SCOPE_read"
 ----
 ======
 
-Spring Security makes sure that the `OidcUser` instance is available forxref:servlet/integrations/mvc.adoc#mvc-authentication-principal[the `@AuthenticationPrincipal` annotation].
+Spring Security đảm bảo instance `OidcUser` khả dụng cho xref:servlet/integrations/mvc.adoc#mvc-authentication-principal[annotation `@AuthenticationPrincipal`].
 
-Further, it also links the `OidcUser` to a simple instance of `OAuth2AuthorizedClient` that it deposits into a mock `ServerOAuth2AuthorizedClientRepository`.
-This can be handy if your tests <<webflux-testing-oauth2-client,use the `@RegisteredOAuth2AuthorizedClient` annotation>>..
+Ngoài ra, nó còn liên kết `OidcUser` với một instance đơn giản của `OAuth2AuthorizedClient` mà nó đặt vào một `ServerOAuth2AuthorizedClientRepository` giả lập.
+Điều này có thể hữu ích nếu các kiểm thử của bạn <<webflux-testing-oauth2-client,sử dụng annotation `@RegisteredOAuth2AuthorizedClient`>>.
 
 [[webflux-testing-oidc-login-authorities]]
-=== Configuring Authorities
+=== Cấu hình authority
 
-In many circumstances, your method is protected by filter or method security and needs your `Authentication` to have certain granted authorities to allow the request.
+Trong nhiều trường hợp, method của bạn được bảo vệ bởi filter hoặc method security và cần `Authentication` có một số authority được cấp nhất định để cho phép request.
 
-In those cases, you can supply what granted authorities you need by using the `authorities()` method:
+Trong những trường hợp đó, bạn có thể cung cấp các authority được cấp cần thiết bằng cách sử dụng method `authorities()`:
 
 [tabs]
 ======
@@ -185,12 +185,12 @@ client
 ======
 
 [[webflux-testing-oidc-login-claims]]
-=== Configuring Claims
+=== Cấu hình claim
 
-While granted authorities are common across all of Spring Security, we also have claims in the case of OAuth 2.0.
+Mặc dù authority được cấp là thành phần phổ biến trong toàn bộ Spring Security, OAuth 2.0 cũng có các claim.
 
-Suppose, for example, that you have a `user_id` claim that indicates the user's ID in your system.
-You might access it as follows in a controller:
+Ví dụ, giả sử bạn có claim `user_id` cho biết ID của user trong hệ thống.
+Bạn có thể truy cập claim đó trong controller như sau:
 
 [tabs]
 ======
@@ -217,7 +217,7 @@ fun foo(@AuthenticationPrincipal oidcUser: OidcUser): Mono<String> {
 ----
 ======
 
-In that case, you can specify that claim with the `idToken()` method:
+Trong trường hợp đó, bạn có thể chỉ định claim bằng method `idToken()`:
 
 [tabs]
 ======
@@ -244,23 +244,23 @@ client
 ----
 ======
 
-That works because `OidcUser` collects its claims from `OidcIdToken`.
+Điều này hoạt động vì `OidcUser` lấy các claim của nó từ `OidcIdToken`.
 
 [[webflux-testing-oidc-login-user]]
-=== Additional Configurations
+=== Cấu hình bổ sung
 
-There are additional methods, too, for further configuring the authentication, depending on what data your controller expects:
+Ngoài ra còn có các method để cấu hình thêm authentication, tùy thuộc vào dữ liệu mà controller của bạn mong đợi:
 
-* `userInfo(OidcUserInfo.Builder)`: Configures the `OidcUserInfo` instance
-* `clientRegistration(ClientRegistration)`: Configures the associated `OAuth2AuthorizedClient` with a given `ClientRegistration`
-* `oidcUser(OidcUser)`: Configures the complete `OidcUser` instance
+* `userInfo(OidcUserInfo.Builder)`: Cấu hình instance `OidcUserInfo`
+* `clientRegistration(ClientRegistration)`: Cấu hình `OAuth2AuthorizedClient` liên kết với một `ClientRegistration` được cung cấp
+* `oidcUser(OidcUser)`: Cấu hình instance `OidcUser` hoàn chỉnh
 
-That last one is handy if you:
-* Have your own implementation of `OidcUser` or
-* Need to change the name attribute
+Method cuối cùng hữu ích nếu bạn:
+* Có implementation riêng của `OidcUser` hoặc
+* Cần thay đổi attribute name
 
-For example, suppose that your authorization server sends the principal name in the `user_name` claim instead of the `sub` claim.
-In that case, you can configure an `OidcUser` by hand:
+Ví dụ, giả sử authorization server của bạn gửi tên principal trong claim `user_name` thay vì claim `sub`.
+Trong trường hợp đó, bạn có thể tự cấu hình một `OidcUser`:
 
 [tabs]
 ======
@@ -295,12 +295,12 @@ client
 ======
 
 [[webflux-testing-oauth2-login]]
-== Testing OAuth 2.0 Login
+== Kiểm thử đăng nhập OAuth 2.0
 
-As with <<webflux-testing-oidc-login,testing OIDC login>>, testing OAuth 2.0 Login presents a similar challenge: mocking a grant flow.
-Because of that, Spring Security also has test support for non-OIDC use cases.
+Tương tự <<webflux-testing-oidc-login,kiểm thử đăng nhập OIDC>>, việc kiểm thử đăng nhập OAuth 2.0 cũng có một thách thức tương tự: giả lập một grant flow.
+Vì vậy, Spring Security cũng có phần hỗ trợ kiểm thử cho các trường hợp không dùng OIDC.
 
-Suppose that we have a controller that gets the logged-in user as an `OAuth2User`:
+Giả sử chúng ta có một controller lấy user đã đăng nhập dưới dạng `OAuth2User`:
 
 [tabs]
 ======
@@ -325,7 +325,7 @@ fun foo(@AuthenticationPrincipal oauth2User: OAuth2User): Mono<String> {
 ----
 ======
 
-In that case, we can tell Spring Security to include a default `OAuth2User` by using the `SecurityMockServerConfigurers#oauth2User` method:
+Trong trường hợp đó, chúng ta có thể yêu cầu Spring Security bao gồm một `OAuth2User` mặc định bằng cách sử dụng method `SecurityMockServerConfigurers#oauth2User`:
 
 [tabs]
 ======
@@ -348,9 +348,9 @@ client
 ----
 ======
 
-The preceding example configures the associated `MockServerRequest` with an `OAuth2User` that includes a simple `Map` of attributes and a `Collection` of granted authorities.
+Ví dụ trước cấu hình `MockServerRequest` liên kết với một `OAuth2User` bao gồm một `Map` attribute đơn giản và một `Collection` các authority được cấp.
 
-Specifically, it includes a `Map` with a key/value pair of `sub`/`user`:
+Cụ thể, nó bao gồm một `Map` có cặp key/value `sub`/`user`:
 
 [tabs]
 ======
@@ -369,7 +369,7 @@ assertThat(user.getAttribute<String>("sub")).isEqualTo("user")
 ----
 ======
 
-It also includes a `Collection` of authorities with just one authority, `SCOPE_read`:
+Nó cũng bao gồm một `Collection` authority chỉ có một authority là `SCOPE_read`:
 
 [tabs]
 ======
@@ -390,17 +390,17 @@ assertThat(user.authorities).containsExactly(SimpleGrantedAuthority("SCOPE_read"
 ----
 ======
 
-Spring Security does the necessary work to make sure that the `OAuth2User` instance is available for xref:servlet/integrations/mvc.adoc#mvc-authentication-principal[the `@AuthenticationPrincipal` annotation].
+Spring Security thực hiện các công việc cần thiết để đảm bảo instance `OAuth2User` khả dụng cho xref:servlet/integrations/mvc.adoc#mvc-authentication-principal[annotation `@AuthenticationPrincipal`].
 
-Further, it also links that `OAuth2User` to a simple instance of `OAuth2AuthorizedClient` that it deposits in a mock `ServerOAuth2AuthorizedClientRepository`.
-This can be handy if your tests <<webflux-testing-oauth2-client,use the `@RegisteredOAuth2AuthorizedClient` annotation>>.
+Ngoài ra, nó còn liên kết `OAuth2User` đó với một instance đơn giản của `OAuth2AuthorizedClient` mà nó đặt vào một `ServerOAuth2AuthorizedClientRepository` giả lập.
+Điều này có thể hữu ích nếu các kiểm thử của bạn <<webflux-testing-oauth2-client,sử dụng annotation `@RegisteredOAuth2AuthorizedClient`>>.
 
 [[webflux-testing-oauth2-login-authorities]]
-=== Configuring Authorities
+=== Cấu hình authority
 
-In many circumstances, your method is protected by filter or method security and needs your `Authentication` to have certain granted authorities to allow the request.
+Trong nhiều trường hợp, method của bạn được bảo vệ bởi filter hoặc method security và cần `Authentication` có một số authority được cấp nhất định để cho phép request.
 
-In this case, you can supply the granted authorities you need by using the `authorities()` method:
+Trong trường hợp này, bạn có thể cung cấp các authority được cấp cần thiết bằng cách sử dụng method `authorities()`:
 
 [tabs]
 ======
@@ -428,12 +428,12 @@ client
 ======
 
 [[webflux-testing-oauth2-login-claims]]
-=== Configuring Claims
+=== Cấu hình claim
 
-While granted authorities are quite common across all of Spring Security, we also have claims in the case of OAuth 2.0.
+Mặc dù authority được cấp khá phổ biến trong toàn bộ Spring Security, OAuth 2.0 cũng có các claim.
 
-Suppose, for example, that you have a `user_id` attribute that indicates the user's ID in your system.
-You might access it as follows in a controller:
+Ví dụ, giả sử bạn có attribute `user_id` cho biết ID của user trong hệ thống.
+Bạn có thể truy cập attribute đó trong controller như sau:
 
 [tabs]
 ======
@@ -460,7 +460,7 @@ fun foo(@AuthenticationPrincipal oauth2User: OAuth2User): Mono<String> {
 ----
 ======
 
-In that case, you can specify that attribute with the `attributes()` method:
+Trong trường hợp đó, bạn có thể chỉ định attribute bằng method `attributes()`:
 
 [tabs]
 ======
@@ -488,19 +488,19 @@ client
 ======
 
 [[webflux-testing-oauth2-login-user]]
-=== Additional Configurations
+=== Cấu hình bổ sung
 
-There are additional methods, too, for further configuring the authentication, depending on what data your controller expects:
+Ngoài ra còn có các method để cấu hình thêm authentication, tùy thuộc vào dữ liệu mà controller của bạn mong đợi:
 
-* `clientRegistration(ClientRegistration)`: Configures the associated `OAuth2AuthorizedClient` with a given `ClientRegistration`
-* `oauth2User(OAuth2User)`: Configures the complete `OAuth2User` instance
+* `clientRegistration(ClientRegistration)`: Cấu hình `OAuth2AuthorizedClient` liên kết với một `ClientRegistration` được cung cấp
+* `oauth2User(OAuth2User)`: Cấu hình instance `OAuth2User` hoàn chỉnh
 
-That last one is handy if you:
-* Have your own implementation of `OAuth2User` or
-* Need to change the name attribute
+Method cuối cùng hữu ích nếu bạn:
+* Có implementation riêng của `OAuth2User` hoặc
+* Cần thay đổi attribute name
 
-For example, suppose that your authorization server sends the principal name in the `user_name` claim instead of the `sub` claim.
-In that case, you can configure an `OAuth2User` by hand:
+Ví dụ, giả sử authorization server của bạn gửi tên principal trong claim `user_name` thay vì claim `sub`.
+Trong trường hợp đó, bạn có thể tự cấu hình một `OAuth2User`:
 
 [tabs]
 ======
@@ -535,10 +535,10 @@ client
 ======
 
 [[webflux-testing-oauth2-client]]
-== Testing OAuth 2.0 Clients
+== Kiểm thử OAuth 2.0 Client
 
-Independent of how your user authenticates, you may have other tokens and client registrations that are in play for the request you are testing.
-For example, your controller may rely on the client credentials grant to get a token that is not associated with the user at all:
+Bất kể user của bạn authentication như thế nào, request đang được kiểm thử có thể sử dụng các token và client registration khác.
+Ví dụ, controller của bạn có thể dựa vào client credentials grant để lấy một token hoàn toàn không liên kết với user:
 
 [tabs]
 ======
@@ -573,8 +573,8 @@ fun foo(@RegisteredOAuth2AuthorizedClient("my-app") authorizedClient: OAuth2Auth
 ----
 ======
 
-Simulating this handshake with the authorization server can be cumbersome.
-Instead, you can use `SecurityMockServerConfigurers#oauth2Client` to add a `OAuth2AuthorizedClient` to a mock `ServerOAuth2AuthorizedClientRepository`:
+Mô phỏng quá trình bắt tay này với authorization server có thể khá rườm rà.
+Thay vào đó, bạn có thể sử dụng `SecurityMockServerConfigurers#oauth2Client` để thêm một `OAuth2AuthorizedClient` vào `ServerOAuth2AuthorizedClientRepository` giả lập:
 
 [tabs]
 ======
@@ -597,9 +597,9 @@ client
 ----
 ======
 
-This creates an `OAuth2AuthorizedClient` that has a simple `ClientRegistration`, a `OAuth2AccessToken`, and a resource owner name.
+Thao tác này tạo một `OAuth2AuthorizedClient` có một `ClientRegistration` đơn giản, một `OAuth2AccessToken` và tên resource owner.
 
-Specifically, it includes a `ClientRegistration` with a client ID of `test-client` and a client secret of `test-secret`:
+Cụ thể, nó bao gồm một `ClientRegistration` có client ID là `test-client` và client secret là `test-secret`:
 
 [tabs]
 ======
@@ -620,7 +620,7 @@ assertThat(authorizedClient.clientRegistration.clientSecret).isEqualTo("test-sec
 ----
 ======
 
-It also includes a resource owner name of `user`:
+Nó cũng bao gồm tên resource owner là `user`:
 
 [tabs]
 ======
@@ -639,7 +639,7 @@ assertThat(authorizedClient.principalName).isEqualTo("user")
 ----
 ======
 
-It also includes an `OAuth2AccessToken` with one scope, `read`:
+Nó cũng bao gồm một `OAuth2AccessToken` có một scope là `read`:
 
 [tabs]
 ======
@@ -660,13 +660,13 @@ assertThat(authorizedClient.accessToken.scopes).containsExactly("read")
 ----
 ======
 
-You can then retrieve the client as usual by using `@RegisteredOAuth2AuthorizedClient` in a controller method.
+Sau đó, bạn có thể lấy client như bình thường bằng cách sử dụng `@RegisteredOAuth2AuthorizedClient` trong một method của controller.
 
 [[webflux-testing-oauth2-client-scopes]]
-=== Configuring Scopes
+=== Cấu hình scope
 
-In many circumstances, the OAuth 2.0 access token comes with a set of scopes.
-Consider the following example of how a controller can inspect the scopes:
+Trong nhiều trường hợp, access token OAuth 2.0 đi kèm một tập scope.
+Xét ví dụ sau về cách controller có thể kiểm tra các scope:
 
 [tabs]
 ======
@@ -709,7 +709,7 @@ fun foo(@RegisteredOAuth2AuthorizedClient("my-app") authorizedClient: OAuth2Auth
 ----
 ======
 
-Given a controller that inspects scopes, you can configure the scope by using the `accessToken()` method:
+Với một controller kiểm tra scope, bạn có thể cấu hình scope bằng cách sử dụng method `accessToken()`:
 
 [tabs]
 ======
@@ -737,19 +737,19 @@ client
 ======
 
 [[webflux-testing-oauth2-client-registration]]
-=== Additional Configurations
+=== Cấu hình bổ sung
 
-You can also use additional methods to further configure the authentication depending on what data your controller expects:
+Bạn cũng có thể sử dụng các method bổ sung để cấu hình thêm authentication, tùy thuộc vào dữ liệu mà controller của bạn mong đợi:
 
-* `principalName(String)`; Configures the resource owner name
-* `clientRegistration(Consumer<ClientRegistration.Builder>)`: Configures the associated `ClientRegistration`
-* `clientRegistration(ClientRegistration)`: Configures the complete `ClientRegistration`
+* `principalName(String)`; Cấu hình tên resource owner
+* `clientRegistration(Consumer<ClientRegistration.Builder>)`: Cấu hình `ClientRegistration` liên kết
+* `clientRegistration(ClientRegistration)`: Cấu hình `ClientRegistration` hoàn chỉnh
 
-That last one is handy if you want to use a real `ClientRegistration`
+Method cuối cùng hữu ích nếu bạn muốn sử dụng một `ClientRegistration` thực.
 
-For example, suppose that you want to use one of your application's `ClientRegistration` definitions, as specified in your `application.yml`.
+Ví dụ, giả sử bạn muốn sử dụng một trong các định nghĩa `ClientRegistration` của ứng dụng, như được chỉ định trong `application.yml`.
 
-In that case, your test can autowire the `ReactiveClientRegistrationRepository` and look up the one your test needs:
+Trong trường hợp đó, kiểm thử của bạn có thể autowire `ReactiveClientRegistrationRepository` và tìm registration mà kiểm thử cần:
 
 [tabs]
 ======
@@ -787,19 +787,19 @@ client
 ======
 
 [[webflux-testing-jwt]]
-== Testing JWT Authentication
+== Kiểm thử JWT authentication
 
-To make an authorized request on a resource server, you need a bearer token.
-If your resource server is configured for JWTs, the bearer token needs to be signed and then encoded according to the JWT specification.
-All of this can be quite daunting, especially when this is not the focus of your test.
+Để thực hiện một request đã được authorization trên resource server, bạn cần một bearer token.
+Nếu resource server của bạn được cấu hình cho JWT, bearer token cần được ký rồi mã hóa theo đặc tả JWT.
+Tất cả việc này có thể khá khó khăn, đặc biệt khi đó không phải là trọng tâm của kiểm thử.
 
-Fortunately, there are a number of simple ways in which you can overcome this difficulty and let your tests focus on authorization and not on representing bearer tokens.
-We look at two of them in the next two subsections.
+May mắn là có một số cách đơn giản giúp bạn vượt qua khó khăn này để các kiểm thử tập trung vào authorization thay vì biểu diễn bearer token.
+Hai cách trong số đó được trình bày ở hai subsection tiếp theo.
 
 === `mockJwt() WebTestClientConfigurer`
 
-The first way is with a `WebTestClientConfigurer`.
-The simplest of these would be to use the `SecurityMockServerConfigurers#mockJwt` method like the following:
+Cách thứ nhất là sử dụng một `WebTestClientConfigurer`.
+Cách đơn giản nhất là sử dụng method `SecurityMockServerConfigurers#mockJwt` như sau:
 
 [tabs]
 ======
@@ -820,9 +820,9 @@ client
 ----
 ======
 
-This example creates a mock `Jwt` and passes it through any authentication APIs so that it is available for your authorization mechanisms to verify.
+Ví dụ này tạo một `Jwt` giả lập và truyền nó qua mọi API authentication để các cơ chế authorization của bạn có thể kiểm tra nó.
 
-By default, the `JWT` that it creates has the following characteristics:
+Theo mặc định, `JWT` được tạo có các đặc điểm sau:
 
 [source,json]
 ----
@@ -835,7 +835,7 @@ By default, the `JWT` that it creates has the following characteristics:
 }
 ----
 
-The resulting `Jwt`, were it tested, would pass in the following way:
+Nếu kiểm thử `Jwt` kết quả, nó sẽ đạt kiểm tra như sau:
 
 [tabs]
 ======
@@ -858,9 +858,9 @@ assertThat(jwt.subject).isEqualTo("sub")
 ----
 ======
 
-Note that you configure these values.
+Lưu ý rằng bạn có thể cấu hình các giá trị này.
 
-You can also configure any headers or claims with their corresponding methods:
+Bạn cũng có thể cấu hình bất kỳ header hoặc claim nào bằng các method tương ứng:
 
 [tabs]
 ======
@@ -909,8 +909,8 @@ client
 ----
 ======
 
-The `scope` and `scp` claims are processed the same way here as they are in a normal bearer token request.
-However, this can be overridden simply by providing the list of `GrantedAuthority` instances that you need for your test:
+Các claim `scope` và `scp` được xử lý ở đây giống như trong một request bearer token thông thường.
+Tuy nhiên, bạn có thể dễ dàng ghi đè hành vi này bằng cách cung cấp danh sách instance `GrantedAuthority` mà kiểm thử cần:
 
 [tabs]
 ======
@@ -933,7 +933,7 @@ client
 ----
 ======
 
-Alternatively, if you have a custom `Jwt` to `Collection<GrantedAuthority>` converter, you can also use that to derive the authorities:
+Ngoài ra, nếu có một converter tùy chỉnh từ `Jwt` sang `Collection<GrantedAuthority>`, bạn cũng có thể sử dụng converter đó để suy ra các authority:
 
 [tabs]
 ======
@@ -956,7 +956,7 @@ client
 ----
 ======
 
-You can also specify a complete `Jwt`, for which javadoc:org.springframework.security.oauth2.jwt.Jwt$Builder[] is quite handy:
+Bạn cũng có thể chỉ định một `Jwt` hoàn chỉnh; javadoc:org.springframework.security.oauth2.jwt.Jwt$Builder[] rất hữu ích cho việc này:
 
 [tabs]
 ======
@@ -991,10 +991,10 @@ client
 ----
 ======
 
-=== `authentication()` and `WebTestClientConfigurer`
+=== `authentication()` và `WebTestClientConfigurer`
 
-The second way is by using the `authentication()` `Mutator`.
-You can instantiate your own `JwtAuthenticationToken` and provide it in your test:
+Cách thứ hai là sử dụng `Mutator` `authentication()`.
+Bạn có thể khởi tạo `JwtAuthenticationToken` của riêng mình và cung cấp nó trong kiểm thử:
 
 [tabs]
 ======
@@ -1031,15 +1031,15 @@ client
 ----
 ======
 
-Note that, as an alternative to these, you can also mock the `ReactiveJwtDecoder` bean itself with a `@MockBean` annotation.
+Lưu ý rằng, thay cho các cách trên, bạn cũng có thể mock bean `ReactiveJwtDecoder` bằng annotation `@MockBean`.
 
 [[webflux-testing-opaque-token]]
-== Testing Opaque Token Authentication
+== Kiểm thử opaque token authentication
 
-Similar to <<webflux-testing-jwt,JWTs>>, opaque tokens require an authorization server in order to verify their validity, which can make testing more difficult.
-To help with that, Spring Security has test support for opaque tokens.
+Tương tự <<webflux-testing-jwt,JWT>>, opaque token yêu cầu một authorization server để xác minh tính hợp lệ, điều này có thể khiến việc kiểm thử khó khăn hơn.
+Để hỗ trợ việc đó, Spring Security có phần hỗ trợ kiểm thử cho opaque token.
 
-Suppose you have a controller that retrieves the authentication as a `BearerTokenAuthentication`:
+Giả sử bạn có một controller lấy authentication dưới dạng `BearerTokenAuthentication`:
 
 [tabs]
 ======
@@ -1064,7 +1064,7 @@ fun foo(authentication: BearerTokenAuthentication): Mono<String?> {
 ----
 ======
 
-In that case, you can tell Spring Security to include a default `BearerTokenAuthentication` by using the `SecurityMockServerConfigurers#opaqueToken` method:
+Trong trường hợp đó, bạn có thể yêu cầu Spring Security bao gồm một `BearerTokenAuthentication` mặc định bằng cách sử dụng method `SecurityMockServerConfigurers#opaqueToken`:
 
 [tabs]
 ======
@@ -1087,9 +1087,9 @@ client
 ----
 ======
 
-This example configures the associated `MockHttpServletRequest` with a `BearerTokenAuthentication` that includes a simple `OAuth2AuthenticatedPrincipal`, a `Map` of attributes, and a `Collection` of granted authorities.
+Ví dụ này cấu hình `MockHttpServletRequest` liên kết với một `BearerTokenAuthentication` bao gồm một `OAuth2AuthenticatedPrincipal` đơn giản, một `Map` attribute và một `Collection` các authority được cấp.
 
-Specifically, it includes a `Map` with a key/value pair of `sub`/`user`:
+Cụ thể, nó bao gồm một `Map` có cặp key/value `sub`/`user`:
 
 [tabs]
 ======
@@ -1108,7 +1108,7 @@ assertThat(token.tokenAttributes["sub"] as String?).isEqualTo("user")
 ----
 ======
 
-It also includes a `Collection` of authorities with just one authority, `SCOPE_read`:
+Nó cũng bao gồm một `Collection` authority chỉ có một authority là `SCOPE_read`:
 
 [tabs]
 ======
@@ -1129,14 +1129,14 @@ assertThat(token.authorities).containsExactly(SimpleGrantedAuthority("SCOPE_read
 ----
 ======
 
-Spring Security does the necessary work to make sure that the `BearerTokenAuthentication` instance is available for your controller methods.
+Spring Security thực hiện các công việc cần thiết để đảm bảo instance `BearerTokenAuthentication` khả dụng cho các method của controller.
 
 [[webflux-testing-opaque-token-authorities]]
-=== Configuring Authorities
+=== Cấu hình authority
 
-In many circumstances, your method is protected by filter or method security and needs your `Authentication` to have certain granted authorities to allow the request.
+Trong nhiều trường hợp, method của bạn được bảo vệ bởi filter hoặc method security và cần `Authentication` có một số authority được cấp nhất định để cho phép request.
 
-In this case, you can supply what granted authorities you need using the `authorities()` method:
+Trong trường hợp này, bạn có thể cung cấp các authority được cấp cần thiết bằng method `authorities()`:
 
 [tabs]
 ======
@@ -1164,12 +1164,12 @@ client
 ======
 
 [[webflux-testing-opaque-token-attributes]]
-=== Configuring Claims
+=== Cấu hình claim
 
-While granted authorities are quite common across all of Spring Security, we also have attributes in the case of OAuth 2.0.
+Mặc dù authority được cấp khá phổ biến trong toàn bộ Spring Security, OAuth 2.0 cũng có các attribute.
 
-Suppose, for example, that you have a `user_id` attribute that indicates the user's ID in your system.
-You might access it as follows in a controller:
+Ví dụ, giả sử bạn có attribute `user_id` cho biết ID của user trong hệ thống.
+Bạn có thể truy cập attribute đó trong controller như sau:
 
 [tabs]
 ======
@@ -1196,7 +1196,7 @@ fun foo(authentication: BearerTokenAuthentication): Mono<String?> {
 ----
 ======
 
-In that case, you can specify that attribute with the `attributes()` method:
+Trong trường hợp đó, bạn có thể chỉ định attribute bằng method `attributes()`:
 
 [tabs]
 ======
@@ -1224,18 +1224,18 @@ client
 ======
 
 [[webflux-testing-opaque-token-principal]]
-=== Additional Configurations
+=== Cấu hình bổ sung
 
-You can also use additional methods to further configure the authentication, depending on what data your controller expects.
+Bạn cũng có thể sử dụng các method bổ sung để cấu hình thêm authentication, tùy thuộc vào dữ liệu mà controller của bạn mong đợi.
 
-One such method is `principal(OAuth2AuthenticatedPrincipal)`, which you can use to configure the complete `OAuth2AuthenticatedPrincipal` instance that underlies the `BearerTokenAuthentication`.
+Một method như vậy là `principal(OAuth2AuthenticatedPrincipal)`, method này cho phép bạn cấu hình instance `OAuth2AuthenticatedPrincipal` hoàn chỉnh nằm bên dưới `BearerTokenAuthentication`.
 
-It is handy if you:
-* Have your own implementation of `OAuth2AuthenticatedPrincipal` or
-* Want to specify a different principal name
+Method này hữu ích nếu bạn:
+* Có implementation riêng của `OAuth2AuthenticatedPrincipal` hoặc
+* Muốn chỉ định tên principal khác
 
-For example, suppose that your authorization server sends the principal name in the `user_name` attribute instead of the `sub` attribute.
-In that case, you can configure an `OAuth2AuthenticatedPrincipal` by hand:
+Ví dụ, giả sử authorization server của bạn gửi tên principal trong attribute `user_name` thay vì attribute `sub`.
+Trong trường hợp đó, bạn có thể tự cấu hình một `OAuth2AuthenticatedPrincipal`:
 
 [tabs]
 ======
@@ -1271,4 +1271,4 @@ client
 ----
 ======
 
-Note that, as an alternative to using `mockOpaqueToken()` test support, you can also mock the `OpaqueTokenIntrospector` bean itself with a `@MockBean` annotation.
+Lưu ý rằng, thay cho phần hỗ trợ kiểm thử `mockOpaqueToken()`, bạn cũng có thể mock chính bean `OpaqueTokenIntrospector` bằng annotation `@MockBean`.
