@@ -1,30 +1,30 @@
 [[servlet-authentication-digest]]
 = Digest Authentication
 
-This section provides details on how Spring Security provides support for https://tools.ietf.org/html/rfc2617[Digest Authentication], which is provided `DigestAuthenticationFilter`.
+Phần này trình bày chi tiết cách Spring Security hỗ trợ https://tools.ietf.org/html/rfc2617[Digest Authentication], được cung cấp bởi `DigestAuthenticationFilter`.
 
 [WARNING]
 ====
-You should not use Digest Authentication in modern applications, because it is not considered to be secure.
-The most obvious problem is that you must store your passwords in plaintext or an encrypted or MD5 format.
-All of these storage formats are considered insecure.
-Instead, you should store credentials by using a one way adaptive password hash (bCrypt, PBKDF2, SCrypt, and others), which is not supported by Digest Authentication.
+Bạn không nên sử dụng Digest Authentication trong các ứng dụng hiện đại vì cơ chế này không được xem là an toàn.
+Vấn đề rõ ràng nhất là bạn phải lưu mật khẩu dưới dạng văn bản thuần hoặc ở định dạng được mã hóa hay MD5.
+Tất cả các định dạng lưu trữ này đều được xem là không an toàn.
+Thay vào đó, bạn nên lưu credential bằng cách sử dụng hàm băm mật khẩu thích ứng một chiều (bCrypt, PBKDF2, SCrypt và các hàm khác), vốn không được Digest Authentication hỗ trợ.
 ====
 
-Digest Authentication tries to solve many of the weaknesses of xref:servlet/authentication/passwords/basic.adoc#servlet-authentication-basic[Basic authentication], specifically by ensuring credentials are never sent in clear text across the wire.
-Many https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Digest#Browser_compatibility[browsers support Digest Authentication].
+Digest Authentication cố gắng giải quyết nhiều điểm yếu của xref:servlet/authentication/passwords/basic.adoc#servlet-authentication-basic[Basic authentication], cụ thể là bảo đảm credential không bao giờ được gửi dưới dạng văn bản rõ qua mạng.
+Nhiều https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Digest#Browser_compatibility[trình duyệt hỗ trợ Digest Authentication].
 
-The standard governing HTTP Digest Authentication is defined by https://tools.ietf.org/html/rfc2617[RFC 2617], which updates an earlier version of the Digest Authentication standard prescribed by https://tools.ietf.org/html/rfc2069[RFC 2069].
-Most user agents implement RFC 2617.
-Spring Security's Digest Authentication support is compatible with the "`auth`" quality of protection (`qop`) prescribed by RFC 2617, which also provides backward compatibility with RFC 2069.
-Digest Authentication was seen as a more attractive option if you need to use unencrypted HTTP (no TLS or HTTPS) and wish to maximize security of the authentication process.
-However, everyone should use xref:features/exploits/http.adoc#http[HTTPS].
+Tiêu chuẩn quy định HTTP Digest Authentication được định nghĩa bởi https://tools.ietf.org/html/rfc2617[RFC 2617], tiêu chuẩn này cập nhật phiên bản trước đó của tiêu chuẩn Digest Authentication được quy định bởi https://tools.ietf.org/html/rfc2069[RFC 2069].
+Hầu hết user agent đều triển khai RFC 2617.
+Tính năng hỗ trợ Digest Authentication của Spring Security tương thích với mức bảo vệ "`auth`" (`qop`) được RFC 2617 quy định, đồng thời cung cấp khả năng tương thích ngược với RFC 2069.
+Digest Authentication từng được xem là một lựa chọn hấp dẫn hơn nếu bạn cần sử dụng HTTP không mã hóa (không có TLS hoặc HTTPS) và muốn tối đa hóa tính bảo mật của quy trình authentication.
+Tuy nhiên, mọi người nên sử dụng xref:features/exploits/http.adoc#http[HTTPS].
 
-Central to Digest Authentication is a "`nonce`".
-This is a value the server generates.
-Spring Security's nonce adopts the following format:
+Trung tâm của Digest Authentication là một "`nonce`".
+Đây là một giá trị do server tạo ra.
+nonce của Spring Security có định dạng sau:
 
-.Digest Syntax
+.Cú pháp Digest
 [source,txt]
 ----
 base64(expirationTime + ":" + md5Hex(expirationTime + ":" + key))
@@ -32,9 +32,9 @@ expirationTime:   The date and time when the nonce expires, expressed in millise
 key:              A private key to prevent modification of the nonce token
 ----
 
-You need to ensure that you xref:features/authentication/password-storage.adoc#authentication-password-storage-configuration[configure] insecure plain text xref:features/authentication/password-storage.adoc#authentication-password-storage[Password Storage] using `NoOpPasswordEncoder`.
-(See the javadoc:org.springframework.security.crypto.password.NoOpPasswordEncoder[] class in the Javadoc.)
-The following provides an example of configuring Digest Authentication with Java Configuration:
+Bạn cần bảo đảm mình xref:features/authentication/password-storage.adoc#authentication-password-storage-configuration[cấu hình] xref:features/authentication/password-storage.adoc#authentication-password-storage[Lưu trữ mật khẩu] dạng văn bản thuần không an toàn bằng `NoOpPasswordEncoder`.
+(Xem class javadoc:org.springframework.security.crypto.password.NoOpPasswordEncoder[] trong Javadoc.)
+Ví dụ sau minh họa cách cấu hình Digest Authentication bằng cấu hình Java:
 
 .Digest Authentication
 [tabs]
