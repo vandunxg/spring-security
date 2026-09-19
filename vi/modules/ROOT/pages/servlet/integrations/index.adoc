@@ -1,5 +1,5 @@
-= Integrations
+= Tích hợp
 :page-section-summary-toc: 1
 
-Spring Security integrates with numerous frameworks and APIs.
-This section describes various integrations that Spring Security has with other technologies:
+Spring Security tích hợp với nhiều framework và API.
+Phần này mô tả các cách Spring Security tích hợp với những công nghệ khác:
