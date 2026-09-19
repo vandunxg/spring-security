@@ -1,8 +1,8 @@
 = SecurityMockMvcRequestBuilders
 
-Spring MVC Test also provides a `RequestBuilder` interface that can be used to create the `MockHttpServletRequest` used in your test.
-Spring Security provides a few `RequestBuilder` implementations that can be used to make testing easier.
-In order to use Spring Security's `RequestBuilder` implementations ensure the following static import is used:
+Spring MVC Test cũng cung cấp một interface `RequestBuilder` có thể được sử dụng để tạo `MockHttpServletRequest` dùng trong test của bạn.
+Spring Security cung cấp một số implementation của `RequestBuilder` giúp việc testing dễ dàng hơn.
+Để sử dụng các implementation `RequestBuilder` của Spring Security, hãy đảm bảo sử dụng static import sau:
 
 [tabs]
 ======
