@@ -1,12 +1,12 @@
 [[appendices]]
-= Appendices
+= Các phụ lục
 :figures: servlet/authentication/kerberos
 :numbered!:
 
 [appendix]
-== Material Used in this Document
-Dummy UserDetailsService used in samples because we don't have a real
-user source.
+== Tài liệu được sử dụng trong tài liệu này
+`Dummy UserDetailsService` được dùng trong các mẫu vì chúng ta không có
+nguồn user thực.
 
 [source,java,indent=0]
 ----
@@ -14,80 +14,76 @@ include::example$kerberos/DummyUserDetailsService.java[tags=snippetA]
 ----
 
 [appendix]
-== Crash Course to Kerberos
-In any authentication process there are usually a three parties
-involved.
+== Nhập môn nhanh về Kerberos
+Trong mọi quy trình authentication thường có ba bên tham gia.
 
 image::{figures}/drawio-kerb-cc1.png[]
 
-First is a `client` which sometimes is a client computer but in most
-of the scenarios it is the actual user sitting on a computer and
-trying to access resources. Then there is the `resource` user is trying
-to access. In this example it is a web server.
+Đầu tiên là `client`, đôi khi là một máy tính client nhưng trong hầu hết
+các trường hợp lại là user thực đang ngồi trước máy tính và cố truy cập
+các resource. Sau đó là `resource` mà user đang cố truy cập. Trong ví dụ
+này, đó là một web server.
 
-Then there is a `Key Distribution Center` or `KDC`. In a case of
-Windows environment this would be a `Domain Controller`. `KDC` is the
-one which really brings everything together and thus is the most
-critical component in your environment. Because of this it is also
-considered as a single point of failure.
+Tiếp theo là `Key Distribution Center`, hay `KDC`. Trong môi trường
+Windows, đây là một `Domain Controller`. `KDC` là thành phần thực sự kết
+nối mọi thứ lại với nhau và vì vậy là thành phần quan trọng nhất trong
+môi trường của bạn. Vì lý do này, nó cũng được xem là một single point
+of failure.
 
-Initially when `Kerberos` environment is setup and domain user
-principals created into a database, encryption keys are also
-created. These encryption keys are based on shared secrets(i.e. user
-password) and actual passwords are never kept in a clear text.
-Effectively `KDC` has its own key and other keys for domain users.
+Ban đầu, khi môi trường `Kerberos` được thiết lập và các user principal
+trong domain được tạo trong database, các encryption key cũng được tạo.
+Các encryption key này dựa trên shared secret (tức là password của user)
+và password thực tế không bao giờ được lưu dưới dạng clear text. Về cơ
+bản, `KDC` có key riêng của nó và các key khác dành cho user trong domain.
 
-Interestingly there is no communication between a `resource` and a
-`KDC` during the authentication process.
+Điều thú vị là trong quy trình authentication không có giao tiếp nào giữa
+`resource` và `KDC`.
 
 image::{figures}/drawio-kerb-cc2.png[]
 
-When client wants to authenticate itself with a `resource` it first
-needs to communicate with a `KDC`. `Client` will craft a special package
-which contains encrypted and unencrypted parts. Unencrypted part
-contains i.e. information about a user and encrypted part other
-information which is part of a protocol. `Client` will encrypt package
-data with its own key.
+Khi client muốn tự authentication với một `resource`, trước hết nó cần
+giao tiếp với một `KDC`. `Client` sẽ tạo một package đặc biệt gồm các phần
+được mã hóa và không được mã hóa. Phần không được mã hóa chứa, chẳng hạn,
+thông tin về một user; phần được mã hóa chứa các thông tin khác thuộc về
+protocol. `Client` sẽ mã hóa dữ liệu của package bằng key riêng của nó.
 
-When `KDC` receives this authentication package from a client it
-checks who this `client` claims to be from an unencrypted part and based
-on that information it uses `client` decryption key it already have in
-its database. If this decryption is successful `KDC` knows that this
-`client` is the one it claims to be.
+Khi `KDC` nhận package authentication này từ một client, nó kiểm tra
+client này tự nhận mình là ai từ phần không được mã hóa, rồi dựa trên
+thông tin đó sử dụng decryption key của client đã có trong database. Nếu
+giải mã thành công, `KDC` biết rằng client này đúng là người mà nó tự
+nhận.
 
-What KDC returns to a client is a ticket called `Ticket Granting
-Ticket` which is signed by a KDC's own private key. Later when
-`client` sends back this ticket it can try to decrypt it and if that
-operation is successful it knows that it was a ticket it itself
-originally signed and gave to a `client`.
+Thứ KDC trả về cho client là một ticket có tên `Ticket Granting
+Ticket`, được ký bằng private key của KDC. Sau đó, khi `client` gửi lại
+ticket này, nó có thể thử giải mã ticket; nếu thao tác đó thành công, nó
+biết rằng đây là ticket do chính nó ký và cấp cho một `client` ban đầu.
 
 image::{figures}/drawio-kerb-cc3.png[]
 
-When client wants to get a ticket which it can use to authenticate
-with a service, `TGT` is sent to `KDC` which then signs a service ticket
-with service's own key. This a moment when a trust between
-`client` and `service` is created. This service ticket contains data
-which only `service` itself is able to decrypt.
+Khi client muốn lấy một ticket có thể dùng để authentication với một
+service, `TGT` được gửi đến `KDC`, rồi `KDC` ký một service ticket bằng key
+riêng của service. Đây là thời điểm trust giữa `client` và `service` được
+tạo ra. Service ticket này chứa dữ liệu mà chỉ `service` mới có thể giải mã.
 
 image::{figures}/drawio-kerb-cc4.png[]
 
-When `client` is authenticating with a service it sends previously
-received service ticket to a service which then thinks that I don't
-know anything about this guy but he gave me an authentication ticket.
-What `service` can do next is try to decrypt that ticket and if that
-operation is successful it knows that only other party who knows my
-credentials is the `KDC` and because I trust him I can also trust that
-this client is a one he claims to be.
+Khi `client` authentication với một service, nó gửi service ticket đã
+nhận trước đó đến service. Service khi đó nghĩ rằng mình không biết gì về
+người này, nhưng người đó đã đưa cho mình một authentication ticket. Việc
+`service` có thể làm tiếp theo là thử giải mã ticket đó. Nếu thao tác này
+thành công, nó biết rằng bên duy nhất khác biết credentials của mình là
+`KDC`; và vì nó tin tưởng KDC, nó cũng có thể tin rằng client này đúng là
+người mà client tự nhận.
 
 [appendix]
-== Setup Kerberos Environments
-Doing a production setup of Kerberos environment is out of scope of
-this document but this appendix provides some help to get you
-started for setting up needed components for development.
+== Thiết lập môi trường Kerberos
+Việc thiết lập môi trường Kerberos cho production nằm ngoài phạm vi của
+tài liệu này, nhưng phụ lục này cung cấp một số trợ giúp để bạn bắt đầu
+thiết lập các component cần thiết cho development.
 
 [[setupmitkerberos]]
-=== Setup MIT Kerberos
-First action is to setup a new realm and a database.
+=== Thiết lập MIT Kerberos
+Việc đầu tiên là thiết lập một realm mới và một database.
 
 [source,text,indent=0]
 ----
@@ -101,8 +97,8 @@ Enter KDC database master key:
 Re-enter KDC database master key to verify:
 ----
 
-`kadmin` command can be used to administer Kerberos environment but
-you can't yet use it because there are no admin users in a database.
+Có thể dùng command `kadmin` để quản trị môi trường Kerberos, nhưng bạn
+chưa thể dùng nó vì trong database chưa có admin user.
 
 [source,text,indent=0]
 ----
@@ -112,7 +108,7 @@ kadmin: Client not found in Kerberos database while initializing
 kadmin interface
 ----
 
-Lets use `kadmin.local` command to create one.
+Hãy dùng command `kadmin.local` để tạo một admin user.
 
 [source,text,indent=0]
 ----
@@ -134,8 +130,8 @@ Re-enter password for principal "root/admin@EXAMPLE.ORG":
 Principal "root/admin@EXAMPLE.ORG" created.
 ----
 
-Then enable admins by modifying `kadm5.acl` file and restart Kerberos
-services.
+Sau đó, bật admin bằng cách sửa file `kadm5.acl` và khởi động lại các
+service Kerberos.
 
 [source,text,indent=0]
 ----
@@ -144,8 +140,8 @@ services.
 */admin *
 ----
 
-Now you can use `kadmin` with previously created `root/admin`
-principal. Lets create our first user `user1`.
+Bây giờ bạn có thể dùng `kadmin` với principal `root/admin` đã tạo trước
+đó. Hãy tạo user đầu tiên của chúng ta là `user1`.
 
 [source,text,indent=0]
 ----
@@ -157,7 +153,7 @@ Re-enter password for principal "user1@EXAMPLE.ORG":
 Principal "user1@EXAMPLE.ORG" created.
 ----
 
-Lets create our second user `user2` and export a keytab file.
+Hãy tạo user thứ hai là `user2` và export một file keytab.
 
 [source,text,indent=0]
 ----
@@ -175,8 +171,8 @@ Entry for principal user2@EXAMPLE.ORG with kvno 2, encryption type des3-cbc-sha1
 Entry for principal user2@EXAMPLE.ORG with kvno 2, encryption type des-cbc-crc added to keytab WRFILE:/tmp/user2.keytab.
 ----
 
-Lets create a service ticket for tomcat and export credentials to a
-keytab file named `tomcat.keytab`.
+Hãy tạo một service ticket cho tomcat và export credential vào một file
+keytab có tên `tomcat.keytab`.
 
 [source,text,indent=0]
 ----
@@ -193,26 +189,26 @@ Entry for principal HTTP/neo.example.org@EXAMPLE.ORG with kvno 2, encryption typ
 ----
 
 [[setupwinkerberos]]
-=== Setup Windows Domain Controller
+=== Thiết lập Windows Domain Controller
 
-This was tested using `Windows Server 2012 R2`
+Điều này đã được kiểm thử bằng `Windows Server 2012 R2`.
 
 [TIP]
 ====
-Internet is full of good articles and videos how to setup Windows AD
-but these two are quite usefull
-https://www.rackspace.com/knowledge_center/article/installing-active-directory-on-windows-server-2012[Rackspace] and
+Internet có rất nhiều bài viết và video hữu ích về cách thiết lập Windows AD,
+nhưng hai tài liệu sau khá hữu ích:
+https://www.rackspace.com/knowledge_center/article/installing-active-directory-on-windows-server-2012[Rackspace] và
 https://social.technet.microsoft.com/wiki/contents/articles/12370.windows-server-2012-set-up-your-first-domain-controller-step-by-step.aspx[Microsoft
 Technet].
 ====
 
-- Normal domain controller and active directory setup was done.
-- Used dns domain `example.org` and windows domain `EXAMPLE`.
-- I created various domain users like `user1`, `user2`, `user3`,
-  `tomcat` and set passwords to `Password#`.
+- Đã thiết lập domain controller và active directory thông thường.
+- Sử dụng dns domain `example.org` và windows domain `EXAMPLE`.
+- Đã tạo nhiều domain user như `user1`, `user2`, `user3`, `tomcat` và đặt
+  password là `Password#`.
 
-I eventually also added all ip's of my vm's to AD's dns server for
-that not to cause any trouble.
+Cuối cùng, tôi cũng thêm toàn bộ IP của các VM vào dns server của AD để
+không gây ra vấn đề nào.
 
 [source,text]
 ----
@@ -226,17 +222,17 @@ Name: neo.example.org
 Address: 172.16.101.1
 ----
 
-Service Principal Name(SPN) needs to be setup with `HTTP` and a
-server name `neo.example.org` where tomcat servlet container is run. This
-is used with `tomcat` domain user and its `keytab` is then used as a
-service credential.
+Cần thiết lập Service Principal Name (SPN) với `HTTP` và server name
+`neo.example.org`, nơi chạy tomcat servlet container. Thông tin này được
+sử dụng với domain user `tomcat`, và `keytab` của user này sau đó được dùng
+làm service credential.
 
 [source,text]
 ----
 PS C:\> setspn -A HTTP/neo.example.org tomcat
 ----
 
-I exported keytab file which is copied to linux server running tomcat.
+Tôi export file keytab và copy file này sang Linux server đang chạy tomcat.
 
 [source,text]
 ----
@@ -247,19 +243,18 @@ PS C:\> ktpass /out c:\tomcat.keytab /mapuser tomcat@EXAMPLE.ORG /princ HTTP/neo
 ----
 
 [appendix]
-== Troubleshooting
-This appendix provides generic information about troubleshooting
-errors and problems.
+== Xử lý sự cố
+Phụ lục này cung cấp thông tin chung về việc xử lý các lỗi và vấn đề.
 
 [IMPORTANT]
 ====
-If you think environment and configuration is correctly setup, do
-double check and ask other person to check possible obvious mistakes
-or typos. Kerberos setup is generally very brittle and it is not
-always very easy to debug where the problem lies.
+Nếu bạn cho rằng environment và configuration đã được thiết lập chính xác,
+hãy kiểm tra lại thật kỹ và nhờ người khác kiểm tra các lỗi hiển nhiên hoặc
+lỗi đánh máy có thể có. Việc thiết lập Kerberos thường khá mong manh và
+không phải lúc nào cũng dễ debug để xác định vấn đề nằm ở đâu.
 ====
 
-.Cannot find key of appropriate type to decrypt
+.Không tìm thấy key có type phù hợp để giải mã
 
 [source,text]
 ----
@@ -268,10 +263,9 @@ Invalid argument (400) - Cannot find key of appropriate type to
 decrypt AP REP - RC4 with HMAC)
 ----
 
-If you see abore error indicating missing key type, this will happen
-with two different use cases. Firstly your JVM may not support
-appropriate encryption type or it is disabled in your `krb5.conf`
-file.
+Nếu bạn thấy lỗi trên cho biết thiếu key type, lỗi này sẽ xảy ra trong hai
+trường hợp khác nhau. Trước tiên, JVM của bạn có thể không hỗ trợ encryption
+type phù hợp hoặc type này bị vô hiệu hóa trong file `krb5.conf`.
 
 [source,text]
 ----
@@ -279,24 +273,23 @@ default_tkt_enctypes = rc4-hmac
 default_tgs_enctypes = rc4-hmac
 ----
 
-Second case is less obvious and hard to track because it will lead
-into same error. This specific `GSSException` is throws also if you
-simply don't have a required encryption key which then may be caused
-by a misconfiguration in your kerberos server or a simply typo in your
-principal.
+Trường hợp thứ hai khó nhận thấy và khó theo dõi hơn vì nó cũng dẫn đến
+cùng lỗi. `GSSException` cụ thể này cũng được ném ra nếu bạn đơn giản là
+không có encryption key bắt buộc; nguyên nhân có thể là server Kerberos
+được cấu hình sai hoặc principal có lỗi đánh máy.
 
-.Using wrong kerberos configuration
+.Sử dụng cấu hình kerberos sai
 
 {zwsp} +
 
-In most system all commands and libraries will search kerberos
-configuration either from a default locations or special locations
-like JDKs. It's easy to get mixed up especially if working from unix
-systems, which already may have default settings to work with MIT
-kerberos, towards Windows domains.
+Trong hầu hết system, tất cả command và library sẽ tìm cấu hình kerberos
+từ các vị trí mặc định hoặc các vị trí đặc biệt như vị trí của JDK. Rất dễ
+bị nhầm lẫn, đặc biệt khi làm việc từ các system Unix vốn có thể đã có
+setting mặc định để làm việc với MIT kerberos, rồi chuyển sang các Windows
+domain.
 
-This is a specific example what happens with `ldapsearch` trying to
-query Windows AD using kerberos authentication.
+Đây là một ví dụ cụ thể về điều xảy ra khi `ldapsearch` cố query Windows AD
+bằng authentication Kerberos.
 
 [source,text]
 ----
@@ -308,8 +301,8 @@ ldap_sasl_interactive_bind_s: Local error (-2)
   (No Kerberos credentials available)
 ----
 
-Well that doesn't look good and is a simple indication that I don't
-have a valid kerberos tickets as shown below.
+Kết quả này không tốt và là dấu hiệu đơn giản cho thấy tôi không có
+Kerberos ticket hợp lệ như bên dưới.
 
 [source,text]
 ----
@@ -317,12 +310,11 @@ $ klist
 klist: Credentials cache file '/tmp/krb5cc_1000' not found
 ----
 
-We already have a keytab file we exported from Windows AD to be used
-with tomcat running on Linux. Lets try to use that to authenticate
-with Windows AD.
+Chúng ta đã có một file keytab được export từ Windows AD để dùng với tomcat
+đang chạy trên Linux. Hãy thử dùng file đó để authentication với Windows AD.
 
-You can have a dedicated config file which usually can be used with
-native Linux commands and JVMs via system propertys.
+Bạn có thể có một file config riêng, thường được dùng với các command native
+của Linux và JVM thông qua system property.
 
 [source,text]
 ----
@@ -342,7 +334,7 @@ example.org=EXAMPLE.ORG
 .example.org=EXAMPLE.ORG
 ----
 
-Lets use that config and a keytab to get initial credentials.
+Hãy dùng config đó cùng một keytab để lấy credential ban đầu.
 
 [source,text]
 ----
@@ -357,8 +349,8 @@ Valid starting     Expires            Service principal
   renew until 27/03/15 09:04:37
 ----
 
-Lets see what happens if we now try to do a simple query against
-Windows AD.
+Hãy xem điều gì xảy ra nếu bây giờ chúng ta thử thực hiện một query đơn
+giản đối với Windows AD.
 
 [source,text]
 ----
@@ -370,11 +362,11 @@ ldap_sasl_interactive_bind_s: Local error (-2)
   (KDC returned error string: PROCESS_TGS)
 ----
 
-This may be simply because `ldapsearch` is getting confused and simply
-using wrong configuration. You can tell `ldapsearch` to use a
-different configuration via `KRB5_CONFIG` env variable just like we
-did with `kinit`. You can also use `KRB5_TRACE=/dev/stderr` to get
-more verbose output of what native libraries are doing.
+Điều này có thể đơn giản là vì `ldapsearch` bị nhầm lẫn và đang dùng config
+sai. Bạn có thể yêu cầu `ldapsearch` dùng config khác thông qua biến môi
+trường `KRB5_CONFIG`, giống như chúng ta đã làm với `kinit`. Bạn cũng có thể
+dùng `KRB5_TRACE=/dev/stderr` để xem output chi tiết hơn về hoạt động của
+các library native.
 
 [source,text]
 ----
@@ -392,9 +384,9 @@ Valid starting     Expires            Service principal
     renew until 27/03/15 09:11:03
 ----
 
-Above you can see what happened if query was successful by looking
-kerberos tickets. Now you can experiment with further query commands
-i.e. if you are working with `KerberosLdapContextSource`.
+Ở trên, bạn có thể thấy điều gì đã xảy ra khi query thành công bằng cách
+xem các Kerberos ticket. Bây giờ bạn có thể thử nghiệm với các command query
+khác, chẳng hạn khi làm việc với `KerberosLdapContextSource`.
 
 [source,text]
 ----
@@ -411,33 +403,31 @@ dn: CN=test user,DC=example,DC=org
 
 [appendix]
 [[browserspnegoconfig]]
-== Configure Browsers for Spnego Negotiation
+== Cấu hình Browser cho Spnego Negotiation
 
 === Firefox
-Complete following steps to ensure that your Firefox browser is
-enabled to perform Spnego authentication.
+Thực hiện các bước sau để đảm bảo browser Firefox của bạn được bật để
+thực hiện authentication Spnego.
 
-- Open Firefox.
-- At address field, type *about:config*.
-- In filter/search, type *negotiate*.
-- Parameter *network.negotiate-auth.trusted-uris* may be set to
-  default *https://* which doesn't work for you. Generally speaking
-  this parameter has to replaced with the server address if Kerberos
-  delegation is required.
-- It is recommended to use `https` for all communication.
+- Mở Firefox.
+- Trong thanh địa chỉ, nhập *about:config*.
+- Trong bộ lọc/tìm kiếm, nhập *negotiate*.
+- Parameter *network.negotiate-auth.trusted-uris* có thể đang được đặt
+  mặc định là *https://*, giá trị này không phù hợp với bạn. Nói chung,
+  parameter này phải được thay bằng địa chỉ server nếu cần Kerberos delegation.
+- Nên sử dụng `https` cho mọi giao tiếp.
 
 === Chrome
+Với Google Chrome, nhìn chung bạn cần đặt các command-line parameter để
+đưa các server mà Chrome sẽ negotiate vào allowlist.
 
-With Google Chrome you generally need to set command-line parameters
-order to white list servers with Chrome will negotiate.
-
-- on Windows machines (clients): Chrome shares the configuration with
-  Internet Explorer so if all changes were applied to IE (as described
-  in E.3), nothing has to be passed via command-line parameters.
-- on Linux/Mac OS machines (clients): the command-line parameter
-  `--auth-negotiate-delegate-whitelist` should only be used if Kerberos
-  delegation is required (otherwise do not set this parameter).
-- It is recommended to use `https` for all communication.
+- trên các máy Windows (client): Chrome dùng chung configuration với
+  Internet Explorer, vì vậy nếu mọi thay đổi đã được áp dụng cho IE (như
+  mô tả trong E.3), không cần truyền gì qua command-line parameter.
+- trên các máy Linux/Mac OS (client): command-line parameter
+  `--auth-negotiate-delegate-whitelist` chỉ nên được dùng nếu cần Kerberos
+  delegation (nếu không thì không đặt parameter này).
+- Nên sử dụng `https` cho mọi giao tiếp.
 
 [source,text]
 ----
@@ -445,11 +435,11 @@ order to white list servers with Chrome will negotiate.
 --auth-negotiate-delegate-whitelist="*.example.com"
 ----
 
-You can see which policies are enable by typing *chrome://policy/*
-into Chrome's address bar.
+Bạn có thể xem các policy đang được bật bằng cách nhập *chrome://policy/*
+vào thanh địa chỉ của Chrome.
 
-With Linux Chrome will also read policy files from
-`/etc/opt/chrome/policies/managed` directory.
+Chrome trên Linux cũng sẽ đọc các policy file từ thư mục
+`/etc/opt/chrome/policies/managed`.
 
 .mypolicy.json
 [source,json]
@@ -463,11 +453,10 @@ With Linux Chrome will also read policy files from
 ----
 
 === Internet Explorer
-Complete following steps to ensure that your Internet Explorer browser
-is enabled to perform Spnego authentication.
+Thực hiện các bước sau để đảm bảo browser Internet Explorer của bạn được
+bật để thực hiện authentication Spnego.
 
-- Open Internet Explorer.
-- Click *Tools > Intenet Options > Security* tab.
-- In *Local intranet* section make sure your server is trusted by i.e.
-  adding it into a list.
-
+- Mở Internet Explorer.
+- Nhấp vào tab *Tools > Intenet Options > Security*.
+- Trong phần *Local intranet*, hãy bảo đảm server của bạn được tin cậy,
+  chẳng hạn bằng cách thêm server vào danh sách.
