@@ -1,10 +1,9 @@
 [[test]]
-= Testing
+= Kiểm thử
 :page-section-summary-toc: 1
 
-This section describes the testing support provided by Spring Security.
+Phần này mô tả phần hỗ trợ kiểm thử do Spring Security cung cấp.
 
-To use the Spring Security test support, you must include `spring-security-test-{spring-security-version}.jar` as a dependency of your project.
+Để sử dụng phần hỗ trợ kiểm thử của Spring Security, bạn phải đưa `spring-security-test-{spring-security-version}.jar` vào làm dependency của dự án.
 
-At a high level Spring Security's test support provides integration for:
-
+Ở mức khái quát, phần hỗ trợ kiểm thử của Spring Security cung cấp khả năng tích hợp cho:
