@@ -2,10 +2,10 @@
 = Method Security
 :figures: servlet/authorization
 
-In addition to xref:servlet/authorization/authorize-http-requests.adoc[modeling authorization at the request level], Spring Security also supports modeling at the method level.
+Ngoài việc xref:servlet/authorization/authorize-http-requests.adoc[mô hình hóa authorization ở cấp request], Spring Security cũng hỗ trợ mô hình hóa ở cấp method.
 
 [[activate-method-security]]
-You can activate it in your application by annotating any `@Configuration` class with `@EnableMethodSecurity` or adding `<method-security>` to any  XML configuration file, like so:
+Bạn có thể kích hoạt tính năng này trong ứng dụng bằng cách gắn `@EnableMethodSecurity` lên bất kỳ class `@Configuration` nào hoặc thêm `<method-security>` vào bất kỳ file cấu hình XML nào, như sau:
 
 [tabs]
 ======
@@ -31,59 +31,59 @@ Xml::
 ----
 ======
 
-Then, you are immediately able to annotate any Spring-managed class or method with <<use-preauthorize, `@PreAuthorize`>>, <<use-postauthorize,`@PostAuthorize`>>, <<use-prefilter,`@PreFilter`>>, and <<use-postfilter,`@PostFilter`>> to authorize method invocations, including the input parameters and return values.
+Sau đó, bạn có thể ngay lập tức gắn <<use-preauthorize, `@PreAuthorize`>>, <<use-postauthorize,`@PostAuthorize`>>, <<use-prefilter,`@PreFilter`>> và <<use-postfilter,`@PostFilter`>> lên bất kỳ class hoặc method do Spring quản lý nào để thực hiện authorization cho các lần gọi method, bao gồm cả tham số đầu vào và giá trị trả về.
 
 [NOTE]
-{spring-boot-reference-url}reference/using/build-systems.html#using.build-systems.starters[Spring Boot Starter Security] does not activate method-level authorization by default.
+{spring-boot-reference-url}reference/using/build-systems.html#using.build-systems.starters[Spring Boot Starter Security] không kích hoạt authorization ở cấp method theo mặc định.
 
-Method Security supports many other use cases as well including <<use-aspectj, AspectJ support>>, <<use-programmatic-authorization,custom annotations>>, and several configuration points.
-Consider learning about the following use cases:
+Method Security cũng hỗ trợ nhiều trường hợp sử dụng khác, bao gồm <<use-aspectj, hỗ trợ AspectJ>>, <<use-programmatic-authorization,annotation tùy chỉnh>> và một số điểm cấu hình.
+Bạn nên tìm hiểu các trường hợp sử dụng sau:
 
-* <<migration-enableglobalmethodsecurity, Migrating from `@EnableGlobalMethodSecurity`>>
-* Understanding <<method-security-architecture,how method security works>> and reasons to use it
-* Comparing <<request-vs-method,request-level and method-level authorization>>
-* Authorizing methods with <<use-preauthorize,`@PreAuthorize`>> and <<use-postauthorize,`@PostAuthorize`>>
-* Providing <<fallback-values-authorization-denied,fallback values when authorization is denied>>
-* Filtering methods with <<use-prefilter,`@PreFilter`>> and <<use-postfilter,`@PostFilter`>>
-* Authorizing methods with <<use-jsr250,JSR-250 annotations>>
-* Authorizing methods with <<use-aspectj,AspectJ expressions>>
-* Integrating with <<weave-aspectj,AspectJ byte-code weaving>>
-* Coordinating with <<changing-the-order,@Transactional and other AOP-based annotations>>
-* Customizing <<customizing-expression-handling,SpEL expression handling>>
-* Integrating with <<custom-authorization-managers,custom authorization systems>>
+* <<migration-enableglobalmethodsecurity,Di chuyển từ `@EnableGlobalMethodSecurity`>>
+* Tìm hiểu <<method-security-architecture,cách method security hoạt động>> và lý do sử dụng nó
+* So sánh <<request-vs-method,authorization ở cấp request và cấp method>>
+* Thực hiện authorization cho method bằng <<use-preauthorize,`@PreAuthorize`>> và <<use-postauthorize,`@PostAuthorize`>>
+* Cung cấp <<fallback-values-authorization-denied,giá trị dự phòng khi authorization bị từ chối>>
+* Lọc method bằng <<use-prefilter,`@PreFilter`>> và <<use-postfilter,`@PostFilter`>>
+* Thực hiện authorization cho method bằng <<use-jsr250,annotation JSR-250>>
+* Thực hiện authorization cho method bằng <<use-aspectj,biểu thức AspectJ>>
+* Tích hợp với <<weave-aspectj,weaving byte-code bằng AspectJ>>
+* Phối hợp với <<changing-the-order,@Transactional và các annotation dựa trên AOP khác>>
+* Tùy chỉnh <<customizing-expression-handling,cách xử lý biểu thức SpEL>>
+* Tích hợp với <<custom-authorization-managers,hệ thống authorization tùy chỉnh>>
 
 [[method-security-architecture]]
-== How Method Security Works
+== Method Security Hoạt động Như thế nào
 
-Spring Security's method authorization support is handy for:
+Tính năng hỗ trợ authorization cho method của Spring Security hữu ích trong các trường hợp:
 
-* Extracting fine-grained authorization logic; for example, when the method parameters and return values contribute to the authorization decision.
-* Enforcing security at the service layer
-* Stylistically favoring annotation-based over `HttpSecurity`-based configuration
+* Tách riêng logic authorization chi tiết; ví dụ khi các tham số method và giá trị trả về góp phần vào quyết định authorization.
+* Thực thi security ở service layer
+* Ưu tiên cấu hình dựa trên annotation thay vì cấu hình dựa trên `HttpSecurity` về mặt phong cách
 
-And since Method Security is built using {spring-framework-reference-url}core.html#aop-api[Spring AOP], you have access to all its expressive power to override Spring Security's defaults as needed.
+Và vì Method Security được xây dựng bằng {spring-framework-reference-url}core.html#aop-api[Spring AOP], bạn có thể tận dụng toàn bộ khả năng biểu đạt của nó để ghi đè các giá trị mặc định của Spring Security khi cần.
 
-As already mentioned, you begin by adding `@EnableMethodSecurity` to a `@Configuration` class or `<sec:method-security/>` in a Spring XML configuration file.
+Như đã đề cập, bạn bắt đầu bằng cách thêm `@EnableMethodSecurity` vào một class `@Configuration` hoặc `<sec:method-security/>` vào file cấu hình XML của Spring.
 
 [[use-method-security]]
 [NOTE]
 ====
-This annotation and XML element supercede `@EnableGlobalMethodSecurity` and `<sec:global-method-security/>`, respectively.
-They offer the following improvements:
+Annotation và phần tử XML này thay thế `@EnableGlobalMethodSecurity` và `<sec:global-method-security/>` tương ứng.
+Chúng mang lại các cải tiến sau:
 
-1. Uses the simplified `AuthorizationManager` API instead of metadata sources, config attributes, decision managers, and voters.
-This simplifies reuse and customization.
-2. Favors direct bean-based configuration, instead of requiring extending `GlobalMethodSecurityConfiguration` to customize beans
-3. Is built using native Spring AOP, removing abstractions and allowing you to use Spring AOP building blocks to customize
-4. Checks for conflicting annotations to ensure an unambiguous security configuration
-5. Complies with JSR-250
-6. Enables `@PreAuthorize`, `@PostAuthorize`, `@PreFilter`, and `@PostFilter` by default
+1. Sử dụng API `AuthorizationManager` đơn giản hóa thay cho metadata source, config attribute, decision manager và voter.
+Điều này đơn giản hóa việc tái sử dụng và tùy chỉnh.
+2. Ưu tiên cấu hình trực tiếp dựa trên bean thay vì yêu cầu mở rộng `GlobalMethodSecurityConfiguration` để tùy chỉnh bean
+3. Được xây dựng bằng Spring AOP nguyên bản, loại bỏ các abstraction và cho phép bạn sử dụng các khối xây dựng của Spring AOP để tùy chỉnh
+4. Kiểm tra các annotation xung đột để bảo đảm cấu hình security không mơ hồ
+5. Tuân thủ JSR-250
+6. Mặc định kích hoạt `@PreAuthorize`, `@PostAuthorize`, `@PreFilter` và `@PostFilter`
 
-If you are using `@EnableGlobalMethodSecurity` or `<global-method-security/>`, these are now deprecated, and you are encouraged to migrate.
+Nếu bạn đang sử dụng `@EnableGlobalMethodSecurity` hoặc `<global-method-security/>`, chúng hiện đã deprecated và bạn nên di chuyển sang cách mới.
 ====
 
-Method authorization is a combination of before- and after-method authorization.
-Consider a service bean that is annotated in the following way:
+Authorization cho method là sự kết hợp giữa authorization trước method và sau method.
+Hãy xem một service bean được gắn annotation như sau:
 
 [tabs]
 ======
@@ -112,63 +112,63 @@ open class MyCustomerService {
 ----
 ======
 
-A given invocation to `MyCustomerService#readCustomer` may look something like this when Method Security <<activate-method-security,is activated>>:
+Một lần gọi `MyCustomerService#readCustomer` có thể diễn ra như sau khi Method Security <<activate-method-security,được kích hoạt>>:
 
 [.invert-dark]
 image::{figures}/methodsecurity.png[]
 
-1. Spring AOP invokes its proxy method for `readCustomer`. Among the proxy's other advisors, it invokes an javadoc:org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor[] that matches <<annotation-method-pointcuts,the `@PreAuthorize` pointcut>>
-2. The interceptor invokes javadoc:org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager[`PreAuthorizeAuthorizationManager#authorize`]
-3. The authorization manager uses a `MethodSecurityExpressionHandler` to parse the annotation's <<authorization-expressions,SpEL expression>> and constructs a corresponding `EvaluationContext` from a `MethodSecurityExpressionRoot` containing xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[a `Supplier<Authentication>`] and `MethodInvocation`.
-4. The interceptor uses this context to evaluate the expression; specifically, it reads xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[the `Authentication`] from the `Supplier` and checks whether it has `permission:read` in its collection of xref:servlet/authorization/architecture.adoc#authz-authorities[authorities]
-5. If the evaluation passes, then Spring AOP proceeds to invoke the method.
-6. If not, the interceptor publishes an `AuthorizationDeniedEvent` and throws an javadoc:org.springframework.security.access.AccessDeniedException[] which xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[the `ExceptionTranslationFilter`] catches and returns a 403 status code to the response
-7. After the method returns, Spring AOP invokes an javadoc:org.springframework.security.authorization.method.AuthorizationManagerAfterMethodInterceptor[] that matches <<annotation-method-pointcuts,the `@PostAuthorize` pointcut>>, operating the same as above, but with javadoc:org.springframework.security.authorization.method.PostAuthorizeAuthorizationManager[]
-8. If the evaluation passes (in this case, the return value belongs to the logged-in user), processing continues normally
-9. If not, the interceptor publishes an `AuthorizationDeniedEvent` and throws an javadoc:org.springframework.security.access.AccessDeniedException[], which xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[the `ExceptionTranslationFilter`] catches and returns a 403 status code to the response
+1. Spring AOP gọi method proxy cho `readCustomer`. Trong số các advisor khác của proxy, nó gọi javadoc:org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor[] khớp với <<annotation-method-pointcuts,pointcut `@PreAuthorize`>>
+2. Interceptor gọi javadoc:org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager[`PreAuthorizeAuthorizationManager#authorize`]
+3. Authorization manager sử dụng `MethodSecurityExpressionHandler` để phân tích <<authorization-expressions,biểu thức SpEL>> của annotation và xây dựng `EvaluationContext` tương ứng từ một `MethodSecurityExpressionRoot` chứa xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Supplier<Authentication>`] và `MethodInvocation`.
+4. Interceptor sử dụng context này để đánh giá biểu thức; cụ thể, nó đọc xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] từ `Supplier` và kiểm tra xem nó có `permission:read` trong tập hợp xref:servlet/authorization/architecture.adoc#authz-authorities[các authority] hay không
+5. Nếu việc đánh giá thành công, Spring AOP tiếp tục gọi method.
+6. Nếu không, interceptor phát hành `AuthorizationDeniedEvent` và ném javadoc:org.springframework.security.access.AccessDeniedException[], exception này được xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] bắt và trả về status code 403 cho response
+7. Sau khi method trả về, Spring AOP gọi javadoc:org.springframework.security.authorization.method.AuthorizationManagerAfterMethodInterceptor[] khớp với <<annotation-method-pointcuts,pointcut `@PostAuthorize`>>, hoạt động giống như trên nhưng sử dụng javadoc:org.springframework.security.authorization.method.PostAuthorizeAuthorizationManager[]
+8. Nếu việc đánh giá thành công (trong trường hợp này, giá trị trả về thuộc về người dùng đã đăng nhập), quá trình tiếp tục bình thường
+9. Nếu không, interceptor phát hành `AuthorizationDeniedEvent` và ném javadoc:org.springframework.security.access.AccessDeniedException[], exception này được xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] bắt và trả về status code 403 cho response
 
 [NOTE]
-If the method is not being called in the context of an HTTP request, you will likely need to handle the `AccessDeniedException` yourself
+Nếu method không được gọi trong context của một HTTP request, có thể bạn sẽ cần tự xử lý `AccessDeniedException`
 
 [[unanimous-based-authorization-decisions]]
-=== Multiple Annotations Are Computed In Series
+=== Nhiều Annotation Được Tính Tuần Tự
 
-As demonstrated above, if a method invocation involves multiple <<authorizing-with-annotations,Method Security annotations>>, each of those is processed one at a time.
-This means that they can collectively be thought of as being "anded" together.
-In other words, for an invocation to be authorized, all annotation inspections need to pass authorization.
+Như minh họa ở trên, nếu một lần gọi method liên quan đến nhiều <<authorizing-with-annotations,annotation Method Security>>, mỗi annotation sẽ được xử lý lần lượt.
+Điều này có nghĩa là về tổng thể, chúng được kết hợp bằng phép "and".
+Nói cách khác, để một lần gọi được authorization, tất cả các lần kiểm tra annotation đều phải vượt qua authorization.
 
 [[repeated-annotations]]
-=== Repeated Annotations Are Not Supported
+=== Không Hỗ Trợ Annotation Lặp Lại
 
-That said, it is not supported to repeat the same annotation on the same method.
-For example, you cannot place `@PreAuthorize` twice on the same method.
+Tuy nhiên, không hỗ trợ lặp lại cùng một annotation trên cùng một method.
+Ví dụ, bạn không thể đặt `@PreAuthorize` hai lần trên cùng một method.
 
-Instead, use SpEL's boolean support or its support for delegating to a separate bean.
+Thay vào đó, hãy sử dụng khả năng hỗ trợ boolean của SpEL hoặc khả năng ủy quyền cho một bean riêng biệt.
 
 [[annotation-method-pointcuts]]
-=== Each Annotation Has Its Own Pointcut
+=== Mỗi Annotation Có Pointcut Riêng
 
-Each annotation has its own pointcut instance that looks for that annotation or its <<meta-annotations,meta-annotation>> counterparts across the entire object hierarchy, starting at <<class-or-interface-annotations,the method and its enclosing class>>.
+Mỗi annotation có một instance pointcut riêng để tìm annotation đó hoặc các <<meta-annotations,meta-annotation>> tương ứng trong toàn bộ hierarchy của object, bắt đầu từ <<class-or-interface-annotations,method và class bao quanh nó>>.
 
-// FIXME: AuthorizationMethodPointcuts is package private and Javadoc is not published You can see the specifics of this in javadoc:org.springframework.security.authorization.method.AuthorizationMethodPointcuts[].
+// FIXME: AuthorizationMethodPointcuts là package private và Javadoc chưa được publish. Bạn có thể xem chi tiết trong javadoc:org.springframework.security.authorization.method.AuthorizationMethodPointcuts[].
 
 [[annotation-method-interceptors]]
-=== Each Annotation Has Its Own Method Interceptor
+=== Mỗi Annotation Có Method Interceptor Riêng
 
-Each annotation has its own dedicated method interceptor.
-The reason for this is to make things more composable.
-For example, if needed, you can disable the Spring Security defaults and <<_enabling_certain_annotations,publish only the `@PostAuthorize` method interceptor>>.
+Mỗi annotation có method interceptor chuyên dụng riêng.
+Lý do là để các thành phần có thể kết hợp với nhau dễ dàng hơn.
+Ví dụ, nếu cần, bạn có thể tắt các giá trị mặc định của Spring Security và <<_enabling_certain_annotations,chỉ publish method interceptor `@PostAuthorize`>>.
 
-The method interceptors are as follows:
+Các method interceptor như sau:
 
-* For <<use-preauthorize,`@PreAuthorize`>>, Spring Security uses javadoc:org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor[`AuthorizationManagerBeforeMethodInterceptor#preAuthorize`], which in turn uses javadoc:org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager[]
-* For <<use-postauthorize,`@PostAuthorize`>>, Spring Security uses javadoc:org.springframework.security.authorization.method.AuthorizationManagerAfterMethodInterceptor[`AuthorizationManagerAfterMethodInterceptor#postAuthorize`], which in turn uses javadoc:org.springframework.security.authorization.method.PostAuthorizeAuthorizationManager[]
-* For <<use-prefilter,`@PreFilter`>>, Spring Security uses javadoc:org.springframework.security.authorization.method.PreFilterAuthorizationMethodInterceptor[]
-* For <<use-postfilter,`@PostFilter`>>, Spring Security uses javadoc:org.springframework.security.authorization.method.PostFilterAuthorizationMethodInterceptor[]
-* For <<use-secured,`@Secured`>>, Spring Security uses javadoc:org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor[`AuthorizationManagerBeforeMethodInterceptor#secured`], which in turn uses javadoc:org.springframework.security.authorization.method.SecuredAuthorizationManager[]
-* For JSR-250 annotations, Spring Security uses javadoc:org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor[`AuthorizationManagerBeforeMethodInterceptor#jsr250`], which in turn uses javadoc:org.springframework.security.authorization.method.Jsr250AuthorizationManager[]
+* Với <<use-preauthorize,`@PreAuthorize`>>, Spring Security sử dụng javadoc:org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor[`AuthorizationManagerBeforeMethodInterceptor#preAuthorize`], interceptor này lần lượt sử dụng javadoc:org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager[]
+* Với <<use-postauthorize,`@PostAuthorize`>>, Spring Security sử dụng javadoc:org.springframework.security.authorization.method.AuthorizationManagerAfterMethodInterceptor[`AuthorizationManagerAfterMethodInterceptor#postAuthorize`], interceptor này lần lượt sử dụng javadoc:org.springframework.security.authorization.method.PostAuthorizeAuthorizationManager[]
+* Với <<use-prefilter,`@PreFilter`>>, Spring Security sử dụng javadoc:org.springframework.security.authorization.method.PreFilterAuthorizationMethodInterceptor[]
+* Với <<use-postfilter,`@PostFilter`>>, Spring Security sử dụng javadoc:org.springframework.security.authorization.method.PostFilterAuthorizationMethodInterceptor[]
+* Với <<use-secured,`@Secured`>>, Spring Security sử dụng javadoc:org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor[`AuthorizationManagerBeforeMethodInterceptor#secured`], interceptor này lần lượt sử dụng javadoc:org.springframework.security.authorization.method.SecuredAuthorizationManager[]
+* Với annotation JSR-250, Spring Security sử dụng javadoc:org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor[`AuthorizationManagerBeforeMethodInterceptor#jsr250`], interceptor này lần lượt sử dụng javadoc:org.springframework.security.authorization.method.Jsr250AuthorizationManager[]
 
-Generally speaking, you can consider the following listing as representative of what interceptors Spring Security publishes when you add `@EnableMethodSecurity`:
+Nói chung, bạn có thể xem đoạn code sau là đại diện cho các interceptor mà Spring Security publish khi bạn thêm `@EnableMethodSecurity`:
 
 [tabs]
 ======
@@ -203,9 +203,9 @@ static Advisor postFilterMethodInterceptor() {
 ======
 
 [[favor-granting-authorities]]
-=== Favor Granting Authorities Over Complicated SpEL Expressions
+=== Ưu Tiên Cấp Authority Thay Vì Biểu Thức SpEL Phức Tạp
 
-Quite often it can be tempting to introduce a complicated SpEL expression like the following:
+Bạn thường dễ muốn đưa vào một biểu thức SpEL phức tạp như sau:
 
 [tabs]
 ======
@@ -225,8 +225,8 @@ Kotlin::
 ======
 
 
-However, you could instead grant `permission:read` to those with `ROLE_ADMIN`.
-One way to do this is with a `RoleHierarchy` like so:
+Tuy nhiên, thay vào đó bạn có thể cấp `permission:read` cho những người có `ROLE_ADMIN`.
+Một cách để làm điều này là sử dụng `RoleHierarchy` như sau:
 
 [tabs]
 ======
@@ -263,8 +263,8 @@ Xml::
 ----
 ======
 
-and then <<customizing-expression-handling,set that in a `MethodSecurityExpressionHandler` instance>>.
-This then allows you to have a simpler <<use-preauthorize,`@PreAuthorize`>> expression like this one:
+và sau đó <<customizing-expression-handling,đặt nó vào một instance `MethodSecurityExpressionHandler`>>.
+Khi đó, bạn có thể sử dụng biểu thức <<use-preauthorize,`@PreAuthorize`>> đơn giản hơn như sau:
 
 [tabs]
 ======
@@ -283,37 +283,37 @@ Kotlin::
 ----
 ======
 
-Or, where possible, adapt application-specific authorization logic into granted authorities at login time.
+Hoặc, nếu có thể, hãy chuyển logic authorization riêng của ứng dụng thành các authority được cấp tại thời điểm login.
 
 [[request-vs-method]]
-== Comparing Request-level vs Method-level Authorization
+== So sánh Authorization ở Cấp Request và Cấp Method
 
-When should you favor method-level authorization over xref:servlet/authorization/authorize-http-requests.adoc[request-level authorization]?
-Some of it comes down to taste; however, consider the following strengths list of each to help you decide.
+Khi nào nên ưu tiên authorization ở cấp method thay cho xref:servlet/authorization/authorize-http-requests.adoc[authorization ở cấp request]?
+Một phần phụ thuộc vào sở thích; tuy nhiên, hãy cân nhắc danh sách ưu điểm sau của mỗi cách để đưa ra quyết định.
 
 |===
 || *request-level* | *method-level*
-| *authorization type* | coarse-grained | fine-grained
-| *configuration location* | declared in a config class | local to method declaration
-| *configuration style* | DSL | Annotations
-| *authorization definitions* | programmatic | SpEL
+| *loại authorization* | coarse-grained | fine-grained
+| *vị trí cấu hình* | khai báo trong một config class | cục bộ tại khai báo method
+| *phong cách cấu hình* | DSL | Annotation
+| *định nghĩa authorization* | programmatic | SpEL
 |===
 
-The main tradeoff seems to be where you want your authorization rules to live.
+Đánh đổi chính dường như nằm ở nơi bạn muốn đặt các quy tắc authorization.
 
 [NOTE]
-It's important to remember that when you use annotation-based Method Security, then unannotated methods are not secured.
-To protect against this, declare xref:servlet/authorization/authorize-http-requests.adoc#activate-request-security[a catch-all authorization rule] in your xref:servlet/configuration/java.adoc#jc-httpsecurity[`HttpSecurity`] instance.
+Điều quan trọng cần nhớ là khi sử dụng Method Security dựa trên annotation, các method không có annotation sẽ không được bảo vệ.
+Để bảo vệ khỏi điều này, hãy khai báo xref:servlet/authorization/authorize-http-requests.adoc#activate-request-security[một quy tắc authorization bao quát] trong instance xref:servlet/configuration/java.adoc#jc-httpsecurity[`HttpSecurity`].
 
 [[authorizing-with-annotations]]
-== Authorizing with Annotations
+== Thực hiện Authorization bằng Annotation
 
-The primary way Spring Security enables method-level authorization support is through annotations that you can add to methods, classes, and interfaces.
+Cách chính để Spring Security hỗ trợ authorization ở cấp method là thông qua các annotation mà bạn có thể thêm vào method, class và interface.
 
 [[use-preauthorize]]
-=== Authorizing Method Invocation with `@PreAuthorize`
+=== Thực hiện Authorization cho Lần Gọi Method bằng `@PreAuthorize`
 
-When <<activate-method-security,Method Security is active>>, you can annotate a method with the javadoc:org.springframework.security.access.prepost.PreAuthorize[format=annotation] annotation like so:
+Khi <<activate-method-security,Method Security đang hoạt động>>, bạn có thể gắn annotation javadoc:org.springframework.security.access.prepost.PreAuthorize[format=annotation] lên một method như sau:
 
 [tabs]
 ======
@@ -344,9 +344,9 @@ open class BankService {
 ----
 ======
 
-This is meant to indicate that the method can only be invoked if the provided expression `hasRole('ADMIN')` passes.
+Điều này cho biết method chỉ có thể được gọi nếu biểu thức được cung cấp `hasRole('ADMIN')` cho kết quả đạt.
 
-You can then xref:servlet/test/method.adoc[test the class] to confirm it is enforcing the authorization rule like so:
+Sau đó, bạn có thể xref:servlet/test/method.adoc[kiểm thử class] để xác nhận class thực thi quy tắc authorization như sau:
 
 [tabs]
 ======
@@ -394,14 +394,14 @@ fun readAccountWithWrongRoleThenAccessDenied() {
 ======
 
 [TIP]
-`@PreAuthorize` also can be a <<meta-annotations, meta-annotation>>, be defined <<class-or-interface-annotations,at the class or interface level>>, and use <<authorization-expressions, SpEL Authorization Expressions>>.
+`@PreAuthorize` cũng có thể là một <<meta-annotations, meta-annotation>>, được định nghĩa <<class-or-interface-annotations,ở cấp class hoặc interface>> và sử dụng <<authorization-expressions,biểu thức Authorization SpEL>>.
 
-While `@PreAuthorize` is quite helpful for declaring needed authorities, it can also be used to evaluate more complex <<using_method_parameters,expressions that involve the method parameters>>.
+Mặc dù `@PreAuthorize` rất hữu ích để khai báo các authority cần thiết, nó cũng có thể được dùng để đánh giá các <<using_method_parameters,biểu thức phức tạp hơn có sử dụng tham số method>>.
 
 [[use-postauthorize]]
-=== Authorization Method Results with `@PostAuthorize`
+=== Thực hiện Authorization cho Kết quả Method bằng `@PostAuthorize`
 
-When Method Security is active, you can annotate a method with the javadoc:org.springframework.security.access.prepost.PostAuthorize[format=annotation] annotation like so:
+Khi Method Security đang hoạt động, bạn có thể gắn annotation javadoc:org.springframework.security.access.prepost.PostAuthorize[format=annotation] lên một method như sau:
 
 [tabs]
 ======
@@ -432,10 +432,10 @@ open class BankService {
 ----
 ======
 
-This is meant to indicate that the method can only return the value if the provided expression `returnObject.owner == authentication.name` passes.
-`returnObject` represents the `Account` object to be returned.
+Điều này cho biết method chỉ có thể trả về giá trị nếu biểu thức được cung cấp `returnObject.owner == authentication.name` cho kết quả đạt.
+`returnObject` đại diện cho object `Account` sẽ được trả về.
 
-You can then xref:servlet/test/method.adoc[test the class] to confirm it is enforcing the authorization rule:
+Sau đó, bạn có thể xref:servlet/test/method.adoc[kiểm thử class] để xác nhận class thực thi quy tắc authorization:
 
 [tabs]
 ======
@@ -483,10 +483,10 @@ fun readAccountWhenNotOwnedThenAccessDenied() {
 ======
 
 [TIP]
-`@PostAuthorize` also can be a <<meta-annotations,meta-annotation>>, be defined <<class-or-interface-annotations,at the class or interface level>>, and use <<authorization-expressions, SpEL Authorization Expressions>>.
+`@PostAuthorize` cũng có thể là một <<meta-annotations,meta-annotation>>, được định nghĩa <<class-or-interface-annotations,ở cấp class hoặc interface>> và sử dụng <<authorization-expressions,biểu thức Authorization SpEL>>.
 
-`@PostAuthorize` is particularly helpful when defending against https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html[Insecure Direct Object Reference].
-In fact, it can be defined as a <<meta-annotations,meta-annotation>> like so:
+`@PostAuthorize` đặc biệt hữu ích khi phòng chống https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html[Insecure Direct Object Reference].
+Thực tế, bạn có thể định nghĩa nó thành một <<meta-annotations,meta-annotation>> như sau:
 
 [tabs]
 ======
@@ -511,7 +511,7 @@ annotation class RequireOwnership
 ----
 ======
 
-Allowing you to instead annotate the service in the following way:
+Nhờ đó, bạn có thể gắn annotation lên service theo cách sau:
 
 [tabs]
 ======
@@ -542,21 +542,21 @@ open class BankService {
 ----
 ======
 
-The result is that the above method will only return the `Account` if its `owner` attribute matches the logged-in user's `name`.
-If not, Spring Security will throw an `AccessDeniedException` and return a 403 status code.
+Kết quả là method ở trên chỉ trả về `Account` nếu attribute `owner` của nó khớp với `name` của người dùng đã đăng nhập.
+Nếu không, Spring Security sẽ ném `AccessDeniedException` và trả về status code 403.
 
 [NOTE]
 =====
-Note that `@PostAuthorize` is not recommended for classes that perform database writes since that typically means that a database change was made before the security invariants were checked.
-A common example of doing this is if you have `@Transactional` and `@PostAuthorize` on the same method.
-Instead, read the value first, using `@PostAuthorize` on the read, and then perform the database write, should that read is authorized.
-If you must do something like this, you can <<changing-the-order, ensure that `@EnableTransactionManagement` comes before `@EnableMethodSecurity`>>.
+Lưu ý rằng `@PostAuthorize` không được khuyến nghị cho các class thực hiện ghi vào database vì điều đó thường có nghĩa là thay đổi database đã xảy ra trước khi các invariant về security được kiểm tra.
+Một ví dụ phổ biến là khi bạn có `@Transactional` và `@PostAuthorize` trên cùng một method.
+Thay vào đó, trước tiên hãy đọc giá trị bằng cách sử dụng `@PostAuthorize` cho thao tác đọc, rồi thực hiện ghi vào database nếu thao tác đọc đó được authorization.
+Nếu bắt buộc phải làm như vậy, bạn có thể <<changing-the-order,đảm bảo `@EnableTransactionManagement` đứng trước `@EnableMethodSecurity>>.
 =====
 
 [[use-prefilter]]
-=== Filtering Method Parameters with `@PreFilter`
+=== Lọc Tham số Method bằng `@PreFilter`
 
-When Method Security is active, you can annotate a method with the javadoc:org.springframework.security.access.prepost.PreFilter[format=annotation] annotation like so:
+Khi Method Security đang hoạt động, bạn có thể gắn annotation javadoc:org.springframework.security.access.prepost.PreFilter[format=annotation] lên một method như sau:
 
 [tabs]
 ======
@@ -589,10 +589,10 @@ open class BankService {
 ----
 ======
 
-This is meant to filter out any values from `accounts` where the expression `filterObject.owner == authentication.name` fails.
-`filterObject` represents each `account` in `accounts` and is used to test each `account`.
+Điều này nhằm lọc ra khỏi `accounts` mọi giá trị mà biểu thức `filterObject.owner == authentication.name` cho kết quả không đạt.
+`filterObject` đại diện cho từng `account` trong `accounts` và được dùng để kiểm tra từng `account`.
 
-You can then test the class in the following way to confirm it is enforcing the authorization rule:
+Sau đó, bạn có thể kiểm thử class theo cách sau để xác nhận class thực thi quy tắc authorization:
 
 [tabs]
 ======
@@ -632,11 +632,11 @@ fun updateAccountsWhenOwnedThenReturns() {
 ======
 
 [TIP]
-`@PreFilter` also can be a <<meta-annotations,meta-annotation>>, be defined <<class-or-interface-annotations,at the class or interface level>>, and use <<authorization-expressions, SpEL Authorization Expressions>>.
+`@PreFilter` cũng có thể là một <<meta-annotations,meta-annotation>>, được định nghĩa <<class-or-interface-annotations,ở cấp class hoặc interface>> và sử dụng <<authorization-expressions,biểu thức Authorization SpEL>>.
 
-`@PreFilter` supports arrays, collections, maps, and streams (so long as the stream is still open).
+`@PreFilter` hỗ trợ array, collection, map và stream (miễn là stream vẫn đang mở).
 
-For example, the above `updateAccounts` declaration will function the same way as the following other four:
+Ví dụ, khai báo `updateAccounts` ở trên sẽ hoạt động giống như bốn khai báo sau:
 
 [tabs]
 ======
@@ -675,12 +675,12 @@ fun updateAccounts(accounts: Stream<Account>): Collection<Account>
 ----
 ======
 
-The result is that the above method will only have the `Account` instances where their `owner` attribute matches the logged-in user's `name`.
+Kết quả là method ở trên chỉ có các instance `Account` mà attribute `owner` của chúng khớp với `name` của người dùng đã đăng nhập.
 
 [[use-postfilter]]
-=== Filtering Method Results with `@PostFilter`
+=== Lọc Kết quả Method bằng `@PostFilter`
 
-When Method Security is active, you can annotate a method with the javadoc:org.springframework.security.access.prepost.PostFilter[format=annotation] annotation like so:
+Khi Method Security đang hoạt động, bạn có thể gắn annotation javadoc:org.springframework.security.access.prepost.PostFilter[format=annotation] lên một method như sau:
 
 [tabs]
 ======
@@ -713,10 +713,10 @@ open class BankService {
 ----
 ======
 
-This is meant to filter out any values from the return value where the expression `filterObject.owner == authentication.name` fails.
-`filterObject` represents each `account` in `accounts` and is used to test each `account`.
+Điều này nhằm lọc ra khỏi giá trị trả về mọi giá trị mà biểu thức `filterObject.owner == authentication.name` cho kết quả không đạt.
+`filterObject` đại diện cho từng `account` trong `accounts` và được dùng để kiểm tra từng `account`.
 
-You can then test the class like so to confirm it is enforcing the authorization rule:
+Sau đó, bạn có thể kiểm thử class như sau để xác nhận class thực thi quy tắc authorization:
 
 [tabs]
 ======
@@ -754,11 +754,11 @@ fun readAccountsWhenOwnedThenReturns() {
 ======
 
 [TIP]
-`@PostFilter` also can be a <<meta-annotations,meta-annotation>>, be defined <<class-or-interface-annotations,at the class or interface level>>, and use <<authorization-expressions, SpEL Authorization Expressions>>.
+`@PostFilter` cũng có thể là một <<meta-annotations,meta-annotation>>, được định nghĩa <<class-or-interface-annotations,ở cấp class hoặc interface>> và sử dụng <<authorization-expressions,biểu thức Authorization SpEL>>.
 
-`@PostFilter` supports arrays, collections, maps, and streams (so long as the stream is still open).
+`@PostFilter` hỗ trợ array, collection, map và stream (miễn là stream vẫn đang mở).
 
-For example, the above `readAccounts` declaration will function the same way as the following other four:
+Ví dụ, khai báo `readAccounts` ở trên sẽ hoạt động giống như bốn khai báo sau:
 
 [tabs]
 ======
@@ -797,18 +797,18 @@ fun readAccounts(vararg ids: String): Stream<Account>
 ----
 ======
 
-The result is that the above method will return the `Account` instances where their `owner` attribute matches the logged-in user's `name`.
+Kết quả là method ở trên sẽ trả về các instance `Account` mà attribute `owner` của chúng khớp với `name` của người dùng đã đăng nhập.
 
 [NOTE]
-In-memory filtering can obviously be expensive, and so be considerate of whether it is better to xref:servlet/integrations/data.adoc[filter the data in the data layer] instead.
+Rõ ràng việc lọc trong memory có thể tốn kém, vì vậy hãy cân nhắc xem có nên xref:servlet/integrations/data.adoc[lọc dữ liệu ở data layer] thay thế hay không.
 
 [[use-secured]]
-=== Authorizing Method Invocation with `@Secured`
+=== Thực hiện Authorization cho Lần Gọi Method bằng `@Secured`
 
-javadoc:org.springframework.security.access.annotation.Secured[format=annotation] is a legacy option for authorizing invocations.
-<<use-preauthorize,`@PreAuthorize`>> supersedes it and is recommended instead.
+javadoc:org.springframework.security.access.annotation.Secured[format=annotation] là một lựa chọn legacy để thực hiện authorization cho các lần gọi.
+<<use-preauthorize,`@PreAuthorize`>> thay thế nó và được khuyến nghị sử dụng.
 
-To use the `@Secured` annotation, you should first change your Method Security declaration to enable it like so:
+Để sử dụng annotation `@Secured`, trước tiên bạn cần thay đổi khai báo Method Security để kích hoạt nó như sau:
 
 [tabs]
 ======
@@ -834,15 +834,15 @@ Xml::
 ----
 ======
 
-This will cause Spring Security to publish <<annotation-method-interceptors,the corresponding method interceptor>> that authorizes methods, classes, and interfaces annotated with `@Secured`.
+Điều này khiến Spring Security publish <<annotation-method-interceptors,method interceptor tương ứng>> để thực hiện authorization cho các method, class và interface được gắn `@Secured`.
 
 [[use-jsr250]]
-=== Authorizing Method Invocation with JSR-250 Annotations
+=== Thực hiện Authorization cho Lần Gọi Method bằng Annotation JSR-250
 
-In case you would like to use https://jcp.org/en/jsr/detail?id=250[JSR-250] annotations, Spring Security also supports that.
-<<use-preauthorize,`@PreAuthorize`>> has more expressive power and is thus recommended.
+Nếu bạn muốn sử dụng annotation https://jcp.org/en/jsr/detail?id=250[JSR-250], Spring Security cũng hỗ trợ.
+<<use-preauthorize,`@PreAuthorize`>> có khả năng biểu đạt cao hơn và do đó được khuyến nghị.
 
-To use the JSR-250 annotations, you should first change your Method Security declaration to enable them like so:
+Để sử dụng annotation JSR-250, trước tiên bạn cần thay đổi khai báo Method Security để kích hoạt chúng như sau:
 
 [tabs]
 ======
@@ -868,15 +868,15 @@ Xml::
 ----
 ======
 
-This will cause Spring Security to publish <<annotation-method-interceptors,the corresponding method interceptor>> that authorizes methods, classes, and interfaces annotated with `@RolesAllowed`, `@PermitAll`, and `@DenyAll`.
+Điều này khiến Spring Security publish <<annotation-method-interceptors,method interceptor tương ứng>> để thực hiện authorization cho các method, class và interface được gắn `@RolesAllowed`, `@PermitAll` và `@DenyAll`.
 
 
 [[class-or-interface-annotations]]
-=== Declaring Annotations at the Class or Interface Level
+=== Khai báo Annotation ở Cấp Class hoặc Interface
 
-It's also supported to have Method Security annotations at the class and interface level.
+Method Security cũng hỗ trợ annotation ở cấp class và interface.
 
-If it is at the class level like so:
+Nếu annotation ở cấp class như sau:
 
 [tabs]
 ======
@@ -905,9 +905,9 @@ open class MyController {
 ----
 ======
 
-then all methods inherit the class-level behavior.
+thì tất cả method sẽ kế thừa behavior ở cấp class.
 
-Or, if it's declared like the following at both the class and method level:
+Hoặc nếu nó được khai báo ở cả cấp class và method như sau:
 
 [tabs]
 ======
@@ -938,20 +938,20 @@ open class MyController {
 ----
 ======
 
-then methods declaring the annotation override the class-level annotation.
+thì các method khai báo annotation sẽ ghi đè annotation ở cấp class.
 
-The same is true for interfaces, with the exception that if a class inherits the annotation from two different interfaces, then startup will fail.
-This is because Spring Security has no way to tell which one you want to use.
+Điều tương tự cũng đúng với interface, ngoại trừ trường hợp một class kế thừa annotation từ hai interface khác nhau thì startup sẽ thất bại.
+Đó là vì Spring Security không có cách nào biết bạn muốn sử dụng annotation nào.
 
-In cases like this, you can resolve the ambiguity by adding the annotation to the concrete method.
+Trong trường hợp như vậy, bạn có thể giải quyết sự mơ hồ bằng cách thêm annotation vào method cụ thể.
 
 [[meta-annotations]]
-=== Using Meta Annotations
+=== Sử dụng Meta-Annotation
 
-Method Security supports meta annotations.
-This means that you can take any annotation and improve readability based on your application-specific use cases.
+Method Security hỗ trợ meta-annotation.
+Điều này có nghĩa là bạn có thể sử dụng bất kỳ annotation nào và cải thiện khả năng đọc dựa trên các trường hợp sử dụng riêng của ứng dụng.
 
-For example, you can simplify `@PreAuthorize("hasRole('ADMIN')")` to `@IsAdmin` like so:
+Ví dụ, bạn có thể đơn giản hóa `@PreAuthorize("hasRole('ADMIN')")` thành `@IsAdmin` như sau:
 
 [tabs]
 ======
@@ -976,7 +976,7 @@ annotation class IsAdmin
 ----
 ======
 
-And the result is that on your secured methods you can now do the following instead:
+Kết quả là trên các method được bảo vệ, giờ đây bạn có thể dùng cách sau:
 
 [tabs]
 ======
@@ -1007,13 +1007,13 @@ open class BankService {
 ----
 ======
 
-This results in more readable method definitions.
+Điều này tạo ra các định nghĩa method dễ đọc hơn.
 
-==== Templating Meta-Annotation Expressions
+==== Tạo Template cho Biểu thức Meta-Annotation
 
-You can also opt into using meta-annotation templates, which allow for much more powerful annotation definitions.
+Bạn cũng có thể chọn sử dụng template meta-annotation, cho phép định nghĩa annotation mạnh mẽ hơn nhiều.
 
-First, publish the following bean:
+Trước tiên, hãy publish bean sau:
 
 [tabs]
 ======
@@ -1040,7 +1040,7 @@ companion object {
 ----
 ======
 
-Now instead of `@IsAdmin`, you can create something more powerful like `@HasRole` like so:
+Giờ đây, thay vì `@IsAdmin`, bạn có thể tạo một annotation mạnh mẽ hơn như `@HasRole`:
 
 [tabs]
 ======
@@ -1067,7 +1067,7 @@ annotation class HasRole(val value: String)
 ----
 ======
 
-And the result is that on your secured methods you can now do the following instead:
+Kết quả là trên các method được bảo vệ, giờ đây bạn có thể dùng cách sau:
 
 [tabs]
 ======
@@ -1098,9 +1098,9 @@ open class BankService {
 ----
 ======
 
-Note that this works with method variables and all annotation types, too, though you will want to be careful to correctly take care of quotation marks so the resulting SpEL expression is correct.
+Lưu ý rằng cách này cũng hoạt động với biến method và mọi loại annotation, tuy nhiên bạn cần cẩn thận xử lý dấu ngoặc kép để biểu thức SpEL kết quả được chính xác.
 
-For example, consider the following `@HasAnyRole` annotation:
+Ví dụ, hãy xem annotation `@HasAnyRole` sau:
 
 [tabs]
 ======
@@ -1127,7 +1127,7 @@ annotation class HasAnyRole(val roles: Array<String>)
 ----
 ======
 
-In that case, you'll notice that you should not use the quotation marks in the expression, but instead in the parameter value like so:
+Trong trường hợp này, bạn sẽ thấy không nên dùng dấu ngoặc kép trong biểu thức mà nên dùng chúng trong giá trị tham số như sau:
 
 [tabs]
 ======
@@ -1158,18 +1158,18 @@ open class BankService {
 ----
 ======
 
-so that, once replaced, the expression becomes `@PreAuthorize("hasAnyRole('USER', 'ADMIN')")`.
+để sau khi thay thế, biểu thức trở thành `@PreAuthorize("hasAnyRole('USER', 'ADMIN')")`.
 
 [[enable-annotation]]
-=== Enabling Certain Annotations
+=== Kích hoạt Annotation Cụ thể
 
-You can turn off ``@EnableMethodSecurity``'s pre-configuration and replace it with you own.
-You may choose to do this if you want to <<custom-authorization-managers,customize the `AuthorizationManager`>> or `Pointcut`.
-Or you may simply want to only enable a specific annotation, like `@PostAuthorize`.
+Bạn có thể tắt cấu hình trước của ``@EnableMethodSecurity`` và thay thế bằng cấu hình của riêng mình.
+Bạn có thể chọn cách này nếu muốn <<custom-authorization-managers,tùy chỉnh `AuthorizationManager`>> hoặc `Pointcut`.
+Hoặc bạn chỉ muốn kích hoạt một annotation cụ thể, chẳng hạn `@PostAuthorize`.
 
-You can do this in the following way:
+Bạn có thể làm như sau:
 
-.Only @PostAuthorize Configuration
+.Chỉ cấu hình @PostAuthorize
 [tabs]
 ======
 Java::
@@ -1216,14 +1216,14 @@ Xml::
 ----
 ======
 
-The above snippet achieves this by first disabling Method Security's pre-configurations and then publishing <<annotation-method-interceptors, the `@PostAuthorize` interceptor>> itself.
+Đoạn code trên thực hiện điều này bằng cách trước tiên tắt các cấu hình trước của Method Security, sau đó tự publish <<annotation-method-interceptors,interceptor `@PostAuthorize`>>.
 
 [[use-intercept-methods]]
-== Authorizing with `<intercept-methods>`
+== Thực hiện Authorization bằng `<intercept-methods>`
 
-While using Spring Security's <<authorizing-with-annotations,annotation-based support>> is preferred for method security, you can also use XML to declare bean authorization rules.
+Mặc dù sử dụng <<authorizing-with-annotations,tính năng hỗ trợ dựa trên annotation>> của Spring Security được ưu tiên cho method security, bạn cũng có thể sử dụng XML để khai báo các quy tắc authorization cho bean.
 
-If you need to declare it in your XML configuration instead, you can use xref:servlet/appendix/namespace/method-security.adoc#nsa-intercept-methods[`<intercept-methods>`] like so:
+Nếu cần khai báo trong cấu hình XML, bạn có thể sử dụng xref:servlet/appendix/namespace/method-security.adoc#nsa-intercept-methods[`<intercept-methods>`] như sau:
 
 [tabs]
 ======
@@ -1241,22 +1241,22 @@ Xml::
 ======
 
 [NOTE]
-This only supports matching method by prefix or by name.
-If your needs are more complex than that, <<authorizing-with-annotations,use annotation support>> instead.
+Tính năng này chỉ hỗ trợ khớp method theo prefix hoặc theo tên.
+Nếu nhu cầu của bạn phức tạp hơn, hãy sử dụng <<authorizing-with-annotations,tính năng hỗ trợ annotation>>.
 
 [[use-programmatic-authorization]]
-== Authorizing Methods Programmatically
+== Thực hiện Authorization cho Method bằng Programmatic API
 
-As you've already seen, there are several ways that you can specify non-trivial authorization rules using <<authorization-expressions, Method Security SpEL expressions>>.
+Như đã thấy, có một số cách để bạn chỉ định các quy tắc authorization không tầm thường bằng <<authorization-expressions,biểu thức SpEL của Method Security>>.
 
-There are a number of ways that you can instead allow your logic to be Java-based instead of SpEL-based.
-This gives use access the entire Java language for increased testability and flow control.
+Thay vào đó, có một số cách cho phép bạn viết logic dựa trên Java thay vì dựa trên SpEL.
+Điều này cho phép sử dụng toàn bộ ngôn ngữ Java để tăng khả năng kiểm thử và kiểm soát flow.
 
-=== Using a Custom Bean in SpEL
+=== Sử dụng Bean Tùy chỉnh trong SpEL
 
-The first way to authorize a method programmatically is a two-step process.
+Cách đầu tiên để thực hiện authorization cho method bằng programmatic API là một quy trình gồm hai bước.
 
-First, declare a bean that has a method that takes a `MethodSecurityExpressionOperations` instance like the following:
+Trước tiên, khai báo một bean có method nhận một instance `MethodSecurityExpressionOperations` như sau:
 
 [tabs]
 ======
@@ -1285,7 +1285,7 @@ open class AuthorizationLogic {
 ----
 ======
 
-Then, reference that bean in your annotations in the following way:
+Sau đó, tham chiếu bean đó trong annotation như sau:
 
 [tabs]
 ======
@@ -1318,15 +1318,15 @@ open class MyController {
 ----
 ======
 
-Spring Security will invoke the given method on that bean for each method invocation.
+Spring Security sẽ gọi method đã cho trên bean đó trong mỗi lần gọi method.
 
-What's nice about this is all your authorization logic is in a separate class that can be independently unit tested and verified for correctness.
-It also has access to the full Java language.
+Điểm hữu ích là toàn bộ logic authorization nằm trong một class riêng, có thể được unit test và xác minh tính đúng đắn độc lập.
+Class này cũng có quyền truy cập toàn bộ ngôn ngữ Java.
 
 [TIP]
-In addition to returning a `Boolean`, you can also return `null` to indicate that the code abstains from making a decision.
+Ngoài việc trả về `Boolean`, bạn cũng có thể trả về `null` để cho biết code không đưa ra quyết định.
 
-If you want to include more information about the nature of the decision, you can instead return a custom `AuthorizationDecision` like this:
+Nếu muốn đưa thêm thông tin về bản chất của quyết định, thay vào đó bạn có thể trả về `AuthorizationDecision` tùy chỉnh như sau:
 
 [tabs]
 ======
@@ -1357,23 +1357,23 @@ open class AuthorizationLogic {
 ----
 ======
 
-Or throw a custom `AuthorizationDeniedException` instance.
-Note, though, that returning an object is preferred as this doesn't incur the expense of generating a stacktrace.
+Hoặc ném một instance `AuthorizationDeniedException` tùy chỉnh.
+Tuy nhiên, nên ưu tiên trả về một object vì cách này không phát sinh chi phí tạo stacktrace.
 
-Then, you can access the custom details when you <<fallback-values-authorization-denied, customize how the authorization result is handled>>.
+Sau đó, bạn có thể truy cập các chi tiết tùy chỉnh khi <<fallback-values-authorization-denied,tùy chỉnh cách xử lý kết quả authorization>>.
 
 [TIP]
 ====
-Further, you can return an `AuthorizationManager` itself.
-This is helpful when unifying custom web authorization rules with method security ones since web security by default requires specifying an `AuthorizationManager` instance.
+Ngoài ra, bạn có thể tự trả về một `AuthorizationManager`.
+Điều này hữu ích khi hợp nhất các quy tắc web authorization tùy chỉnh với các quy tắc method security, vì web security theo mặc định yêu cầu chỉ định một instance `AuthorizationManager`.
 ====
 
 [[custom-authorization-managers]]
-=== Using a Custom Authorization Manager
+=== Sử dụng Authorization Manager Tùy chỉnh
 
-The second way to authorize a method programmatically is to create a custom xref:servlet/authorization/architecture.adoc#_the_authorizationmanager[`AuthorizationManager`].
+Cách thứ hai để thực hiện authorization cho method bằng programmatic API là tạo xref:servlet/authorization/architecture.adoc#_the_authorizationmanager[`AuthorizationManager`] tùy chỉnh.
 
-First, declare an authorization manager instance, perhaps like this one:
+Trước tiên, khai báo một instance authorization manager, chẳng hạn như sau:
 
 [tabs]
 ======
@@ -1418,10 +1418,10 @@ class MyPostAuthorizeAuthorizationManager : AuthorizationManager<MethodInvocatio
 ----
 ======
 
-Then, publish the method interceptor with a pointcut that corresponds to when you want that `AuthorizationManager` to run.
-For example, you could replace how `@PreAuthorize` and `@PostAuthorize` work like so:
+Sau đó, publish method interceptor với một pointcut tương ứng với thời điểm bạn muốn `AuthorizationManager` đó chạy.
+Ví dụ, bạn có thể thay thế cách hoạt động của `@PreAuthorize` và `@PostAuthorize` như sau:
 
-.Only @PreAuthorize and @PostAuthorize Configuration
+.Chỉ cấu hình @PreAuthorize và @PostAuthorize
 [tabs]
 ======
 Java::
@@ -1490,18 +1490,18 @@ Xml::
 
 [TIP]
 ====
-You can place your interceptor in between Spring Security method interceptors using the order constants specified in `AuthorizationInterceptorsOrder`.
+Bạn có thể đặt interceptor của mình giữa các method interceptor của Spring Security bằng cách sử dụng các hằng số order được chỉ định trong `AuthorizationInterceptorsOrder`.
 ====
 
-You can also implement `MethodAuthorizationDeniedHandler` in the same manager class to override the default exception-handling behavior.
+Bạn cũng có thể implement `MethodAuthorizationDeniedHandler` trong cùng manager class để ghi đè behavior xử lý exception mặc định.
 
 [[customizing-expression-handling]]
-=== Customizing Expression Handling
+=== Tùy chỉnh Cách Xử lý Biểu thức
 
-Or, third, you can customize how each SpEL expression is handled.
-To do that, you can expose a custom javadoc:org.springframework.security.access.expression.method.MethodSecurityExpressionHandler[], like so:
+Hoặc, cách thứ ba, bạn có thể tùy chỉnh cách xử lý từng biểu thức SpEL.
+Để làm vậy, bạn có thể expose một javadoc:org.springframework.security.access.expression.method.MethodSecurityExpressionHandler[] tùy chỉnh như sau:
 
-.Custom MethodSecurityExpressionHandler
+.MethodSecurityExpressionHandler Tùy chỉnh
 [tabs]
 ======
 Java::
@@ -1547,19 +1547,19 @@ Xml::
 
 [TIP]
 ====
-We expose `MethodSecurityExpressionHandler` using a `static` method to ensure that Spring publishes it before it initializes Spring Security's method security `@Configuration` classes
+Chúng ta expose `MethodSecurityExpressionHandler` bằng một method `static` để bảo đảm Spring publish nó trước khi khởi tạo các class `@Configuration` về method security của Spring Security
 ====
 
-You can also <<subclass-defaultmethodsecurityexpressionhandler,subclass `DefaultMessageSecurityExpressionHandler`>> to add your own custom authorization expressions beyond the defaults.
+Bạn cũng có thể <<subclass-defaultmethodsecurityexpressionhandler,mở rộng `DefaultMessageSecurityExpressionHandler`>> để thêm các biểu thức authorization tùy chỉnh ngoài những biểu thức mặc định.
 
 [[pre-post-authorize-aot]]
-=== Working with AOT
+=== Làm việc với AOT
 
-Spring Security will scan all beans in the application context for methods that use `@PreAuthorize` or `@PostAuthorize`.
-When it finds one, it will resolve any beans used inside the security expression and register the appropriate runtime hints for that bean.
-If it finds a method that uses `@AuthorizeReturnObject`, it will recursively search inside the method's return type for `@PreAuthorize` and `@PostAuthorize` annotations and register them accordingly.
+Spring Security sẽ quét tất cả bean trong application context để tìm các method sử dụng `@PreAuthorize` hoặc `@PostAuthorize`.
+Khi tìm thấy, nó sẽ resolve mọi bean được sử dụng bên trong biểu thức security và đăng ký runtime hint thích hợp cho bean đó.
+Nếu tìm thấy một method sử dụng `@AuthorizeReturnObject`, nó sẽ đệ quy tìm trong kiểu trả về của method các annotation `@PreAuthorize` và `@PostAuthorize`, rồi đăng ký chúng tương ứng.
 
-For example, consider the following Spring Boot application:
+Ví dụ, hãy xem ứng dụng Spring Boot sau:
 
 [tabs]
 ======
@@ -1650,16 +1650,16 @@ class User(private val fullName: String) {
 ----
 ======
 
-<1> Spring Security finds the `AccountService` bean
-<2> Finding a method that uses `@PreAuthorize`, it will resolve any bean names used inside the expression, `authz` in that case, and register runtime hints for the bean class
-<3> Finding a method that uses `@AuthorizeReturnObject`, it will look into the method's return type for any `@PreAuthorize` or `@PostAuthorize`
-<4> Then, it finds a `@PreAuthorize` with another bean name: `accountAuthz`; the runtime hints are registered for the bean class as well
-<5> Finding another `@AuthorizeReturnObject` it will look again into the method's return type
-<6> Now, a `@PostAuthorize` is found with yet another bean name used: `myOtherAuthz`; the runtime hints are registered for the bean class as well
+<1> Spring Security tìm thấy bean `AccountService`
+<2> Khi tìm thấy method sử dụng `@PreAuthorize`, nó sẽ resolve mọi tên bean được dùng trong biểu thức, trong trường hợp này là `authz`, và đăng ký runtime hint cho class của bean
+<3> Khi tìm thấy method sử dụng `@AuthorizeReturnObject`, nó sẽ tìm trong kiểu trả về của method các annotation `@PreAuthorize` hoặc `@PostAuthorize`
+<4> Sau đó, nó tìm thấy `@PreAuthorize` với một tên bean khác là `accountAuthz`; runtime hint cũng được đăng ký cho class của bean
+<5> Khi tìm thấy một `@AuthorizeReturnObject` khác, nó lại tìm trong kiểu trả về của method
+<6> Lúc này, một `@PostAuthorize` được tìm thấy với tên bean khác được sử dụng là `myOtherAuthz`; runtime hint cũng được đăng ký cho class của bean
 
-There will be many times when Spring Security cannot determine the actual return type of the method ahead of time since it may be hidden in an erased generic type.
+Có nhiều trường hợp Spring Security không thể xác định trước kiểu trả về thực tế của method vì kiểu đó có thể bị ẩn trong một generic type đã bị xóa.
 
-Consider the following service:
+Hãy xem service sau:
 
 [tabs]
 ======
@@ -1694,9 +1694,9 @@ class AccountService {
 ----
 ======
 
-In this case, the generic type is erased and so it isn’t apparent to Spring Security ahead-of-time that `Account` needs to be visited in order to check for `@PreAuthorize` and `@PostAuthorize`.
+Trong trường hợp này, generic type đã bị xóa nên Spring Security không thể biết trước rằng cần duyệt `Account` để kiểm tra `@PreAuthorize` và `@PostAuthorize`.
 
-To address this, you can publish a javadoc:org.springframework.security.aot.hint.PrePostAuthorizeExpressionBeanHintsRegistrar[`PrePostAuthorizeExpressionBeanHintsRegistrar`] like so:
+Để giải quyết, bạn có thể publish javadoc:org.springframework.security.aot.hint.PrePostAuthorizeExpressionBeanHintsRegistrar[`PrePostAuthorizeExpressionBeanHintsRegistrar`] như sau:
 
 [tabs]
 ======
@@ -1724,15 +1724,15 @@ fun registerTheseToo(): SecurityHintsRegistrar {
 ======
 
 [[use-aspectj]]
-== Authorizing with AspectJ
+== Thực hiện Authorization bằng AspectJ
 
 [[match-by-pointcut]]
-=== Matching Methods with Custom Pointcuts
+=== Khớp Method bằng Pointcut Tùy chỉnh
 
-Being built on Spring AOP, you can declare patterns that are not related to annotations, similar to xref:servlet/authorization/authorize-http-requests.adoc[request-level authorization].
-This has the potential advantage of centralizing method-level authorization rules.
+Vì được xây dựng trên Spring AOP, bạn có thể khai báo các pattern không liên quan đến annotation, tương tự như xref:servlet/authorization/authorize-http-requests.adoc[authorization ở cấp request].
+Cách này có ưu điểm tiềm năng là tập trung các quy tắc authorization ở cấp method.
 
-For example, you can use publish your own `Advisor` or use xref:servlet/appendix/namespace/method-security.adoc#nsa-protect-pointcut[`<protect-pointcut>`] to match AOP expressions to authorization rules for your service layer like so:
+Ví dụ, bạn có thể publish `Advisor` của riêng mình hoặc sử dụng xref:servlet/appendix/namespace/method-security.adoc#nsa-protect-pointcut[`<protect-pointcut>`] để khớp các biểu thức AOP với các quy tắc authorization cho service layer như sau:
 
 [tabs]
 ======
@@ -1779,11 +1779,11 @@ Xml::
 ======
 
 [[weave-aspectj]]
-=== Integrate with AspectJ Byte-weaving
+=== Tích hợp với Byte-weaving của AspectJ
 
-Performance can at times be enhanced by using AspectJ to weave Spring Security advice into the byte code of your beans.
+Đôi khi hiệu năng có thể được cải thiện bằng cách sử dụng AspectJ để weave advice của Spring Security vào byte code của các bean.
 
-After setting up AspectJ, you can quite simply state in the `@EnableMethodSecurity` annotation or `<method-security>` element that you are using AspectJ:
+Sau khi thiết lập AspectJ, bạn có thể chỉ định đơn giản trong annotation `@EnableMethodSecurity` hoặc phần tử `<method-security>` rằng mình đang sử dụng AspectJ:
 
 [tabs]
 ======
@@ -1809,50 +1809,50 @@ Xml::
 ----
 ======
 
-And the result will be that Spring Security will publish its advisors as AspectJ advice so that they can be woven in accordingly.
+Kết quả là Spring Security sẽ publish các advisor của mình dưới dạng advice của AspectJ để chúng có thể được weave tương ứng.
 
 [[changing-the-order]]
-== Specifying Order
+== Chỉ định Order
 
-As already noted, there is a Spring AOP method interceptor for each annotation, and each of these has a location in the Spring AOP advisor chain.
+Như đã lưu ý, mỗi annotation có một method interceptor của Spring AOP, và mỗi interceptor có một vị trí trong advisor chain của Spring AOP.
 
-Namely, the `@PreFilter` method interceptor's order is 100, ``@PreAuthorize``'s is 200, and so on.
+Cụ thể, order của method interceptor `@PreFilter` là 100, của ``@PreAuthorize`` là 200, v.v.
 
-You can use the `offset` parameter on `@EnableMethodSecurity` to move all interceptors en masse to provide their advice earlier or later in a method invocation.
+Bạn có thể sử dụng tham số `offset` trên `@EnableMethodSecurity` để di chuyển toàn bộ interceptor cùng lúc, khiến advice của chúng chạy sớm hơn hoặc muộn hơn trong một lần gọi method.
 
 [[authorization-expressions]]
-== Expressing Authorization with SpEL
+== Biểu đạt Authorization bằng SpEL
 
-You've already seen several examples using SpEL, so now let's cover the API a bit more in depth.
+Bạn đã thấy một số ví dụ sử dụng SpEL, vì vậy bây giờ hãy tìm hiểu API sâu hơn một chút.
 
-Spring Security encapsulates all of its authorization fields and methods in a set of root objects.
-The most generic root object is called `SecurityExpressionRoot` and it forms the basis for `MethodSecurityExpressionRoot`.
-Spring Security supplies this root object to `MethodSecurityEvaluationContext` when preparing to evaluate an authorization expression.
+Spring Security đóng gói tất cả field và method authorization của mình trong một tập hợp root object.
+Root object tổng quát nhất có tên là `SecurityExpressionRoot` và nó là nền tảng cho `MethodSecurityExpressionRoot`.
+Spring Security cung cấp root object này cho `MethodSecurityEvaluationContext` khi chuẩn bị đánh giá một biểu thức authorization.
 
 [[using-authorization-expression-fields-and-methods]]
-=== Using Authorization Expression Fields and Methods
+=== Sử dụng Field và Method của Biểu thức Authorization
 
-The first thing this provides is an enhanced set of authorization fields and methods to your SpEL expressions.
-What follows is a quick overview of the most common methods:
+Điều đầu tiên mà tính năng này cung cấp là một tập hợp field và method authorization được mở rộng cho các biểu thức SpEL của bạn.
+Sau đây là tổng quan nhanh về các method phổ biến nhất:
 
-* `permitAll` - The method requires no authorization to be invoked; note that in this case, xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[the `Authentication`] is never retrieved from the session
-* `denyAll` - The method is not allowed under any circumstances; note that in this case, the `Authentication` is never retrieved from the session
-* `hasAuthority` - The method requires that the `Authentication` have xref:servlet/authorization/architecture.adoc#authz-authorities[a `GrantedAuthority`] that matches the given value
-* `hasRole` - A shortcut for `hasAuthority` that prefixes `ROLE_` or whatever is configured as the default prefix
-* `hasAnyAuthority` - The method requires that the `Authentication` have a `GrantedAuthority` that matches any of the given values
-* `hasAnyRole` - A shortcut for `hasAnyAuthority` that prefixes `ROLE_` or whatever is configured as the default prefix
-* `hasAllAuthorities` - The method requires that the `Authentication` have ``GrantedAuthority``s that matches all of the given values
-* `hasAllRoles` - A shortcut for `hasAllAuthorities` that prefixes `ROLE_` or whatever is configured as the default prefix
-* `hasPermission` - A hook into your `PermissionEvaluator` instance for doing object-level authorization
+* `permitAll` - Method không yêu cầu authorization để được gọi; lưu ý rằng trong trường hợp này, xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] không bao giờ được lấy từ session
+* `denyAll` - Method không được phép trong bất kỳ trường hợp nào; lưu ý rằng trong trường hợp này, `Authentication` không bao giờ được lấy từ session
+* `hasAuthority` - Method yêu cầu `Authentication` có xref:servlet/authorization/architecture.adoc#authz-authorities[`GrantedAuthority`] khớp với giá trị đã cho
+* `hasRole` - Shortcut cho `hasAuthority`, thêm tiền tố `ROLE_` hoặc tiền tố mặc định đã được cấu hình
+* `hasAnyAuthority` - Method yêu cầu `Authentication` có một `GrantedAuthority` khớp với bất kỳ giá trị nào đã cho
+* `hasAnyRole` - Shortcut cho `hasAnyAuthority`, thêm tiền tố `ROLE_` hoặc tiền tố mặc định đã được cấu hình
+* `hasAllAuthorities` - Method yêu cầu `Authentication` có các ``GrantedAuthority`` khớp với tất cả giá trị đã cho
+* `hasAllRoles` - Shortcut cho `hasAllAuthorities`, thêm tiền tố `ROLE_` hoặc tiền tố mặc định đã được cấu hình
+* `hasPermission` - Một hook vào instance `PermissionEvaluator` của bạn để thực hiện authorization ở cấp object
 
-And here is a brief look at the most common fields:
+Sau đây là phần giới thiệu ngắn về các field phổ biến nhất:
 
-* `authentication` - The `Authentication` instance associated with this method invocation
-* `principal` - The `Authentication#getPrincipal` associated with this method invocation
+* `authentication` - Instance `Authentication` gắn với lần gọi method này
+* `principal` - `Authentication#getPrincipal` gắn với lần gọi method này
 
-Having now learned the patterns, rules, and how they can be paired together, you should be able to understand what is going on in this more complex example:
+Sau khi đã biết các pattern, quy tắc và cách kết hợp chúng, bạn có thể hiểu điều gì đang xảy ra trong ví dụ phức tạp hơn sau:
 
-.Authorize Requests
+.Authorization cho Request
 [tabs]
 ======
 Java::
@@ -1914,27 +1914,27 @@ Xml::
 </sec:method-security>
 ----
 ======
-<1> This method may not be invoked by anyone for any reason
-<2> This method may only be invoked by ``Authentication``s granted the `ROLE_ADMIN` authority
-<3> This method may only be invoked by ``Authentication``s granted the `db` and `ROLE_ADMIN` authorities
-<4> This method may only be invoked by ``Princpal``s with an `aud` claim equal to "my-audience"
-<5> This method may only be invoked if the bean ``authz``'s `check` method returns `true`
+<1> Không ai có thể gọi method này vì bất kỳ lý do nào
+<2> Method này chỉ có thể được gọi bởi ``Authentication`` được cấp authority `ROLE_ADMIN`
+<3> Method này chỉ có thể được gọi bởi ``Authentication`` được cấp các authority `db` và `ROLE_ADMIN`
+<4> Method này chỉ có thể được gọi bởi ``Princpal`` có claim `aud` bằng "my-audience"
+<5> Method này chỉ có thể được gọi nếu method `check` của bean ``authz`` trả về `true`
 
 [TIP]
 ====
-You can use a bean like `authz` above to <<_using_a_custom_bean_in_spel, add programmatic authorization>>.
+Bạn có thể sử dụng bean như `authz` ở trên để <<_using_a_custom_bean_in_spel,thêm authorization bằng programmatic API>>.
 ====
 
 [[using_method_parameters]]
-=== Using Method Parameters
+=== Sử dụng Tham số Method
 
-Additionally, Spring Security provides a mechanism for discovering method parameters so they can also be accessed in the SpEL expression as well.
+Ngoài ra, Spring Security cung cấp cơ chế phát hiện tham số method để các tham số này cũng có thể được truy cập trong biểu thức SpEL.
 
-For a complete reference, Spring Security uses `DefaultSecurityParameterNameDiscoverer` to discover the parameter names.
-By default, the following options are tried for a method.
+Để tham chiếu đầy đủ, Spring Security sử dụng `DefaultSecurityParameterNameDiscoverer` để phát hiện tên tham số.
+Theo mặc định, các tùy chọn sau được thử cho một method.
 
-1. If Spring Security's `@P` annotation is present on a single argument to the method, the value is used.
-The following example uses the `@P` annotation:
+1. Nếu annotation `@P` của Spring Security hiện diện trên một đối số duy nhất của method, giá trị đó sẽ được sử dụng.
+Ví dụ sau sử dụng annotation `@P`:
 
 +
 
@@ -1965,12 +1965,12 @@ fun doSomething(@P("c") contact: Contact?)
 ----
 ======
 +
-The intention of this expression is to require that the current `Authentication` have `write` permission specifically for this `Contact` instance.
+Mục đích của biểu thức này là yêu cầu `Authentication` hiện tại có permission `write` dành riêng cho instance `Contact` này.
 +
-Behind the scenes, this is implemented by using `AnnotationParameterNameDiscoverer`, which you can customize to support the value attribute of any specified annotation.
+Ở phía sau, tính năng này được triển khai bằng `AnnotationParameterNameDiscoverer`, mà bạn có thể tùy chỉnh để hỗ trợ attribute value của bất kỳ annotation được chỉ định nào.
 
-2. If xref:servlet/integrations/data.adoc[Spring Data's] `@Param` annotation is present on at least one parameter for the method, the value is used.
-The following example uses the `@Param` annotation:
+2. Nếu annotation `@Param` của xref:servlet/integrations/data.adoc[Spring Data] hiện diện trên ít nhất một tham số của method, giá trị đó sẽ được sử dụng.
+Ví dụ sau sử dụng annotation `@Param`:
 +
 [tabs]
 ======
@@ -1999,43 +1999,43 @@ fun findContactByName(@Param("n") name: String?): Contact?
 ----
 ======
 +
-The intention of this expression is to require that `name` be equal to `Authentication#getName` for the invocation to be authorized.
+Mục đích của biểu thức này là yêu cầu `name` bằng `Authentication#getName` để lần gọi được authorization.
 +
-Behind the scenes, this is implemented by using `AnnotationParameterNameDiscoverer`, which you can customize to support the value attribute of any specified annotation.
+Ở phía sau, tính năng này được triển khai bằng `AnnotationParameterNameDiscoverer`, mà bạn có thể tùy chỉnh để hỗ trợ attribute value của bất kỳ annotation được chỉ định nào.
 
-3. If you compile your code with the `-parameters` argument, the standard JDK reflection API is used to discover the parameter names.
-This works on both classes and interfaces.
+3. Nếu biên dịch code bằng đối số `-parameters`, standard JDK reflection API sẽ được sử dụng để phát hiện tên tham số.
+Cách này hoạt động trên cả class và interface.
 
-4. Finally, if you compile your code with debug symbols, the parameter names are discovered by using the debug symbols.
-This does not work for interfaces, since they do not have debug information about the parameter names.
-For interfaces, either annotations or the `-parameters` approach must be used.
+4. Cuối cùng, nếu biên dịch code với debug symbol, tên tham số được phát hiện bằng cách sử dụng debug symbol.
+Cách này không hoạt động với interface vì interface không có thông tin debug về tên tham số.
+Với interface, phải sử dụng annotation hoặc cách tiếp cận `-parameters`.
 
 [[customizing-authorization-managers]]
-== Customizing Authorization Managers
+== Tùy chỉnh Authorization Manager
 
-When you use SpEL expressions with <<use-preauthorize,`@PreAuthorize`>>, <<use-postauthorize,`@PostAuthorize`>>, <<use-prefilter,`@PreFilter`>> and <<use-postfilter,`@PostFilter`>>, Spring Security takes care of creating the appropriate `AuthorizationManager` instances for you.
-In certain cases, you may want to customize what is created in order to have complete control over how authorization decisions are made xref:servlet/authorization/architecture.adoc#authz-delegate-authorization-manager[at the framework level].
+Khi sử dụng biểu thức SpEL với <<use-preauthorize,`@PreAuthorize`>>, <<use-postauthorize,`@PostAuthorize`>>, <<use-prefilter,`@PreFilter`>> và <<use-postfilter,`@PostFilter`>>, Spring Security sẽ tự tạo các instance `AuthorizationManager` thích hợp cho bạn.
+Trong một số trường hợp, bạn có thể muốn tùy chỉnh những gì được tạo ra để kiểm soát hoàn toàn cách đưa ra quyết định authorization xref:servlet/authorization/architecture.adoc#authz-delegate-authorization-manager[ở cấp framework].
 
-In order to take control of creating instances of `AuthorizationManager` for pre- and post-annotations, you can create a custom xref:servlet/authorization/architecture.adoc#authz-authorization-manager-factory[`AuthorizationManagerFactory`].
-For example, let's say you want to allow users with the `ADMIN` role whenever any other role is required.
-To do this, you can create a custom implementation for method security as in the following example:
+Để kiểm soát việc tạo instance `AuthorizationManager` cho các annotation pre và post, bạn có thể tạo xref:servlet/authorization/architecture.adoc#authz-authorization-manager-factory[`AuthorizationManagerFactory`] tùy chỉnh.
+Ví dụ, giả sử bạn muốn cho phép người dùng có role `ADMIN` bất cứ khi nào yêu cầu một role khác.
+Để làm vậy, bạn có thể tạo implementation tùy chỉnh cho method security như trong ví dụ sau:
 
 include-code::./CustomMethodInvocationAuthorizationManagerFactory[tag=class,indent=0]
 
-Now, whenever you <<use-preauthorize,use the `@PreAuthorize` annotation>> with `hasRole` or `hasAnyRole`, Spring Security will automatically invoke your custom factory to create an instance of `AuthorizationManager` that allows access for the given role(s) _OR_ the `ADMIN` role.
+Giờ đây, bất cứ khi nào bạn <<use-preauthorize,sử dụng annotation `@PreAuthorize`>> với `hasRole` hoặc `hasAnyRole`, Spring Security sẽ tự động gọi factory tùy chỉnh để tạo instance `AuthorizationManager` cho phép truy cập với role đã cho _HOẶC_ role `ADMIN`.
 
 [TIP]
-We use this as a simple example of creating a custom `AuthorizationManagerFactory`, though the same outcome could be accomplished with <<favor-granting-authorities,a role hierarchy>>.
-Use whichever approach fits best in your situation.
+Đây là ví dụ đơn giản về việc tạo `AuthorizationManagerFactory` tùy chỉnh, dù bạn cũng có thể đạt được kết quả tương tự bằng <<favor-granting-authorities,một role hierarchy>>.
+Hãy sử dụng cách tiếp cận phù hợp nhất với tình huống của bạn.
 
 [[authorize-object]]
-== Authorizing Arbitrary Objects
+== Thực hiện Authorization cho Object Bất kỳ
 
-Spring Security also supports wrapping any object that is annotated its method security annotations.
+Spring Security cũng hỗ trợ wrapping bất kỳ object nào được gắn annotation method security.
 
-The simplest way to achieve this is to mark any method that returns the object you wish to authorize with the `@AuthorizeReturnObject` annotation.
+Cách đơn giản nhất là gắn annotation `@AuthorizeReturnObject` lên bất kỳ method nào trả về object mà bạn muốn thực hiện authorization.
 
-For example, consider the following `User` class:
+Ví dụ, hãy xem class `User` sau:
 
 [tabs]
 ======
@@ -2071,7 +2071,7 @@ class User (val name:String, @get:PreAuthorize("hasAuthority('user:read')") val 
 ----
 ======
 
-Given an interface like this one:
+Với một interface như sau:
 
 [tabs]
 ======
@@ -2100,7 +2100,7 @@ class UserRepository {
 ----
 ======
 
-Then any `User` that is returned from `findById` will be secured like other Spring Security-protected components:
+Khi đó, mọi `User` được trả về từ `findById` sẽ được bảo vệ như các component khác được Spring Security bảo vệ:
 
 [tabs]
 ======
@@ -2138,12 +2138,12 @@ fun getEmailWhenProxiedThenAuthorizes() {
 ----
 ======
 
-=== Using `@AuthorizeReturnObject` at the class level
+=== Sử dụng `@AuthorizeReturnObject` ở Cấp Class
 
-`@AuthorizeReturnObject` can be placed at the class level. Note, though, that this means Spring Security will attempt to proxy any return object, including ``String``, ``Integer`` and other types.
-This is often not what you want to do.
+`@AuthorizeReturnObject` có thể được đặt ở cấp class. Tuy nhiên, lưu ý rằng điều này có nghĩa Spring Security sẽ cố proxy mọi object trả về, bao gồm ``String``, ``Integer`` và các kiểu khác.
+Đây thường không phải điều bạn muốn.
 
-If you want to use `@AuthorizeReturnObject` on a class or interface whose methods return value types, like `int`, `String`, `Double` or collections of those types, then you should also publish the appropriate `AuthorizationAdvisorProxyFactory.TargetVisitor` as follows:
+Nếu muốn sử dụng `@AuthorizeReturnObject` trên một class hoặc interface có method trả về các kiểu giá trị như `int`, `String`, `Double` hoặc collection của những kiểu này, bạn cũng nên publish `AuthorizationAdvisorProxyFactory.TargetVisitor` thích hợp như sau:
 
 
 [tabs]
@@ -2177,18 +2177,18 @@ open fun skipValueTypes() = TargetVisitor.defaultsSkipValueTypes()
 
 [TIP]
 ====
-You can set your own `AuthorizationAdvisorProxyFactory.TargetVisitor` to customize the proxying for any set of types
+Bạn có thể đặt `AuthorizationAdvisorProxyFactory.TargetVisitor` của riêng mình để tùy chỉnh việc proxy cho bất kỳ tập hợp kiểu nào
 ====
 
-=== Programmatically Proxying
+=== Proxy bằng Programmatic API
 
-You can also programmatically proxy a given object.
+Bạn cũng có thể proxy một object đã cho bằng programmatic API.
 
-To achieve this, you can autowire the provided `AuthorizationProxyFactory` instance, which is based on which method security interceptors you have configured.
-If you are using `@EnableMethodSecurity`, then this means that it will by default have the interceptors for `@PreAuthorize`, `@PostAuthorize`, `@PreFilter`, and `@PostFilter`.
+Để làm vậy, bạn có thể autowire instance `AuthorizationProxyFactory` được cung cấp, dựa trên các method security interceptor mà bạn đã cấu hình.
+Nếu sử dụng `@EnableMethodSecurity`, theo mặc định nó sẽ có interceptor cho `@PreAuthorize`, `@PostAuthorize`, `@PreFilter` và `@PostFilter`.
 
 
-You can proxy an instance of user in the following way:
+Bạn có thể proxy một instance của user như sau:
 
 [tabs]
 ======
@@ -2225,11 +2225,11 @@ fun getEmailWhenProxiedThenAuthorizes() {
 ----
 ======
 
-=== Manual Construction
+=== Tạo Thủ công
 
-You can also define your own instance if you need something different from the Spring Security default.
+Bạn cũng có thể tự định nghĩa instance nếu cần một thứ khác với giá trị mặc định của Spring Security.
 
-For example, if you define an `AuthorizationProxyFactory` instance like so:
+Ví dụ, nếu định nghĩa một instance `AuthorizationProxyFactory` như sau:
 
 [tabs]
 ======
@@ -2261,7 +2261,7 @@ proxyFactory.setTargetVisitor(TargetVisitor.defaultsSkipValueTypes())
 ----
 ======
 
-Then you can wrap any instance of `User` as follows:
+Sau đó, bạn có thể wrap bất kỳ instance `User` nào như sau:
 
 [tabs]
 ======
@@ -2294,11 +2294,11 @@ fun getEmailWhenProxiedThenAuthorizes() {
 ----
 ======
 
-=== Proxying Collections
+=== Proxy Collection
 
-`AuthorizationProxyFactory` supports Java collections, streams, arrays, optionals, and iterators by proxying the element type and maps by proxying the value type.
+`AuthorizationProxyFactory` hỗ trợ collection, stream, array, optional và iterator của Java bằng cách proxy element type, đồng thời proxy map bằng cách proxy value type.
 
-This means that when proxying a `List` of objects, the following also works:
+Điều này có nghĩa là khi proxy một `List` các object, cách sau cũng hoạt động:
 
 [tabs]
 ======
@@ -2317,29 +2317,29 @@ void getEmailWhenProxiedThenAuthorizes() {
 ----
 ======
 
-=== Proxying Classes
+=== Proxy Class
 
-In limited circumstances, it may be valuable to proxy a `Class` itself, and `AuthorizationProxyFactory` also supports this.
-This is roughly the equivalent of calling `ProxyFactory#getProxyClass` in Spring Framework's support for creating proxies.
+Trong một số trường hợp hạn chế, proxy chính `Class` có thể hữu ích, và `AuthorizationProxyFactory` cũng hỗ trợ việc này.
+Điều này gần tương đương với việc gọi `ProxyFactory#getProxyClass` trong tính năng hỗ trợ tạo proxy của Spring Framework.
 
-One place where this is handy is when you need to construct the proxy class ahead-of-time, like with Spring AOT.
+Một trường hợp hữu ích là khi bạn cần tạo proxy class ahead-of-time, chẳng hạn với Spring AOT.
 
-=== Support for All Method Security Annotations
+=== Hỗ trợ Mọi Annotation Method Security
 
-`AuthorizationProxyFactory` supports whichever method security annotations are enabled in your application.
-It is based off of whatever `AuthorizationAdvisor` classes are published as a bean.
+`AuthorizationProxyFactory` hỗ trợ các annotation method security được kích hoạt trong ứng dụng.
+Nó dựa trên các class `AuthorizationAdvisor` được publish dưới dạng bean.
 
-Since `@EnableMethodSecurity` publishes `@PreAuthorize`, `@PostAuthorize`, `@PreFilter`, and `@PostFilter`  advisors by default, you will typically need to do nothing to activate the ability.
+Vì `@EnableMethodSecurity` mặc định publish advisor cho `@PreAuthorize`, `@PostAuthorize`, `@PreFilter` và `@PostFilter`, thông thường bạn không cần làm gì để kích hoạt khả năng này.
 
 [NOTE]
 ====
-SpEL expressions that use `returnObject` or `filterObject` sit behind the proxy and so have full access to the object.
+Các biểu thức SpEL sử dụng `returnObject` hoặc `filterObject` nằm phía sau proxy nên có toàn quyền truy cập object.
 ====
 
 [#custom_advice]
-=== Custom Advice
+=== Advice Tùy chỉnh
 
-If you have security advice that you also want applied, you can publish your own `AuthorizationAdvisor` like so:
+Nếu có security advice cũng muốn áp dụng, bạn có thể publish `AuthorizationAdvisor` của riêng mình như sau:
 
 [tabs]
 ======
@@ -2370,11 +2370,11 @@ internal class SecurityConfig {
 ----
 ======
 
-And Spring Security will add that advisor into the set of advice that `AuthorizationProxyFactory` adds when proxying an object.
+Spring Security sẽ thêm advisor đó vào tập hợp advice mà `AuthorizationProxyFactory` thêm vào khi proxy một object.
 
-=== Working with Jackson
+=== Làm việc với Jackson
 
-One powerful use of this feature is to return a secured value from a controller like so:
+Một cách sử dụng mạnh mẽ của tính năng này là trả về một giá trị được bảo vệ từ controller như sau:
 
 [tabs]
 ======
@@ -2411,7 +2411,7 @@ class UserController  {
 ----
 ======
 
-You will need to <<fallback-values-authorization-denied,add a `MethodAuthorizationDeniedHandler`>> like this one:
+Bạn sẽ cần <<fallback-values-authorization-denied,thêm một `MethodAuthorizationDeniedHandler`>> như sau:
 
 [tabs]
 ======
@@ -2455,8 +2455,8 @@ open class User {
 ----
 ======
 
-Then, you'll see a different JSON serialization based on the authorization level of the user.
-If they don't have the `user:read` authority, then they'll see:
+Sau đó, bạn sẽ thấy serialization JSON khác nhau dựa trên mức authorization của người dùng.
+Nếu họ không có authority `user:read`, họ sẽ thấy:
 
 [source,json]
 ----
@@ -2466,7 +2466,7 @@ If they don't have the `user:read` authority, then they'll see:
 }
 ----
 
-And if they do have that authority, they'll see:
+Nếu có authority đó, họ sẽ thấy:
 
 [source,json]
 ----
@@ -2478,17 +2478,17 @@ And if they do have that authority, they'll see:
 
 [TIP]
 ====
-You can also add the Spring Boot property `spring.jackson.default-property-inclusion=non_null` to exclude the null value from serialization, if you also don't want to reveal the JSON key to an unauthorized user.
+Bạn cũng có thể thêm property Spring Boot `spring.jackson.default-property-inclusion=non_null` để loại trừ giá trị null khỏi serialization, nếu không muốn tiết lộ JSON key cho người dùng chưa được authorization.
 ====
 
 [[authorize-return-object-aot]]
-=== Working with AOT
+=== Làm việc với AOT
 
-Spring Security will scan all beans in the application context for methods that use `@AuthorizeReturnObject`.
-When it finds one, it will create and register the appropriate proxy class ahead of time.
-It will also recursively search for other nested objects that also use `@AuthorizeReturnObject` and register them accordingly.
+Spring Security sẽ quét tất cả bean trong application context để tìm các method sử dụng `@AuthorizeReturnObject`.
+Khi tìm thấy, nó sẽ tạo và đăng ký proxy class thích hợp ahead-of-time.
+Nó cũng sẽ đệ quy tìm các object lồng nhau khác sử dụng `@AuthorizeReturnObject` và đăng ký chúng tương ứng.
 
-For example, consider the following Spring Boot application:
+Ví dụ, hãy xem ứng dụng Spring Boot sau:
 
 [tabs]
 ======
@@ -2570,15 +2570,15 @@ open class MyApplication {
 }
 ----
 ======
-<1> - First, Spring Security finds the `MyController` bean
-<2> - Finding a method that uses `@AuthorizeReturnObject`, it proxies `Message`, the return value, and registers that proxy class to `RuntimeHints`
-<3> - Then, it traverses `Message` to see if it uses `@AuthorizeReturnObject`
-<4> - Finding a method that uses `@AuthorizeReturnObject`, it proxies `User`, the return value, and registers that proxy class to `RuntimeHints`
-<5> - Finally, it traverses `User` to see if it uses `@AuthorizeReturnObject`; finding nothing, the algorithm completes
+<1> - Trước tiên, Spring Security tìm thấy bean `MyController`
+<2> - Khi tìm thấy method sử dụng `@AuthorizeReturnObject`, nó proxy `Message`, giá trị trả về, và đăng ký proxy class đó vào `RuntimeHints`
+<3> - Sau đó, nó duyệt `Message` để xem có sử dụng `@AuthorizeReturnObject` hay không
+<4> - Khi tìm thấy method sử dụng `@AuthorizeReturnObject`, nó proxy `User`, giá trị trả về, và đăng ký proxy class đó vào `RuntimeHints`
+<5> - Cuối cùng, nó duyệt `User` để xem có sử dụng `@AuthorizeReturnObject` hay không; không tìm thấy gì, thuật toán hoàn tất
 
-There will be many times when Spring Security cannot determine the proxy class ahead of time since it may be hidden in an erased generic type.
+Có nhiều trường hợp Spring Security không thể xác định trước proxy class vì proxy class có thể bị ẩn trong một generic type đã bị xóa.
 
-Consider the following change to `MyController`:
+Hãy xem thay đổi sau đối với `MyController`:
 
 [tabs]
 ======
@@ -2609,9 +2609,9 @@ static class MyController {
 ----
 ======
 
-In this case, the generic type is erased and so it isn't apparent to Spring Security ahead-of-time that `Message` will need to be proxied at runtime.
+Trong trường hợp này, generic type đã bị xóa nên Spring Security không thể biết trước rằng `Message` sẽ cần được proxy tại runtime.
 
-To address this, you can publish `AuthorizeProxyFactoryHintsRegistrar` like so:
+Để giải quyết, bạn có thể publish `AuthorizeProxyFactoryHintsRegistrar` như sau:
 
 [tabs]
 ======
@@ -2638,18 +2638,18 @@ fun registerTheseToo(proxyFactory: AuthorizationProxyFactory?): SecurityHintsReg
 ----
 ======
 
-Spring Security will register that class and then traverse its type as before.
+Spring Security sẽ đăng ký class đó rồi duyệt kiểu của nó như trước.
 
 [[fallback-values-authorization-denied]]
-== Providing Fallback Values When Authorization is Denied
+== Cung cấp Giá trị Dự phòng Khi Authorization Bị Từ chối
 
-There are some scenarios where you may not wish to throw an `AuthorizationDeniedException` when a method is invoked without the required permissions.
-Instead, you might wish to return a post-processed result, like a masked result, or a default value in cases where authorization denied happened before invoking the method.
+Có một số trường hợp bạn có thể không muốn ném `AuthorizationDeniedException` khi method được gọi mà không có permission cần thiết.
+Thay vào đó, bạn có thể muốn trả về kết quả đã được post-process, chẳng hạn kết quả được che, hoặc một giá trị mặc định trong trường hợp authorization bị từ chối trước khi gọi method.
 
-Spring Security provides support for handling authorization denied on method invocation by using the javadoc:org.springframework.security.authorization.method.HandleAuthorizationDenied[format=annotation].
-The handler works for denied authorizations that happened in the <<authorizing-with-annotations,`@PreAuthorize` and `@PostAuthorize` annotations>> as well as javadoc:org.springframework.security.authorization.AuthorizationDeniedException[] thrown from the method invocation itself.
+Spring Security hỗ trợ xử lý authorization bị từ chối khi gọi method bằng javadoc:org.springframework.security.authorization.method.HandleAuthorizationDenied[format=annotation].
+Handler này hoạt động với authorization bị từ chối xảy ra trong <<authorizing-with-annotations,annotation `@PreAuthorize` và `@PostAuthorize`>>, cũng như javadoc:org.springframework.security.authorization.AuthorizationDeniedException[] được ném từ chính lần gọi method.
 
-Let's consider the example from the <<authorize-object,previous section>>, but instead of creating the `AccessDeniedExceptionInterceptor` to transform an `AccessDeniedException` to a `null` return value, we will use the `handlerClass` attribute from `@HandleAuthorizationDenied`:
+Hãy xem ví dụ trong <<authorize-object,phần trước>>, nhưng thay vì tạo `AccessDeniedExceptionInterceptor` để chuyển `AccessDeniedException` thành giá trị trả về `null`, chúng ta sẽ sử dụng attribute `handlerClass` của `@HandleAuthorizationDenied`:
 
 [tabs]
 ======
@@ -2715,15 +2715,15 @@ class User (val name:String, @PreAuthorize(value = "hasAuthority('user:read')") 
 ----
 ======
 
-<1> Create an implementation of `MethodAuthorizationDeniedHandler` that returns a `null` value
-<2> Register the `NullMethodAuthorizationDeniedHandler` as a bean
-<3> Annotate the method with `@HandleAuthorizationDenied` and pass the `NullMethodAuthorizationDeniedHandler` to the `handlerClass` attribute
+<1> Tạo một implementation của `MethodAuthorizationDeniedHandler` trả về giá trị `null`
+<2> Đăng ký `NullMethodAuthorizationDeniedHandler` dưới dạng bean
+<3> Gắn `@HandleAuthorizationDenied` lên method và truyền `NullMethodAuthorizationDeniedHandler` vào attribute `handlerClass`
 
-And then you can verify that a `null` value is returned instead of the `AccessDeniedException`:
+Sau đó, bạn có thể xác minh rằng giá trị `null` được trả về thay vì `AccessDeniedException`:
 
 [TIP]
 ====
-You can also annotate your class with `@Component` instead of creating a `@Bean` method
+Bạn cũng có thể gắn `@Component` lên class thay vì tạo method `@Bean`
 ====
 
 [tabs]
@@ -2757,13 +2757,13 @@ fun getEmailWhenProxiedThenNullEmail() {
 ----
 ======
 
-=== Using the Denied Result From the Method Invocation
+=== Sử dụng Kết quả Bị Từ chối từ Lần gọi Method
 
-There are some scenarios where you might want to return a secure result derived from the denied result.
-For example, if a user is not authorized to see email addresses, you might want to apply some masking on the original email address, i.e. _useremail@example.com_ would become _use\\******@example.com_.
+Có một số trường hợp bạn có thể muốn trả về kết quả an toàn được tạo ra từ kết quả bị từ chối.
+Ví dụ, nếu người dùng không được authorization để xem địa chỉ email, bạn có thể muốn che một phần địa chỉ email ban đầu, tức là _useremail@example.com_ sẽ trở thành _use\\******@example.com_.
 
-For those scenarios, you can override the `handleDeniedInvocationResult` from the `MethodAuthorizationDeniedHandler`, which has the javadoc:org.springframework.security.authorization.method.MethodInvocationResult[] as an argument.
-Let's continue with the previous example, but instead of returning `null`, we will return a masked value of the email:
+Trong các trường hợp đó, bạn có thể ghi đè `handleDeniedInvocationResult` của `MethodAuthorizationDeniedHandler`, method này nhận javadoc:org.springframework.security.authorization.method.MethodInvocationResult[] làm đối số.
+Hãy tiếp tục với ví dụ trước, nhưng thay vì trả về `null`, chúng ta sẽ trả về giá trị email đã được che:
 
 [tabs]
 ======
@@ -2840,15 +2840,15 @@ class User (val name:String, @PostAuthorize(value = "hasAuthority('user:read')")
 ----
 ======
 
-<1> Create an implementation of `MethodAuthorizationDeniedHandler` that returns a masked value of the unauthorized result value
-<2> Register the `EmailMaskingMethodAuthorizationDeniedHandler` as a bean
-<3> Annotate the method with `@HandleAuthorizationDenied` and pass the `EmailMaskingMethodAuthorizationDeniedHandler` to the `handlerClass` attribute
+<1> Tạo một implementation của `MethodAuthorizationDeniedHandler` trả về giá trị đã che của kết quả chưa được authorization
+<2> Đăng ký `EmailMaskingMethodAuthorizationDeniedHandler` dưới dạng bean
+<3> Gắn `@HandleAuthorizationDenied` lên method và truyền `EmailMaskingMethodAuthorizationDeniedHandler` vào attribute `handlerClass`
 
-And then you can verify that a masked email is returned instead of an `AccessDeniedException`:
+Sau đó, bạn có thể xác minh rằng email đã che được trả về thay vì `AccessDeniedException`:
 
 [WARNING]
 ====
-Since you have access to the original denied value, make sure that you correctly handle it and do not return it to the caller.
+Vì bạn có quyền truy cập giá trị ban đầu bị từ chối, hãy bảo đảm xử lý đúng giá trị đó và không trả nó về cho caller.
 ====
 
 [tabs]
@@ -2884,22 +2884,22 @@ fun getEmailWhenProxiedThenMaskedEmail() {
 ----
 ======
 
-When implementing the `MethodAuthorizationDeniedHandler` you have a few options on what type you can return:
+Khi implement `MethodAuthorizationDeniedHandler`, bạn có một số lựa chọn về kiểu có thể trả về:
 
-- A `null` value.
-- A non-null value, respecting the method's return type.
-- Throw an exception, usually an instance of `AuthorizationDeniedException`. This is the default behavior.
-- A `Mono` type for reactive applications.
+- Giá trị `null`.
+- Giá trị khác null, phù hợp với kiểu trả về của method.
+- Ném một exception, thường là instance của `AuthorizationDeniedException`. Đây là behavior mặc định.
+- Kiểu `Mono` cho các ứng dụng reactive.
 
-Note that since the handler must be registered as beans in your application context, you can inject dependencies into them if you need a more complex logic.
-In addition to that, you have available the `MethodInvocation` or the `MethodInvocationResult`, as well as the `AuthorizationResult` for more details related to the authorization decision.
+Lưu ý rằng vì handler phải được đăng ký dưới dạng bean trong application context, bạn có thể inject dependency vào chúng nếu cần logic phức tạp hơn.
+Ngoài ra, bạn có thể sử dụng `MethodInvocation` hoặc `MethodInvocationResult`, cũng như `AuthorizationResult` để lấy thêm chi tiết liên quan đến quyết định authorization.
 
 [[deciding-return-based-parameters]]
-=== Deciding What to Return Based on Available Parameters
+=== Quyết định Giá trị Trả về Dựa trên Tham số Có sẵn
 
-Consider a scenario where there might be multiple mask values for different methods, it would be not so productive if we had to create a handler for each of those methods, although it is perfectly fine to do that.
-In such cases, we can use the information passed via parameters to decide what to do.
-For example, we can create a custom `@Mask` annotation and a handler that detects that annotation to decide what mask value to return:
+Hãy xem trường hợp có thể có nhiều giá trị mask cho các method khác nhau; việc phải tạo một handler cho từng method sẽ không hiệu quả, dù hoàn toàn có thể làm như vậy.
+Trong những trường hợp đó, chúng ta có thể sử dụng thông tin được truyền qua tham số để quyết định phải làm gì.
+Ví dụ, chúng ta có thể tạo annotation `@Mask` tùy chỉnh và một handler phát hiện annotation đó để quyết định giá trị mask cần trả về:
 
 [tabs]
 ======
@@ -3009,7 +3009,7 @@ class MyService {
 ----
 ======
 
-Now the return values when access is denied will be decided based on the `@Mask` annotation:
+Giờ đây, các giá trị trả về khi access bị từ chối sẽ được quyết định dựa trên annotation `@Mask`:
 
 [tabs]
 ======
@@ -3054,10 +3054,10 @@ fun barWhenDeniedThenReturnQuestionMarks() {
 ----
 ======
 
-=== Combining with Meta Annotation Support
+=== Kết hợp với Tính năng Hỗ trợ Meta-Annotation
 
-You can also combine the `@HandleAuthorizationDenied` with other annotations in order to reduce and simplify the annotations in a method.
-Let's consider the <<deciding-return-based-parameters,example from the previous section>> and merge `@HandleAuthorizationDenied` with `@Mask`:
+Bạn cũng có thể kết hợp `@HandleAuthorizationDenied` với các annotation khác để giảm bớt và đơn giản hóa số annotation trên một method.
+Hãy xem <<deciding-return-based-parameters,ví dụ trong phần trước>> và hợp nhất `@HandleAuthorizationDenied` với `@Mask`:
 
 [tabs]
 ======
@@ -3096,15 +3096,15 @@ fun myMethod(): String {
 ----
 ======
 
-Now you do not have to remember to add both annotations when you need a mask behavior in your method.
-Make sure to read the <<meta-annotations,Meta Annotations Support>> section for more details on the usage.
+Giờ đây, bạn không cần nhớ thêm cả hai annotation khi cần behavior mask trong method.
+Hãy đọc phần <<meta-annotations,Tính năng Hỗ trợ Meta-Annotation>> để biết thêm chi tiết về cách sử dụng.
 
 [[migration-enableglobalmethodsecurity]]
-== Migrating from `@EnableGlobalMethodSecurity`
+== Di chuyển từ `@EnableGlobalMethodSecurity`
 
-If you are using `@EnableGlobalMethodSecurity`, you should migrate to `@EnableMethodSecurity`.
+Nếu đang sử dụng `@EnableGlobalMethodSecurity`, bạn nên di chuyển sang `@EnableMethodSecurity`.
 
-If you cannot migrate at this time, please include the `spring-security-access` module as a dependency like so:
+Nếu hiện tại chưa thể di chuyển, hãy thêm module `spring-security-access` làm dependency như sau:
 
 [tabs]
 ======
@@ -3127,12 +3127,12 @@ implementation('org.springframework.security:spring-security-access')
 ======
 
 [[servlet-replace-globalmethodsecurity-with-methodsecurity]]
-=== Replace xref:servlet/authorization/method-security.adoc#jc-enable-global-method-security[global method security] with xref:servlet/authorization/method-security.adoc#jc-enable-method-security[method security]
+=== Thay thế xref:servlet/authorization/method-security.adoc#jc-enable-global-method-security[global method security] bằng xref:servlet/authorization/method-security.adoc#jc-enable-method-security[method security]
 
-javadoc:org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity[format=annotation] and xref:servlet/appendix/namespace/method-security.adoc#nsa-global-method-security[`<global-method-security>`] are deprecated in favor of javadoc:org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity[`@EnableMethodSecurity`] and xref:servlet/appendix/namespace/method-security.adoc#nsa-method-security[`<method-security>`], respectively.
-The new annotation and XML element activate Spring's xref:servlet/authorization/method-security.adoc#jc-enable-method-security[pre-post annotations] by default and use `AuthorizationManager` internally.
+javadoc:org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity[format=annotation] và xref:servlet/appendix/namespace/method-security.adoc#nsa-global-method-security[`<global-method-security>`] đã deprecated và được thay thế lần lượt bằng javadoc:org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity[`@EnableMethodSecurity`] và xref:servlet/appendix/namespace/method-security.adoc#nsa-method-security[`<method-security>`].
+Annotation và phần tử XML mới mặc định kích hoạt xref:servlet/authorization/method-security.adoc#jc-enable-method-security[các annotation pre-post] của Spring và sử dụng `AuthorizationManager` ở bên trong.
 
-This means that the following two listings are functionally equivalent:
+Điều này có nghĩa hai đoạn code sau tương đương về chức năng:
 
 [tabs]
 ======
@@ -3158,7 +3158,7 @@ Xml::
 ----
 ======
 
-and:
+và:
 
 [tabs]
 ======
@@ -3184,9 +3184,9 @@ Xml::
 ----
 ======
 
-For applications not using the pre-post annotations, make sure to turn it off to avoid activating unwanted behavior.
+Với các ứng dụng không sử dụng annotation pre-post, hãy tắt tính năng này để tránh kích hoạt behavior không mong muốn.
 
-For example, a listing like:
+Ví dụ, đoạn code như sau:
 
 [tabs]
 ======
@@ -3212,7 +3212,7 @@ Xml::
 ----
 ======
 
-should change to:
+nên được thay đổi thành:
 
 [tabs]
 ======
@@ -3238,20 +3238,20 @@ Xml::
 ----
 ======
 
-=== Use a Custom `@Bean` instead of subclassing `DefaultMethodSecurityExpressionHandler`
+=== Sử dụng `@Bean` Tùy chỉnh thay vì Mở rộng `DefaultMethodSecurityExpressionHandler`
 
-As a performance optimization, a new method was introduced to `MethodSecurityExpressionHandler` that takes a `Supplier<Authentication>` instead of an `Authentication`.
+Để tối ưu hiệu năng, một method mới được thêm vào `MethodSecurityExpressionHandler`, nhận `Supplier<Authentication>` thay vì `Authentication`.
 
-This allows Spring Security to defer the lookup of the `Authentication`, and is taken advantage of automatically when you use `@EnableMethodSecurity` instead of `@EnableGlobalMethodSecurity`.
+Điều này cho phép Spring Security trì hoãn việc tìm `Authentication`, và được tự động tận dụng khi bạn sử dụng `@EnableMethodSecurity` thay vì `@EnableGlobalMethodSecurity`.
 
-However, let's say that your code extends `DefaultMethodSecurityExpressionHandler` and overrides `createSecurityExpressionRoot(Authentication, MethodInvocation)` to return a custom `SecurityExpressionRoot` instance.
-This will no longer work because the arrangement that `@EnableMethodSecurity` sets up calls `createEvaluationContext(Supplier<Authentication>, MethodInvocation)` instead.
+Tuy nhiên, giả sử code của bạn mở rộng `DefaultMethodSecurityExpressionHandler` và ghi đè `createSecurityExpressionRoot(Authentication, MethodInvocation)` để trả về một instance `SecurityExpressionRoot` tùy chỉnh.
+Cách này sẽ không còn hoạt động vì cấu hình do `@EnableMethodSecurity` thiết lập sẽ gọi `createEvaluationContext(Supplier<Authentication>, MethodInvocation)` thay thế.
 
-Happily, such a level of customization is often unnecessary.
-Instead, you can create a custom bean with the authorization methods that you need.
+May mắn là mức độ tùy chỉnh này thường không cần thiết.
+Thay vào đó, bạn có thể tạo một bean tùy chỉnh với các method authorization cần thiết.
 
-For example, let's say you are wanting a custom evaluation of `@PostAuthorize("hasAuthority('ADMIN')")`.
-You can create a custom `@Bean` like this one:
+Ví dụ, giả sử bạn muốn đánh giá tùy chỉnh `@PostAuthorize("hasAuthority('ADMIN')")`.
+Bạn có thể tạo `@Bean` tùy chỉnh như sau:
 
 [tabs]
 ======
@@ -3282,7 +3282,7 @@ class MyAuthorizer {
 ----
 ======
 
-and then refer to it in the annotation like so:
+và sau đó tham chiếu nó trong annotation như sau:
 
 [tabs]
 ======
@@ -3302,10 +3302,10 @@ Kotlin::
 ======
 
 [[subclass-defaultmethodsecurityexpressionhandler]]
-==== I'd still prefer to subclass `DefaultMethodSecurityExpressionHandler`
+==== Tôi vẫn muốn mở rộng `DefaultMethodSecurityExpressionHandler`
 
-If you must continue subclassing `DefaultMethodSecurityExpressionHandler`, you can still do so.
-Instead, override the `createEvaluationContext(Supplier<Authentication>, MethodInvocation)` method like so:
+Nếu vẫn phải tiếp tục mở rộng `DefaultMethodSecurityExpressionHandler`, bạn vẫn có thể làm vậy.
+Thay vào đó, hãy ghi đè method `createEvaluationContext(Supplier<Authentication>, MethodInvocation)` như sau:
 
 [tabs]
 ======
@@ -3344,7 +3344,7 @@ class MyExpressionHandler: DefaultMethodSecurityExpressionHandler {
 ----
 ======
 
-== Further Reading
+== Đọc thêm
 
-Now that you have secured your application's methods, please xref:servlet/authorization/authorize-http-requests.adoc[secure its requests] if you haven't already.
-You can also read further on xref:servlet/test/index.adoc[testing your application] or on integrating Spring Security with other aspects of you application like xref:servlet/integrations/data.adoc[the data layer] or xref:servlet/integrations/observability.adoc[tracing and metrics].
+Sau khi đã bảo vệ các method của ứng dụng, hãy xref:servlet/authorization/authorize-http-requests.adoc[bảo vệ các request] nếu bạn chưa làm vậy.
+Bạn cũng có thể đọc thêm về xref:servlet/test/index.adoc[kiểm thử ứng dụng] hoặc tích hợp Spring Security với các khía cạnh khác của ứng dụng như xref:servlet/integrations/data.adoc[data layer] hoặc xref:servlet/integrations/observability.adoc[tracing và metric].
