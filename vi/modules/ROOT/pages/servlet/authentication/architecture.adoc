@@ -171,7 +171,7 @@ Dĩ nhiên, Spring Security được thiết kế rõ ràng để xử lý yêu 
 == AuthenticationManager
 
 javadoc:org.springframework.security.authentication.AuthenticationManager[] là API xác định cách các Filter của Spring Security thực hiện xref:features/authentication/index.adoc#authentication[authentication].
-<<servlet-authentication-authentication,`Authentication`>> được trả về sau đó được controller (tức các xref:servlet/architecture.adoc#servlet-security-filters[instance `Filters` của Spring Security]) đã gọi `AuthenticationManager` thiết lập trên <<servlet-authentication-securitycontextholder>>.
+Sau đó, controller gọi `AuthenticationManager` (tức các xref:servlet/architecture.adoc#servlet-security-filters[instance `Filters` của Spring Security]) sẽ thiết lập <<servlet-authentication-authentication,`Authentication`>> được trả về trên <<servlet-authentication-securitycontextholder>>.
 Nếu không tích hợp với các instance `Filters` của Spring Security, bạn có thể thiết lập trực tiếp `SecurityContextHolder` và không bắt buộc phải sử dụng `AuthenticationManager`.
 
 Mặc dù implementation của `AuthenticationManager` có thể là bất kỳ thứ gì, implementation phổ biến nhất là <<servlet-authentication-providermanager,`ProviderManager`>>.
