@@ -1,37 +1,37 @@
 [[community]]
-= Spring Security Community
+= Cộng đồng Spring Security
 
-Welcome to the Spring Security Community!
-This section discusses how you can make the most of our vast community.
+Chào mừng bạn đến với Cộng đồng Spring Security!
+Phần này thảo luận về cách bạn có thể tận dụng tối đa cộng đồng rộng lớn của chúng ta.
 
 
 [[community-help]]
-== Getting Help
-If you need help with Spring Security, we are here to help.
-The following are some of the best ways to get help:
+== Nhận trợ giúp
+Nếu bạn cần trợ giúp về Spring Security, chúng tôi sẵn sàng hỗ trợ.
+Dưới đây là một số cách tốt nhất để nhận trợ giúp:
 
-* Read through this documentation.
-* Try one of our many xref:samples.adoc#samples[sample applications].
-* Ask a question on https://stackoverflow.com/questions/tagged/spring-security[https://stackoverflow.com] with the `spring-security` tag.
-* Report bugs and enhancement requests at https://github.com/spring-projects/spring-security/issues
+* Đọc tài liệu này.
+* Thử một trong nhiều xref:samples.adoc#samples[ứng dụng mẫu] của chúng tôi.
+* Đặt câu hỏi trên https://stackoverflow.com/questions/tagged/spring-security[https://stackoverflow.com] với thẻ `spring-security`.
+* Báo cáo lỗi và yêu cầu cải tiến tại https://github.com/spring-projects/spring-security/issues
 
 [[community-becoming-involved]]
-== Becoming Involved
-We welcome your involvement in the Spring Security project.
-There are many ways to contribute, including answering questions on Stack Overflow, writing new code, improving existing code, assisting with documentation, developing samples or tutorials, reporting bugs, or simply making suggestions.
-For more information, see our https://github.com/spring-projects/spring-security/blob/main/CONTRIBUTING.adoc[Contributing] documentation.
+== Tham gia đóng góp
+Chúng tôi hoan nghênh sự tham gia của bạn vào dự án Spring Security.
+Có nhiều cách để đóng góp, bao gồm trả lời câu hỏi trên Stack Overflow, viết mã mới, cải thiện mã hiện có, hỗ trợ tài liệu, phát triển các ví dụ mẫu hoặc hướng dẫn, báo cáo lỗi, hoặc đơn giản là đưa ra đề xuất.
+Để biết thêm thông tin, hãy xem https://github.com/spring-projects/spring-security/blob/main/CONTRIBUTING.adoc[Tài liệu đóng góp] của chúng tôi.
 
 [[community-source]]
-== Source Code
+== Mã nguồn
 
-You can find Spring Security's source code on GitHub at https://github.com/spring-projects/spring-security/
+Bạn có thể tìm mã nguồn của Spring Security trên GitHub tại https://github.com/spring-projects/spring-security/
 
 [[community-license]]
-== Apache 2 License
+== Giấy phép Apache 2
 
-Spring Security is Open Source software released under the https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license].
+Spring Security là phần mềm mã nguồn mở được phát hành theo https://www.apache.org/licenses/LICENSE-2.0.html[giấy phép Apache 2.0].
 
-== Social Media
+== Mạng xã hội
 
-You can follow https://twitter.com/SpringSecurity[@SpringSecurity] and the https://twitter.com/SpringSecurity/lists/team[Spring Security team] on Twitter to stay up to date with the latest news.
-You can also follow https://twitter.com/SpringCentral[@SpringCentral] to keep up to date with the entire Spring portfolio.
+Bạn có thể theo dõi https://twitter.com/SpringSecurity[@SpringSecurity] và https://twitter.com/SpringSecurity/lists/team[nhóm Spring Security] trên Twitter để cập nhật những tin tức mới nhất.
+Bạn cũng có thể theo dõi https://twitter.com/SpringCentral[@SpringCentral] để cập nhật thông tin về toàn bộ danh mục Spring.
