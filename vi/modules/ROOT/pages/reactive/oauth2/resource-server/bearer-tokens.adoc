@@ -1,15 +1,15 @@
-= OAuth 2.0 Resource Server Bearer Tokens
+= Bearer Token của Resource Server OAuth 2.0
 
 [[webflux-oauth2resourceserver-bearertoken-resolver]]
-== Bearer Token Resolution
+== Phân giải Bearer Token
 
-By default, Resource Server looks for a bearer token in the `Authorization` header.
-However, you can verify this token.
+Theo mặc định, Resource Server tìm bearer token trong header `Authorization`.
+Tuy nhiên, bạn có thể xác minh token này.
 
-For example, you may have a need to read the bearer token from a custom header.
-To do so, you can wire an instance of `ServerBearerTokenAuthenticationConverter` into the DSL:
+Ví dụ, bạn có thể cần đọc bearer token từ một header tùy chỉnh.
+Để làm vậy, bạn có thể kết nối một instance của `ServerBearerTokenAuthenticationConverter` vào DSL:
 
-.Custom Bearer Token Header
+.Header Bearer Token tùy chỉnh
 [tabs]
 ======
 Java::
@@ -38,10 +38,10 @@ return http {
 ----
 ======
 
-== Bearer Token Propagation
+== Truyền Bearer Token
 
-Now that you have a bearer token, you can pass that to downstream services.
-This is possible with javadoc:org.springframework.security.oauth2.server.resource.web.reactive.function.client.ServerBearerExchangeFilterFunction[]:
+Bây giờ bạn đã có một bearer token, bạn có thể truyền token đó đến các downstream service.
+Điều này có thể thực hiện bằng javadoc:org.springframework.security.oauth2.server.resource.web.reactive.function.client.ServerBearerExchangeFilterFunction[]:
 
 [tabs]
 ======
@@ -70,8 +70,8 @@ fun rest(): WebClient {
 ----
 ======
 
-When the `WebClient` shown in the preceding example performs requests, Spring Security looks up the current `Authentication` and extract any javadoc:org.springframework.security.oauth2.core.AbstractOAuth2Token[] credential.
-Then, it propagates that token in the `Authorization` header -- for example:
+Khi `WebClient` trong ví dụ trước thực hiện các request, Spring Security tra cứu `Authentication` hiện tại và trích xuất credential javadoc:org.springframework.security.oauth2.core.AbstractOAuth2Token[].
+Sau đó, nó truyền token đó trong header `Authorization` -- ví dụ:
 
 [tabs]
 ======
@@ -96,9 +96,9 @@ this.rest.get()
 ----
 ======
 
-The preceding example invokes the `https://other-service.example.com/endpoint`, adding the bearer token `Authorization` header for you.
+Ví dụ trước gọi `https://other-service.example.com/endpoint` và tự thêm header `Authorization` chứa bearer token cho bạn.
 
-In places where you need to override this behavior, you can supply the header yourself:
+Ở những nơi bạn cần ghi đè hành vi này, bạn có thể tự cung cấp header:
 
 [tabs]
 ======
@@ -125,9 +125,9 @@ rest.get()
 ----
 ======
 
-In this case, the filter falls back and forwards the request onto the rest of the web filter chain.
+Trong trường hợp này, filter sẽ chuyển sang phương án dự phòng và chuyển tiếp request đến phần còn lại của web filter chain.
 
 [NOTE]
 ====
-Unlike the javadoc:org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction[OAuth 2.0 Client filter function], this filter function makes no attempt to renew the token, should it be expired.
+Không giống javadoc:org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction[filter function của OAuth 2.0 Client], filter function này không cố gắng gia hạn token nếu token đã hết hạn.
 ====
