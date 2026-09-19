@@ -1,7 +1,7 @@
 [[integrations]]
-= Integrations
+= Tích hợp
 :page-section-summary-toc: 1
 
-Spring Security provides integrations with numerous frameworks and APIs.
-In this section, we discuss generic integrations that are not specific to Servlet or Reactive environments.
-To see specific integrations, refer to the xref:servlet/integrations/index.adoc[Servlet] and xref:reactive/integrations/cors.adoc[Reactive] Integrations sections.
+Spring Security cung cấp khả năng tích hợp với nhiều framework và API.
+Trong phần này, chúng ta thảo luận về các tích hợp chung không dành riêng cho môi trường Servlet hoặc Reactive.
+Để xem các tích hợp cụ thể, hãy tham khảo các phần Tích hợp xref:servlet/integrations/index.adoc[Servlet] và Tích hợp xref:reactive/integrations/cors.adoc[Reactive].
