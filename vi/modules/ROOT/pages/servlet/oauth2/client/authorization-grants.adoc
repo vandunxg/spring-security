@@ -1,33 +1,33 @@
 [[oauth2-client-authorization-grants]]
-= [[oauth2Client-auth-grant-support]]Authorization Grant Support
+= [[oauth2Client-auth-grant-support]]Hỗ trợ Authorization Grant
 
-This section describes Spring Security's support for authorization grants.
+Phần này mô tả hỗ trợ của Spring Security cho các authorization grant.
 
 [[oauth2-client-authorization-code]]
 == [[oauth2Client-auth-code-grant]]Authorization Code
 
 [NOTE]
 ====
-See the OAuth 2.0 Authorization Framework for further details on the https://tools.ietf.org/html/rfc6749#section-1.3.1[Authorization Code] grant.
+Xem OAuth 2.0 Authorization Framework để biết thêm chi tiết về grant https://tools.ietf.org/html/rfc6749#section-1.3.1[Authorization Code].
 ====
 
 [[oauth2-client-authorization-code-authorization]]
-=== Obtaining Authorization
+=== Nhận Authorization
 
 [NOTE]
 ====
-See the https://tools.ietf.org/html/rfc6749#section-4.1.1[Authorization Request/Response] protocol flow for the Authorization Code grant.
+Xem flow protocol https://tools.ietf.org/html/rfc6749#section-4.1.1[Authorization Request/Response] cho grant Authorization Code.
 ====
 
 [[oauth2-client-authorization-code-authorization-request]]
-=== Initiating the Authorization Request
+=== Khởi tạo Authorization Request
 
-The `OAuth2AuthorizationRequestRedirectFilter` uses an `OAuth2AuthorizationRequestResolver` to resolve an `OAuth2AuthorizationRequest` and initiate the Authorization Code grant flow by redirecting the end-user's user-agent to the Authorization Server's Authorization Endpoint.
+`OAuth2AuthorizationRequestRedirectFilter` sử dụng `OAuth2AuthorizationRequestResolver` để resolve một `OAuth2AuthorizationRequest` và khởi tạo flow grant Authorization Code bằng cách redirect user-agent của end-user đến Authorization Endpoint của Authorization Server.
 
-The primary role of the `OAuth2AuthorizationRequestResolver` is to resolve an `OAuth2AuthorizationRequest` from the provided web request.
-The default implementation `DefaultOAuth2AuthorizationRequestResolver` matches on the (default) path `+/oauth2/authorization/{registrationId}+`, extracting the `registrationId`, and using it to build the `OAuth2AuthorizationRequest` for the associated `ClientRegistration`.
+Vai trò chính của `OAuth2AuthorizationRequestResolver` là resolve một `OAuth2AuthorizationRequest` từ web request được cung cấp.
+Implementation mặc định `DefaultOAuth2AuthorizationRequestResolver` khớp với path mặc định `+/oauth2/authorization/{registrationId}+`, trích xuất `registrationId` và dùng nó để xây dựng `OAuth2AuthorizationRequest` cho `ClientRegistration` tương ứng.
 
-Consider the following Spring Boot properties for an OAuth 2.0 Client registration:
+Hãy xem các property Spring Boot sau cho một registration của OAuth 2.0 Client:
 
 [source,yaml,attrs="-attributes"]
 ----
@@ -48,15 +48,15 @@ spring:
             token-uri: https://dev-1234.oktapreview.com/oauth2/v1/token
 ----
 
-Given the preceding properties, a request with the base path `/oauth2/authorization/okta` initiates the Authorization Request redirect by the `OAuth2AuthorizationRequestRedirectFilter` and ultimately starts the Authorization Code grant flow.
+Với các property trước đó, request có base path `/oauth2/authorization/okta` khởi tạo redirect Authorization Request bởi `OAuth2AuthorizationRequestRedirectFilter` và cuối cùng bắt đầu flow grant Authorization Code.
 
 [NOTE]
 ====
-The `AuthorizationCodeOAuth2AuthorizedClientProvider` is an implementation of `OAuth2AuthorizedClientProvider` for the Authorization Code grant,
-which also initiates the Authorization Request redirect by the `OAuth2AuthorizationRequestRedirectFilter`.
+`AuthorizationCodeOAuth2AuthorizedClientProvider` là một implementation của `OAuth2AuthorizedClientProvider` cho grant Authorization Code,
+đồng thời cũng khởi tạo redirect Authorization Request bởi `OAuth2AuthorizationRequestRedirectFilter`.
 ====
 
-If the OAuth 2.0 Client is a https://tools.ietf.org/html/rfc6749#section-2.1[Public Client], configure the OAuth 2.0 Client registration as follows:
+Nếu OAuth 2.0 Client là https://tools.ietf.org/html/rfc6749#section-2.1[Public Client], hãy cấu hình registration của OAuth 2.0 Client như sau:
 
 [source,yaml,attrs="-attributes"]
 ----
@@ -73,26 +73,26 @@ spring:
             # ...
 ----
 
-Public Clients are supported by using https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange] (PKCE).
-If the client is running in an untrusted environment (such as a native application or web browser-based application) and is therefore incapable of maintaining the confidentiality of its credentials, PKCE is automatically used when the following conditions are true:
+Public Client được hỗ trợ bằng cách sử dụng https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange] (PKCE).
+Nếu client đang chạy trong môi trường không đáng tin cậy (chẳng hạn native application hoặc web browser-based application) và do đó không thể duy trì tính bảo mật của credential, PKCE sẽ tự động được sử dụng khi các điều kiện sau đúng:
 
-. `client-secret` is omitted (or empty)
-. `client-authentication-method` is set to `none` (`ClientAuthenticationMethod.NONE`)
+. `client-secret` bị bỏ qua (hoặc rỗng)
+. `client-authentication-method` được đặt thành `none` (`ClientAuthenticationMethod.NONE`)
 
 or
 
-. When `ClientRegistration.clientSettings.requireProofKey` is `true` (in this case `ClientRegistration.authorizationGrantType` must be `authorization_code`)
+. Khi `ClientRegistration.clientSettings.requireProofKey` là `true` (trong trường hợp này `ClientRegistration.authorizationGrantType` phải là `authorization_code`)
 
 
 [TIP]
 ====
-If the OAuth 2.0 Provider doesn't support PKCE for https://tools.ietf.org/html/rfc6749#section-2.1[Confidential Clients], you need to disable it by setting `ClientRegistration.clientSettings.requireProofKey` to `false`.
+Nếu OAuth 2.0 Provider không hỗ trợ PKCE cho https://tools.ietf.org/html/rfc6749#section-2.1[Confidential Clients], bạn cần vô hiệu hóa PKCE bằng cách đặt `ClientRegistration.clientSettings.requireProofKey` thành `false`.
 ====
 
 [[oauth2-client-authorization-code-redirect-uri]]
-[[oauth2Client-auth-code-redirect-uri]]The `DefaultOAuth2AuthorizationRequestResolver` also supports `URI` template variables for the `redirect-uri` by using `UriComponentsBuilder`.
+[[oauth2Client-auth-code-redirect-uri]]`DefaultOAuth2AuthorizationRequestResolver` cũng hỗ trợ các biến template `URI` cho `redirect-uri` bằng cách sử dụng `UriComponentsBuilder`.
 
-The following configuration uses all the supported `URI` template variables:
+Cấu hình sau sử dụng tất cả biến template `URI` được hỗ trợ:
 
 [source,yaml,attrs="-attributes"]
 ----
@@ -109,26 +109,26 @@ spring:
 
 [NOTE]
 ====
-`+{baseUrl}+` resolves to `+{baseScheme}://{baseHost}{basePort}{basePath}+`
+`+{baseUrl}+` được resolve thành `+{baseScheme}://{baseHost}{basePort}{basePath}+`
 ====
 
-Configuring the `redirect-uri` with `URI` template variables is especially useful when the OAuth 2.0 Client is running behind a xref:features/exploits/http.adoc#http-proxy-server[Proxy Server].
-Doing so ensures that the `X-Forwarded-*` headers are used when expanding the `redirect-uri`.
+Cấu hình `redirect-uri` bằng các biến template `URI` đặc biệt hữu ích khi OAuth 2.0 Client chạy phía sau xref:features/exploits/http.adoc#http-proxy-server[Proxy Server].
+Việc này đảm bảo các header `X-Forwarded-*` được sử dụng khi mở rộng `redirect-uri`.
 
 [[oauth2-client-authorization-code-authorization-request-resolver]]
-=== Customizing the Authorization Request
+=== Tùy chỉnh Authorization Request
 
-One of the primary use cases an `OAuth2AuthorizationRequestResolver` can realize is the ability to customize the Authorization Request with additional parameters above the standard parameters defined in the OAuth 2.0 Authorization Framework.
+Một trong các trường hợp sử dụng chính mà `OAuth2AuthorizationRequestResolver` có thể đáp ứng là tùy chỉnh Authorization Request bằng các parameter bổ sung ngoài những parameter tiêu chuẩn được định nghĩa trong OAuth 2.0 Authorization Framework.
 
-For example, OpenID Connect defines additional OAuth 2.0 request parameters for the https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest[Authorization Code Flow] extending from the standard parameters defined in the https://tools.ietf.org/html/rfc6749#section-4.1.1[OAuth 2.0 Authorization Framework].
-One of those extended parameters is the `prompt` parameter.
+Ví dụ, OpenID Connect định nghĩa các parameter request OAuth 2.0 bổ sung cho https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest[Authorization Code Flow], mở rộng từ các parameter tiêu chuẩn được định nghĩa trong https://tools.ietf.org/html/rfc6749#section-4.1.1[OAuth 2.0 Authorization Framework].
+Một trong các parameter mở rộng đó là parameter `prompt`.
 
 [NOTE]
 ====
-The `prompt` parameter is optional. Space delimited, case sensitive list of ASCII string values that specifies whether the Authorization Server prompts the End-User for re-authentication and consent. The defined values are: `none`, `login`, `consent`, and `select_account`.
+Parameter `prompt` là tùy chọn. Đây là danh sách các giá trị chuỗi ASCII phân tách bằng khoảng trắng, phân biệt chữ hoa chữ thường, chỉ định Authorization Server có yêu cầu End-User re-authentication và consent hay không. Các giá trị được định nghĩa là: `none`, `login`, `consent` và `select_account`.
 ====
 
-The following example shows how to configure the `DefaultOAuth2AuthorizationRequestResolver` with a `Consumer<OAuth2AuthorizationRequest.Builder>` that customizes the Authorization Request for `oauth2Login()`, by including the request parameter `prompt=consent`.
+Ví dụ sau cho thấy cách cấu hình `DefaultOAuth2AuthorizationRequestResolver` với một `Consumer<OAuth2AuthorizationRequest.Builder>` để tùy chỉnh Authorization Request cho `oauth2Login()`, bằng cách thêm request parameter `prompt=consent`.
 
 [tabs]
 ======
@@ -223,9 +223,9 @@ class SecurityConfig {
 ----
 ======
 
-For the simple use case where the additional request parameter is always the same for a specific provider, you can add it directly in the `authorization-uri` property.
+Với trường hợp đơn giản khi request parameter bổ sung luôn giống nhau đối với một provider cụ thể, bạn có thể thêm trực tiếp parameter đó vào property `authorization-uri`.
 
-For example, if the value for the request parameter `prompt` is always `consent` for the provider `okta`, you can configure it as follows:
+Ví dụ, nếu giá trị của request parameter `prompt` luôn là `consent` đối với provider `okta`, bạn có thể cấu hình như sau:
 
 [source,yaml]
 ----
@@ -238,15 +238,15 @@ spring:
             authorization-uri: https://dev-1234.oktapreview.com/oauth2/v1/authorize?prompt=consent
 ----
 
-The preceding example shows the common use case of adding a custom parameter on top of the standard parameters.
-Alternatively, if your requirements are more advanced, you can take full control in building the Authorization Request URI by overriding the `OAuth2AuthorizationRequest.authorizationRequestUri` property.
+Ví dụ trước đó minh họa trường hợp sử dụng phổ biến là thêm một parameter tùy chỉnh bên trên các parameter tiêu chuẩn.
+Ngoài ra, nếu yêu cầu của bạn nâng cao hơn, bạn có thể toàn quyền xây dựng Authorization Request URI bằng cách override property `OAuth2AuthorizationRequest.authorizationRequestUri`.
 
 [TIP]
 ====
-`OAuth2AuthorizationRequest.Builder.build()` constructs the `OAuth2AuthorizationRequest.authorizationRequestUri`, which represents the Authorization Request URI including all query parameters using the `application/x-www-form-urlencoded` format.
+`OAuth2AuthorizationRequest.Builder.build()` xây dựng `OAuth2AuthorizationRequest.authorizationRequestUri`, đại diện cho Authorization Request URI bao gồm tất cả query parameter bằng format `application/x-www-form-urlencoded`.
 ====
 
-The following example shows a variation of `authorizationRequestCustomizer()` from the preceding example and instead overrides the `OAuth2AuthorizationRequest.authorizationRequestUri` property:
+Ví dụ sau là một biến thể của `authorizationRequestCustomizer()` trong ví dụ trước đó và thay vào đó override property `OAuth2AuthorizationRequest.authorizationRequestUri`:
 
 [tabs]
 ======
@@ -278,20 +278,20 @@ private fun authorizationRequestCustomizer(): Consumer<OAuth2AuthorizationReques
 ======
 
 [[oauth2-client-authorization-code-authorization-request-repository]]
-=== Storing the Authorization Request
+=== Lưu Authorization Request
 
-The `AuthorizationRequestRepository` is responsible for the persistence of the `OAuth2AuthorizationRequest` from the time the Authorization Request is initiated to the time the Authorization Response is received (the callback).
+`AuthorizationRequestRepository` chịu trách nhiệm persistence của `OAuth2AuthorizationRequest` từ lúc Authorization Request được khởi tạo cho đến khi nhận được Authorization Response (callback).
 
 [TIP]
 ====
-The `OAuth2AuthorizationRequest` is used to correlate and validate the Authorization Response.
+`OAuth2AuthorizationRequest` được dùng để correlate và validate Authorization Response.
 ====
 
-The default implementation of `AuthorizationRequestRepository` is `HttpSessionOAuth2AuthorizationRequestRepository`, which stores the `OAuth2AuthorizationRequest` in the `HttpSession`.
+Implementation mặc định của `AuthorizationRequestRepository` là `HttpSessionOAuth2AuthorizationRequestRepository`, lưu `OAuth2AuthorizationRequest` trong `HttpSession`.
 
-If you have a custom implementation of `AuthorizationRequestRepository`, you can configure it as follows:
+Nếu bạn có implementation tùy chỉnh của `AuthorizationRequestRepository`, bạn có thể cấu hình như sau:
 
-.AuthorizationRequestRepository Configuration
+.Cấu hình AuthorizationRequestRepository
 [tabs]
 ======
 Java::
@@ -362,14 +362,14 @@ Xml::
 ======
 
 [[oauth2-client-authorization-code-access-token]]
-=== Requesting an Access Token
+=== Request Access Token
 
 [NOTE]
 ====
-See the https://tools.ietf.org/html/rfc6749#section-4.1.3[Access Token Request/Response] protocol flow for the Authorization Code grant.
+Xem flow protocol https://tools.ietf.org/html/rfc6749#section-4.1.3[Access Token Request/Response] cho grant Authorization Code.
 ====
 
-The default implementation of `OAuth2AccessTokenResponseClient` for the Authorization Code grant is `RestClientAuthorizationCodeTokenResponseClient`, which uses a `RestClient` instance to exchange an authorization code for an access token at the Authorization Server’s Token Endpoint.
+Implementation mặc định của `OAuth2AccessTokenResponseClient` cho grant Authorization Code là `RestClientAuthorizationCodeTokenResponseClient`, sử dụng một instance `RestClient` để exchange authorization code lấy access token tại Token Endpoint của Authorization Server.
 
 :section-id: authorization-code
 :grant-type: Authorization Code
@@ -381,11 +381,11 @@ include::partial$servlet/oauth2/client/rest-client-access-token-response-client.
 :leveloffset: -1
 
 [[oauth2-client-authorization-code-access-token-response-client-dsl]]
-=== Customize using the DSL
+=== Tùy chỉnh bằng DSL
 
-Whether you customize `{class-name}` or provide your own implementation of `OAuth2AccessTokenResponseClient`, you can configure it using the DSL (as an alternative to <<oauth2-client-authorization-code-access-token-response-client-bean,publishing a bean>>) as follows:
+Dù bạn tùy chỉnh `{class-name}` hay cung cấp implementation riêng của `OAuth2AccessTokenResponseClient`, bạn có thể cấu hình bằng DSL (thay cho <<oauth2-client-authorization-code-access-token-response-client-bean,đăng ký một bean>>) như sau:
 
-.Access Token Response Configuration via DSL
+.Cấu hình Access Token Response bằng DSL
 [tabs]
 ======
 Java::
@@ -449,18 +449,18 @@ Xml::
 
 [NOTE]
 ====
-See the OAuth 2.0 Authorization Framework for further details on the https://tools.ietf.org/html/rfc6749#section-1.5[Refresh Token].
+Xem OAuth 2.0 Authorization Framework để biết thêm chi tiết về https://tools.ietf.org/html/rfc6749#section-1.5[Refresh Token].
 ====
 
 [[oauth2-client-refresh-token-access-token]]
-=== Refreshing an Access Token
+=== Refresh Access Token
 
 [NOTE]
 ====
-See the https://tools.ietf.org/html/rfc6749#section-6[Access Token Request/Response] protocol flow for the Refresh Token grant.
+Xem flow protocol https://tools.ietf.org/html/rfc6749#section-6[Access Token Request/Response] cho grant Refresh Token.
 ====
 
-The default implementation of `OAuth2AccessTokenResponseClient` for the Refresh Token grant is `RestClientRefreshTokenTokenResponseClient`, which uses a `RestClient` instance to obtain an access token at the Authorization Server’s Token Endpoint.
+Implementation mặc định của `OAuth2AccessTokenResponseClient` cho grant Refresh Token là `RestClientRefreshTokenTokenResponseClient`, sử dụng một instance `RestClient` để lấy access token tại Token Endpoint của Authorization Server.
 
 :section-id: refresh-token
 :grant-type: Refresh Token
@@ -472,11 +472,11 @@ include::partial$servlet/oauth2/client/rest-client-access-token-response-client.
 :leveloffset: -1
 
 [[oauth2-client-refresh-token-authorized-client-provider-builder]]
-=== Customize using the Builder
+=== Tùy chỉnh bằng Builder
 
-Whether you customize `RestClientRefreshTokenTokenResponseClient` or provide your own implementation of `OAuth2AccessTokenResponseClient`, you can configure it using the `OAuth2AuthorizedClientProviderBuilder` (as an alternative to <<oauth2-client-refresh-token-access-token-response-client-bean,publishing a bean>>) as follows:
+Dù bạn tùy chỉnh `RestClientRefreshTokenTokenResponseClient` hay cung cấp implementation riêng của `OAuth2AccessTokenResponseClient`, bạn có thể cấu hình bằng `OAuth2AuthorizedClientProviderBuilder` (thay cho <<oauth2-client-refresh-token-access-token-response-client-bean,đăng ký một bean>>) như sau:
 
-.Access Token Response Configuration via Builder
+.Cấu hình Access Token Response bằng Builder
 [tabs]
 ======
 Java::
@@ -517,30 +517,30 @@ authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider)
 
 [NOTE]
 ====
-`OAuth2AuthorizedClientProviderBuilder.builder().refreshToken()` configures a `RefreshTokenOAuth2AuthorizedClientProvider`,
-which is an implementation of an `OAuth2AuthorizedClientProvider` for the Refresh Token grant.
+`OAuth2AuthorizedClientProviderBuilder.builder().refreshToken()` cấu hình một `RefreshTokenOAuth2AuthorizedClientProvider`,
+là implementation của `OAuth2AuthorizedClientProvider` cho grant Refresh Token.
 ====
 
-The `OAuth2RefreshToken` can optionally be returned in the Access Token Response for the `authorization_code` grant type.
-If the `OAuth2AuthorizedClient.getRefreshToken()` is available and the `OAuth2AuthorizedClient.getAccessToken()` is expired, it is automatically refreshed by the `RefreshTokenOAuth2AuthorizedClientProvider`.
+`OAuth2RefreshToken` có thể được trả về tùy chọn trong Access Token Response cho grant type `authorization_code`.
+Nếu `OAuth2AuthorizedClient.getRefreshToken()` khả dụng và `OAuth2AuthorizedClient.getAccessToken()` đã hết hạn, token sẽ được `RefreshTokenOAuth2AuthorizedClientProvider` tự động refresh.
 
 [[oauth2-client-client-credentials]]
 == [[oauth2Client-client-creds-grant]]Client Credentials
 
 [NOTE]
 ====
-Please refer to the OAuth 2.0 Authorization Framework for further details on the https://tools.ietf.org/html/rfc6749#section-1.3.4[Client Credentials] grant.
+Vui lòng tham khảo OAuth 2.0 Authorization Framework để biết thêm chi tiết về grant https://tools.ietf.org/html/rfc6749#section-1.3.4[Client Credentials].
 ====
 
 [[oauth2-client-client-credentials-access-token]]
-=== Requesting an Access Token
+=== Request Access Token
 
 [NOTE]
 ====
-See the https://tools.ietf.org/html/rfc6749#section-4.4.2[Access Token Request/Response] protocol flow for the Client Credentials grant.
+Xem flow protocol https://tools.ietf.org/html/rfc6749#section-4.4.2[Access Token Request/Response] cho grant Client Credentials.
 ====
 
-The default implementation of `OAuth2AccessTokenResponseClient` for the Client Credentials grant is `RestClientClientCredentialsTokenResponseClient`, which uses a `RestClient` instance to obtain an access token at the Authorization Server’s Token Endpoint.
+Implementation mặc định của `OAuth2AccessTokenResponseClient` cho grant Client Credentials là `RestClientClientCredentialsTokenResponseClient`, sử dụng một instance `RestClient` để lấy access token tại Token Endpoint của Authorization Server.
 
 :section-id: client-credentials
 :grant-type: Client Credentials
@@ -552,11 +552,11 @@ include::partial$servlet/oauth2/client/rest-client-access-token-response-client.
 :leveloffset: -1
 
 [[oauth2-client-client-credentials-authorized-client-provider-builder]]
-=== Customize using the Builder
+=== Tùy chỉnh bằng Builder
 
-Whether you customize `RestClientClientCredentialsTokenResponseClient` or provide your own implementation of `OAuth2AccessTokenResponseClient`, you can configure it using the `OAuth2AuthorizedClientProviderBuilder` (as an alternative to <<oauth2-client-client-credentials-access-token-response-client-bean,publishing a bean>>) as follows:
+Dù bạn tùy chỉnh `RestClientClientCredentialsTokenResponseClient` hay cung cấp implementation riêng của `OAuth2AccessTokenResponseClient`, bạn có thể cấu hình bằng `OAuth2AuthorizedClientProviderBuilder` (thay cho <<oauth2-client-client-credentials-access-token-response-client-bean,đăng ký một bean>>) như sau:
 
-.Access Token Response Configuration via Builder
+.Cấu hình Access Token Response bằng Builder
 [tabs]
 ======
 Java::
@@ -595,14 +595,14 @@ authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider)
 
 [NOTE]
 ====
-`OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials()` configures a `ClientCredentialsOAuth2AuthorizedClientProvider`,
-which is an implementation of an `OAuth2AuthorizedClientProvider` for the Client Credentials grant.
+`OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials()` cấu hình một `ClientCredentialsOAuth2AuthorizedClientProvider`,
+là implementation của `OAuth2AuthorizedClientProvider` cho grant Client Credentials.
 ====
 
 [[oauth2-client-client-credentials-authorized-client-manager]]
-=== Using the Access Token
+=== Sử dụng Access Token
 
-Consider the following Spring Boot properties for an OAuth 2.0 Client registration:
+Hãy xem các property Spring Boot sau cho một registration của OAuth 2.0 Client:
 
 [source,yaml]
 ----
@@ -621,7 +621,7 @@ spring:
             token-uri: https://dev-1234.oktapreview.com/oauth2/v1/token
 ----
 
-Further consider the following `OAuth2AuthorizedClientManager` `@Bean`:
+Ngoài ra, hãy xem `@Bean` `OAuth2AuthorizedClientManager` sau:
 
 [tabs]
 ======
@@ -667,7 +667,7 @@ fun authorizedClientManager(
 ----
 ======
 
-Given the preceding properties and bean, you can obtain the `OAuth2AccessToken` as follows:
+Với các property và bean trước đó, bạn có thể lấy `OAuth2AccessToken` như sau:
 
 [tabs]
 ======
@@ -737,8 +737,8 @@ class OAuth2ClientController {
 
 [NOTE]
 ====
-`HttpServletRequest` and `HttpServletResponse` are both OPTIONAL attributes.
-If not provided, they default to `ServletRequestAttributes` by using `RequestContextHolder.getRequestAttributes()`.
+`HttpServletRequest` và `HttpServletResponse` đều là attribute TÙY CHỌN.
+Nếu không được cung cấp, chúng mặc định là `ServletRequestAttributes` bằng cách sử dụng `RequestContextHolder.getRequestAttributes()`.
 ====
 
 [[oauth2-client-jwt-bearer]]
@@ -746,18 +746,18 @@ If not provided, they default to `ServletRequestAttributes` by using `RequestCon
 
 [NOTE]
 ====
-Please refer to JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants for further details on the https://datatracker.ietf.org/doc/html/rfc7523[JWT Bearer] grant.
+Vui lòng tham khảo JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants để biết thêm chi tiết về grant https://datatracker.ietf.org/doc/html/rfc7523[JWT Bearer].
 ====
 
 [[oauth2-client-jwt-bearer-access-token]]
-=== Requesting an Access Token
+=== Request Access Token
 
 [NOTE]
 ====
-Please refer to the https://datatracker.ietf.org/doc/html/rfc7523#section-2.1[Access Token Request/Response] protocol flow for the JWT Bearer grant.
+Vui lòng tham khảo flow protocol https://datatracker.ietf.org/doc/html/rfc7523#section-2.1[Access Token Request/Response] cho grant JWT Bearer.
 ====
 
-The default implementation of `OAuth2AccessTokenResponseClient` for the JWT Bearer grant is `RestClientJwtBearerTokenResponseClient`, which uses a `RestClient` instance to obtain an access token at the Authorization Server’s Token Endpoint.
+Implementation mặc định của `OAuth2AccessTokenResponseClient` cho grant JWT Bearer là `RestClientJwtBearerTokenResponseClient`, sử dụng một instance `RestClient` để lấy access token tại Token Endpoint của Authorization Server.
 
 :section-id: jwt-bearer
 :grant-type: JWT Bearer
@@ -769,11 +769,11 @@ include::partial$servlet/oauth2/client/rest-client-access-token-response-client.
 :leveloffset: -1
 
 [[oauth2-client-jwt-bearer-authorized-client-provider-builder]]
-=== Customize using the Builder
+=== Tùy chỉnh bằng Builder
 
-Whether you customize `RestClientJwtBearerTokenResponseClient` or provide your own implementation of `OAuth2AccessTokenResponseClient`, you can configure it using the `OAuth2AuthorizedClientProviderBuilder` (as an alternative to <<oauth2-client-jwt-bearer-access-token-response-client-bean,publishing a bean>>) as follows:
+Dù bạn tùy chỉnh `RestClientJwtBearerTokenResponseClient` hay cung cấp implementation riêng của `OAuth2AccessTokenResponseClient`, bạn có thể cấu hình bằng `OAuth2AuthorizedClientProviderBuilder` (thay cho <<oauth2-client-jwt-bearer-access-token-response-client-bean,đăng ký một bean>>) như sau:
 
-.Access Token Response Configuration via Builder
+.Cấu hình Access Token Response bằng Builder
 [tabs]
 ======
 Java::
@@ -817,9 +817,9 @@ authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider)
 ======
 
 [[oauth2-client-jwt-bearer-authorized-client-manager]]
-=== Using the Access Token
+=== Sử dụng Access Token
 
-Given the following Spring Boot properties for an OAuth 2.0 Client registration:
+Với các property Spring Boot sau cho một registration của OAuth 2.0 Client:
 
 [source,yaml]
 ----
@@ -838,7 +838,7 @@ spring:
             token-uri: https://dev-1234.oktapreview.com/oauth2/v1/token
 ----
 
-...and the `OAuth2AuthorizedClientManager` `@Bean`:
+...và `@Bean` `OAuth2AuthorizedClientManager`:
 
 [tabs]
 ======
@@ -888,7 +888,7 @@ fun authorizedClientManager(
 ----
 ======
 
-You may obtain the `OAuth2AccessToken` as follows:
+Bạn có thể lấy `OAuth2AccessToken` như sau:
 
 [tabs]
 ======
@@ -942,12 +942,12 @@ class OAuth2ResourceServerController {
 
 [NOTE]
 ====
-`JwtBearerOAuth2AuthorizedClientProvider` resolves the `Jwt` assertion via `OAuth2AuthorizationContext.getPrincipal().getPrincipal()` by default, hence the use of `JwtAuthenticationToken` in the preceding example.
+Theo mặc định, `JwtBearerOAuth2AuthorizedClientProvider` resolve assertion `Jwt` thông qua `OAuth2AuthorizationContext.getPrincipal().getPrincipal()`, do đó ví dụ trước sử dụng `JwtAuthenticationToken`.
 ====
 
 [TIP]
 ====
-If you need to resolve the `Jwt` assertion from a different source, you can provide `JwtBearerOAuth2AuthorizedClientProvider.setJwtAssertionResolver()` with a custom `Function<OAuth2AuthorizationContext, Jwt>`.
+Nếu cần resolve assertion `Jwt` từ một nguồn khác, bạn có thể cung cấp `JwtBearerOAuth2AuthorizedClientProvider.setJwtAssertionResolver()` với một `Function<OAuth2AuthorizationContext, Jwt>` tùy chỉnh.
 ====
 
 [[oauth2-client-token-exchange]]
@@ -955,18 +955,18 @@ If you need to resolve the `Jwt` assertion from a different source, you can prov
 
 [NOTE]
 ====
-Please refer to OAuth 2.0 Token Exchange for further details on the https://datatracker.ietf.org/doc/html/rfc8693[Token Exchange] grant.
+Vui lòng tham khảo OAuth 2.0 Token Exchange để biết thêm chi tiết về grant https://datatracker.ietf.org/doc/html/rfc8693[Token Exchange].
 ====
 
 [[oauth2-client-token-exchange-access-token]]
-=== Requesting an Access Token
+=== Request Access Token
 
 [NOTE]
 ====
-Please refer to the https://datatracker.ietf.org/doc/html/rfc8693#section-2[Token Exchange Request and Response] protocol flow for the Token Exchange grant.
+Vui lòng tham khảo flow protocol https://datatracker.ietf.org/doc/html/rfc8693#section-2[Token Exchange Request and Response] cho grant Token Exchange.
 ====
 
-The default implementation of `OAuth2AccessTokenResponseClient` for the Token Exchange grant is `RestClientTokenExchangeTokenResponseClient`, which uses a `RestClient` instance to obtain an access token at the Authorization Server’s Token Endpoint.
+Implementation mặc định của `OAuth2AccessTokenResponseClient` cho grant Token Exchange là `RestClientTokenExchangeTokenResponseClient`, sử dụng một instance `RestClient` để lấy access token tại Token Endpoint của Authorization Server.
 
 :section-id: token-exchange
 :grant-type: Token Exchange
@@ -978,11 +978,11 @@ include::partial$servlet/oauth2/client/rest-client-access-token-response-client.
 :leveloffset: -1
 
 [[oauth2-client-token-exchange-authorized-client-provider-builder]]
-=== Customize using the Builder
+=== Tùy chỉnh bằng Builder
 
-Whether you customize `RestClientTokenExchangeTokenResponseClient` or provide your own implementation of `OAuth2AccessTokenResponseClient`, you can configure it using the `OAuth2AuthorizedClientProviderBuilder` (as an alternative to <<oauth2-client-token-exchange-access-token-response-client-bean,publishing a bean>>) as follows:
+Dù bạn tùy chỉnh `RestClientTokenExchangeTokenResponseClient` hay cung cấp implementation riêng của `OAuth2AccessTokenResponseClient`, bạn có thể cấu hình bằng `OAuth2AuthorizedClientProviderBuilder` (thay cho <<oauth2-client-token-exchange-access-token-response-client-bean,đăng ký một bean>>) như sau:
 
-.Access Token Response Configuration via Builder
+.Cấu hình Access Token Response bằng Builder
 [tabs]
 ======
 Java::
@@ -1026,9 +1026,9 @@ authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider)
 ======
 
 [[oauth2-client-token-exchange-authorized-client-manager]]
-=== [[token-exchange-grant-access-token]]Using the Access Token
+=== [[token-exchange-grant-access-token]]Sử dụng Access Token
 
-Given the following Spring Boot properties for an OAuth 2.0 Client registration:
+Với các property Spring Boot sau cho một registration của OAuth 2.0 Client:
 
 [source,yaml]
 ----
@@ -1047,7 +1047,7 @@ spring:
             token-uri: https://dev-1234.oktapreview.com/oauth2/v1/token
 ----
 
-...and the `OAuth2AuthorizedClientManager` `@Bean`:
+...và `@Bean` `OAuth2AuthorizedClientManager`:
 
 [tabs]
 ======
@@ -1097,7 +1097,7 @@ fun authorizedClientManager(
 ----
 ======
 
-You may obtain the `OAuth2AccessToken` as follows:
+Bạn có thể lấy `OAuth2AccessToken` như sau:
 
 [tabs]
 ======
@@ -1151,16 +1151,16 @@ class OAuth2ResourceServerController {
 
 [NOTE]
 ====
-`TokenExchangeOAuth2AuthorizedClientProvider` resolves the subject token (as an `OAuth2Token`) via `OAuth2AuthorizationContext.getPrincipal().getPrincipal()` by default, hence the use of `JwtAuthenticationToken` in the preceding example.
-An actor token is not resolved by default.
+Theo mặc định, `TokenExchangeOAuth2AuthorizedClientProvider` resolve subject token (dưới dạng một `OAuth2Token`) thông qua `OAuth2AuthorizationContext.getPrincipal().getPrincipal()`, do đó ví dụ trước sử dụng `JwtAuthenticationToken`.
+Actor token không được resolve theo mặc định.
 ====
 
 [TIP]
 ====
-If you need to resolve the subject token from a different source, you can provide `TokenExchangeOAuth2AuthorizedClientProvider.setSubjectTokenResolver()` with a custom `Function<OAuth2AuthorizationContext, OAuth2Token>`.
+Nếu cần resolve subject token từ một nguồn khác, bạn có thể cung cấp `TokenExchangeOAuth2AuthorizedClientProvider.setSubjectTokenResolver()` với một `Function<OAuth2AuthorizationContext, OAuth2Token>` tùy chỉnh.
 ====
 
 [TIP]
 ====
-If you need to resolve an actor token, you can provide `TokenExchangeOAuth2AuthorizedClientProvider.setActorTokenResolver()` with a custom `Function<OAuth2AuthorizationContext, OAuth2Token>`.
+Nếu cần resolve actor token, bạn có thể cung cấp `TokenExchangeOAuth2AuthorizedClientProvider.setActorTokenResolver()` với một `Function<OAuth2AuthorizationContext, OAuth2Token>` tùy chỉnh.
 ====
