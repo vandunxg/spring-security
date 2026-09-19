@@ -1,75 +1,75 @@
 [[servlet-architecture]]
-= Architecture
+= Kiến trúc
 :figures: servlet/architecture
 
-This section discusses Spring Security's high-level architecture within Servlet based applications.
-We build on this high-level understanding within the xref:servlet/authentication/index.adoc#servlet-authentication[Authentication], xref:servlet/authorization/index.adoc#servlet-authorization[Authorization], and xref:servlet/exploits/index.adoc#servlet-exploits[Protection Against Exploits] sections of the reference.
+Phần này trình bày kiến trúc cấp cao của Spring Security trong các ứng dụng dựa trên Servlet.
+Chúng ta sẽ dựa trên hiểu biết cấp cao này trong các phần xref:servlet/authentication/index.adoc#servlet-authentication[Authentication], xref:servlet/authorization/index.adoc#servlet-authorization[Authorization] và xref:servlet/exploits/index.adoc#servlet-exploits[Bảo vệ khỏi Exploit] của tài liệu tham khảo.
 // FIXME: Add links to other sections of architecture
 
 [[servlet-filters-review]]
-== A Review of Filters
+== Tổng quan về Filter
 
-Spring Security's Servlet support is based on Servlet Filters, so it is helpful to look at the role of Filters generally first.
-The following image shows the typical layering of the handlers for a single HTTP request.
+Hỗ trợ Servlet của Spring Security dựa trên Servlet Filter, vì vậy trước hết chúng ta nên xem xét vai trò của Filter nói chung.
+Hình ảnh sau đây minh họa các lớp bộ xử lý điển hình cho một HTTP request.
 
 .FilterChain
 [[servlet-filterchain-figure]]
 [.invert-dark]
 image::{figures}/filterchain.png[]
 
-The client sends a request to the application, and the container creates a `FilterChain`, which contains the `Filter` instances and `Servlet` that should process the `HttpServletRequest`, based on the path of the request URI.
-In a Spring MVC application, the `Servlet` is an instance of {spring-framework-reference-url}web.html#mvc-servlet[`DispatcherServlet`].
-At most, one `Servlet` can handle a single `HttpServletRequest` and `HttpServletResponse`.
-However, more than one `Filter` can be used to:
+Client gửi một request đến ứng dụng, và container tạo một `FilterChain`, chứa các instance `Filter` và `Servlet` cần xử lý `HttpServletRequest`, dựa trên path của request URI.
+Trong một ứng dụng Spring MVC, `Servlet` là một instance của {spring-framework-reference-url}web.html#mvc-servlet[`DispatcherServlet`].
+Nhiều nhất chỉ một `Servlet` có thể xử lý một `HttpServletRequest` và `HttpServletResponse`.
+Tuy nhiên, có thể sử dụng nhiều `Filter` để:
 
-* Prevent downstream `Filter` instances or the `Servlet` from being invoked.
-In this case, the `Filter` typically writes the `HttpServletResponse`.
-* Modify the `HttpServletRequest` or `HttpServletResponse` used by the downstream `Filter` instances and the `Servlet`.
+* Ngăn các instance `Filter` phía sau hoặc `Servlet` được gọi.
+Trong trường hợp này, `Filter` thường ghi vào `HttpServletResponse`.
+* Sửa đổi `HttpServletRequest` hoặc `HttpServletResponse` được các instance `Filter` phía sau và `Servlet` sử dụng.
 
-The power of the `Filter` comes from the `FilterChain` that is passed into it.
+Sức mạnh của `Filter` đến từ `FilterChain` được truyền vào nó.
 
-.`FilterChain` Usage Example
+.Ví dụ sử dụng `FilterChain`
 include-code::./FilterChainUsage[tag=dofilter,indent=0]
 
-Since a `Filter` impacts only downstream `Filter` instances and the `Servlet`, the order in which each `Filter` is invoked is extremely important.
+Vì một `Filter` chỉ tác động đến các instance `Filter` phía sau và `Servlet`, thứ tự gọi từng `Filter` là cực kỳ quan trọng.
 
 [[servlet-delegatingfilterproxy]]
 == DelegatingFilterProxy
 
-Spring provides a `Filter` implementation named {spring-framework-api-url}org/springframework/web/filter/DelegatingFilterProxy.html[`DelegatingFilterProxy`] that allows bridging between the Servlet container's lifecycle and Spring's `ApplicationContext`.
-The Servlet container allows registering `Filter` instances by using its own standards, but it is not aware of Spring-defined Beans.
-You can register `DelegatingFilterProxy` through the standard Servlet container mechanisms but delegate all the work to a Spring Bean that implements `Filter`.
+Spring cung cấp một implementation `Filter` có tên {spring-framework-api-url}org/springframework/web/filter/DelegatingFilterProxy.html[`DelegatingFilterProxy`], cho phép kết nối lifecycle của Servlet container với `ApplicationContext` của Spring.
+Servlet container cho phép đăng ký các instance `Filter` bằng các standard riêng, nhưng không biết đến các Bean do Spring định nghĩa.
+Bạn có thể đăng ký `DelegatingFilterProxy` thông qua các cơ chế standard của Servlet container nhưng ủy quyền toàn bộ công việc cho một Spring Bean implements `Filter`.
 
-Here is a picture of how `DelegatingFilterProxy` fits into the <<servlet-filters-review,`Filter` instances and the `FilterChain`>>.
+Hình dưới đây minh họa cách `DelegatingFilterProxy` nằm trong <<servlet-filters-review,các instance `Filter` và `FilterChain`>>.
 
 .DelegatingFilterProxy
 [[servlet-delegatingfilterproxy-figure]]
 [.invert-dark]
 image::{figures}/delegatingfilterproxy.png[]
 
-`DelegatingFilterProxy` looks up __Bean Filter~0~__ from the `ApplicationContext` and then invokes __Bean Filter~0~__.
-The following listing shows pseudo code of `DelegatingFilterProxy`:
+`DelegatingFilterProxy` tra cứu __Bean Filter~0~__ từ `ApplicationContext`, sau đó gọi __Bean Filter~0~__.
+Đoạn liệt kê sau đây trình bày mã giả của `DelegatingFilterProxy`:
 
-.`DelegatingFilterProxy` Pseudo Code
+.Mã giả của `DelegatingFilterProxy`
 
 include-code::./SampleDelegatingFilterProxy[tag=dofilter,indent=0]
 
-<1> Lazily get Filter that was registered as a Spring Bean.
-For the example in <<servlet-delegatingfilterproxy-figure>> `delegate` is an instance of __Bean Filter~0~__.
-<2> Delegate work to the Spring Bean.
+<1> Lấy Filter đã được đăng ký dưới dạng Spring Bean một cách trì hoãn.
+Trong ví dụ tại <<servlet-delegatingfilterproxy-figure>>, `delegate` là một instance của __Bean Filter~0~__.
+<2> Ủy quyền công việc cho Spring Bean.
 
-Another benefit of `DelegatingFilterProxy` is that it allows delaying looking up `Filter` bean instances.
-This is important because the container needs to register the `Filter` instances before the container can start up.
-However, Spring typically uses a `ContextLoaderListener` to load the Spring Beans, which is not done until after the `Filter` instances need to be registered.
+Một lợi ích khác của `DelegatingFilterProxy` là cho phép trì hoãn việc tra cứu các instance bean `Filter`.
+Điều này quan trọng vì container cần đăng ký các instance `Filter` trước khi có thể khởi động.
+Tuy nhiên, Spring thường sử dụng một `ContextLoaderListener` để tải các Spring Bean, việc này chỉ được thực hiện sau thời điểm cần đăng ký các instance `Filter`.
 
 [[servlet-filterchainproxy]]
 == FilterChainProxy
 
-Spring Security's Servlet support is contained within `FilterChainProxy`.
-`FilterChainProxy` is a special `Filter` provided by Spring Security that allows delegating to many `Filter` instances through <<servlet-securityfilterchain,`SecurityFilterChain`>>.
-Since `FilterChainProxy` is a Bean, it is typically wrapped in a <<servlet-delegatingfilterproxy>>.
+Hỗ trợ Servlet của Spring Security nằm trong `FilterChainProxy`.
+`FilterChainProxy` là một `Filter` đặc biệt do Spring Security cung cấp, cho phép ủy quyền cho nhiều instance `Filter` thông qua <<servlet-securityfilterchain,`SecurityFilterChain`>>.
+Vì `FilterChainProxy` là một Bean, nó thường được bọc trong một <<servlet-delegatingfilterproxy>>.
 
-The following image shows the role of `FilterChainProxy`.
+Hình ảnh sau đây minh họa vai trò của `FilterChainProxy`.
 
 .FilterChainProxy
 [[servlet-filterchainproxy-figure]]
@@ -79,136 +79,136 @@ image::{figures}/filterchainproxy.png[]
 [[servlet-securityfilterchain]]
 == SecurityFilterChain
 
-javadoc:org.springframework.security.web.SecurityFilterChain[]  is used by <<servlet-filterchainproxy>> to determine which Spring Security `Filter` instances should be invoked for the current request.
+javadoc:org.springframework.security.web.SecurityFilterChain[] được <<servlet-filterchainproxy>> sử dụng để xác định những instance `Filter` nào của Spring Security cần được gọi cho request hiện tại.
 
-The following image shows the role of `SecurityFilterChain`.
+Hình ảnh sau đây minh họa vai trò của `SecurityFilterChain`.
 
 .SecurityFilterChain
 [[servlet-securityfilterchain-figure]]
 [.invert-dark]
 image::{figures}/securityfilterchain.png[]
 
-The <<servlet-security-filters,Security Filters>> in `SecurityFilterChain` are typically Beans, but they are registered with `FilterChainProxy` instead of <<servlet-delegatingfilterproxy>>.
-`FilterChainProxy` provides a number of advantages to registering directly with the Servlet container or <<servlet-delegatingfilterproxy>>.
-First, it provides a starting point for all of Spring Security's Servlet support.
-For that reason, if you try to troubleshoot Spring Security's Servlet support, adding a debug point in `FilterChainProxy` is a great place to start.
+Các <<servlet-security-filters,Security Filter>> trong `SecurityFilterChain` thường là Bean, nhưng được đăng ký với `FilterChainProxy` thay vì <<servlet-delegatingfilterproxy>>.
+`FilterChainProxy` mang lại một số lợi ích so với việc đăng ký trực tiếp với Servlet container hoặc <<servlet-delegatingfilterproxy>>.
+Thứ nhất, nó cung cấp điểm bắt đầu cho toàn bộ hỗ trợ Servlet của Spring Security.
+Vì lý do đó, nếu bạn muốn khắc phục sự cố hỗ trợ Servlet của Spring Security, đặt một breakpoint trong `FilterChainProxy` là nơi bắt đầu rất tốt.
 
-Second, since `FilterChainProxy` is central to Spring Security usage, it can perform tasks that are not viewed as optional.
+Thứ hai, vì `FilterChainProxy` là thành phần trung tâm trong việc sử dụng Spring Security, nó có thể thực hiện những tác vụ không được xem là tùy chọn.
 // FIXME: Add a link to SecurityContext
-For example, it clears out the `SecurityContext` to avoid memory leaks.
-It also applies Spring Security's xref:servlet/exploits/firewall.adoc#servlet-httpfirewall[`HttpFirewall`] to protect applications against certain types of attacks.
+Ví dụ, nó xóa `SecurityContext` để tránh rò rỉ bộ nhớ.
+Nó cũng áp dụng xref:servlet/exploits/firewall.adoc#servlet-httpfirewall[`HttpFirewall`] của Spring Security để bảo vệ ứng dụng khỏi một số loại tấn công.
 
-In addition, it provides more flexibility in determining when a `SecurityFilterChain` should be invoked.
-In a Servlet container, `Filter` instances are invoked based upon the URL alone.
+Ngoài ra, nó cung cấp nhiều tính linh hoạt hơn trong việc xác định thời điểm gọi một `SecurityFilterChain`.
+Trong Servlet container, các instance `Filter` được gọi chỉ dựa trên URL.
 // FIXME: Link to RequestMatcher
-However, `FilterChainProxy` can determine invocation based upon anything in the `HttpServletRequest` by using the `RequestMatcher` interface.
+Tuy nhiên, `FilterChainProxy` có thể xác định việc gọi dựa trên bất kỳ thông tin nào trong `HttpServletRequest` bằng cách sử dụng interface `RequestMatcher`.
 
-The following image shows multiple `SecurityFilterChain` instances:
+Hình ảnh sau đây minh họa nhiều instance `SecurityFilterChain`:
 
-.Multiple SecurityFilterChain
+.Nhiều SecurityFilterChain
 [[servlet-multi-securityfilterchain-figure]]
 [.invert-dark]
 image::{figures}/multi-securityfilterchain.png[]
 
-In the <<servlet-multi-securityfilterchain-figure>> figure, `FilterChainProxy` decides which `SecurityFilterChain` should be used.
-Only the first `SecurityFilterChain` that matches is invoked.
-If a URL of `/api/messages/` is requested, it first matches on the `SecurityFilterChain~0~` pattern of `+/api/**+`, so only `SecurityFilterChain~0~` is invoked, even though it also matches on ``SecurityFilterChain~n~``.
-If a URL of `/messages/` is requested, it does not match on the `SecurityFilterChain~0~` pattern of `+/api/**+`, so `FilterChainProxy` continues trying each `SecurityFilterChain`.
-Assuming that no other `SecurityFilterChain` instances match, `SecurityFilterChain~n~` is invoked.
+Trong hình <<servlet-multi-securityfilterchain-figure>>, `FilterChainProxy` quyết định sử dụng `SecurityFilterChain` nào.
+Chỉ `SecurityFilterChain` đầu tiên khớp mới được gọi.
+Nếu request đến URL `/api/messages/`, URL này trước tiên khớp với pattern `+/api/**+` của `SecurityFilterChain~0~`, vì vậy chỉ `SecurityFilterChain~0~` được gọi, dù nó cũng khớp với ``SecurityFilterChain~n~``.
+Nếu request đến URL `/messages/`, URL này không khớp với pattern `+/api/**+` của `SecurityFilterChain~0~`, vì vậy `FilterChainProxy` tiếp tục thử từng `SecurityFilterChain`.
+Giả sử không có instance `SecurityFilterChain` nào khác khớp, `SecurityFilterChain~n~` sẽ được gọi.
 // FIXME: add link to pattern matching
 
-Notice that `SecurityFilterChain~0~` has only three security `Filter` instances configured.
-However, `SecurityFilterChain~n~` has four security `Filter` instances configured.
-It is important to note that each `SecurityFilterChain` can be unique and can be configured in isolation.
-In fact, a `SecurityFilterChain` might have zero security `Filter` instances if the application wants Spring Security to ignore certain requests.
+Lưu ý rằng `SecurityFilterChain~0~` chỉ được cấu hình với ba instance `Filter` bảo mật.
+Tuy nhiên, `SecurityFilterChain~n~` được cấu hình với bốn instance `Filter` bảo mật.
+Cần lưu ý rằng mỗi `SecurityFilterChain` có thể là duy nhất và có thể được cấu hình độc lập.
+Trên thực tế, một `SecurityFilterChain` có thể có không instance `Filter` bảo mật nào nếu ứng dụng muốn Spring Security bỏ qua một số request nhất định.
 // FIXME: add link to configuring multiple `SecurityFilterChain` instances
 
 [[servlet-security-filters]]
-== Security Filters
+== Security Filter
 
-The Security Filters are inserted into the <<servlet-filterchainproxy>> with the <<servlet-securityfilterchain>> API.
-Those filters can be used for a number of different purposes, like
-xref:servlet/exploits/index.adoc[exploit protection], xref:servlet/authentication/index.adoc[authentication], xref:servlet/authorization/index.adoc[authorization], and more.
-The filters are executed in a specific order to guarantee that they are invoked at the right time, for example, the `Filter` that performs authentication should be invoked before the `Filter` that performs authorization.
-It is typically not necessary to know the ordering of Spring Security's ``Filter``s.
-However, there are times that it is beneficial to know the ordering, if you want to know them, you can check the {gh-url}/config/src/main/java/org/springframework/security/config/annotation/web/builders/FilterOrderRegistration.java[`FilterOrderRegistration` code].
+Security Filter được chèn vào <<servlet-filterchainproxy>> bằng API <<servlet-securityfilterchain>>.
+Các filter này có thể được sử dụng cho nhiều mục đích khác nhau, chẳng hạn như
+xref:servlet/exploits/index.adoc[exploit protection], xref:servlet/authentication/index.adoc[authentication], xref:servlet/authorization/index.adoc[authorization] và các mục đích khác.
+Các filter được thực thi theo một thứ tự cụ thể để bảo đảm chúng được gọi đúng thời điểm; ví dụ, `Filter` thực hiện authentication phải được gọi trước `Filter` thực hiện authorization.
+Thông thường không cần biết thứ tự của các ``Filter`` của Spring Security.
+Tuy nhiên, đôi khi biết thứ tự này rất hữu ích; nếu muốn biết, bạn có thể xem {gh-url}/config/src/main/java/org/springframework/security/config/annotation/web/builders/FilterOrderRegistration.java[mã `FilterOrderRegistration`].
 
-These security filters are most often declared using an javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity[`HttpSecurity`] instance.
-To exemplify the above paragraph, let's consider the following security configuration:
+Các security filter này thường được khai báo bằng một instance javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity[`HttpSecurity`].
+Để minh họa cho đoạn trên, hãy xem xét cấu hình bảo mật sau:
 
 include-code::./SecurityConfig[tag=snippet,indent=0]
 
-The above configuration will result in the following `Filter` ordering:
+Cấu hình trên sẽ tạo ra thứ tự `Filter` như sau:
 
 [cols="1,1", options="header"]
 |====
-| Filter | Added by
+| Filter | Được thêm bởi
 | xref:servlet/exploits/csrf.adoc[CsrfFilter] | `HttpSecurity#csrf`
 | xref:servlet/authentication/passwords/basic.adoc[BasicAuthenticationFilter] | `HttpSecurity#httpBasic`
 | xref:servlet/authentication/passwords/form.adoc#servlet-authentication-form[UsernamePasswordAuthenticationFilter] | `HttpSecurity#formLogin`
 | xref:servlet/authorization/authorize-http-requests.adoc[AuthorizationFilter] | `HttpSecurity#authorizeHttpRequests`
 |====
 
-1. First, the `CsrfFilter` is invoked to protect against xref:servlet/exploits/csrf.adoc[CSRF attacks].
-2. Second, xref:servlet/authentication/architecture.adoc[the authentication filters] are invoked to authenticate the request.
-3. Third, xref:servlet/authorization/authorize-http-requests.adoc[the `AuthorizationFilter`] is invoked to authorize the request.
+1. Thứ nhất, `CsrfFilter` được gọi để bảo vệ khỏi xref:servlet/exploits/csrf.adoc[các cuộc tấn công CSRF].
+2. Thứ hai, xref:servlet/authentication/architecture.adoc[các authentication filter] được gọi để thực hiện authentication cho request.
+3. Thứ ba, xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] được gọi để thực hiện authorization cho request.
 
 [NOTE]
 ====
-There might be other `Filter` instances that are not listed above.
-If you want to see the list of filters invoked for a particular request, you can <<servlet-print-filters,print them>>.
+Có thể có những instance `Filter` khác không được liệt kê ở trên.
+Nếu muốn xem danh sách filter được gọi cho một request cụ thể, bạn có thể <<servlet-print-filters,in danh sách đó>>.
 ====
 
 [[servlet-print-filters]]
-=== Printing the Security Filters
+=== In các Security Filter
 
-Often times, it is useful to see the list of security ``Filter``s that are invoked for a particular request.
-For example, you want to make sure that the <<adding-filters-to-chain,filter you have added>> is in the list of the security filters.
+Thông thường, việc xem danh sách các ``Filter`` bảo mật được gọi cho một request cụ thể là hữu ích.
+Ví dụ, bạn muốn bảo đảm rằng <<adding-filters-to-chain,filter đã thêm>> nằm trong danh sách security filter.
 
-The list of filters is printed at DEBUG level on the application startup, so you can see something like the following on the console output for example:
+Danh sách filter được in ở level DEBUG khi ứng dụng khởi động, vì vậy bạn có thể thấy nội dung tương tự sau trong output của console:
 
 [source,text,role="terminal"]
 ----
 2023-06-14T08:55:22.321-03:00  DEBUG 76975 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [ DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CsrfFilter, LogoutFilter, UsernamePasswordAuthenticationFilter, DefaultLoginPageGeneratingFilter, DefaultLogoutPageGeneratingFilter, BasicAuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter]
 ----
 
-And that will give a pretty good idea of the security filters that are configured for <<servlet-securityfilterchain,each filter chain>>.
+Điều đó cho bạn biết khá rõ các security filter được cấu hình cho <<servlet-securityfilterchain,từng filter chain>>.
 
-But that is not all, you can also configure your application to print the invocation of each individual filter for each request.
-That is helpful to see if the filter you have added is invoked for a particular request or to check where an exception is coming from.
-To do that, you can configure your application to <<servlet-logging,log the security events>>.
+Nhưng đó chưa phải tất cả; bạn cũng có thể cấu hình ứng dụng để in việc gọi từng filter riêng lẻ cho mỗi request.
+Điều này hữu ích để xem filter bạn đã thêm có được gọi cho một request cụ thể hay không, hoặc kiểm tra exception xuất phát từ đâu.
+Để làm vậy, bạn có thể cấu hình ứng dụng để <<servlet-logging,ghi log các security event>>.
 
 [[adding-filters-to-chain]]
-=== Adding Filters to the Filter Chain
+=== Thêm Filter vào Filter Chain
 
-Most of the time, the default <<servlet-security-filters>> are enough to provide security to your application.
-However, there might be times that you want to add a custom `Filter` to the <<servlet-securityfilterchain>>.
+Trong phần lớn trường hợp, <<servlet-security-filters>> mặc định đủ để bảo mật ứng dụng của bạn.
+Tuy nhiên, đôi khi bạn có thể muốn thêm một `Filter` tùy chỉnh vào <<servlet-securityfilterchain>>.
 
-javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity[] comes with three methods for adding filters:
+javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity[] cung cấp ba method để thêm filter:
 
-* `#addFilterBefore(Filter, Class<?>)` adds your filter before another filter
-* `#addFilterAfter(Filter, Class<?>)` adds your filter after another filter
-* `#addFilterAt(Filter, Class<?>)` replaces another filter with your filter
+* `#addFilterBefore(Filter, Class<?>)` thêm filter của bạn trước một filter khác
+* `#addFilterAfter(Filter, Class<?>)` thêm filter của bạn sau một filter khác
+* `#addFilterAt(Filter, Class<?>)` thay thế một filter khác bằng filter của bạn
 
 [[adding-custom-filter]]
-==== Adding a Custom Filter
+==== Thêm Filter tùy chỉnh
 
-If you are creating a filter of your own, you will need to determine its location in the filter chain.
-Please take a look at the following key events that occur in the filter chain:
+Nếu bạn đang tạo filter của riêng mình, bạn cần xác định vị trí của nó trong filter chain.
+Hãy xem các event chính sau đây xảy ra trong filter chain:
 
-1. xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContext`] is loaded from the session
-2. Request is protected from common exploits; xref:features/exploits/headers.adoc[secure headers], xref:servlet/integrations/cors.adoc[CORS], xref:servlet/exploits/csrf.adoc[CSRF]
-3. Request is xref:servlet/authentication/architecture.adoc[authenticated]
-4. Request is xref:servlet/authorization/architecture.adoc[authorized]
+1. xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContext`] được tải từ session
+2. Request được bảo vệ khỏi các exploit phổ biến; xref:features/exploits/headers.adoc[các header bảo mật], xref:servlet/integrations/cors.adoc[CORS], xref:servlet/exploits/csrf.adoc[CSRF]
+3. Request được xref:servlet/authentication/architecture.adoc[thực hiện authentication]
+4. Request được xref:servlet/authorization/architecture.adoc[thực hiện authorization]
 
-Consider which events you need to have happened in order to locate your filter.
-The following is a rule of thumb:
+Hãy cân nhắc những event nào cần xảy ra trước để xác định vị trí filter của bạn.
+Quy tắc kinh nghiệm như sau:
 
 [cols="1,1,1"]
 |===
-| If your filter is a(n) | Then place it after | As these events have already occurred
+| Nếu filter của bạn là | Thì đặt nó sau | Vì các event này đã xảy ra
 
-| exploit protection filter
+| filter bảo vệ khỏi exploit
 | SecurityContextHolderFilter
 | 1
 
@@ -222,54 +222,54 @@ The following is a rule of thumb:
 |===
 
 [TIP]
-Most commonly, applications add a custom authentication.
-This means they should be placed after xref:servlet/authentication/logout.adoc[`LogoutFilter`].
+Thông thường nhất, các ứng dụng thêm custom authentication.
+Điều đó có nghĩa là chúng nên được đặt sau xref:servlet/authentication/logout.adoc[`LogoutFilter`].
 
-For example, let's say that you want to add a `Filter` that gets a tenant id header and check if the current user has access to that tenant.
+Ví dụ, giả sử bạn muốn thêm một `Filter` lấy tenant id từ header và kiểm tra user hiện tại có quyền truy cập tenant đó hay không.
 
-First, let's create the `Filter`:
+Trước tiên, hãy tạo `Filter`:
 
 include-code::./TenantFilter[tag=snippet,indent=0]
 
-The sample code above does the following:
+Đoạn code mẫu trên thực hiện những việc sau:
 
-<1> Get the tenant id from the request header.
-<2> Check if the current user has access to the tenant id.
-<3> If the user has access, then invoke the rest of the filters in the chain.
-<4> If the user does not have access, then throw an `AccessDeniedException`.
+<1> Lấy tenant id từ request header.
+<2> Kiểm tra user hiện tại có quyền truy cập tenant id hay không.
+<3> Nếu user có quyền truy cập, gọi các filter còn lại trong chain.
+<4> Nếu user không có quyền truy cập, ném một `AccessDeniedException`.
 
 [TIP]
 ====
-Instead of implementing `Filter`, you can extend from {spring-framework-api-url}org/springframework/web/filter/OncePerRequestFilter.html[OncePerRequestFilter] which is a base class for filters that are only invoked once per request and provides a `doFilterInternal` method with the `HttpServletRequest` and `HttpServletResponse` parameters.
+Thay vì implements `Filter`, bạn có thể extend {spring-framework-api-url}org/springframework/web/filter/OncePerRequestFilter.html[OncePerRequestFilter], một base class dành cho các filter chỉ được gọi một lần trong mỗi request và cung cấp method `doFilterInternal` với các parameter `HttpServletRequest` và `HttpServletResponse`.
 ====
 
-Now, you need to add the filter to the <<servlet-securityfilterchain>>.
-The previous description already gives us a clue on where to add the filter, since we need to know the current user, we need to add it after the authentication filters.
+Bây giờ, bạn cần thêm filter vào <<servlet-securityfilterchain>>.
+Phần mô tả trước đã gợi ý vị trí cần thêm filter: vì cần biết user hiện tại, chúng ta cần thêm nó sau các authentication filter.
 
-Based on the rule of thumb, you can add it before xref:servlet/authentication/logout.adoc[`LogoutFilter`], like so:
+Theo quy tắc kinh nghiệm, bạn có thể thêm nó trước xref:servlet/authentication/logout.adoc[`LogoutFilter`] như sau:
 
 include-code::./SecurityConfigBefore[tag=snippet,indent=0]
 
-<1> Use `HttpSecurity#addFilterBefore` to add the `TenantFilter` before the `LogoutFilter`.
+<1> Sử dụng `HttpSecurity#addFilterBefore` để thêm `TenantFilter` trước `LogoutFilter`.
 
-Or after xref:servlet/authentication/anonymous.adoc[`AnonymousAuthenticationFilter`], the last authentication filter in the chain, like so:
+Hoặc sau xref:servlet/authentication/anonymous.adoc[`AnonymousAuthenticationFilter`], authentication filter cuối cùng trong chain, như sau:
 
 include-code::./SecurityConfigAfter[tag=snippet,indent=0]
 
-<1> Use `HttpSecurity#addFilterAfter` to add the `TenantFilter` after the `AnonymousAuthenticationFilter`.
+<1> Sử dụng `HttpSecurity#addFilterAfter` để thêm `TenantFilter` sau `AnonymousAuthenticationFilter`.
 
-By adding the filter after the xref:servlet/authentication/anonymous.adoc[`AnonymousAuthenticationFilter`] we are making sure that the `TenantFilter` is invoked after the authentication filters.
+Bằng cách thêm filter sau xref:servlet/authentication/anonymous.adoc[`AnonymousAuthenticationFilter`], chúng ta bảo đảm `TenantFilter` được gọi sau các authentication filter.
 
-And that's it, now the `TenantFilter` will be invoked in the filter chain and will check if the current user has access to the tenant id.
+Vậy là xong; giờ `TenantFilter` sẽ được gọi trong filter chain và kiểm tra user hiện tại có quyền truy cập tenant id hay không.
 
-==== Declaring Your Filter as a Bean
+==== Khai báo Filter dưới dạng Bean
 
-When you declare a `Filter` as a Spring bean, either by annotating it with `@Component` or by declaring it as a bean in your configuration, Spring Boot automatically {spring-boot-reference-url}reference/web/servlet.html#web.servlet.embedded-container.servlets-filters-listeners.beans[registers it with the embedded container].
-That may cause the filter to be invoked twice, once by the container and once by Spring Security and in a different order.
+Khi khai báo một `Filter` dưới dạng Spring bean, bằng cách gắn annotation `@Component` hoặc khai báo nó dưới dạng bean trong cấu hình, Spring Boot tự động {spring-boot-reference-url}reference/web/servlet.html#web.servlet.embedded-container.servlets-filters-listeners.beans[đăng ký nó với embedded container].
+Điều đó có thể khiến filter được gọi hai lần, một lần bởi container và một lần bởi Spring Security, theo một thứ tự khác.
 
-Because of that, filters are often not Spring beans.
+Vì vậy, filter thường không phải là Spring bean.
 
-However, if your filter needs to be a Spring bean (to take advantage of dependency injection, for example) you can tell Spring Boot to not register it with the container by declaring a `FilterRegistrationBean` bean and setting its `enabled` property to `false`:
+Tuy nhiên, nếu filter của bạn cần là một Spring bean (ví dụ để tận dụng dependency injection), bạn có thể yêu cầu Spring Boot không đăng ký nó với container bằng cách khai báo một bean `FilterRegistrationBean` và đặt property `enabled` thành `false`:
 
 [source,java]
 ----
@@ -281,69 +281,69 @@ public FilterRegistrationBean<TenantFilter> tenantFilterRegistration(TenantFilte
 }
 ----
 
-This makes so that `HttpSecurity` is the only one adding it.
+Điều này khiến `HttpSecurity` là thành phần duy nhất thêm nó.
 
 [[customizing-filter]]
-==== Customizing a Spring Security Filter
+==== Tùy chỉnh Filter của Spring Security
 
-Generally, you can use a filter's DSL method to configure Spring Security's filters.
-For example, the simplest way to add `BasicAuthenticationFilter` is by asking the DSL to do it:
+Nhìn chung, bạn có thể sử dụng DSL method của filter để cấu hình các filter của Spring Security.
+Ví dụ, cách đơn giản nhất để thêm `BasicAuthenticationFilter` là yêu cầu DSL thực hiện việc đó:
 
 include-code::./CustomizingFilterTests[tag=basic-default,indent=0]
 
-However, in the event that you want to construct a Spring Security filter yourself, you specify it in the DSL using `addFilterAt` like so:
+Tuy nhiên, nếu muốn tự tạo một Spring Security filter, bạn chỉ định nó trong DSL bằng `addFilterAt` như sau:
 
 include-code::./CustomizingFilterTests[tag=custom-filter,indent=0]
 
-Note that if that filter has already been added, then Spring Security will throw an exception.
-For example, calling xref:servlet/authentication/passwords/basic.adoc[ `HttpSecurity#httpBasic`] adds a `BasicAuthenticationFilter` for you.
-So, the following arrangement fails since there are two calls that are both trying to add `BasicAuthenticationFilter`:
+Lưu ý rằng nếu filter đó đã được thêm, Spring Security sẽ ném một exception.
+Ví dụ, gọi xref:servlet/authentication/passwords/basic.adoc[ `HttpSecurity#httpBasic`] sẽ thêm `BasicAuthenticationFilter` cho bạn.
+Do đó, cách sắp xếp sau thất bại vì có hai lời gọi cùng cố gắng thêm `BasicAuthenticationFilter`:
 
 include-code::./CustomizingFilterTests[tag=incorrect,indent=0]
 
-In this case, remove the call to `httpBasic` since you are constructing `BasicAuthenticationFilter` yourself.
+Trong trường hợp này, hãy xóa lời gọi `httpBasic` vì bạn đang tự tạo `BasicAuthenticationFilter`.
 
 [TIP]
 ====
-In the event that you are unable to reconfigure `HttpSecurity` to not add a certain filter, you can typically disable the Spring Security filter by calling its DSL's `disable` method like so:
+Nếu không thể cấu hình lại `HttpSecurity` để không thêm một filter cụ thể, thông thường bạn có thể vô hiệu hóa Spring Security filter bằng cách gọi method `disable` của DSL như sau:
 
 include-code::./CustomizingFilterTests[tag=disable,indent=0]
 ====
 
 [[servlet-exceptiontranslationfilter]]
-== Handling Security Exceptions
+== Xử lý Exception bảo mật
 
 
-The javadoc:org.springframework.security.web.access.ExceptionTranslationFilter[] allows translation of javadoc:org.springframework.security.access.AccessDeniedException[] and javadoc:org.springframework.security.core.AuthenticationException[] into HTTP responses.
+javadoc:org.springframework.security.web.access.ExceptionTranslationFilter[] cho phép chuyển javadoc:org.springframework.security.access.AccessDeniedException[] và javadoc:org.springframework.security.core.AuthenticationException[] thành các HTTP response.
 
-`ExceptionTranslationFilter` is inserted into the <<servlet-filterchainproxy>> as one of the <<servlet-security-filters>>.
+`ExceptionTranslationFilter` được chèn vào <<servlet-filterchainproxy>> như một trong các <<servlet-security-filters>>.
 
-The following image shows the relationship of `ExceptionTranslationFilter` to other components:
+Hình ảnh sau đây minh họa mối quan hệ của `ExceptionTranslationFilter` với các component khác:
 
 [.invert-dark]
 image::{figures}/exceptiontranslationfilter.png[]
 
 
-* image:{icondir}/number_1.png[] First, the `ExceptionTranslationFilter` invokes `FilterChain.doFilter(request, response)` to invoke the rest of the application.
-* image:{icondir}/number_2.png[] If the user is not authenticated or it is an `AuthenticationException`, then __Start Authentication__.
-** The xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder] is cleared out.
-** The `HttpServletRequest` is <<savedrequests,saved>> so that it can be used to replay the original request once authentication is successful.
+* image:{icondir}/number_1.png[] Trước tiên, `ExceptionTranslationFilter` gọi `FilterChain.doFilter(request, response)` để gọi phần còn lại của ứng dụng.
+* image:{icondir}/number_2.png[] Nếu user chưa được authenticated hoặc đó là một `AuthenticationException`, thì __Start Authentication__.
+** xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder] được xóa.
+** `HttpServletRequest` được <<savedrequests,lưu lại>> để có thể dùng replay request ban đầu sau khi authentication thành công.
 // FIXME: add link to authentication success
-** The `AuthenticationEntryPoint` is used to request credentials from the client.
-For example, it might redirect to a log in page or send a `WWW-Authenticate` header.
+** `AuthenticationEntryPoint` được sử dụng để yêu cầu credential từ client.
+Ví dụ, nó có thể redirect đến trang đăng nhập hoặc gửi header `WWW-Authenticate`.
 // FIXME: link to AuthenticationEntryPoint
-* image:{icondir}/number_3.png[] Otherwise, if it is an `AccessDeniedException`, then __Access Denied__.
-The `AccessDeniedHandler` is invoked to handle access denied.
+* image:{icondir}/number_3.png[] Nếu không, nếu đó là một `AccessDeniedException`, thì __Access Denied__.
+`AccessDeniedHandler` được gọi để xử lý việc access denied.
 // FIXME: link to AccessDeniedHandler
 
 [NOTE]
 ====
-If the application does not throw an `AccessDeniedException` or an `AuthenticationException`, then `ExceptionTranslationFilter` does not do anything.
+Nếu ứng dụng không ném `AccessDeniedException` hoặc `AuthenticationException`, thì `ExceptionTranslationFilter` không thực hiện gì.
 ====
 
-The pseudocode for `ExceptionTranslationFilter` looks something like this:
+Mã giả của `ExceptionTranslationFilter` có dạng như sau:
 
-.ExceptionTranslationFilter pseudocode
+.Mã giả của ExceptionTranslationFilter
 [source,java]
 ----
 try {
@@ -356,56 +356,56 @@ try {
 	}
 }
 ----
-<1> As described in <<servlet-filters-review>>, invoking `FilterChain.doFilter(request, response)` is the equivalent of invoking the rest of the application.
-This means that if another part of the application, (xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] or method security) throws an `AuthenticationException` or `AccessDeniedException` it is caught and handled here.
-<2> If the user is not authenticated or it is an `AuthenticationException`, __Start Authentication__.
-<3> Otherwise, __Access Denied__
+<1> Như đã mô tả trong <<servlet-filters-review>>, gọi `FilterChain.doFilter(request, response)` tương đương với gọi phần còn lại của ứng dụng.
+Điều này có nghĩa là nếu một phần khác của ứng dụng, (xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] hoặc method security), ném `AuthenticationException` hoặc `AccessDeniedException`, exception đó sẽ được bắt và xử lý tại đây.
+<2> Nếu user chưa được authenticated hoặc đó là một `AuthenticationException`, __Start Authentication__.
+<3> Nếu không, __Access Denied__
 
 [[savedrequests]]
-== Saving Requests Between Authentication
+== Lưu Request giữa các lần Authentication
 
-As illustrated in <<servlet-exceptiontranslationfilter>>, when a request has no authentication and is for a resource that requires authentication, there is a need to save the request for the authenticated resource to re-request after authentication is successful.
-In Spring Security this is done by saving the `HttpServletRequest` using a <<requestcache,`RequestCache`>> implementation.
+Như minh họa trong <<servlet-exceptiontranslationfilter>>, khi một request chưa có authentication và nhắm đến resource yêu cầu authentication, cần lưu request để resource đã authenticated có thể request lại sau khi authentication thành công.
+Trong Spring Security, việc này được thực hiện bằng cách lưu `HttpServletRequest` sử dụng một implementation <<requestcache,`RequestCache`>>.
 
 [[requestcache]]
 === RequestCache
 
-The `HttpServletRequest` is saved in the javadoc:org.springframework.security.web.savedrequest.RequestCache[].
-When the user successfully authenticates, the `RequestCache` is used to replay the original request.
-The <<requestcacheawarefilter,`RequestCacheAwareFilter`>> uses the `RequestCache` to get the saved `HttpServletRequest` after the user authenticates, while the `ExceptionTranslationFilter` uses the `RequestCache` to save the `HttpServletRequest` after it detects `AuthenticationException`, before redirecting the user to the login endpoint.
+`HttpServletRequest` được lưu trong javadoc:org.springframework.security.web.savedrequest.RequestCache[].
+Khi user authentication thành công, `RequestCache` được sử dụng để replay request ban đầu.
+<<requestcacheawarefilter,`RequestCacheAwareFilter`>> sử dụng `RequestCache` để lấy `HttpServletRequest` đã lưu sau khi user authentication, trong khi `ExceptionTranslationFilter` sử dụng `RequestCache` để lưu `HttpServletRequest` sau khi phát hiện `AuthenticationException`, trước khi redirect user đến login endpoint.
 
-By default, an `HttpSessionRequestCache` is used.
-The code below demonstrates how to customize the `RequestCache` implementation that is used to check the `HttpSession` for a saved request if the parameter named `continue` is present.
+Theo mặc định, một `HttpSessionRequestCache` được sử dụng.
+Code dưới đây minh họa cách tùy chỉnh implementation `RequestCache` được dùng để kiểm tra `HttpSession` nhằm tìm request đã lưu nếu parameter có tên `continue` tồn tại.
 
 include::partial$servlet/architecture/request-cache-continue.adoc[]
 
 [[requestcache-prevent-saved-request]]
-==== Prevent the Request From Being Saved
+==== Ngăn Request được Lưu
 
-There are a number of reasons you may want to not store the user's unauthenticated request in the session.
-You may want to offload that storage onto the user's browser or store it in a database.
-Or you may want to shut off this feature since you always want to redirect the user to the home page instead of the page they tried to visit before login.
+Có một số lý do khiến bạn không muốn lưu request chưa được authenticated của user trong session.
+Bạn có thể muốn chuyển việc lưu trữ đó sang browser của user hoặc lưu vào database.
+Hoặc bạn có thể muốn tắt tính năng này vì luôn muốn redirect user đến home page thay vì trang họ đã cố truy cập trước khi đăng nhập.
 
-To do that, you can use the javadoc:org.springframework.security.web.savedrequest.NullRequestCache[NullRequestCache] implementation.
+Để làm vậy, bạn có thể sử dụng implementation javadoc:org.springframework.security.web.savedrequest.NullRequestCache[NullRequestCache].
 
-.Prevent the Request From Being Saved
+.Ngăn Request được Lưu
 include-code::./SecurityConfig[tag=snippet,indent=0]
 
 [[requestcacheawarefilter]]
 === RequestCacheAwareFilter
 
-The javadoc:org.springframework.security.web.savedrequest.RequestCacheAwareFilter[] uses the <<requestcache,`RequestCache`>> to replay the original request.
+javadoc:org.springframework.security.web.savedrequest.RequestCacheAwareFilter[] sử dụng <<requestcache,`RequestCache`>> để replay request ban đầu.
 
 [[servlet-logging]]
-== Logging
+== Ghi log
 
-Spring Security provides comprehensive logging of all security related events at the DEBUG and TRACE level.
-This can be very useful when debugging your application because for security measures Spring Security does not add any detail of why a request has been rejected to the response body.
-If you come across a 401 or 403 error, it is very likely that you will find a log message that will help you understand what is going on.
+Spring Security cung cấp logging toàn diện cho tất cả security event ở level DEBUG và TRACE.
+Điều này rất hữu ích khi debug ứng dụng vì lý do bảo mật, Spring Security không thêm chi tiết về lý do request bị từ chối vào response body.
+Nếu gặp lỗi 401 hoặc 403, rất có thể bạn sẽ tìm thấy log message giúp hiểu điều gì đang xảy ra.
 
-Let's consider an example where a user tries to make a `POST` request to a resource that has xref:servlet/exploits/csrf.adoc[CSRF protection] enabled without the CSRF token.
-With no logs, the user will see a 403 error with no explanation of why the request was rejected.
-However, if you enable logging for Spring Security, you will see a log message like this:
+Hãy xem xét ví dụ trong đó user cố thực hiện một `POST` request đến resource đã bật xref:servlet/exploits/csrf.adoc[bảo vệ CSRF] nhưng không có CSRF token.
+Nếu không có log, user sẽ thấy lỗi 403 mà không có giải thích về lý do request bị từ chối.
+Tuy nhiên, nếu bật logging cho Spring Security, bạn sẽ thấy một log message như sau:
 
 [source,text]
 ----
@@ -420,12 +420,12 @@ However, if you enable logging for Spring Security, you will see a log message l
 2023-06-14T09:44:25.814-03:00 TRACE 76975 --- [nio-8080-exec-1] o.s.s.w.header.writers.HstsHeaderWriter  : Not injecting HSTS header since it did not match request to [Is Secure]
 ----
 
-It becomes clear that the CSRF token is missing and that is why the request is being denied.
+Có thể thấy rõ CSRF token bị thiếu và đó là lý do request bị từ chối.
 
-To configure your application to log all the security events, you can add the following to your application:
+Để cấu hình ứng dụng ghi log tất cả security event, bạn có thể thêm nội dung sau vào ứng dụng:
 
 ====
-.application.properties in Spring Boot
+.application.properties trong Spring Boot
 [source,properties,role="primary"]
 ----
 logging.level.org.springframework.security=TRACE
