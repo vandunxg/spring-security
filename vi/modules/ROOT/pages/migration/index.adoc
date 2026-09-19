@@ -25,11 +25,11 @@ Bạn nên thay thế cấu hình các module riêng lẻ như `CoreJacksonModul
 `SecurityJacksonModules`, vì cơ chế này cho phép tự động đưa thông tin kiểu vào và cấu hình một
 `PolymorphicTypeValidator` xử lý việc xác thực tên class.
 
-Phần hỗ trợ Jackson 3 sử dụng định dạng tương thích với phần hỗ trợ Jackson 2 hiện không còn được khuyến nghị, vì vậy các đối tượng của class được tuần tự hóa bằng
+Phần hỗ trợ Jackson 3 sử dụng định dạng tương thích với phần hỗ trợ Jackson 2 hiện đã deprecated, vì vậy các đối tượng của class được tuần tự hóa bằng
 Jackson 2 phải có thể được giải tuần tự hóa bằng phần hỗ trợ Jackson 3.
 
 `spring-security-oauth2-authorization-server` hiện sử dụng Jackson 3 theo mặc định. Nếu muốn tiếp tục
-sử dụng phần hỗ trợ Jackson 2 không còn được khuyến nghị, phụ thuộc bắc cầu vào Jackson 3 (`tools.jackson.core:jackson-databind`)
+sử dụng phần hỗ trợ Jackson 2 đã deprecated, phụ thuộc bắc cầu vào Jackson 3 (`tools.jackson.core:jackson-databind`)
 nên được loại trừ và một phụ thuộc vào Jackson 2 (`com.fasterxml.jackson.core:jackson-databind`) nên được thêm vào.
 
 == Thực hiện các bước dành riêng cho ứng dụng
