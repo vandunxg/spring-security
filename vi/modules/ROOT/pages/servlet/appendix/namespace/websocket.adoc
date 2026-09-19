@@ -1,54 +1,54 @@
 [[nsa-websocket-security]]
-= WebSocket Security
+= Bảo mật WebSocket
 
-Spring Security 4.0+ provides support for authorizing messages.
-One concrete example of where this is useful is to provide authorization in WebSocket based applications.
+Spring Security 4.0+ cung cấp hỗ trợ cho việc authorization các message.
+Một ví dụ cụ thể về trường hợp hỗ trợ này hữu ích là cung cấp authorization trong các ứng dụng dựa trên WebSocket.
 
 [[nsa-websocket-message-broker]]
 == <websocket-message-broker>
 
-The websocket-message-broker element has two different modes.
-If the <<nsa-websocket-message-broker-id,websocket-message-broker@id>> is not specified, then it will do the following things:
+Phần tử websocket-message-broker có hai mode khác nhau.
+Nếu không chỉ định <<nsa-websocket-message-broker-id,websocket-message-broker@id>>, element này sẽ thực hiện những việc sau:
 
-* Ensure that any SimpAnnotationMethodMessageHandler has the AuthenticationPrincipalArgumentResolver registered as a custom argument resolver.
-This allows the use of `@AuthenticationPrincipal` to resolve the principal of the current `Authentication`
-* Ensures that the SecurityContextChannelInterceptor is automatically registered for the clientInboundChannel.
-This populates the SecurityContextHolder with the user that is found in the Message
-* Ensures that a ChannelSecurityInterceptor is registered with the clientInboundChannel.
-This allows authorization rules to be specified for a message.
-* Ensures that a CsrfChannelInterceptor is registered with the clientInboundChannel.
-This ensures that only requests from the original domain are enabled.
-* Ensures that a CsrfTokenHandshakeInterceptor is registered with WebSocketHttpRequestHandler, TransportHandlingSockJsService, or DefaultSockJsService.
-This ensures that the expected CsrfToken from the HttpServletRequest is copied into the WebSocket Session attributes.
+* Đảm bảo mọi SimpAnnotationMethodMessageHandler đều đăng ký AuthenticationPrincipalArgumentResolver làm custom argument resolver.
+Điều này cho phép sử dụng `@AuthenticationPrincipal` để resolve principal của `Authentication` hiện tại.
+* Đảm bảo SecurityContextChannelInterceptor được tự động đăng ký với clientInboundChannel.
+Điều này điền user được tìm thấy trong Message vào SecurityContextHolder.
+* Đảm bảo một ChannelSecurityInterceptor được đăng ký với clientInboundChannel.
+Điều này cho phép chỉ định các authorization rule cho một message.
+* Đảm bảo một CsrfChannelInterceptor được đăng ký với clientInboundChannel.
+Điều này đảm bảo chỉ các request từ domain ban đầu được bật.
+* Đảm bảo một CsrfTokenHandshakeInterceptor được đăng ký với WebSocketHttpRequestHandler, TransportHandlingSockJsService hoặc DefaultSockJsService.
+Điều này đảm bảo CsrfToken mong đợi từ HttpServletRequest được sao chép vào các attribute của WebSocket Session.
 
-If additional control is necessary, the id can be specified and a ChannelSecurityInterceptor will be assigned to the specified id.
-All the wiring with Spring's messaging infrastructure can then be done manually.
-This is more cumbersome, but provides greater control over the configuration.
+Nếu cần quyền kiểm soát bổ sung, có thể chỉ định id và một ChannelSecurityInterceptor sẽ được gán cho id đã chỉ định.
+Sau đó, có thể thực hiện thủ công toàn bộ wiring với messaging infrastructure của Spring.
+Cách này cồng kềnh hơn, nhưng cung cấp quyền kiểm soát lớn hơn đối với configuration.
 
 
 [[nsa-websocket-message-broker-attributes]]
-=== <websocket-message-broker> Attributes
+=== Các thuộc tính của <websocket-message-broker>
 
 [[nsa-websocket-message-broker-id]]
-* **id** A bean identifier, used for referring to the ChannelSecurityInterceptor bean elsewhere in the context.
-If specified, Spring Security requires explicit configuration within Spring Messaging.
-If not specified, Spring Security will automatically integrate with the messaging infrastructure as described in <<nsa-websocket-message-broker>>
+* **id** Một bean identifier, được dùng để tham chiếu bean ChannelSecurityInterceptor ở nơi khác trong context.
+Nếu được chỉ định, Spring Security yêu cầu explicit configuration trong Spring Messaging.
+Nếu không được chỉ định, Spring Security sẽ tự động tích hợp với messaging infrastructure như mô tả trong <<nsa-websocket-message-broker>>
 
 [[nsa-websocket-message-broker-same-origin-disabled]]
-* **same-origin-disabled** Disables the requirement for CSRF token to be present in the Stomp headers (default false).
-Changing the default is useful if it is necessary to allow other origins to make SockJS connections.
+* **same-origin-disabled** Tắt yêu cầu phải có CSRF token trong các Stomp header (mặc định là false).
+Thay đổi giá trị mặc định hữu ích khi cần cho phép các origin khác tạo kết nối SockJS.
 
 [[nsa-websocket-message-broker-authorization-manager-ref]]
-* **authorization-manager-ref** Use this `AuthorizationManager` instance; when set, `use-authorization-manager` is ignored and assumed to be `true`
+* **authorization-manager-ref** Sử dụng instance `AuthorizationManager` này; khi được thiết lập, `use-authorization-manager` bị bỏ qua và được giả định là `true`
 
 [[nsa-websocket-message-broker-use-authorization-manager]]
-* **use-authorization-manager** Use `AuthorizationManager` API instead of `SecurityMetadataSource` API (defaults to true).
+* **use-authorization-manager** Sử dụng API `AuthorizationManager` thay cho API `SecurityMetadataSource` (mặc định là true).
 
 [[nsa-websocket-message-broker-security-context-holder-strategy-ref]]
-* **security-context-holder-strategy-ref** Use this `SecurityContextHolderStrategy` (note only supported in conjunction with the `AuthorizationManager` API)
+* **security-context-holder-strategy-ref** Sử dụng `SecurityContextHolderStrategy` này (lưu ý chỉ được hỗ trợ khi kết hợp với API `AuthorizationManager`)
 
 [[nsa-websocket-message-broker-children]]
-=== Child Elements of <websocket-message-broker>
+=== Các phần tử con của <websocket-message-broker>
 
 
 * xref:servlet/appendix/namespace/http.adoc#nsa-expression-handler[expression-handler]
@@ -57,27 +57,27 @@ Changing the default is useful if it is necessary to allow other origins to make
 [[nsa-intercept-message]]
 == <intercept-message>
 
-Defines an authorization rule for a message.
+Định nghĩa một authorization rule cho một message.
 
 
 [[nsa-intercept-message-parents]]
-=== Parent Elements of <intercept-message>
+=== Các phần tử cha của <intercept-message>
 
 
 * <<nsa-websocket-message-broker,websocket-message-broker>>
 
 
 [[nsa-intercept-message-attributes]]
-=== <intercept-message> Attributes
+=== Các thuộc tính của <intercept-message>
 
 [[nsa-intercept-message-pattern]]
-* **pattern** An ant based pattern that matches on the Message destination.
-For example, "/**" matches any Message with a destination; "/admin/**" matches any Message that has a destination that starts with "/admin/**".
+* **pattern** Một pattern dựa trên ant khớp với đích đến của Message.
+Ví dụ, "/**" khớp với mọi Message có đích đến; "/admin/**" khớp với mọi Message có đích đến bắt đầu bằng "/admin/**".
 
 [[nsa-intercept-message-type]]
-* **type** The type of message to match on.
-Valid values are defined in SimpMessageType (i.e. CONNECT, CONNECT_ACK, HEARTBEAT, MESSAGE, SUBSCRIBE, UNSUBSCRIBE, DISCONNECT, DISCONNECT_ACK, OTHER).
+* **type** Kiểu message cần khớp.
+Các giá trị hợp lệ được định nghĩa trong SimpMessageType (tức là CONNECT, CONNECT_ACK, HEARTBEAT, MESSAGE, SUBSCRIBE, UNSUBSCRIBE, DISCONNECT, DISCONNECT_ACK, OTHER).
 
 [[nsa-intercept-message-access]]
-* **access** The expression used to secure the Message.
-For example, "denyAll" will deny access to all of the matching Messages; "permitAll" will grant access to all of the matching Messages; "hasRole('ADMIN') requires the current user to have the role 'ROLE_ADMIN' for the matching Messages.
+* **access** Expression được sử dụng để bảo vệ Message.
+Ví dụ, "denyAll" sẽ từ chối quyền truy cập vào mọi Message khớp; "permitAll" sẽ cấp quyền truy cập cho mọi Message khớp; "hasRole('ADMIN') yêu cầu user hiện tại có role 'ROLE_ADMIN' đối với các Message khớp.
