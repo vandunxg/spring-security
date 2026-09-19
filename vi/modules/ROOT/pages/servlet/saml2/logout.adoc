@@ -1,28 +1,28 @@
 [[servlet-saml2login-logout]]
-= Performing Single Logout
+= Thực hiện Single Logout
 
-Among its xref:servlet/authentication/logout.adoc[other logout mechanisms], Spring Security ships with support for RP- and AP-initiated SAML 2.0 Single Logout.
+Trong số các xref:servlet/authentication/logout.adoc[cơ chế logout khác], Spring Security cung cấp hỗ trợ cho Single Logout SAML 2.0 do RP và AP khởi tạo.
 
-Briefly, there are two use cases Spring Security supports:
+Tóm lại, Spring Security hỗ trợ hai trường hợp sử dụng:
 
-* **RP-Initiated** - Your application has an endpoint that, when POSTed to, will logout the user and send a `saml2:LogoutRequest` to the asserting party.
-Thereafter, the asserting party will send back a `saml2:LogoutResponse` and allow your application to respond
-* **AP-Initiated** - Your application has an endpoint that will receive a `saml2:LogoutRequest` from the asserting party.
-Your application will complete its logout at that point and then send a `saml2:LogoutResponse` to the asserting party.
+* **RP-Initiated** - Ứng dụng của bạn có một endpoint mà khi nhận POST sẽ logout người dùng và gửi một `saml2:LogoutRequest` đến asserting party.
+Sau đó, asserting party sẽ gửi lại một `saml2:LogoutResponse` và cho phép ứng dụng của bạn phản hồi
+* **AP-Initiated** - Ứng dụng của bạn có một endpoint sẽ nhận `saml2:LogoutRequest` từ asserting party.
+Tại thời điểm đó, ứng dụng của bạn sẽ hoàn tất logout rồi gửi một `saml2:LogoutResponse` đến asserting party.
 
 [NOTE]
-In the **AP-Initiated** scenario, any local redirection that your application would do post-logout is rendered moot.
-Once your application sends a `saml2:LogoutResponse`, it no longer has control of the browser.
+Trong kịch bản **AP-Initiated**, mọi redirect cục bộ mà ứng dụng của bạn thực hiện sau logout đều không còn ý nghĩa.
+Khi ứng dụng gửi một `saml2:LogoutResponse`, ứng dụng không còn quyền kiểm soát browser.
 
-== Minimal Configuration for Single Logout
+== Cấu hình tối thiểu cho Single Logout
 
-To use Spring Security's SAML 2.0 Single Logout feature, you will need the following things:
+Để sử dụng tính năng Single Logout SAML 2.0 của Spring Security, bạn cần những thành phần sau:
 
-* First, the asserting party must support SAML 2.0 Single Logout
-* Second, the asserting party should be configured to sign and POST `saml2:LogoutRequest` s and `saml2:LogoutResponse` s your application's `/logout/saml2/slo` endpoint
-* Third, your application must have a PKCS#8 private key and X.509 certificate for signing `saml2:LogoutRequest` s and `saml2:LogoutResponse` s
+* Thứ nhất, asserting party phải hỗ trợ Single Logout SAML 2.0
+* Thứ hai, asserting party nên được cấu hình để ký và POST các `saml2:LogoutRequest` và `saml2:LogoutResponse` đến endpoint `/logout/saml2/slo` của ứng dụng
+* Thứ ba, ứng dụng của bạn phải có private key PKCS#8 và certificate X.509 để ký các `saml2:LogoutRequest` và `saml2:LogoutResponse`
 
-You can achieve this in Spring Boot in the following way:
+Bạn có thể thực hiện việc này trong Spring Boot như sau:
 
 [source,yaml]
 ----
@@ -40,60 +40,60 @@ spring:
               metadata-uri: https://ap.example.com/metadata <1>
 
 ----
-<1> - The metadata URI of the IDP, which will indicate to your application its support of SLO
-<2> - The SLO endpoint in your application
-<3> - The signing credentials to sign ``<saml2:LogoutRequest>``s and ``<saml2:LogoutResponse>``s
+<1> - URI metadata của IDP, URI này cho ứng dụng biết IDP có hỗ trợ SLO
+<2> - Endpoint SLO trong ứng dụng
+<3> - Credential ký dùng để ký các ``<saml2:LogoutRequest>`` và ``<saml2:LogoutResponse>``
 
 [NOTE]
 ----
-An asserting party supports Single Logout if their metadata includes the `<SingleLogoutService>` element in their metadata.
+Một asserting party hỗ trợ Single Logout nếu metadata của nó bao gồm phần tử `<SingleLogoutService>`.
 ----
 
-And that's it!
+Vậy là xong!
 
-Spring Security's logout support offers a number of configuration points.
-Consider the following use cases:
+Hỗ trợ logout của Spring Security cung cấp một số điểm cấu hình.
+Hãy xem xét các trường hợp sử dụng sau:
 
-* Understand how the above <<_startup_expectations, minimal configuration works>>
-* Get a picture of <<architecture, the overall architecture>>
-* Allow users to <<separating-local-saml2-logout, logout out of the app only>>
-* Customize <<_configuring_logout_endpoints, logout endpoints>>
-* Storing `<saml2:LogoutRequests>` somewhere <<_customizing_storage, other than the session>>
+* Tìm hiểu cách <<_startup_expectations,hoạt động của cấu hình tối thiểu ở trên>>
+* Có cái nhìn tổng quan về <<architecture,kiến trúc tổng thể>>
+* Cho phép người dùng <<separating-local-saml2-logout,chỉ logout khỏi ứng dụng>>
+* Tùy chỉnh <<_configuring_logout_endpoints,các endpoint logout>>
+* Lưu trữ `<saml2:LogoutRequests>` ở nơi <<_customizing_storage,khác với session>>
 
-=== Startup Expectations
+=== Kỳ vọng khi khởi động
 
-When these properties are used, in addition to login, SAML 2.0 Service Provider will automatically configure itself facilitate logout by way of ``<saml2:LogoutRequest>``s and ``<saml2:LogoutResponse>``s using either RP- or AP-initiated logout.
+Khi sử dụng các property này, ngoài login, SAML 2.0 Service Provider sẽ tự động cấu hình để hỗ trợ logout bằng ``<saml2:LogoutRequest>`` và ``<saml2:LogoutResponse>`` theo cơ chế logout do RP hoặc AP khởi tạo.
 
-It achieves this through a deterministic startup process:
+Quá trình này được thực hiện thông qua một quy trình khởi động có tính xác định:
 
-1. Query the Identity Server Metadata endpoint for the `<SingleLogoutService>` element
-2. Scan the metadata and cache any public signature verification keys
-3. Prepare the appropriate endpoints
+1. Truy vấn endpoint Identity Server Metadata để tìm phần tử `<SingleLogoutService>`
+2. Quét metadata và cache mọi public key dùng để xác minh chữ ký
+3. Chuẩn bị các endpoint thích hợp
 
-A consequence of this process is that the identity server must be up and receiving requests in order for Service Provider to successfully start up.
+Hệ quả của quy trình này là identity server phải đang hoạt động và nhận request để Service Provider có thể khởi động thành công.
 
 [NOTE]
-If the identity server is down when Service Provider queries it (given appropriate timeouts), then startup will fail.
+Nếu identity server không hoạt động khi Service Provider truy vấn nó (với các timeout phù hợp), quá trình khởi động sẽ thất bại.
 
-=== Runtime Expectations
+=== Kỳ vọng khi chạy
 
-Given the above configuration any logged-in user can send a `POST /logout` to your application to perform RP-initiated SLO.
-Your application will then do the following:
+Với cấu hình ở trên, mọi người dùng đã login đều có thể gửi `POST /logout` đến ứng dụng để thực hiện SLO do RP khởi tạo.
+Sau đó, ứng dụng sẽ thực hiện các bước sau:
 
-1. Logout the user and invalidate the session
-2. Produce a `<saml2:LogoutRequest>` and POST it to the associated asserting party's SLO endpoint
-3. Then, if the asserting party responds with a `<saml2:LogoutResponse>`, the application with verify it and redirect to the configured success endpoint
+1. Logout người dùng và invalidate session
+2. Tạo một `<saml2:LogoutRequest>` rồi POST đến endpoint SLO của asserting party tương ứng
+3. Sau đó, nếu asserting party phản hồi bằng một `<saml2:LogoutResponse>`, ứng dụng sẽ xác minh response và redirect đến success endpoint đã cấu hình
 
-Also, your application can participate in an AP-initiated logout when the asserting party sends a `<saml2:LogoutRequest>` to `/logout/saml2/slo`.
-When this happens, your application will do the following:
+Ngoài ra, ứng dụng của bạn có thể tham gia logout do AP khởi tạo khi asserting party gửi một `<saml2:LogoutRequest>` đến `/logout/saml2/slo`.
+Khi đó, ứng dụng sẽ thực hiện các bước sau:
 
-1. Verify the `<saml2:LogoutRequest>`
-2. Logout the user and invalidate the session
-3. Produce a `<saml2:LogoutResponse>` and POST it back to the asserting party's SLO endpoint
+1. Xác minh `<saml2:LogoutRequest>`
+2. Logout người dùng và invalidate session
+3. Tạo một `<saml2:LogoutResponse>` rồi POST ngược lại đến endpoint SLO của asserting party
 
-== Minimal Configuration Sans Boot
+== Cấu hình tối thiểu không dùng Boot
 
-Instead of Boot properties, you can also achieve the same outcome by publishing the beans directly like so:
+Thay vì dùng property của Boot, bạn cũng có thể đạt được kết quả tương tự bằng cách publish trực tiếp các bean như sau:
 
 [tabs]
 ======
@@ -171,74 +171,74 @@ class SecurityConfig(@Value("${private.key}") val key: RSAPrivateKey,
 }
 ----
 ======
-<1> - The metadata URI of the IDP, which will indicate to your application its support of SLO
-<2> - The SLO endpoint in your application
-<3> - The signing credentials to sign ``<saml2:LogoutRequest>``s and ``<saml2:LogoutResponse>``s, which you can also add to xref:servlet/saml2/login/overview.adoc#servlet-saml2login-rpr-duplicated[multiple relying parties]
-<4> - Second, indicate that your application wants to use SAML SLO to logout the end user
+<1> - URI metadata của IDP, URI này cho ứng dụng biết IDP có hỗ trợ SLO
+<2> - Endpoint SLO trong ứng dụng
+<3> - Credential ký dùng để ký các ``<saml2:LogoutRequest>`` và ``<saml2:LogoutResponse>``, bạn cũng có thể thêm chúng vào xref:servlet/saml2/login/overview.adoc#servlet-saml2login-rpr-duplicated[nhiều Relying Party]
+<4> - Thứ hai, cho biết ứng dụng muốn sử dụng SAML SLO để logout end user
 
 [NOTE]
-Adding `saml2Logout` adds the capability for logout to your service provider as a whole.
-Because it is an optional capability, you need to enable it for each individual `RelyingPartyRegistration`.
-You do this by setting the `RelyingPartyRegistration.Builder#singleLogoutServiceLocation` property as seen above.
+Việc thêm `saml2Logout` bổ sung khả năng logout cho toàn bộ Service Provider.
+Vì đây là một khả năng tùy chọn, bạn cần bật nó cho từng `RelyingPartyRegistration`.
+Bạn thực hiện việc này bằng cách đặt property `RelyingPartyRegistration.Builder#singleLogoutServiceLocation` như ở trên.
 
 [[architecture]]
-== How Saml 2.0 Logout Works
+== Cách logout Saml 2.0 hoạt động
 
-Next, let's see the architectural components that Spring Security uses to support https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf#page=37[SAML 2.0 Logout] in servlet-based applications, like the one we just saw.
+Tiếp theo, hãy xem các thành phần kiến trúc mà Spring Security sử dụng để hỗ trợ https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf#page=37[SAML 2.0 Logout] trong các ứng dụng dựa trên Servlet, giống ứng dụng vừa thấy.
 
-For RP-initiated logout:
+Đối với logout do RP khởi tạo:
 
-image:{icondir}/number_1.png[] Spring Security executes its xref:servlet/authentication/logout.adoc#logout-architecture[logout flow], calling its ``LogoutHandler``s to invalidate the session and perform other cleanup.
-It then invokes the javadoc:org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2RelyingPartyInitiatedLogoutSuccessHandler[].
+image:{icondir}/number_1.png[] Spring Security thực hiện xref:servlet/authentication/logout.adoc#logout-architecture[luồng logout], gọi các ``LogoutHandler`` để invalidate session và thực hiện việc dọn dẹp khác.
+Sau đó, nó gọi javadoc:org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2RelyingPartyInitiatedLogoutSuccessHandler[].
 
-image:{icondir}/number_2.png[] The logout success handler uses an instance of
-javadoc:org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutRequestResolver[] to create, sign, and serialize a `<saml2:LogoutRequest>`.
-It uses the keys and configuration from the xref:servlet/saml2/login/overview.adoc#servlet-saml2login-relyingpartyregistration[`RelyingPartyRegistration`] that is associated with the current `Saml2AuthenticatedPrincipal`.
-Then, it redirect-POSTs the `<saml2:LogoutRequest>` to the asserting party SLO endpoint
+image:{icondir}/number_2.png[] Logout success handler sử dụng một instance của
+javadoc:org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutRequestResolver[] để tạo, ký và serialize một `<saml2:LogoutRequest>`.
+Nó sử dụng các key và cấu hình từ xref:servlet/saml2/login/overview.adoc#servlet-saml2login-relyingpartyregistration[`RelyingPartyRegistration`] được liên kết với `Saml2AuthenticatedPrincipal` hiện tại.
+Sau đó, nó redirect-POST `<saml2:LogoutRequest>` đến endpoint SLO của asserting party
 
-The browser hands control over to the asserting party.
-If the asserting party redirects back (which it may not), then the application proceeds to step image:{icondir}/number_3.png[].
+Browser chuyển quyền kiểm soát cho asserting party.
+Nếu asserting party redirect trở lại (điều này có thể không xảy ra), ứng dụng sẽ tiếp tục đến bước image:{icondir}/number_3.png[].
 
-image:{icondir}/number_3.png[] The javadoc:org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutResponseFilter[] deserializes, verifies, and processes the `<saml2:LogoutResponse>` with its javadoc:org.springframework.security.saml2.provider.service.authentication.logout.Saml2LogoutResponseValidator[].
+image:{icondir}/number_3.png[] javadoc:org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutResponseFilter[] deserialize, xác minh và xử lý `<saml2:LogoutResponse>` bằng javadoc:org.springframework.security.saml2.provider.service.authentication.logout.Saml2LogoutResponseValidator[].
 
-image:{icondir}/number_4.png[] If valid, then it completes the local logout flow by redirecting to `/login?logout`, or whatever has been configured.
-If invalid, then it responds with a 400.
+image:{icondir}/number_4.png[] Nếu hợp lệ, nó hoàn tất luồng logout cục bộ bằng cách redirect đến `/login?logout`, hoặc đến giá trị đã được cấu hình.
+Nếu không hợp lệ, nó phản hồi với mã 400.
 
-For AP-initiated logout:
+Đối với logout do AP khởi tạo:
 
-image:{icondir}/number_1.png[] The javadoc:org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutRequestFilter[] deserializes, verifies, and processes the `<saml2:LogoutRequest>` with its javadoc:org.springframework.security.saml2.provider.service.authentication.logout.Saml2LogoutRequestValidator[].
+image:{icondir}/number_1.png[] javadoc:org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutRequestFilter[] deserialize, xác minh và xử lý `<saml2:LogoutRequest>` bằng javadoc:org.springframework.security.saml2.provider.service.authentication.logout.Saml2LogoutRequestValidator[].
 
-image:{icondir}/number_2.png[] If valid, then the filter calls the configured ``LogoutHandler``s, invalidating the session and performing other cleanup.
+image:{icondir}/number_2.png[] Nếu hợp lệ, filter gọi các ``LogoutHandler`` đã cấu hình, invalidate session và thực hiện việc dọn dẹp khác.
 
-image:{icondir}/number_3.png[] It uses a javadoc:org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutResponseResolver[] to create, sign and serialize a `<saml2:LogoutResponse>`.
-It uses the keys and configuration from the xref:servlet/saml2/login/overview.adoc#servlet-saml2login-relyingpartyregistration[`RelyingPartyRegistration`] derived from the endpoint or from the contents of the `<saml2:LogoutRequest>`.
-Then, it redirect-POSTs the `<saml2:LogoutResponse>` to the asserting party SLO endpoint.
+image:{icondir}/number_3.png[] Nó sử dụng javadoc:org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutResponseResolver[] để tạo, ký và serialize một `<saml2:LogoutResponse>`.
+Nó sử dụng các key và cấu hình từ xref:servlet/saml2/login/overview.adoc#servlet-saml2login-relyingpartyregistration[`RelyingPartyRegistration`] được suy ra từ endpoint hoặc từ nội dung của `<saml2:LogoutRequest>`.
+Sau đó, nó redirect-POST `<saml2:LogoutResponse>` đến endpoint SLO của asserting party.
 
-The browser hands control over to the asserting party.
+Browser chuyển quyền kiểm soát cho asserting party.
 
-image:{icondir}/number_4.png[] If invalid, then it https://github.com/spring-projects/spring-security/pull/14676[responds with a 400].
+image:{icondir}/number_4.png[] Nếu không hợp lệ, nó https://github.com/spring-projects/spring-security/pull/14676[phản hồi với mã 400].
 
-== Configuring Logout Endpoints
+== Cấu hình các endpoint logout
 
-There are three behaviors that can be triggered by different endpoints:
+Có ba hành vi có thể được kích hoạt bởi các endpoint khác nhau:
 
-* RP-initiated logout, which allows an authenticated user to `POST` and trigger the logout process by sending the asserting party a `<saml2:LogoutRequest>`
-* AP-initiated logout, which allows an asserting party to send a `<saml2:LogoutRequest>` to the application
-* AP logout response, which allows an asserting party to send a `<saml2:LogoutResponse>` in response to the RP-initiated `<saml2:LogoutRequest>`
+* Logout do RP khởi tạo, cho phép người dùng đã authentication thực hiện `POST` và kích hoạt quy trình logout bằng cách gửi một `<saml2:LogoutRequest>` đến asserting party
+* Logout do AP khởi tạo, cho phép asserting party gửi một `<saml2:LogoutRequest>` đến ứng dụng
+* Response logout do AP khởi tạo, cho phép asserting party gửi một `<saml2:LogoutResponse>` để phản hồi cho `<saml2:LogoutRequest>` do RP khởi tạo
 
-The first is triggered by performing normal `POST /logout` when the principal is of type `Saml2AuthenticatedPrincipal`.
+Hành vi thứ nhất được kích hoạt bằng cách thực hiện `POST /logout` thông thường khi principal có kiểu `Saml2AuthenticatedPrincipal`.
 
-The second is triggered by POSTing to the `/logout/saml2/slo` endpoint with a `SAMLRequest` signed by the asserting party.
+Hành vi thứ hai được kích hoạt bằng cách POST đến endpoint `/logout/saml2/slo` với một `SAMLRequest` được asserting party ký.
 
-The third is triggered by POSTing to the `/logout/saml2/slo` endpoint with a `SAMLResponse` signed by the asserting party.
+Hành vi thứ ba được kích hoạt bằng cách POST đến endpoint `/logout/saml2/slo` với một `SAMLResponse` được asserting party ký.
 
-Because the user is already logged in or the original Logout Request is known, the `registrationId` is already known.
-For this reason, `+{registrationId}+` is not part of these URLs by default.
+Vì người dùng đã login hoặc Logout Request ban đầu đã được biết, `registrationId` cũng đã được biết.
+Vì lý do này, `+{registrationId}+` mặc định không phải là một phần của các URL này.
 
-This URL is customizable in the DSL.
+URL này có thể được tùy chỉnh trong DSL.
 
-For example, if you are migrating your existing relying party over to Spring Security, your asserting party may already be pointing to `GET /SLOService.saml2`.
-To reduce changes in configuration for the asserting party, you can configure the filter in the DSL like so:
+Ví dụ, nếu bạn đang chuyển Relying Party hiện có sang Spring Security, asserting party có thể đã trỏ đến `GET /SLOService.saml2`.
+Để giảm các thay đổi cấu hình cho asserting party, bạn có thể cấu hình filter trong DSL như sau:
 
 [tabs]
 ======
@@ -270,9 +270,9 @@ http {
 ----
 ======
 
-You should also configure these endpoints in your `RelyingPartyRegistration`.
+Bạn cũng nên cấu hình các endpoint này trong `RelyingPartyRegistration`.
 
-Also, you can customize the endpoint for triggering logout locally like so:
+Bạn cũng có thể tùy chỉnh endpoint dùng để kích hoạt logout cục bộ như sau:
 
 [tabs]
 ======
@@ -297,12 +297,12 @@ http {
 ======
 
 [[separating-local-saml2-logout]]
-=== Separating Local Logout from SAML 2.0 Logout
+=== Tách logout cục bộ khỏi logout SAML 2.0
 
-In some cases, you may want to expose one logout endpoint for local logout and another for RP-initiated SLO.
-Like is the case with other logout mechanisms, you can register more than one, so long as they each have a different endpoint.
+Trong một số trường hợp, bạn có thể muốn cung cấp một endpoint logout cho logout cục bộ và một endpoint khác cho SLO do RP khởi tạo.
+Tương tự các cơ chế logout khác, bạn có thể đăng ký nhiều endpoint, miễn là mỗi endpoint có một đường dẫn khác nhau.
 
-So, for example, you can wire the DSL like so:
+Ví dụ, bạn có thể nối DSL như sau:
 
 [tabs]
 ======
@@ -330,21 +330,21 @@ http {
 ----
 ======
 
-and now if a client sends a `POST /logout`, the session will be cleared, but there won't be a `<saml2:LogoutRequest>` sent to the asserting party.
-But, if the client sends a `POST /saml2/logout`, then the application will initiate SAML 2.0 SLO as normal.
+và bây giờ, nếu client gửi `POST /logout`, session sẽ được xóa, nhưng sẽ không có `<saml2:LogoutRequest>` nào được gửi đến asserting party.
+Tuy nhiên, nếu client gửi `POST /saml2/logout`, ứng dụng sẽ khởi tạo SLO SAML 2.0 như bình thường.
 
-== Customizing `<saml2:LogoutRequest>` Resolution
+== Tùy chỉnh việc phân giải `<saml2:LogoutRequest>`
 
-It's common to need to set other values in the `<saml2:LogoutRequest>` than the defaults that Spring Security provides.
+Thông thường, bạn cần đặt các giá trị khác trong `<saml2:LogoutRequest>` so với các giá trị mặc định Spring Security cung cấp.
 
-By default, Spring Security will issue a `<saml2:LogoutRequest>` and supply:
+Mặc định, Spring Security sẽ phát hành một `<saml2:LogoutRequest>` và cung cấp:
 
-* The `DestinationValidator` attribute - from `RelyingPartyRegistration#getAssertingPartyMetadata#getSingleLogoutServiceLocation`
-* The `ID` attribute - a GUID
-* The `<Issuer>` element - from `RelyingPartyRegistration#getEntityId`
-* The `<NameID>` element - from `Authentication#getName`
+* Thuộc tính `DestinationValidator` - từ `RelyingPartyRegistration#getAssertingPartyMetadata#getSingleLogoutServiceLocation`
+* Thuộc tính `ID` - một GUID
+* Phần tử `<Issuer>` - từ `RelyingPartyRegistration#getEntityId`
+* Phần tử `<NameID>` - từ `Authentication#getName`
 
-To add other values, you can use delegation, like so:
+Để thêm các giá trị khác, bạn có thể dùng delegation như sau:
 
 [tabs]
 ======
@@ -388,7 +388,7 @@ open fun logoutRequestResolver(registrations:RelyingPartyRegistrationRepository?
 ----
 ======
 
-Then, you can supply your custom `Saml2LogoutRequestResolver` in the DSL as follows:
+Sau đó, bạn có thể cung cấp `Saml2LogoutRequestResolver` tùy chỉnh trong DSL như sau:
 
 [tabs]
 ======
@@ -418,18 +418,18 @@ http {
 ----
 ======
 
-== Customizing `<saml2:LogoutResponse>` Resolution
+== Tùy chỉnh việc phân giải `<saml2:LogoutResponse>`
 
-It's common to need to set other values in the `<saml2:LogoutResponse>` than the defaults that Spring Security provides.
+Thông thường, bạn cần đặt các giá trị khác trong `<saml2:LogoutResponse>` so với các giá trị mặc định Spring Security cung cấp.
 
-By default, Spring Security will issue a `<saml2:LogoutResponse>` and supply:
+Mặc định, Spring Security sẽ phát hành một `<saml2:LogoutResponse>` và cung cấp:
 
-* The `DestinationValidator` attribute - from `RelyingPartyRegistration#getAssertingPartyMetadata#getSingleLogoutServiceResponseLocation`
-* The `ID` attribute - a GUID
-* The `<Issuer>` element - from `RelyingPartyRegistration#getEntityId`
-* The `<Status>` element - `SUCCESS`
+* Thuộc tính `DestinationValidator` - từ `RelyingPartyRegistration#getAssertingPartyMetadata#getSingleLogoutServiceResponseLocation`
+* Thuộc tính `ID` - một GUID
+* Phần tử `<Issuer>` - từ `RelyingPartyRegistration#getEntityId`
+* Phần tử `<Status>` - `SUCCESS`
 
-To add other values, you can use delegation, like so:
+Để thêm các giá trị khác, bạn có thể dùng delegation như sau:
 
 [tabs]
 ======
@@ -467,7 +467,7 @@ open fun logoutResponseResolver(registrations: RelyingPartyRegistrationRepositor
 ----
 ======
 
-Then, you can supply your custom `Saml2LogoutResponseResolver` in the DSL as follows:
+Sau đó, bạn có thể cung cấp `Saml2LogoutResponseResolver` tùy chỉnh trong DSL như sau:
 
 [tabs]
 ======
@@ -497,10 +497,10 @@ http {
 ----
 ======
 
-== Customizing `<saml2:LogoutRequest>` Authentication
+== Tùy chỉnh việc authentication `<saml2:LogoutRequest>`
 
-To customize validation, you can implement your own `Saml2LogoutRequestValidator`.
-At this point, the validation is minimal, so you may be able to first delegate to the default `Saml2LogoutRequestValidator` like so:
+Để tùy chỉnh việc validation, bạn có thể tự triển khai `Saml2LogoutRequestValidator`.
+Hiện tại, validation còn tối thiểu, nên trước tiên bạn có thể ủy quyền cho `Saml2LogoutRequestValidator` mặc định như sau:
 
 [tabs]
 ======
@@ -514,14 +514,14 @@ public class MyOpenSamlLogoutRequestValidator implements Saml2LogoutRequestValid
 
 	@Override
     public Saml2LogoutValidatorResult validate(Saml2LogoutRequestValidatorParameters parameters) {
-		 // verify signature, issuer, destination, and principal name
+		 // xác minh signature, issuer, destination và tên principal
 		Saml2LogoutValidatorResult result = delegate.validate(authentication);
 
         if(result.hasErrors()){
             return result;
         }
 		
-        // perform custom validation
+        // thực hiện validation tùy chỉnh
 
         return result;
     }
@@ -538,14 +538,14 @@ open class MyOpenSamlLogoutRequestValidator : Saml2LogoutRequestValidator {
 
 	@Override
     fun validate(parameters: Saml2LogoutRequestValidatorParameters): Saml2LogoutValidatorResult {
-		 // verify signature, issuer, destination, and principal name
+		 // xác minh signature, issuer, destination và tên principal
 		val result = delegate.validate(authentication)
 
 		if (result.hasErrors()) {
             return result
         }
 
-        // perform custom validation
+        // thực hiện validation tùy chỉnh
 
         return result
     }
@@ -553,7 +553,7 @@ open class MyOpenSamlLogoutRequestValidator : Saml2LogoutRequestValidator {
 ----
 ======
 
-Then, you can supply your custom `Saml2LogoutRequestValidator` in the DSL as follows:
+Sau đó, bạn có thể cung cấp `Saml2LogoutRequestValidator` tùy chỉnh trong DSL như sau:
 
 [tabs]
 ======
@@ -583,10 +583,10 @@ http {
 ----
 ======
 
-== Customizing `<saml2:LogoutResponse>` Authentication
+== Tùy chỉnh việc authentication `<saml2:LogoutResponse>`
 
-To customize validation, you can implement your own `Saml2LogoutResponseValidator`.
-At this point, the validation is minimal, so you may be able to first delegate to the default `Saml2LogoutResponseValidator` like so:
+Để tùy chỉnh việc validation, bạn có thể tự triển khai `Saml2LogoutResponseValidator`.
+Hiện tại, validation còn tối thiểu, nên trước tiên bạn có thể ủy quyền cho `Saml2LogoutResponseValidator` mặc định như sau:
 
 [tabs]
 ======
@@ -600,14 +600,14 @@ public class MyOpenSamlLogoutResponseValidator implements Saml2LogoutResponseVal
 
 	@Override
     public Saml2LogoutValidatorResult validate(Saml2LogoutResponseValidatorParameters parameters) {
-		// verify signature, issuer, destination, and status
+		// xác minh signature, issuer, destination và status
 		Saml2LogoutValidatorResult result = delegate.validate(parameters);
 
         if (result.hasErrors()) {
             return result;
         }
 
-        // perform custom validation
+        // thực hiện validation tùy chỉnh
 
         return result;
     }
@@ -623,14 +623,14 @@ open class MyOpenSamlLogoutResponseValidator : Saml2LogoutResponseValidator {
 	private val delegate = OpenSaml5LogoutResponseValidator()
 
     override fun validate(parameters: Saml2LogoutResponseValidatorParameters): Saml2LogoutValidatorResult {
-		// verify signature, issuer, destination, and status
+		// xác minh signature, issuer, destination và status
 		val result = delegate.validate(authentication)
 
         if (result.hasErrors()) {
             return result
         }
 		
-        // perform custom validation
+        // thực hiện validation tùy chỉnh
 
         return result
     }
@@ -638,7 +638,7 @@ open class MyOpenSamlLogoutResponseValidator : Saml2LogoutResponseValidator {
 ----
 ======
 
-Then, you can supply your custom `Saml2LogoutResponseValidator` in the DSL as follows:
+Sau đó, bạn có thể cung cấp `Saml2LogoutResponseValidator` tùy chỉnh trong DSL như sau:
 
 [tabs]
 ======
@@ -668,11 +668,11 @@ http {
 ----
 ======
 
-== Customizing `<saml2:LogoutRequest>` storage
+== Tùy chỉnh việc lưu trữ `<saml2:LogoutRequest>`
 
-When your application sends a `<saml2:LogoutRequest>`, the value is stored in the session so that the `RelayState` parameter and the `InResponseTo` attribute in the `<saml2:LogoutResponse>` can be verified.
+Khi ứng dụng gửi một `<saml2:LogoutRequest>`, giá trị này được lưu trong session để có thể xác minh tham số `RelayState` và thuộc tính `InResponseTo` trong `<saml2:LogoutResponse>`.
 
-If you want to store logout requests in some place other than the session, you can supply your custom implementation in the DSL, like so:
+Nếu muốn lưu trữ logout request ở nơi khác thay vì session, bạn có thể cung cấp implementation tùy chỉnh trong DSL như sau:
 
 [tabs]
 ======
@@ -703,8 +703,8 @@ http {
 ======
 
 [[jc-logout-references]]
-== Further Logout-Related References
+== Các tham chiếu khác liên quan đến logout
 
-- xref:servlet/test/mockmvc/logout.adoc#test-logout[Testing Logout]
+- xref:servlet/test/mockmvc/logout.adoc#test-logout[Kiểm thử logout]
 - xref:servlet/integrations/servlet-api.adoc#servletapi-logout[HttpServletRequest.logout()]
-- xref:servlet/exploits/csrf.adoc#csrf-considerations-logout[Logging Out] in section CSRF Caveats
+- xref:servlet/exploits/csrf.adoc#csrf-considerations-logout[Logout] trong phần Các lưu ý về CSRF
