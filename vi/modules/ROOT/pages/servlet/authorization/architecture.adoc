@@ -1,18 +1,18 @@
 // from the original documentation
 
 [[authz-arch]]
-= Authorization Architecture
+= Kiến trúc authorization
 :figures: servlet/authorization
 
-This section describes the Spring Security architecture that applies to authorization.
+Phần này mô tả kiến trúc Spring Security áp dụng cho authorization.
 
 [[authz-authorities]]
-== Authorities
-xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] discusses how all `Authentication` implementations store a list of `GrantedAuthority` objects.
-These represent the authorities that have been granted to the principal.
-The `GrantedAuthority` objects are inserted into the `Authentication` object by the `AuthenticationManager` and are later read by `AuthorizationManager` instances when making authorization decisions.
+== Các authority
+xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] thảo luận cách mọi triển khai `Authentication` lưu trữ một danh sách các object `GrantedAuthority`.
+Các object này đại diện cho những authority đã được cấp cho principal.
+Các object `GrantedAuthority` được `AuthenticationManager` đưa vào object `Authentication`, sau đó được các instance `AuthorizationManager` đọc khi đưa ra quyết định authorization.
 
-The `GrantedAuthority` interface has only one method:
+Interface `GrantedAuthority` chỉ có một method:
 
 [source,java]
 ----
@@ -21,29 +21,29 @@ String getAuthority();
 
 ----
 
-This method is used by an
-`AuthorizationManager` instance to obtain a precise `String` representation of the `GrantedAuthority`.
-By returning a representation as a `String`, a `GrantedAuthority` can be easily "read" by most `AuthorizationManager` implementations.
-If a `GrantedAuthority` cannot be precisely represented as a `String`, the `GrantedAuthority` is considered "complex" and `getAuthority()` must return `null`.
+Method này được một instance
+`AuthorizationManager` sử dụng để lấy biểu diễn `String` chính xác của `GrantedAuthority`.
+Bằng cách trả về một biểu diễn dưới dạng `String`, hầu hết các triển khai `AuthorizationManager` có thể dễ dàng "đọc" một `GrantedAuthority`.
+Nếu không thể biểu diễn chính xác một `GrantedAuthority` dưới dạng `String`, `GrantedAuthority` được xem là "phức tạp" và `getAuthority()` phải trả về `null`.
 
-An example of a complex `GrantedAuthority` would be an implementation that stores a list of operations and authority thresholds that apply to different customer account numbers.
-Representing this complex `GrantedAuthority` as a `String` would be quite difficult. As a result, the `getAuthority()` method should return `null`.
-This indicates to any `AuthorizationManager` that it needs to support the specific `GrantedAuthority` implementation to understand its contents.
+Một ví dụ về `GrantedAuthority` phức tạp là một triển khai lưu trữ danh sách các operation và ngưỡng authority áp dụng cho những số tài khoản khách hàng khác nhau.
+Việc biểu diễn `GrantedAuthority` phức tạp này dưới dạng `String` sẽ khá khó khăn. Vì vậy, method `getAuthority()` nên trả về `null`.
+Điều này cho mọi `AuthorizationManager` biết rằng nó cần hỗ trợ triển khai `GrantedAuthority` cụ thể để hiểu nội dung của nó.
 
-Spring Security includes one concrete `GrantedAuthority` implementation: `SimpleGrantedAuthority`.
-This implementation lets any user-specified `String` be converted into a `GrantedAuthority`.
-All `AuthenticationProvider` instances included with the security architecture use `SimpleGrantedAuthority` to populate the `Authentication` object.
+Spring Security bao gồm một triển khai `GrantedAuthority` cụ thể: `SimpleGrantedAuthority`.
+Triển khai này cho phép chuyển bất kỳ `String` nào do user chỉ định thành một `GrantedAuthority`.
+Mọi instance `AuthenticationProvider` đi kèm kiến trúc security đều sử dụng `SimpleGrantedAuthority` để điền vào object `Authentication`.
 
 [[jc-method-security-custom-granted-authority-defaults]]
-By default, role-based authorization rules include `ROLE_` as a prefix.
-This means that if there is an authorization rule that requires a security context to have a role of "USER", Spring Security will by default look for a `GrantedAuthority#getAuthority` that returns "ROLE_USER".
+Theo mặc định, các rule authorization dựa trên role có `ROLE_` làm prefix.
+Điều này có nghĩa là nếu có một rule authorization yêu cầu security context có role là "USER", theo mặc định Spring Security sẽ tìm một `GrantedAuthority#getAuthority` trả về "ROLE_USER".
 
-You can customize this with `GrantedAuthorityDefaults`.
-`GrantedAuthorityDefaults` exists to allow customizing the prefix to use for role-based authorization rules.
+Bạn có thể tùy chỉnh điều này bằng `GrantedAuthorityDefaults`.
+`GrantedAuthorityDefaults` cho phép tùy chỉnh prefix được sử dụng cho các rule authorization dựa trên role.
 
-You can configure the authorization rules to use a different prefix by exposing a `GrantedAuthorityDefaults` bean, like so:
+Bạn có thể cấu hình các rule authorization sử dụng prefix khác bằng cách expose một bean `GrantedAuthorityDefaults`, như sau:
 
-.Custom MethodSecurityExpressionHandler
+.MethodSecurityExpressionHandler tùy chỉnh
 [tabs]
 ======
 Java::
@@ -80,22 +80,22 @@ Xml::
 
 [TIP]
 ====
-You expose `GrantedAuthorityDefaults` using a `static` method to ensure that Spring publishes it before it initializes Spring Security's method security `@Configuration` classes
+Bạn expose `GrantedAuthorityDefaults` bằng một method `static` để đảm bảo Spring publish nó trước khi khởi tạo các class `@Configuration` method security của Spring Security.
 ====
 
 [[authz-pre-invocation]]
-== Invocation Handling
-Spring Security provides interceptors that control access to secure objects, such as method invocations or web requests.
-A pre-invocation decision on whether the invocation is allowed to proceed is made by `AuthorizationManager` instances.
-Also post-invocation decisions on whether a given value may be returned is made by `AuthorizationManager` instances.
+== Xử lý invocation
+Spring Security cung cấp các interceptor kiểm soát quyền truy cập vào các secure object, chẳng hạn như method invocation hoặc web request.
+Các instance `AuthorizationManager` đưa ra quyết định trước invocation về việc invocation có được phép tiếp tục hay không.
+Các instance `AuthorizationManager` cũng đưa ra quyết định sau invocation về việc có thể trả về một giá trị nhất định hay không.
 
-=== The AuthorizationManager
-`AuthorizationManager` supersedes both <<authz-legacy-note,`AccessDecisionManager` and `AccessDecisionVoter`>>.
+=== AuthorizationManager
+`AuthorizationManager` thay thế cả <<authz-legacy-note,`AccessDecisionManager` và `AccessDecisionVoter`>>.
 
-Applications that customize an `AccessDecisionManager` or `AccessDecisionVoter` are encouraged to <<authz-voter-adaptation,change to using `AuthorizationManager`>>.
+Các application tùy chỉnh `AccessDecisionManager` hoặc `AccessDecisionVoter` được khuyến khích <<authz-voter-adaptation,chuyển sang sử dụng `AuthorizationManager`>>.
 
-``AuthorizationManager``s are called by Spring Security's xref:servlet/authorization/authorize-http-requests.adoc[request-based], xref:servlet/authorization/method-security.adoc[method-based], and xref:servlet/integrations/websocket.adoc[message-based] authorization components and are responsible for making final access control decisions.
-The `AuthorizationManager` interface contains two methods:
+Các ``AuthorizationManager`` được gọi bởi các component authorization xref:servlet/authorization/authorize-http-requests.adoc[dựa trên request], xref:servlet/authorization/method-security.adoc[dựa trên method] và xref:servlet/integrations/websocket.adoc[dựa trên message] của Spring Security, đồng thời chịu trách nhiệm đưa ra quyết định access control cuối cùng.
+Interface `AuthorizationManager` chứa hai method:
 
 [source,java]
 ----
@@ -107,58 +107,58 @@ default void verify(Supplier<Authentication> authentication, Object secureObject
 }
 ----
 
-The ``AuthorizationManager``'s `authorize` method is passed all the relevant information it needs in order to make an authorization decision.
-In particular, passing the secure `Object` enables those arguments contained in the actual secure object invocation to be inspected.
-For example, let's assume the secure object was a `MethodInvocation`.
-It would be easy to query the `MethodInvocation` for any `Customer` argument, and then implement some sort of security logic in the `AuthorizationManager` to ensure the principal is permitted to operate on that customer.
-Implementations are expected to return a positive `AuthorizationDecision` if access is granted, negative `AuthorizationDecision` if access is denied, and a null `AuthorizationDecision` when abstaining from making a decision.
+Method `authorize` của ``AuthorizationManager`` nhận mọi thông tin liên quan cần thiết để đưa ra quyết định authorization.
+Đặc biệt, việc truyền secure `Object` cho phép kiểm tra các argument nằm trong invocation của secure object thực tế.
+Ví dụ, giả sử secure object là một `MethodInvocation`.
+Bạn có thể dễ dàng truy vấn `MethodInvocation` để tìm bất kỳ argument `Customer` nào, sau đó triển khai một dạng logic security trong `AuthorizationManager` nhằm đảm bảo principal được phép thao tác trên customer đó.
+Các triển khai được kỳ vọng trả về một `AuthorizationDecision` dương nếu quyền truy cập được cấp, một `AuthorizationDecision` âm nếu quyền truy cập bị từ chối, và một `AuthorizationDecision` null khi abstain không đưa ra quyết định.
 
-`verify` calls `authorize` and subsequently throws an `AccessDeniedException` in the case of a negative `AuthorizationDecision`.
+`verify` gọi `authorize` và sau đó ném `AccessDeniedException` nếu `AuthorizationDecision` là âm.
 
 [[authz-delegate-authorization-manager]]
-=== Delegate-based AuthorizationManager Implementations
-Whilst users can implement their own `AuthorizationManager` to control all aspects of authorization, Spring Security ships with a delegating `AuthorizationManager` that can collaborate with individual ``AuthorizationManager``s.
+=== Các triển khai AuthorizationManager dựa trên delegate
+Mặc dù user có thể tự triển khai `AuthorizationManager` để kiểm soát mọi khía cạnh của authorization, Spring Security cung cấp một `AuthorizationManager` delegating có thể phối hợp với từng ``AuthorizationManager`` riêng lẻ.
 
-`RequestMatcherDelegatingAuthorizationManager` will match the request with the most appropriate delegate `AuthorizationManager`.
-For method security, you can use `AuthorizationManagerBeforeMethodInterceptor` and `AuthorizationManagerAfterMethodInterceptor`.
+`RequestMatcherDelegatingAuthorizationManager` sẽ match request với `AuthorizationManager` delegate phù hợp nhất.
+Đối với method security, bạn có thể sử dụng `AuthorizationManagerBeforeMethodInterceptor` và `AuthorizationManagerAfterMethodInterceptor`.
 
-<<authz-authorization-manager-implementations>> illustrates the relevant classes.
+<<authz-authorization-manager-implementations>> minh họa các class liên quan.
 
 [[authz-authorization-manager-implementations]]
-.Authorization Manager Implementations
+.Các triển khai AuthorizationManager
 [.invert-dark]
 image::{figures}/authorizationhierarchy.png[]
 
-Using this approach, a composition of `AuthorizationManager` implementations can be polled on an authorization decision.
+Với cách tiếp cận này, một tổ hợp các triển khai `AuthorizationManager` có thể được thăm dò khi đưa ra quyết định authorization.
 
 [[authz-authority-authorization-manager]]
 ==== AuthorityAuthorizationManager
-The most common `AuthorizationManager` provided with Spring Security is `AuthorityAuthorizationManager`.
-It is configured with a given set of authorities to look for on the current `Authentication`.
-It will return positive `AuthorizationDecision` should the `Authentication` contain any of the configured authorities.
-It will return a negative `AuthorizationDecision` otherwise.
+`AuthorizationManager` phổ biến nhất do Spring Security cung cấp là `AuthorityAuthorizationManager`.
+Nó được cấu hình với một tập authority cụ thể cần tìm trong `Authentication` hiện tại.
+Nó sẽ trả về `AuthorizationDecision` dương nếu `Authentication` chứa bất kỳ authority nào đã cấu hình.
+Nếu không, nó sẽ trả về `AuthorizationDecision` âm.
 
 [[authz-authenticated-authorization-manager]]
 ==== AuthenticatedAuthorizationManager
-Another manager is the `AuthenticatedAuthorizationManager`.
-It can be used to differentiate between anonymous, fully-authenticated and remember-me authenticated users.
-Many sites allow certain limited access under remember-me authentication, but require a user to confirm their identity by logging in for full access.
+Một manager khác là `AuthenticatedAuthorizationManager`.
+Nó có thể được dùng để phân biệt user anonymous, fully-authenticated và đã xác thực bằng remember-me.
+Nhiều site cho phép một số quyền truy cập giới hạn khi authentication bằng remember-me, nhưng yêu cầu user xác nhận danh tính bằng cách đăng nhập để có toàn quyền truy cập.
 
 [[authz-conditional-authorization-manager]]
 ==== ConditionalAuthorizationManager
-javadoc:org.springframework.security.authorization.ConditionalAuthorizationManager[] delegates to one of two ``AuthorizationManager``s based on a condition evaluated against the current ``Authentication``.
-When the condition returns true (and the authentication is non-null), the ``whenTrue`` manager is used; otherwise the ``whenFalse`` manager is used.
-Create an instance using the builder returned by `ConditionalAuthorizationManager.when(Predicate<Authentication>)`: set `whenTrue` (required) and optionally `whenFalse` (defaults to permit-all).
-This is useful for scenarios such as requiring multi-factor authentication only when the user has registered a second factor.
+javadoc:org.springframework.security.authorization.ConditionalAuthorizationManager[] delegate đến một trong hai ``AuthorizationManager`` dựa trên điều kiện được đánh giá đối với ``Authentication`` hiện tại.
+Khi điều kiện trả về true (và authentication khác null), manager ``whenTrue`` được sử dụng; nếu không, manager ``whenFalse`` được sử dụng.
+Tạo một instance bằng builder do `ConditionalAuthorizationManager.when(Predicate<Authentication>)` trả về: đặt `whenTrue` (bắt buộc) và tùy chọn `whenFalse` (mặc định là permit-all).
+Điều này hữu ích trong các tình huống như chỉ yêu cầu authentication đa yếu tố khi user đã đăng ký factor thứ hai.
 
-.ConditionalAuthorizationManager example
+.Ví dụ ConditionalAuthorizationManager
 include-code::./ConditionalAuthorizationManagerExample[tag=conditionalAuthorizationManager,indent=0]
 
 [[authz-authorization-manager-factory]]
-=== Creating AuthorizationManager instances
+=== Tạo các instance AuthorizationManager
 
-The javadoc:org.springframework.security.authorization.AuthorizationManagerFactory[] interface (introduced in Spring Security 7.0) is used to create generic ``AuthorizationManager``s in xref:servlet/authorization/authorize-http-requests.adoc[request-based] and xref:servlet/authorization/method-security.adoc[method-based] authorization components.
-The following is a sketch of the `AuthorizationManagerFactory` interface:
+Interface javadoc:org.springframework.security.authorization.AuthorizationManagerFactory[] (được giới thiệu trong Spring Security 7.0) được sử dụng để tạo các ``AuthorizationManager`` generic trong các component authorization xref:servlet/authorization/authorize-http-requests.adoc[dựa trên request] và xref:servlet/authorization/method-security.adoc[dựa trên method].
+Dưới đây là phác thảo của interface `AuthorizationManagerFactory`:
 
 [source,java]
 ----
@@ -178,45 +178,45 @@ public interface AuthorizationManagerFactory<T> {
 }
 ----
 
-The default implementation is javadoc:org.springframework.security.authorization.DefaultAuthorizationManagerFactory[], which allows for customizing the `rolePrefix` (defaults to `"ROLE_"`), `RoleHierarchy` and `AuthenticationTrustManager` that are provided to the ``AuthorizationManager``s created by the factory.
+Triển khai mặc định là javadoc:org.springframework.security.authorization.DefaultAuthorizationManagerFactory[], cho phép tùy chỉnh `rolePrefix` (mặc định là `"ROLE_"`), `RoleHierarchy` và `AuthenticationTrustManager` được cung cấp cho các ``AuthorizationManager`` do factory tạo ra.
 
-In order to customize the default instance used by Spring Security, simply publish a bean as in the following example:
+Để tùy chỉnh instance mặc định được Spring Security sử dụng, chỉ cần publish một bean như trong ví dụ sau:
 
 include-code::./AuthorizationManagerFactoryConfiguration[tag=config,indent=0]
 
 [TIP]
-It is also possible to target a specific usage of this factory within Spring Security by providing a concrete parameterized type instead of a generic type.
-See examples of each in the xref:servlet/authorization/authorize-http-requests.adoc#customizing-authorization-managers[request-based] and xref:servlet/authorization/method-security.adoc#customizing-authorization-managers[method-based] sections of the documentation.
+Bạn cũng có thể nhắm đến một cách sử dụng cụ thể của factory này trong Spring Security bằng cách cung cấp một kiểu được parameterize cụ thể thay vì kiểu generic.
+Xem ví dụ về từng cách trong các phần tài liệu xref:servlet/authorization/authorize-http-requests.adoc#customizing-authorization-managers[dựa trên request] và xref:servlet/authorization/method-security.adoc#customizing-authorization-managers[dựa trên method].
 
-In addition to simply customizing the default instance of `AuthorizationManagerFactory`, you can provide your own implementation to fully customize the instances created by the factory and provide your own implementations.
+Ngoài việc chỉ tùy chỉnh instance mặc định của `AuthorizationManagerFactory`, bạn có thể cung cấp triển khai của riêng mình để tùy chỉnh hoàn toàn các instance do factory tạo ra và cung cấp các triển khai của riêng mình.
 
 [NOTE]
-The {gh-url}/core/src/main/java/org/springframework/security/authorization/AuthorizationManagerFactory.java[actual interface] provides default implementations for all factory methods, which allows custom implementations to only implement the methods that need to be customized.
+{gh-url}/core/src/main/java/org/springframework/security/authorization/AuthorizationManagerFactory.java[giao diện thực tế] cung cấp triển khai mặc định cho mọi method của factory, cho phép các triển khai tùy chỉnh chỉ cần triển khai những method cần tùy chỉnh.
 
 [[authz-authorization-managers]]
 ==== AuthorizationManagers
-There are also helpful static factories in javadoc:org.springframework.security.authorization.AuthorizationManagers[] for composing individual ``AuthorizationManager``s into more sophisticated expressions.
+Ngoài ra, javadoc:org.springframework.security.authorization.AuthorizationManagers[] cung cấp các static factory hữu ích để kết hợp từng ``AuthorizationManager`` thành các expression phức tạp hơn.
 
 [[authz-custom-authorization-manager]]
-==== Custom Authorization Managers
-Obviously, you can also implement a custom `AuthorizationManager` and you can put just about any access-control logic you want in it.
-It might be specific to your application (business-logic related) or it might implement some security administration logic.
-For example, you can create an implementation that can query Open Policy Agent or your own authorization database.
+==== AuthorizationManager tùy chỉnh
+Tất nhiên, bạn cũng có thể triển khai một `AuthorizationManager` tùy chỉnh và đặt gần như bất kỳ logic access control nào bạn muốn vào đó.
+Logic này có thể dành riêng cho application của bạn (liên quan đến business logic) hoặc có thể triển khai một số logic quản trị security.
+Ví dụ, bạn có thể tạo một triển khai có thể truy vấn Open Policy Agent hoặc database authorization của riêng mình.
 
 [TIP]
-You'll find a https://spring.io/blog/2009/01/03/spring-security-customization-part-2-adjusting-secured-session-in-real-time[blog article] on the Spring web site which describes how to use the legacy `AccessDecisionVoter` to deny access in real-time to users whose accounts have been suspended.
-You can achieve the same outcome by implementing `AuthorizationManager` instead.
+Bạn sẽ tìm thấy một https://spring.io/blog/2009/01/03/spring-security-customization-part-2-adjusting-secured-session-in-real-time[bài viết blog] trên website Spring mô tả cách sử dụng `AccessDecisionVoter` legacy để từ chối quyền truy cập theo thời gian thực đối với user có tài khoản bị đình chỉ.
+Bạn có thể đạt được kết quả tương tự bằng cách triển khai `AuthorizationManager`.
 
 [[authz-voter-adaptation]]
-== Adapting AccessDecisionManager and AccessDecisionVoters
+== Adapter cho AccessDecisionManager và AccessDecisionVoters
 
-Previous to `AuthorizationManager`, Spring Security published <<authz-legacy-note,`AccessDecisionManager` and `AccessDecisionVoter`>>.
+Trước `AuthorizationManager`, Spring Security cung cấp <<authz-legacy-note,`AccessDecisionManager` và `AccessDecisionVoter`>>.
 
-In some cases, like migrating an older application, it may be desirable to introduce an `AuthorizationManager` that invokes an `AccessDecisionManager` or `AccessDecisionVoter`.
+Trong một số trường hợp, chẳng hạn khi migration một application cũ, bạn có thể muốn giới thiệu một `AuthorizationManager` gọi `AccessDecisionManager` hoặc `AccessDecisionVoter`.
 
-To call an existing `AccessDecisionManager`, you can do:
+Để gọi một `AccessDecisionManager` hiện có, bạn có thể làm như sau:
 
-.Adapting an AccessDecisionManager
+.Adapter cho AccessDecisionManager
 [tabs]
 ======
 Java::
@@ -248,11 +248,11 @@ public class AccessDecisionManagerAuthorizationManagerAdapter implements Authori
 ----
 ======
 
-And then wire it into your `SecurityFilterChain`.
+Sau đó tích hợp nó vào `SecurityFilterChain` của bạn.
 
-Or to only call an `AccessDecisionVoter`, you can do:
+Hoặc để chỉ gọi một `AccessDecisionVoter`, bạn có thể làm như sau:
 
-.Adapting an AccessDecisionVoter
+.Adapter cho AccessDecisionVoter
 [tabs]
 ======
 Java::
@@ -280,21 +280,21 @@ public class AccessDecisionVoterAuthorizationManagerAdapter implements Authoriza
 ----
 ======
 
-And then wire it into your `SecurityFilterChain`.
+Sau đó tích hợp nó vào `SecurityFilterChain` của bạn.
 
 [[authz-hierarchical-roles]]
-== Hierarchical Roles
-It is a common requirement that a particular role in an application should automatically "include" other roles.
-For example, in an application which has the concept of an "admin" and a "user" role, you may want an admin to be able to do everything a normal user can.
-To achieve this, you can either make sure that all admin users are also assigned the "user" role.
-Alternatively, you can modify every access constraint which requires the "user" role to also include the "admin" role.
-This can get quite complicated if you have a lot of different roles in your application.
+== Role phân cấp
+Một yêu cầu phổ biến là một role cụ thể trong application phải tự động "bao gồm" các role khác.
+Ví dụ, trong một application có khái niệm role "admin" và "user", bạn có thể muốn admin làm được mọi thứ mà user thông thường có thể làm.
+Để đạt được điều này, bạn có thể đảm bảo mọi admin user cũng được gán role "user".
+Ngoài ra, bạn có thể sửa mọi access constraint yêu cầu role "user" để cũng bao gồm role "admin".
+Điều này có thể trở nên khá phức tạp nếu application của bạn có nhiều role khác nhau.
 
-The use of a role-hierarchy allows you to configure which roles (or authorities) should include others.
-This is supported for filter-based authorization in `HttpSecurity#authorizeHttpRequests` and for method-based authorization through `DefaultMethodSecurityExpressionHandler` for pre-post annotations, `SecuredAuthorizationManager` for `@Secured`, and `Jsr250AuthorizationManager` for JSR-250 annotations.
-You can configure the behavior for all of them at once in the following way:
+Việc sử dụng role hierarchy cho phép bạn cấu hình role (hoặc authority) nào sẽ bao gồm role khác.
+Tính năng này được hỗ trợ cho authorization dựa trên filter trong `HttpSecurity#authorizeHttpRequests` và cho authorization dựa trên method thông qua `DefaultMethodSecurityExpressionHandler` đối với annotation pre-post, `SecuredAuthorizationManager` đối với `@Secured`, và `Jsr250AuthorizationManager` đối với annotation JSR-250.
+Bạn có thể cấu hình hành vi cho tất cả chúng cùng lúc như sau:
 
-.Hierarchical Roles Configuration
+.Cấu hình role phân cấp
 [tabs]
 ======
 Java::
@@ -342,24 +342,24 @@ Xml::
 ----
 ======
 
-Here we have four roles in a hierarchy `ROLE_ADMIN => ROLE_STAFF => ROLE_USER => ROLE_GUEST`.
-A user who is authenticated with `ROLE_ADMIN`, will behave as if they have all four roles when security constraints are evaluated against any filter- or method-based rules.
+Ở đây chúng ta có bốn role trong hierarchy `ROLE_ADMIN => ROLE_STAFF => ROLE_USER => ROLE_GUEST`.
+Một user được authentication với `ROLE_ADMIN` sẽ hoạt động như thể có cả bốn role khi các security constraint được đánh giá đối với bất kỳ rule nào dựa trên filter hoặc method.
 
 [TIP]
-The `>` symbol can be thought of as meaning "includes".
+Có thể hiểu ký hiệu `>` là "bao gồm".
 
-Role hierarchies offer a convenient means of simplifying the access-control configuration data for your application and/or reducing the number of authorities which you need to assign to a user.
-For more complex requirements you may wish to define a logical mapping between the specific access-rights your application requires and the roles that are assigned to users, translating between the two when loading the user information.
+Role hierarchy cung cấp một cách thuận tiện để đơn giản hóa dữ liệu cấu hình access control cho application của bạn và/hoặc giảm số lượng authority cần gán cho user.
+Đối với các yêu cầu phức tạp hơn, bạn có thể muốn xác định ánh xạ logic giữa các quyền truy cập cụ thể mà application yêu cầu và các role được gán cho user, chuyển đổi giữa hai bên khi tải thông tin user.
 
 [[authz-legacy-note]]
-== Legacy Authorization Components
+== Các component authorization legacy
 
 [NOTE]
-Spring Security contains some legacy components.
-Since they are not yet removed, documentation is included for historical purposes.
-Their recommended replacements are above.
+Spring Security chứa một số component legacy.
+Vì chúng chưa bị loại bỏ, tài liệu này được đưa vào nhằm mục đích lịch sử.
+Các thay thế được khuyến nghị của chúng nằm ở phần trên.
 
-When accessing legacy authorization components, please also include the `spring-security-access` dependency like so:
+Khi truy cập các component authorization legacy, hãy include thêm dependency `spring-security-access` như sau:
 
 [tabs]
 ======
@@ -382,9 +382,9 @@ implementation('org.springframework.security:spring-security-access')
 ======
 
 [[authz-access-decision-manager]]
-=== The AccessDecisionManager
-The `AccessDecisionManager` is called by the `AbstractSecurityInterceptor` and is responsible for making final access control decisions.
-The `AccessDecisionManager` interface contains three methods:
+=== AccessDecisionManager
+`AccessDecisionManager` được `AbstractSecurityInterceptor` gọi và chịu trách nhiệm đưa ra các quyết định access control cuối cùng.
+Interface `AccessDecisionManager` chứa ba method:
 
 [source,java]
 ----
@@ -396,31 +396,31 @@ boolean supports(ConfigAttribute attribute);
 boolean supports(Class clazz);
 ----
 
-The `decide` method of the `AccessDecisionManager` is passed all the relevant information it needs to make an authorization decision.
-In particular, passing the secure `Object` lets those arguments contained in the actual secure object invocation be inspected.
-For example, assume the secure object is a `MethodInvocation`.
-You can query the `MethodInvocation` for any `Customer` argument and then implement some sort of security logic in the `AccessDecisionManager` to ensure the principal is permitted to operate on that customer.
-Implementations are expected to throw an `AccessDeniedException` if access is denied.
+Method `decide` của `AccessDecisionManager` nhận mọi thông tin liên quan cần thiết để đưa ra quyết định authorization.
+Đặc biệt, việc truyền secure `Object` cho phép kiểm tra các argument nằm trong invocation của secure object thực tế.
+Ví dụ, giả sử secure object là một `MethodInvocation`.
+Bạn có thể truy vấn `MethodInvocation` để tìm bất kỳ argument `Customer` nào, sau đó triển khai một dạng logic security trong `AccessDecisionManager` nhằm đảm bảo principal được phép thao tác trên customer đó.
+Các triển khai được kỳ vọng ném `AccessDeniedException` nếu quyền truy cập bị từ chối.
 
-The `supports(ConfigAttribute)` method is called by the `AbstractSecurityInterceptor` at startup time to determine if the `AccessDecisionManager` can process the passed `ConfigAttribute`.
-The `supports(Class)` method is called by a security interceptor implementation to ensure the configured `AccessDecisionManager` supports the type of secure object that the security interceptor presents.
+Method `supports(ConfigAttribute)` được `AbstractSecurityInterceptor` gọi lúc startup để xác định `AccessDecisionManager` có thể xử lý `ConfigAttribute` được truyền vào hay không.
+Method `supports(Class)` được một triển khai security interceptor gọi để đảm bảo `AccessDecisionManager` đã cấu hình hỗ trợ kiểu secure object mà security interceptor cung cấp.
 
 [[authz-voting-based]]
-=== Voting-Based AccessDecisionManager Implementations
-While users can implement their own `AccessDecisionManager` to control all aspects of authorization, Spring Security includes several `AccessDecisionManager` implementations that are based on voting.
-<<authz-access-voting>> describes the relevant classes.
+=== Các triển khai AccessDecisionManager dựa trên bỏ phiếu
+Mặc dù user có thể tự triển khai `AccessDecisionManager` để kiểm soát mọi khía cạnh của authorization, Spring Security bao gồm một số triển khai `AccessDecisionManager` dựa trên bỏ phiếu.
+<<authz-access-voting>> mô tả các class liên quan.
 
-The following image shows the `AccessDecisionManager` interface:
+Hình ảnh sau đây minh họa interface `AccessDecisionManager`:
 
 [[authz-access-voting]]
-.Voting Decision Manager
+.Manager quyết định dựa trên bỏ phiếu
 [.invert-dark]
 image::{figures}/access-decision-voting.png[]
 
-By using this approach, a series of `AccessDecisionVoter` implementations are polled on an authorization decision.
-The `AccessDecisionManager` then decides whether or not to throw an `AccessDeniedException` based on its assessment of the votes.
+Với cách tiếp cận này, một chuỗi các triển khai `AccessDecisionVoter` được thăm dò khi đưa ra quyết định authorization.
+Sau đó, `AccessDecisionManager` quyết định có ném `AccessDeniedException` hay không dựa trên đánh giá các phiếu bầu.
 
-The `AccessDecisionVoter` interface has three methods:
+Interface `AccessDecisionVoter` có ba method:
 
 [source,java]
 ----
@@ -431,59 +431,59 @@ boolean supports(ConfigAttribute attribute);
 boolean supports(Class clazz);
 ----
 
-Concrete implementations return an `int`, with possible values being reflected in the `AccessDecisionVoter` static fields named `ACCESS_ABSTAIN`, `ACCESS_DENIED` and `ACCESS_GRANTED`.
-A voting implementation returns `ACCESS_ABSTAIN` if it has no opinion on an authorization decision.
-If it does have an opinion, it must return either `ACCESS_DENIED` or `ACCESS_GRANTED`.
+Các triển khai cụ thể trả về một `int`, với các giá trị khả dĩ được phản ánh trong những field static của `AccessDecisionVoter` có tên `ACCESS_ABSTAIN`, `ACCESS_DENIED` và `ACCESS_GRANTED`.
+Một triển khai bỏ phiếu trả về `ACCESS_ABSTAIN` nếu không có ý kiến về quyết định authorization.
+Nếu có ý kiến, nó phải trả về `ACCESS_DENIED` hoặc `ACCESS_GRANTED`.
 
-There are three concrete `AccessDecisionManager` implementations provided with Spring Security to tally the votes.
-The `ConsensusBased` implementation grants or denies access based on the consensus of non-abstain votes.
-Properties are provided to control behavior in the event of an equality of votes or if all votes are abstain.
-The `AffirmativeBased` implementation grants access if one or more `ACCESS_GRANTED` votes were received (in other words, a deny vote will be ignored, provided there was at least one grant vote).
-Like the `ConsensusBased` implementation, there is a parameter that controls the behavior if all voters abstain.
-The `UnanimousBased` provider expects unanimous `ACCESS_GRANTED` votes in order to grant access, ignoring abstains.
-It denies access if there is any `ACCESS_DENIED` vote.
-Like the other implementations, there is a parameter that controls the behavior if all voters abstain.
+Spring Security cung cấp ba triển khai `AccessDecisionManager` cụ thể để tổng hợp các phiếu bầu.
+Triển khai `ConsensusBased` cấp hoặc từ chối quyền truy cập dựa trên sự đồng thuận của các phiếu không abstain.
+Các property được cung cấp để kiểm soát hành vi khi số phiếu bằng nhau hoặc khi tất cả phiếu đều abstain.
+Triển khai `AffirmativeBased` cấp quyền truy cập nếu nhận được một hoặc nhiều phiếu `ACCESS_GRANTED` (nói cách khác, phiếu từ chối sẽ bị bỏ qua nếu có ít nhất một phiếu cấp quyền).
+Giống triển khai `ConsensusBased`, có một parameter kiểm soát hành vi nếu mọi voter đều abstain.
+Provider `UnanimousBased` yêu cầu các phiếu `ACCESS_GRANTED` nhất trí để cấp quyền truy cập và bỏ qua các phiếu abstain.
+Nó từ chối quyền truy cập nếu có bất kỳ phiếu `ACCESS_DENIED` nào.
+Giống các triển khai khác, có một parameter kiểm soát hành vi nếu mọi voter đều abstain.
 
-You can implement a custom `AccessDecisionManager` that tallies votes differently.
-For example, votes from a particular `AccessDecisionVoter` might receive additional weighting, while a deny vote from a particular voter may have a veto effect.
+Bạn có thể triển khai một `AccessDecisionManager` tùy chỉnh để tổng hợp phiếu theo cách khác.
+Ví dụ, phiếu từ một `AccessDecisionVoter` cụ thể có thể được tính trọng số bổ sung, trong khi phiếu từ một voter cụ thể có thể có hiệu lực phủ quyết.
 
 [[authz-role-voter]]
 ==== RoleVoter
-The most commonly used `AccessDecisionVoter` provided with Spring Security is the `RoleVoter`, which treats configuration attributes as role names and votes to grant access if the user has been assigned that role.
+`AccessDecisionVoter` được sử dụng phổ biến nhất do Spring Security cung cấp là `RoleVoter`, coi các configuration attribute là tên role và bỏ phiếu cấp quyền truy cập nếu user được gán role đó.
 
-It votes if any `ConfigAttribute` begins with the `ROLE_` prefix.
-It votes to grant access if there is a `GrantedAuthority` that returns a `String` representation (from the `getAuthority()` method) exactly equal to one or more `ConfigAttributes` that start with the `ROLE_` prefix.
-If there is no exact match of any `ConfigAttribute` starting with `ROLE_`, `RoleVoter` votes to deny access.
-If no `ConfigAttribute` begins with `ROLE_`, the voter abstains.
+Voter này bỏ phiếu nếu bất kỳ `ConfigAttribute` nào bắt đầu bằng prefix `ROLE_`.
+Nó bỏ phiếu cấp quyền truy cập nếu có một `GrantedAuthority` trả về biểu diễn `String` (từ method `getAuthority()`) khớp chính xác với một hoặc nhiều `ConfigAttribute` bắt đầu bằng prefix `ROLE_`.
+Nếu không có `ConfigAttribute` nào bắt đầu bằng `ROLE_` khớp chính xác, `RoleVoter` bỏ phiếu từ chối quyền truy cập.
+Nếu không có `ConfigAttribute` nào bắt đầu bằng `ROLE_`, voter abstain.
 
 
 [[authz-authenticated-voter]]
 ==== AuthenticatedVoter
-Another voter which we have implicitly seen is the `AuthenticatedVoter`, which can be used to differentiate between anonymous, fully-authenticated, and remember-me authenticated users.
-Many sites allow certain limited access under remember-me authentication but require a user to confirm their identity by logging in for full access.
+Một voter khác mà chúng ta đã thấy một cách ngầm định là `AuthenticatedVoter`, có thể được sử dụng để phân biệt user anonymous, fully-authenticated và đã xác thực bằng remember-me.
+Nhiều site cho phép một số quyền truy cập giới hạn khi authentication bằng remember-me nhưng yêu cầu user xác nhận danh tính bằng cách đăng nhập để có toàn quyền truy cập.
 
-When we have used the `IS_AUTHENTICATED_ANONYMOUSLY` attribute to grant anonymous access, this attribute was being processed by the `AuthenticatedVoter`.
-For more information, see
+Khi chúng ta sử dụng attribute `IS_AUTHENTICATED_ANONYMOUSLY` để cấp quyền truy cập anonymous, attribute này được `AuthenticatedVoter` xử lý.
+Để biết thêm thông tin, xem
 javadoc:org.springframework.security.access.vote.AuthenticatedVoter[].
 
 
 [[authz-custom-voter]]
-==== Custom Voters
-You can also implement a custom `AccessDecisionVoter` and put just about any access-control logic you want in it.
-It might be specific to your application (business-logic related) or it might implement some security administration logic.
-For example, on the Spring web site, you can find a https://spring.io/blog/2009/01/03/spring-security-customization-part-2-adjusting-secured-session-in-real-time[blog article] that describes how to use a voter to deny access in real-time to users whose accounts have been suspended.
+==== Voter tùy chỉnh
+Bạn cũng có thể triển khai một `AccessDecisionVoter` tùy chỉnh và đặt gần như bất kỳ logic access control nào bạn muốn vào đó.
+Logic này có thể dành riêng cho application của bạn (liên quan đến business logic) hoặc có thể triển khai một số logic quản trị security.
+Ví dụ, trên website Spring có một https://spring.io/blog/2009/01/03/spring-security-customization-part-2-adjusting-secured-session-in-real-time[bài viết blog] mô tả cách sử dụng voter để từ chối quyền truy cập theo thời gian thực đối với user có tài khoản bị đình chỉ.
 
 [[authz-after-invocation]]
-.After Invocation Implementation
+.Triển khai sau invocation
 [.invert-dark]
 image::{figures}/after-invocation.png[]
 
-Like many other parts of Spring Security, `AfterInvocationManager` has a single concrete implementation, `AfterInvocationProviderManager`, which polls a list of ``AfterInvocationProvider``s.
-Each `AfterInvocationProvider` is allowed to modify the return object or throw an `AccessDeniedException`.
-Indeed multiple providers can modify the object, as the result of the previous provider is passed to the next in the list.
+Giống nhiều phần khác của Spring Security, `AfterInvocationManager` có một triển khai cụ thể duy nhất là `AfterInvocationProviderManager`, triển khai này thăm dò một danh sách các ``AfterInvocationProvider``.
+Mỗi `AfterInvocationProvider` được phép sửa đổi object được trả về hoặc ném `AccessDeniedException`.
+Thực tế, nhiều provider có thể sửa đổi object, vì kết quả của provider trước được truyền cho provider tiếp theo trong danh sách.
 
-Please be aware that if you're using `AfterInvocationManager`, you will still need configuration attributes that allow the ``MethodSecurityInterceptor``'s `AccessDecisionManager` to allow an operation.
-If you're using the typical Spring Security included `AccessDecisionManager` implementations, having no configuration attributes defined for a particular secure method invocation will cause each `AccessDecisionVoter` to abstain from voting.
-In turn, if the `AccessDecisionManager` property           "`allowIfAllAbstainDecisions`" is `false`, an `AccessDeniedException` will be thrown.
-You may avoid this potential issue by either (i) setting "`allowIfAllAbstainDecisions`" to `true` (although this is generally not recommended) or (ii) simply ensure that there is at least one configuration attribute that an `AccessDecisionVoter` will vote to grant access for.
-This latter (recommended) approach is usually achieved through a `ROLE_USER` or `ROLE_AUTHENTICATED` configuration attribute.
+Hãy lưu ý rằng nếu đang sử dụng `AfterInvocationManager`, bạn vẫn cần các configuration attribute cho phép `AccessDecisionManager` của ``MethodSecurityInterceptor`` cho phép một operation.
+Nếu đang sử dụng các triển khai `AccessDecisionManager` điển hình đi kèm Spring Security, việc không định nghĩa configuration attribute nào cho một method invocation bảo mật cụ thể sẽ khiến mỗi `AccessDecisionVoter` abstain khi bỏ phiếu.
+Do đó, nếu property "`allowIfAllAbstainDecisions`" của `AccessDecisionManager` là `false`, một `AccessDeniedException` sẽ bị ném.
+Bạn có thể tránh vấn đề tiềm ẩn này bằng một trong hai cách: (i) đặt "`allowIfAllAbstainDecisions`" thành `true` (mặc dù nhìn chung không được khuyến nghị), hoặc (ii) chỉ cần đảm bảo có ít nhất một configuration attribute mà `AccessDecisionVoter` sẽ bỏ phiếu cấp quyền truy cập.
+Cách thứ hai (được khuyến nghị) thường đạt được thông qua configuration attribute `ROLE_USER` hoặc `ROLE_AUTHENTICATED`.
