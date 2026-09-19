@@ -1,2 +1,0 @@
-org.springframework.aot.hint.RuntimeHintsRegistrar=\
-org.springframework.security.saml2.aot.hint.Saml2RuntimeHints
