@@ -1,6 +1,6 @@
 = Reactive
 
-Nếu bạn đã thực hiện xref:migration/index.adoc[các bước migration ban đầu] cho ứng dụng Reactive của mình, giờ bạn đã sẵn sàng thực hiện các bước dành riêng cho ứng dụng Reactive.
+Nếu bạn đã thực hiện xref:migration/index.adoc[các bước chuyển đổi ban đầu] cho ứng dụng Reactive của mình, giờ bạn đã sẵn sàng thực hiện các bước dành riêng cho ứng dụng Reactive.
 
 == Xác thực Header `typ` bằng `JwtTypeValidator`
 
@@ -44,7 +44,7 @@ fun jwtDecoder(): JwtDecoder {
 ----
 ======
 <1> - Tắt việc Nimbus xác minh `typ`
-<2> - Thêm validator `typ` mặc định
+<2> - Thêm trình xác thực `typ` mặc định
 
 thành:
 
@@ -79,4 +79,4 @@ fun jwtDecoder(): NimbusReactiveJwtDecoder {
 ----
 ======
 <1> - `validateTypes` hiện mặc định là `false`
-<2> - `JwtTypeValidator#jwt` được tất cả các method `createDefaultXXX` thêm vào
+<2> - `JwtTypeValidator#jwt` được tất cả các phương thức `createDefaultXXX` thêm vào
