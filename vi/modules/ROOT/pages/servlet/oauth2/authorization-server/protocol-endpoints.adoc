@@ -1,13 +1,13 @@
 [[oauth2AuthorizationServer-protocol-endpoints]]
-= Protocol Endpoints
+= Các endpoint giao thức
 
 [[oauth2AuthorizationServer-oauth2-authorization-endpoint]]
-== OAuth2 Authorization Endpoint
+== Endpoint Authorization OAuth2
 
-`OAuth2AuthorizationEndpointConfigurer` provides the ability to customize the https://datatracker.ietf.org/doc/html/rfc6749#section-3.1[OAuth2 Authorization endpoint].
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1[OAuth2 authorization requests].
+`OAuth2AuthorizationEndpointConfigurer` cung cấp khả năng tùy chỉnh https://datatracker.ietf.org/doc/html/rfc6749#section-3.1[endpoint Authorization OAuth2].
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1[các yêu cầu authorization OAuth2].
 
-`OAuth2AuthorizationEndpointConfigurer` provides the following configuration options:
+`OAuth2AuthorizationEndpointConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -31,42 +31,42 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `authorizationRequestConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract an https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1[OAuth2 authorization request] (or consent) from `HttpServletRequest` to an instance of `OAuth2AuthorizationCodeRequestAuthenticationToken` or `OAuth2AuthorizationConsentAuthenticationToken`.
-<2> `authorizationRequestConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OAuth2AuthorizationCodeRequestAuthenticationToken` or `OAuth2AuthorizationConsentAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `authorizationResponseHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling an "`authenticated`" `OAuth2AuthorizationCodeRequestAuthenticationToken` and returning the https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2[OAuth2AuthorizationResponse].
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling an `OAuth2AuthorizationCodeRequestAuthenticationException` and returning the https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1[OAuth2Error response].
-<7> `consentPage()`: The `URI` of the custom consent page to redirect resource owners to if consent is required during the authorization request flow.
+<1> `authorizationRequestConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1[yêu cầu authorization OAuth2] (hoặc consent) từ `HttpServletRequest` thành một instance của `OAuth2AuthorizationCodeRequestAuthenticationToken` hoặc `OAuth2AuthorizationConsentAuthenticationToken`.
+<2> `authorizationRequestConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationConverter`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OAuth2AuthorizationCodeRequestAuthenticationToken` hoặc `OAuth2AuthorizationConsentAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationProvider`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `authorizationResponseHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthorizationCodeRequestAuthenticationToken` "`authenticated`" và trả về https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2[`OAuth2AuthorizationResponse`].
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthorizationCodeRequestAuthenticationException` và trả về https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1[phản hồi `OAuth2Error`].
+<7> `consentPage()`: `URI` của trang consent tùy chỉnh để chuyển hướng resource owner đến nếu cần consent trong flow yêu cầu authorization.
 
-`OAuth2AuthorizationEndpointConfigurer` configures the `OAuth2AuthorizationEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OAuth2AuthorizationEndpointFilter` is the `Filter` that processes OAuth2 authorization requests (and consents).
+`OAuth2AuthorizationEndpointConfigurer` cấu hình `OAuth2AuthorizationEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OAuth2AuthorizationEndpointFilter` là `Filter` xử lý các yêu cầu authorization OAuth2 (và consent).
 
-`OAuth2AuthorizationEndpointFilter` is configured with the following defaults:
+`OAuth2AuthorizationEndpointFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- A `DelegatingAuthenticationConverter` composed of `OAuth2AuthorizationCodeRequestAuthenticationConverter` and `OAuth2AuthorizationConsentAuthenticationConverter`.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `OAuth2AuthorizationCodeRequestAuthenticationProvider` and `OAuth2AuthorizationConsentAuthenticationProvider`.
-* `*AuthenticationSuccessHandler*` -- An internal implementation that handles an "`authenticated`" `OAuth2AuthorizationCodeRequestAuthenticationToken` and returns the `OAuth2AuthorizationResponse`.
-* `*AuthenticationFailureHandler*` -- An internal implementation that uses the `OAuth2Error` associated with the `OAuth2AuthorizationCodeRequestAuthenticationException` and returns the `OAuth2Error` response.
+* `*AuthenticationConverter*` -- Một `DelegatingAuthenticationConverter` được tạo thành từ `OAuth2AuthorizationCodeRequestAuthenticationConverter` và `OAuth2AuthorizationConsentAuthenticationConverter`.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `OAuth2AuthorizationCodeRequestAuthenticationProvider` và `OAuth2AuthorizationConsentAuthenticationProvider`.
+* `*AuthenticationSuccessHandler*` -- Một implementation nội bộ xử lý `OAuth2AuthorizationCodeRequestAuthenticationToken` "`authenticated`" và trả về `OAuth2AuthorizationResponse`.
+* `*AuthenticationFailureHandler*` -- Một implementation nội bộ sử dụng `OAuth2Error` liên kết với `OAuth2AuthorizationCodeRequestAuthenticationException` và trả về phản hồi `OAuth2Error`.
 
 [[oauth2AuthorizationServer-oauth2-authorization-endpoint-customizing-authorization-request-validation]]
-=== Customizing Authorization Request Validation
+=== Tùy chỉnh validation yêu cầu Authorization
 
-`OAuth2AuthorizationCodeRequestAuthenticationValidator` is the default validator used for validating specific OAuth2 authorization request parameters used in the Authorization Code Grant.
-The default implementation validates the `redirect_uri` and `scope` parameters.
-If validation fails, an `OAuth2AuthorizationCodeRequestAuthenticationException` is thrown.
+`OAuth2AuthorizationCodeRequestAuthenticationValidator` là validator mặc định được sử dụng để validation các tham số cụ thể của yêu cầu authorization OAuth2 trong Authorization Code Grant.
+Implementation mặc định validation các tham số `redirect_uri` và `scope`.
+Nếu validation thất bại, một `OAuth2AuthorizationCodeRequestAuthenticationException` sẽ được ném ra.
 
-`OAuth2AuthorizationCodeRequestAuthenticationProvider` provides the ability to override the default authorization request validation by supplying a custom authentication validator of type `Consumer<OAuth2AuthorizationCodeRequestAuthenticationContext>` to `setAuthenticationValidator()`.
+`OAuth2AuthorizationCodeRequestAuthenticationProvider` cung cấp khả năng ghi đè validation yêu cầu authorization mặc định bằng cách cung cấp một authentication validator tùy chỉnh có kiểu `Consumer<OAuth2AuthorizationCodeRequestAuthenticationContext>` cho `setAuthenticationValidator()`.
 
 [TIP]
-`OAuth2AuthorizationCodeRequestAuthenticationContext` holds the `OAuth2AuthorizationCodeRequestAuthenticationToken`, which contains the OAuth2 authorization request parameters.
+`OAuth2AuthorizationCodeRequestAuthenticationContext` chứa `OAuth2AuthorizationCodeRequestAuthenticationToken`, vốn chứa các tham số của yêu cầu authorization OAuth2.
 
 [IMPORTANT]
-If validation fails, the authentication validator *MUST* throw `OAuth2AuthorizationCodeRequestAuthenticationException`.
+Nếu validation thất bại, authentication validator *MUST* ném `OAuth2AuthorizationCodeRequestAuthenticationException`.
 
-A common use case during the development life cycle phase is to allow for `localhost` in the `redirect_uri` parameter.
+Một trường hợp sử dụng phổ biến trong giai đoạn vòng đời phát triển là cho phép `localhost` trong tham số `redirect_uri`.
 
-The following example shows how to configure `OAuth2AuthorizationCodeRequestAuthenticationProvider` with a custom authentication validator that allows for `localhost` in the `redirect_uri` parameter:
+Ví dụ sau cho thấy cách cấu hình `OAuth2AuthorizationCodeRequestAuthenticationProvider` với authentication validator tùy chỉnh cho phép `localhost` trong tham số `redirect_uri`:
 
 [source,java]
 ----
@@ -89,9 +89,9 @@ private Consumer<List<AuthenticationProvider>> configureAuthenticationValidator(
 		authenticationProviders.forEach((authenticationProvider) -> {
 			if (authenticationProvider instanceof OAuth2AuthorizationCodeRequestAuthenticationProvider) {
 				Consumer<OAuth2AuthorizationCodeRequestAuthenticationContext> authenticationValidator =
-					// Override default redirect_uri validator
+					// Ghi đè validator redirect_uri mặc định
 					new CustomRedirectUriValidator()
-						// Reuse default scope validator
+						// Tái sử dụng validator scope mặc định
 						.andThen(OAuth2AuthorizationCodeRequestAuthenticationValidator.DEFAULT_SCOPE_VALIDATOR);
 
 				((OAuth2AuthorizationCodeRequestAuthenticationProvider) authenticationProvider)
@@ -109,7 +109,7 @@ static class CustomRedirectUriValidator implements Consumer<OAuth2AuthorizationC
 		RegisteredClient registeredClient = authenticationContext.getRegisteredClient();
 		String requestedRedirectUri = authorizationCodeRequestAuthentication.getRedirectUri();
 
-		// Use exact string matching when comparing client redirect URIs against pre-registered URIs
+		// Sử dụng so khớp chuỗi chính xác khi so sánh redirect URI của client với các URI đã đăng ký trước
 		if (!registeredClient.getRedirectUris().contains(requestedRedirectUri)) {
 			OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST);
 			throw new OAuth2AuthorizationCodeRequestAuthenticationException(error, null);
@@ -119,12 +119,12 @@ static class CustomRedirectUriValidator implements Consumer<OAuth2AuthorizationC
 ----
 
 [[oauth2AuthorizationServer-oauth2-pushed-authorization-request-endpoint]]
-== OAuth2 Pushed Authorization Request Endpoint
+== Endpoint Pushed Authorization Request OAuth2
 
-`OAuth2PushedAuthorizationRequestEndpointConfigurer` provides the ability to customize the https://datatracker.ietf.org/doc/html/rfc9126#section-2[OAuth2 Pushed Authorization Request endpoint].
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for https://datatracker.ietf.org/doc/html/rfc9126#section-2.1[OAuth2 Pushed Authorization requests].
+`OAuth2PushedAuthorizationRequestEndpointConfigurer` cung cấp khả năng tùy chỉnh https://datatracker.ietf.org/doc/html/rfc9126#section-2[endpoint Pushed Authorization Request OAuth2].
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho https://datatracker.ietf.org/doc/html/rfc9126#section-2.1[các Pushed Authorization Request OAuth2].
 
-`OAuth2PushedAuthorizationRequestEndpointConfigurer` provides the following configuration options:
+`OAuth2PushedAuthorizationRequestEndpointConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -147,41 +147,41 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `pushedAuthorizationRequestConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract an https://datatracker.ietf.org/doc/html/rfc9126#section-2.1[OAuth2 pushed authorization request] from `HttpServletRequest` to an instance of `OAuth2PushedAuthorizationRequestAuthenticationToken`.
-<2> `pushedAuthorizationRequestConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OAuth2PushedAuthorizationRequestAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `pushedAuthorizationResponseHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling an "`authenticated`" `OAuth2PushedAuthorizationRequestAuthenticationToken` and returning the https://datatracker.ietf.org/doc/html/rfc9126#section-2.2[OAuth2 pushed authorization response].
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling an `OAuth2AuthenticationException` and returning the https://datatracker.ietf.org/doc/html/rfc9126#section-2.3[OAuth2Error response].
+<1> `pushedAuthorizationRequestConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất https://datatracker.ietf.org/doc/html/rfc9126#section-2.1[yêu cầu pushed authorization OAuth2] từ `HttpServletRequest` thành một instance của `OAuth2PushedAuthorizationRequestAuthenticationToken`.
+<2> `pushedAuthorizationRequestConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationConverter`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OAuth2PushedAuthorizationRequestAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationProvider`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `pushedAuthorizationResponseHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2PushedAuthorizationRequestAuthenticationToken` "`authenticated`" và trả về https://datatracker.ietf.org/doc/html/rfc9126#section-2.2[phản hồi pushed authorization OAuth2].
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthenticationException` và trả về https://datatracker.ietf.org/doc/html/rfc9126#section-2.3[phản hồi `OAuth2Error`].
 
-`OAuth2PushedAuthorizationRequestEndpointConfigurer` configures the `OAuth2PushedAuthorizationRequestEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OAuth2PushedAuthorizationRequestEndpointFilter` is the `Filter` that processes OAuth2 pushed authorization requests.
+`OAuth2PushedAuthorizationRequestEndpointConfigurer` cấu hình `OAuth2PushedAuthorizationRequestEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OAuth2PushedAuthorizationRequestEndpointFilter` là `Filter` xử lý các yêu cầu pushed authorization OAuth2.
 
-`OAuth2PushedAuthorizationRequestEndpointFilter` is configured with the following defaults:
+`OAuth2PushedAuthorizationRequestEndpointFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- A `DelegatingAuthenticationConverter` composed of `OAuth2AuthorizationCodeRequestAuthenticationConverter`.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `OAuth2PushedAuthorizationRequestAuthenticationProvider`.
-* `*AuthenticationSuccessHandler*` -- An internal implementation that handles an "`authenticated`" `OAuth2PushedAuthorizationRequestAuthenticationToken` and returns the OAuth2 pushed authorization response.
-* `*AuthenticationFailureHandler*` -- An `OAuth2ErrorAuthenticationFailureHandler`.
+* `*AuthenticationConverter*` -- Một `DelegatingAuthenticationConverter` được tạo thành từ `OAuth2AuthorizationCodeRequestAuthenticationConverter`.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `OAuth2PushedAuthorizationRequestAuthenticationProvider`.
+* `*AuthenticationSuccessHandler*` -- Một implementation nội bộ xử lý `OAuth2PushedAuthorizationRequestAuthenticationToken` "`authenticated`" và trả về phản hồi pushed authorization OAuth2.
+* `*AuthenticationFailureHandler*` -- Một `OAuth2ErrorAuthenticationFailureHandler`.
 
 [[oauth2AuthorizationServer-oauth2-pushed-authorization-request-endpoint-customizing-pushed-authorization-request-validation]]
-=== Customizing Pushed Authorization Request Validation
+=== Tùy chỉnh validation Pushed Authorization Request
 
-`OAuth2AuthorizationCodeRequestAuthenticationValidator` is the default validator used for validating specific OAuth2 pushed authorization request parameters used in the Authorization Code Grant.
-The default implementation validates the `redirect_uri` and `scope` parameters.
-If validation fails, an `OAuth2AuthorizationCodeRequestAuthenticationException` is thrown.
+`OAuth2AuthorizationCodeRequestAuthenticationValidator` là validator mặc định được sử dụng để validation các tham số cụ thể của pushed authorization request OAuth2 trong Authorization Code Grant.
+Implementation mặc định validation các tham số `redirect_uri` và `scope`.
+Nếu validation thất bại, một `OAuth2AuthorizationCodeRequestAuthenticationException` sẽ được ném ra.
 
-`OAuth2PushedAuthorizationRequestAuthenticationProvider` provides the ability to override the default pushed authorization request validation by supplying a custom authentication validator of type `Consumer<OAuth2AuthorizationCodeRequestAuthenticationContext>` to `setAuthenticationValidator()`.
+`OAuth2PushedAuthorizationRequestAuthenticationProvider` cung cấp khả năng ghi đè validation pushed authorization request mặc định bằng cách cung cấp một authentication validator tùy chỉnh có kiểu `Consumer<OAuth2AuthorizationCodeRequestAuthenticationContext>` cho `setAuthenticationValidator()`.
 
 [TIP]
-`OAuth2AuthorizationCodeRequestAuthenticationContext` holds the `OAuth2AuthorizationCodeRequestAuthenticationToken`, which contains the OAuth2 pushed authorization request parameters.
+`OAuth2AuthorizationCodeRequestAuthenticationContext` chứa `OAuth2AuthorizationCodeRequestAuthenticationToken`, vốn chứa các tham số của pushed authorization request OAuth2.
 
 [IMPORTANT]
-If validation fails, the authentication validator *MUST* throw `OAuth2AuthorizationCodeRequestAuthenticationException`.
+Nếu validation thất bại, authentication validator *MUST* ném `OAuth2AuthorizationCodeRequestAuthenticationException`.
 
-A common use case during the development life cycle phase is to allow for `localhost` in the `redirect_uri` parameter.
+Một trường hợp sử dụng phổ biến trong giai đoạn vòng đời phát triển là cho phép `localhost` trong tham số `redirect_uri`.
 
-The following example shows how to configure `OAuth2PushedAuthorizationRequestAuthenticationProvider` with a custom authentication validator that allows for `localhost` in the `redirect_uri` parameter:
+Ví dụ sau cho thấy cách cấu hình `OAuth2PushedAuthorizationRequestAuthenticationProvider` với authentication validator tùy chỉnh cho phép `localhost` trong tham số `redirect_uri`:
 
 [source,java]
 ----
@@ -204,9 +204,9 @@ private Consumer<List<AuthenticationProvider>> configureAuthenticationValidator(
 		authenticationProviders.forEach((authenticationProvider) -> {
 			if (authenticationProvider instanceof OAuth2PushedAuthorizationRequestAuthenticationProvider) {
 				Consumer<OAuth2AuthorizationCodeRequestAuthenticationContext> authenticationValidator =
-					// Override default redirect_uri validator
+					// Ghi đè validator redirect_uri mặc định
 					new CustomRedirectUriValidator()
-						// Reuse default scope validator
+						// Tái sử dụng validator scope mặc định
 						.andThen(OAuth2AuthorizationCodeRequestAuthenticationValidator.DEFAULT_SCOPE_VALIDATOR);
 
 				((OAuth2PushedAuthorizationRequestAuthenticationProvider) authenticationProvider)
@@ -224,7 +224,7 @@ static class CustomRedirectUriValidator implements Consumer<OAuth2AuthorizationC
 		RegisteredClient registeredClient = authenticationContext.getRegisteredClient();
 		String requestedRedirectUri = authorizationCodeRequestAuthentication.getRedirectUri();
 
-		// Use exact string matching when comparing client redirect URIs against pre-registered URIs
+		// Sử dụng so khớp chuỗi chính xác khi so sánh redirect URI của client với các URI đã đăng ký trước
 		if (!registeredClient.getRedirectUris().contains(requestedRedirectUri)) {
 			OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST);
 			throw new OAuth2AuthorizationCodeRequestAuthenticationException(error, null);
@@ -234,12 +234,12 @@ static class CustomRedirectUriValidator implements Consumer<OAuth2AuthorizationC
 ----
 
 [[oauth2AuthorizationServer-oauth2-device-authorization-endpoint]]
-== OAuth2 Device Authorization Endpoint
+== Endpoint Device Authorization OAuth2
 
-`OAuth2DeviceAuthorizationEndpointConfigurer` provides the ability to customize the https://datatracker.ietf.org/doc/html/rfc8628#section-3.1[OAuth2 Device Authorization endpoint].
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for OAuth2 device authorization requests.
+`OAuth2DeviceAuthorizationEndpointConfigurer` cung cấp khả năng tùy chỉnh https://datatracker.ietf.org/doc/html/rfc8628#section-3.1[endpoint Device Authorization OAuth2].
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho các yêu cầu device authorization OAuth2.
 
-`OAuth2DeviceAuthorizationEndpointConfigurer` provides the following configuration options:
+`OAuth2DeviceAuthorizationEndpointConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -263,34 +263,34 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `deviceAuthorizationRequestConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract an https://datatracker.ietf.org/doc/html/rfc8628#section-3.1[OAuth2 device authorization request] from `HttpServletRequest` to an instance of `OAuth2DeviceAuthorizationRequestAuthenticationToken`.
-<2> `deviceAuthorizationRequestConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OAuth2DeviceAuthorizationRequestAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `deviceAuthorizationResponseHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling an "`authenticated`" `OAuth2DeviceAuthorizationRequestAuthenticationToken` and returning the https://datatracker.ietf.org/doc/html/rfc8628#section-3.2[OAuth2DeviceAuthorizationResponse].
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling an `OAuth2AuthenticationException` and returning the https://datatracker.ietf.org/doc/html/rfc6749#section-5.2[OAuth2Error response].
-<7> `verificationUri()`: The `URI` of the custom end-user verification page to direct resource owners to on a secondary device.
+<1> `deviceAuthorizationRequestConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất https://datatracker.ietf.org/doc/html/rfc8628#section-3.1[yêu cầu device authorization OAuth2] từ `HttpServletRequest` thành một instance của `OAuth2DeviceAuthorizationRequestAuthenticationToken`.
+<2> `deviceAuthorizationRequestConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationConverter`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OAuth2DeviceAuthorizationRequestAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationProvider`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `deviceAuthorizationResponseHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2DeviceAuthorizationRequestAuthenticationToken` "`authenticated`" và trả về https://datatracker.ietf.org/doc/html/rfc8628#section-3.2[`OAuth2DeviceAuthorizationResponse`].
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthenticationException` và trả về https://datatracker.ietf.org/doc/html/rfc6749#section-5.2[phản hồi `OAuth2Error`].
+<7> `verificationUri()`: `URI` của trang verification tùy chỉnh dành cho end user để hướng resource owner đến trên một thiết bị thứ hai.
 
 [NOTE]
-The OAuth2 Device Authorization endpoint is disabled by default.
+Endpoint Device Authorization OAuth2 bị tắt theo mặc định.
 
-`OAuth2DeviceAuthorizationEndpointConfigurer` configures the `OAuth2DeviceAuthorizationEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OAuth2DeviceAuthorizationEndpointFilter` is the `Filter` that processes OAuth2 device authorization requests.
+`OAuth2DeviceAuthorizationEndpointConfigurer` cấu hình `OAuth2DeviceAuthorizationEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OAuth2DeviceAuthorizationEndpointFilter` là `Filter` xử lý các yêu cầu device authorization OAuth2.
 
-`OAuth2DeviceAuthorizationEndpointFilter` is configured with the following defaults:
+`OAuth2DeviceAuthorizationEndpointFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- An `OAuth2DeviceAuthorizationRequestAuthenticationConverter`.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `OAuth2DeviceAuthorizationRequestAuthenticationProvider`.
-* `*AuthenticationSuccessHandler*` -- An internal implementation that handles an "`authenticated`" `OAuth2DeviceAuthorizationRequestAuthenticationToken` and returns the `OAuth2DeviceAuthorizationResponse`.
-* `*AuthenticationFailureHandler*` -- An `OAuth2ErrorAuthenticationFailureHandler`.
+* `*AuthenticationConverter*` -- Một `OAuth2DeviceAuthorizationRequestAuthenticationConverter`.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `OAuth2DeviceAuthorizationRequestAuthenticationProvider`.
+* `*AuthenticationSuccessHandler*` -- Một implementation nội bộ xử lý `OAuth2DeviceAuthorizationRequestAuthenticationToken` "`authenticated`" và trả về `OAuth2DeviceAuthorizationResponse`.
+* `*AuthenticationFailureHandler*` -- Một `OAuth2ErrorAuthenticationFailureHandler`.
 
 [[oauth2AuthorizationServer-oauth2-device-verification-endpoint]]
-== OAuth2 Device Verification Endpoint
+== Endpoint Device Verification OAuth2
 
-`OAuth2DeviceVerificationEndpointConfigurer` provides the ability to customize the https://datatracker.ietf.org/doc/html/rfc8628#section-3.3[OAuth2 Device Verification endpoint] (or "User Interaction").
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for OAuth2 device verification requests.
+`OAuth2DeviceVerificationEndpointConfigurer` cung cấp khả năng tùy chỉnh https://datatracker.ietf.org/doc/html/rfc8628#section-3.3[endpoint Device Verification OAuth2] (hoặc "User Interaction").
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho các yêu cầu device verification OAuth2.
 
-`OAuth2DeviceVerificationEndpointConfigurer` provides the following configuration options:
+`OAuth2DeviceVerificationEndpointConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -314,34 +314,34 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `deviceVerificationRequestConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract an https://datatracker.ietf.org/doc/html/rfc8628#section-3.3[OAuth2 device verification request] (or consent) from `HttpServletRequest` to an instance of `OAuth2DeviceVerificationAuthenticationToken` or `OAuth2DeviceAuthorizationConsentAuthenticationToken`.
-<2> `deviceVerificationRequestConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OAuth2DeviceVerificationAuthenticationToken` or `OAuth2DeviceAuthorizationConsentAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `deviceVerificationResponseHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling an "`authenticated`" `OAuth2DeviceVerificationAuthenticationToken` and directing the resource owner to return to their device.
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling an `OAuth2AuthenticationException` and returning the error response.
-<7> `consentPage()`: The `URI` of the custom consent page to redirect resource owners to if consent is required during the device verification request flow.
+<1> `deviceVerificationRequestConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất https://datatracker.ietf.org/doc/html/rfc8628#section-3.3[yêu cầu device verification OAuth2] (hoặc consent) từ `HttpServletRequest` thành một instance của `OAuth2DeviceVerificationAuthenticationToken` hoặc `OAuth2DeviceAuthorizationConsentAuthenticationToken`.
+<2> `deviceVerificationRequestConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationConverter`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OAuth2DeviceVerificationAuthenticationToken` hoặc `OAuth2DeviceAuthorizationConsentAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationProvider`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `deviceVerificationResponseHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2DeviceVerificationAuthenticationToken` "`authenticated`" và hướng resource owner quay lại thiết bị của họ.
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthenticationException` và trả về phản hồi lỗi.
+<7> `consentPage()`: `URI` của trang consent tùy chỉnh để chuyển hướng resource owner đến nếu cần consent trong flow device verification request.
 
 [NOTE]
-The OAuth2 Device Verification endpoint is disabled by default.
+Endpoint Device Verification OAuth2 bị tắt theo mặc định.
 
-`OAuth2DeviceVerificationEndpointConfigurer` configures the `OAuth2DeviceVerificationEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OAuth2DeviceVerificationEndpointFilter` is the `Filter` that processes OAuth2 device verification requests (and consents).
+`OAuth2DeviceVerificationEndpointConfigurer` cấu hình `OAuth2DeviceVerificationEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OAuth2DeviceVerificationEndpointFilter` là `Filter` xử lý các yêu cầu device verification OAuth2 (và consent).
 
-`OAuth2DeviceVerificationEndpointFilter` is configured with the following defaults:
+`OAuth2DeviceVerificationEndpointFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- A `DelegatingAuthenticationConverter` composed of `OAuth2DeviceVerificationAuthenticationConverter` and `OAuth2DeviceAuthorizationConsentAuthenticationConverter`.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `OAuth2DeviceVerificationAuthenticationProvider` and `OAuth2DeviceAuthorizationConsentAuthenticationProvider`.
-* `*AuthenticationSuccessHandler*` -- A `SimpleUrlAuthenticationSuccessHandler` that handles an "`authenticated`" `OAuth2DeviceVerificationAuthenticationToken` and redirects the user to a success page (`/?success`).
-* `*AuthenticationFailureHandler*` -- An internal implementation that uses the `OAuth2Error` associated with the `OAuth2AuthenticationException` and returns the `OAuth2Error` response.
+* `*AuthenticationConverter*` -- Một `DelegatingAuthenticationConverter` được tạo thành từ `OAuth2DeviceVerificationAuthenticationConverter` và `OAuth2DeviceAuthorizationConsentAuthenticationConverter`.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `OAuth2DeviceVerificationAuthenticationProvider` và `OAuth2DeviceAuthorizationConsentAuthenticationProvider`.
+* `*AuthenticationSuccessHandler*` -- Một `SimpleUrlAuthenticationSuccessHandler` xử lý `OAuth2DeviceVerificationAuthenticationToken` "`authenticated`" và chuyển hướng user đến trang thành công (`/?success`).
+* `*AuthenticationFailureHandler*` -- Một implementation nội bộ sử dụng `OAuth2Error` liên kết với `OAuth2AuthenticationException` và trả về phản hồi `OAuth2Error`.
 
 [[oauth2AuthorizationServer-oauth2-token-endpoint]]
-== OAuth2 Token Endpoint
+== Endpoint Token OAuth2
 
-`OAuth2TokenEndpointConfigurer` provides the ability to customize the https://datatracker.ietf.org/doc/html/rfc6749#section-3.2[OAuth2 Token endpoint].
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3[OAuth2 access token requests].
+`OAuth2TokenEndpointConfigurer` cung cấp khả năng tùy chỉnh https://datatracker.ietf.org/doc/html/rfc6749#section-3.2[endpoint Token OAuth2].
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3[các yêu cầu access token OAuth2].
 
-`OAuth2TokenEndpointConfigurer` provides the following configuration options:
+`OAuth2TokenEndpointConfigurer` cung cấp các tùy chọn cấu hình sau:
 [source,java]
 ----
 @Bean
@@ -363,41 +363,41 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `accessTokenRequestConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract an https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3[OAuth2 access token request] from `HttpServletRequest` to an instance of `OAuth2AuthorizationGrantAuthenticationToken`.
-<2> `accessTokenRequestConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OAuth2AuthorizationGrantAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `accessTokenResponseHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling an `OAuth2AccessTokenAuthenticationToken` and returning the https://datatracker.ietf.org/doc/html/rfc6749#section-5.1[`OAuth2AccessTokenResponse`].
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling an `OAuth2AuthenticationException` and returning the https://datatracker.ietf.org/doc/html/rfc6749#section-5.2[OAuth2Error response].
+<1> `accessTokenRequestConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3[yêu cầu access token OAuth2] từ `HttpServletRequest` thành một instance của `OAuth2AuthorizationGrantAuthenticationToken`.
+<2> `accessTokenRequestConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationConverter`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OAuth2AuthorizationGrantAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationProvider`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `accessTokenResponseHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AccessTokenAuthenticationToken` và trả về https://datatracker.ietf.org/doc/html/rfc6749#section-5.1[`OAuth2AccessTokenResponse`].
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthenticationException` và trả về https://datatracker.ietf.org/doc/html/rfc6749#section-5.2[phản hồi `OAuth2Error`].
 
-`OAuth2TokenEndpointConfigurer` configures the `OAuth2TokenEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OAuth2TokenEndpointFilter` is the `Filter` that processes OAuth2 access token requests.
+`OAuth2TokenEndpointConfigurer` cấu hình `OAuth2TokenEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OAuth2TokenEndpointFilter` là `Filter` xử lý các yêu cầu access token OAuth2.
 
-The supported https://datatracker.ietf.org/doc/html/rfc6749#section-1.3[authorization grant types] are `authorization_code`, `refresh_token`, `client_credentials`, `urn:ietf:params:oauth:grant-type:device_code`, and `urn:ietf:params:oauth:grant-type:token-exchange`.
+Các https://datatracker.ietf.org/doc/html/rfc6749#section-1.3[authorization grant type] được hỗ trợ là `authorization_code`, `refresh_token`, `client_credentials`, `urn:ietf:params:oauth:grant-type:device_code` và `urn:ietf:params:oauth:grant-type:token-exchange`.
 
-`OAuth2TokenEndpointFilter` is configured with the following defaults:
+`OAuth2TokenEndpointFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- A `DelegatingAuthenticationConverter` composed of `OAuth2AuthorizationCodeAuthenticationConverter`, `OAuth2RefreshTokenAuthenticationConverter`, `OAuth2ClientCredentialsAuthenticationConverter`, `OAuth2DeviceCodeAuthenticationConverter`, and `OAuth2TokenExchangeAuthenticationConverter`.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `OAuth2AuthorizationCodeAuthenticationProvider`, `OAuth2RefreshTokenAuthenticationProvider`, `OAuth2ClientCredentialsAuthenticationProvider`, `OAuth2DeviceCodeAuthenticationProvider`, and `OAuth2TokenExchangeAuthenticationProvider`.
-* `*AuthenticationSuccessHandler*` -- An `OAuth2AccessTokenResponseAuthenticationSuccessHandler`.
-* `*AuthenticationFailureHandler*` -- An `OAuth2ErrorAuthenticationFailureHandler`.
+* `*AuthenticationConverter*` -- Một `DelegatingAuthenticationConverter` được tạo thành từ `OAuth2AuthorizationCodeAuthenticationConverter`, `OAuth2RefreshTokenAuthenticationConverter`, `OAuth2ClientCredentialsAuthenticationConverter`, `OAuth2DeviceCodeAuthenticationConverter` và `OAuth2TokenExchangeAuthenticationConverter`.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `OAuth2AuthorizationCodeAuthenticationProvider`, `OAuth2RefreshTokenAuthenticationProvider`, `OAuth2ClientCredentialsAuthenticationProvider`, `OAuth2DeviceCodeAuthenticationProvider` và `OAuth2TokenExchangeAuthenticationProvider`.
+* `*AuthenticationSuccessHandler*` -- Một `OAuth2AccessTokenResponseAuthenticationSuccessHandler`.
+* `*AuthenticationFailureHandler*` -- Một `OAuth2ErrorAuthenticationFailureHandler`.
 
 [[oauth2AuthorizationServer-oauth2-token-endpoint-customizing-client-credentials-grant-request-validation]]
-=== Customizing Client Credentials Grant Request Validation
+=== Tùy chỉnh validation yêu cầu Client Credentials Grant
 
-`OAuth2ClientCredentialsAuthenticationValidator` is the default validator used for validating specific OAuth2 Client Credentials Grant request parameters.
-The default implementation validates the `scope` parameter.
-If validation fails, an `OAuth2AuthenticationException` is thrown.
+`OAuth2ClientCredentialsAuthenticationValidator` là validator mặc định được sử dụng để validation các tham số cụ thể của yêu cầu OAuth2 Client Credentials Grant.
+Implementation mặc định validation tham số `scope`.
+Nếu validation thất bại, một `OAuth2AuthenticationException` sẽ được ném ra.
 
-`OAuth2ClientCredentialsAuthenticationProvider` provides the ability to override the default request validation by supplying a custom authentication validator of type `Consumer<OAuth2ClientCredentialsAuthenticationContext>` to `setAuthenticationValidator()`.
+`OAuth2ClientCredentialsAuthenticationProvider` cung cấp khả năng ghi đè validation yêu cầu mặc định bằng cách cung cấp một authentication validator tùy chỉnh có kiểu `Consumer<OAuth2ClientCredentialsAuthenticationContext>` cho `setAuthenticationValidator()`.
 
 [TIP]
-`OAuth2ClientCredentialsAuthenticationContext` holds the `OAuth2ClientCredentialsAuthenticationToken`, which contains the OAuth2 Client Credentials Grant request parameters.
+`OAuth2ClientCredentialsAuthenticationContext` chứa `OAuth2ClientCredentialsAuthenticationToken`, vốn chứa các tham số của yêu cầu OAuth2 Client Credentials Grant.
 
 [IMPORTANT]
-If validation fails, the authentication validator *MUST* throw `OAuth2AuthenticationException`.
+Nếu validation thất bại, authentication validator *MUST* ném `OAuth2AuthenticationException`.
 
-The following example shows how to configure `OAuth2ClientCredentialsAuthenticationProvider` with a custom authentication validator that overrides the default `scope` validation:
+Ví dụ sau cho thấy cách cấu hình `OAuth2ClientCredentialsAuthenticationProvider` với authentication validator tùy chỉnh ghi đè validation `scope` mặc định:
 
 [source,java]
 ----
@@ -422,7 +422,7 @@ private Consumer<List<AuthenticationProvider>> configureAuthenticationValidator(
 				Consumer<OAuth2ClientCredentialsAuthenticationContext> authenticationValidator =
 					new CustomScopeValidator();
 
-				// Override default scope validation
+				// Ghi đè validation scope mặc định
 				((OAuth2ClientCredentialsAuthenticationProvider) authenticationProvider)
 					.setAuthenticationValidator(authenticationValidator);
 			}
@@ -440,40 +440,40 @@ static class CustomScopeValidator implements Consumer<OAuth2ClientCredentialsAut
 		RegisteredClient registeredClient = authenticationContext.getRegisteredClient();
 		Set<String> allowedScopes = registeredClient.getScopes();
 
-        // TODO Implement scope validation
+        // TODO Triển khai validation scope
 
 	}
 }
 ----
 
 [[oauth2AuthorizationServer-oauth2-token-endpoint-dpop-bound-access-tokens]]
-=== DPoP-bound Access Tokens
+=== Access token liên kết DPoP
 
-https://datatracker.ietf.org/doc/html/rfc9449[RFC 9449 OAuth 2.0 Demonstrating Proof of Possession (DPoP)] is an application-level mechanism for sender-constraining an access token.
+https://datatracker.ietf.org/doc/html/rfc9449[RFC 9449 OAuth 2.0 Demonstrating Proof of Possession (DPoP)] là một cơ chế ở cấp ứng dụng để ràng buộc access token với sender.
 
-The primary goal of DPoP is to prevent unauthorized or illegitimate clients from using leaked or stolen access tokens, by binding an access token to a public key upon issuance by the authorization server and requiring that the client proves possession of the corresponding private key when using the access token at the resource server.
+Mục tiêu chính của DPoP là ngăn client trái phép hoặc không hợp lệ sử dụng access token bị làm lộ hoặc đánh cắp, bằng cách liên kết access token với một public key khi authorization server cấp token và yêu cầu client chứng minh việc sở hữu private key tương ứng khi sử dụng access token tại resource server.
 
-Access tokens that are sender-constrained via DPoP stand in contrast to the typical bearer token, which can be used by any client in possession of the access token.
+Access token được ràng buộc sender thông qua DPoP khác với bearer token thông thường, vốn có thể được sử dụng bởi bất kỳ client nào sở hữu access token.
 
-DPoP introduces the concept of a https://datatracker.ietf.org/doc/html/rfc9449#name-dpop-proof-jwts[DPoP Proof], which is a JWT created by the client and sent as a header in an HTTP request.
-A client uses a DPoP proof to prove the possession of a private key corresponding to a certain public key.
+DPoP đưa ra khái niệm https://datatracker.ietf.org/doc/html/rfc9449#name-dpop-proof-jwts[DPoP Proof], là một JWT do client tạo và gửi dưới dạng header trong HTTP request.
+Client sử dụng DPoP proof để chứng minh việc sở hữu private key tương ứng với một public key nhất định.
 
-When the client initiates an access token request, it attaches a DPoP proof to the request in an HTTP header.
-The authorization server binds (sender-constrains) the access token to the public key associated in the DPoP proof.
+Khi client khởi tạo access token request, nó đính kèm DPoP proof vào request trong một HTTP header.
+Authorization server liên kết (ràng buộc sender) access token với public key được liên kết trong DPoP proof.
 
-When the client initiates a protected resource request, it again attaches a DPoP proof to the request in an HTTP header.
+Khi client khởi tạo protected resource request, nó lại đính kèm DPoP proof vào request trong một HTTP header.
 
-The resource server obtains information about the public key bound to the access token, either directly in the access token (JWT) or via the <<oauth2AuthorizationServer-oauth2-token-introspection-endpoint,OAuth2 Token Introspection endpoint>>.
-The resource server then verifies that the public key bound to the access token matches the public key in the DPoP proof.
-It also verifies that the access token hash in the DPoP proof matches the access token in the request.
+Resource server lấy thông tin về public key được liên kết với access token, trực tiếp từ access token (JWT) hoặc thông qua <<oauth2AuthorizationServer-oauth2-token-introspection-endpoint,endpoint Token Introspection OAuth2>>.
+Sau đó resource server xác minh public key được liên kết với access token khớp với public key trong DPoP proof.
+Nó cũng xác minh hash của access token trong DPoP proof khớp với access token trong request.
 
 [[oauth2AuthorizationServer-oauth2-token-endpoint-dpop-access-token-request]]
-==== DPoP Access Token Request
+==== Yêu cầu Access Token DPoP
 
-To request an access token that is bound to a public key using DPoP, the client MUST provide a valid DPoP proof in the `DPoP` header when making an access token request to the OAuth2 Token endpoint.
-This is applicable for all access token requests regardless of authorization grant type (e.g. `authorization_code`, `refresh_token`, `client_credentials`, etc).
+Để yêu cầu một access token được liên kết với public key bằng DPoP, client MUST cung cấp DPoP proof hợp lệ trong header `DPoP` khi thực hiện access token request đến endpoint Token OAuth2.
+Điều này áp dụng cho mọi access token request, không phụ thuộc vào authorization grant type (ví dụ: `authorization_code`, `refresh_token`, `client_credentials`, v.v.).
 
-The following HTTP request shows an `authorization_code` access token request with a DPoP proof in the `DPoP` header:
+HTTP request sau cho thấy một access token request `authorization_code` có DPoP proof trong header `DPoP`:
 
 [source,shell]
 ----
@@ -489,7 +489,7 @@ grant_type=authorization_code\
 &code_verifier=bEaL42izcC-o-xBk0K2vuJ6U-y1p9r_wW2dFWIWgjz-
 ----
 
-The following shows a representation of the DPoP Proof JWT header and claims:
+Sau đây là biểu diễn header và claims của DPoP Proof JWT:
 
 [source,json]
 ----
@@ -514,7 +514,7 @@ The following shows a representation of the DPoP Proof JWT header and claims:
 }
 ----
 
-The following code shows an example of how to generate the DPoP Proof JWT:
+Đoạn code sau cho thấy ví dụ về cách tạo DPoP Proof JWT:
 
 [source,java]
 ----
@@ -537,9 +537,9 @@ JwtClaimsSet claims = JwtClaimsSet.builder()
 Jwt dPoPProof = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims));
 ----
 
-After the authorization server successfully validates the DPoP proof, the public key from the DPoP proof will be bound (sender-constrained) to the issued access token.
+Sau khi authorization server validation thành công DPoP proof, public key từ DPoP proof sẽ được liên kết (ràng buộc sender) với access token đã cấp.
 
-The following access token response shows the `token_type` parameter as `DPoP` to signal to the client that the access token was bound to its DPoP proof public key:
+Phản hồi access token sau đây hiển thị tham số `token_type` là `DPoP` để báo cho client biết access token đã được liên kết với public key trong DPoP proof của nó:
 
 [source,shell]
 ----
@@ -555,14 +555,14 @@ Cache-Control: no-store
 ----
 
 [[oauth2AuthorizationServer-oauth2-token-endpoint-dpop-public-key-confirmation]]
-==== Public Key Confirmation
+==== Xác nhận public key
 
-Resource servers MUST be able to identify whether an access token is DPoP-bound and verify the binding to the public key of the DPoP proof.
-The binding is accomplished by associating the public key with the access token in a way that can be accessed by the resource server, such as embedding the public key hash in the access token directly (JWT) or through token introspection.
+Resource server MUST có khả năng xác định access token có được liên kết DPoP hay không và xác minh liên kết với public key của DPoP proof.
+Việc liên kết được thực hiện bằng cách liên kết public key với access token theo cách resource server có thể truy cập, chẳng hạn nhúng trực tiếp hash của public key vào access token (JWT) hoặc thông qua token introspection.
 
-When an access token is represented as a JWT, the public key hash is contained in the `jkt` claim under the confirmation method (`cnf`) claim.
+Khi access token được biểu diễn dưới dạng JWT, hash của public key nằm trong claim `jkt` bên dưới claim phương thức confirmation (`cnf`).
 
-The following example shows the claims of a JWT access token containing a `cnf` claim with a `jkt` claim, which is the JWK SHA-256 Thumbprint of the DPoP proof public key:
+Ví dụ sau cho thấy các claim của JWT access token chứa claim `cnf` với claim `jkt`, là JWK SHA-256 Thumbprint của public key trong DPoP proof:
 
 [source,json]
 ----
@@ -579,12 +579,12 @@ The following example shows the claims of a JWT access token containing a `cnf` 
 ----
 
 [[oauth2AuthorizationServer-oauth2-token-introspection-endpoint]]
-== OAuth2 Token Introspection Endpoint
+== Endpoint Token Introspection OAuth2
 
-`OAuth2TokenIntrospectionEndpointConfigurer` provides the ability to customize the https://datatracker.ietf.org/doc/html/rfc7662#section-2[OAuth2 Token Introspection endpoint].
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for https://datatracker.ietf.org/doc/html/rfc7662#section-2.1[OAuth2 introspection requests].
+`OAuth2TokenIntrospectionEndpointConfigurer` cung cấp khả năng tùy chỉnh https://datatracker.ietf.org/doc/html/rfc7662#section-2[endpoint Token Introspection OAuth2].
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho https://datatracker.ietf.org/doc/html/rfc7662#section-2.1[các yêu cầu introspection OAuth2].
 
-`OAuth2TokenIntrospectionEndpointConfigurer` provides the following configuration options:
+`OAuth2TokenIntrospectionEndpointConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -607,30 +607,30 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `introspectionRequestConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract an https://datatracker.ietf.org/doc/html/rfc7662#section-2.1[OAuth2 introspection request] from `HttpServletRequest` to an instance of `OAuth2TokenIntrospectionAuthenticationToken`.
-<2> `introspectionRequestConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OAuth2TokenIntrospectionAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `introspectionResponseHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling an "`authenticated`" `OAuth2TokenIntrospectionAuthenticationToken` and returning the https://datatracker.ietf.org/doc/html/rfc7662#section-2.2[OAuth2TokenIntrospection response].
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling an `OAuth2AuthenticationException` and returning the https://datatracker.ietf.org/doc/html/rfc7662#section-2.3[OAuth2Error response].
+<1> `introspectionRequestConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất https://datatracker.ietf.org/doc/html/rfc7662#section-2.1[yêu cầu introspection OAuth2] từ `HttpServletRequest` thành một instance của `OAuth2TokenIntrospectionAuthenticationToken`.
+<2> `introspectionRequestConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationConverter`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OAuth2TokenIntrospectionAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationProvider`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `introspectionResponseHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2TokenIntrospectionAuthenticationToken` "`authenticated`" và trả về https://datatracker.ietf.org/doc/html/rfc7662#section-2.2[phản hồi `OAuth2TokenIntrospection`].
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthenticationException` và trả về https://datatracker.ietf.org/doc/html/rfc7662#section-2.3[phản hồi `OAuth2Error`].
 
-`OAuth2TokenIntrospectionEndpointConfigurer` configures the `OAuth2TokenIntrospectionEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OAuth2TokenIntrospectionEndpointFilter` is the `Filter` that processes OAuth2 introspection requests.
+`OAuth2TokenIntrospectionEndpointConfigurer` cấu hình `OAuth2TokenIntrospectionEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OAuth2TokenIntrospectionEndpointFilter` là `Filter` xử lý các yêu cầu introspection OAuth2.
 
-`OAuth2TokenIntrospectionEndpointFilter` is configured with the following defaults:
+`OAuth2TokenIntrospectionEndpointFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- An `OAuth2TokenIntrospectionAuthenticationConverter`.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `OAuth2TokenIntrospectionAuthenticationProvider`.
-* `*AuthenticationSuccessHandler*` -- An internal implementation that handles an "`authenticated`" `OAuth2TokenIntrospectionAuthenticationToken` and returns the `OAuth2TokenIntrospection` response.
-* `*AuthenticationFailureHandler*` -- An `OAuth2ErrorAuthenticationFailureHandler`.
+* `*AuthenticationConverter*` -- Một `OAuth2TokenIntrospectionAuthenticationConverter`.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `OAuth2TokenIntrospectionAuthenticationProvider`.
+* `*AuthenticationSuccessHandler*` -- Một implementation nội bộ xử lý `OAuth2TokenIntrospectionAuthenticationToken` "`authenticated`" và trả về phản hồi `OAuth2TokenIntrospection`.
+* `*AuthenticationFailureHandler*` -- Một `OAuth2ErrorAuthenticationFailureHandler`.
 
 [[oauth2AuthorizationServer-oauth2-token-revocation-endpoint]]
-== OAuth2 Token Revocation Endpoint
+== Endpoint Token Revocation OAuth2
 
-`OAuth2TokenRevocationEndpointConfigurer` provides the ability to customize the https://datatracker.ietf.org/doc/html/rfc7009#section-2[OAuth2 Token Revocation endpoint].
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for https://datatracker.ietf.org/doc/html/rfc7009#section-2.1[OAuth2 revocation requests].
+`OAuth2TokenRevocationEndpointConfigurer` cung cấp khả năng tùy chỉnh https://datatracker.ietf.org/doc/html/rfc7009#section-2[endpoint Token Revocation OAuth2].
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho https://datatracker.ietf.org/doc/html/rfc7009#section-2.1[các yêu cầu revocation OAuth2].
 
-`OAuth2TokenRevocationEndpointConfigurer` provides the following configuration options:
+`OAuth2TokenRevocationEndpointConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -653,30 +653,30 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `revocationRequestConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract an https://datatracker.ietf.org/doc/html/rfc7009#section-2.1[OAuth2 revocation request] from `HttpServletRequest` to an instance of `OAuth2TokenRevocationAuthenticationToken`.
-<2> `revocationRequestConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OAuth2TokenRevocationAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `revocationResponseHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling an "`authenticated`" `OAuth2TokenRevocationAuthenticationToken` and returning the https://datatracker.ietf.org/doc/html/rfc7009#section-2.2[OAuth2 revocation response].
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling an `OAuth2AuthenticationException` and returning the https://datatracker.ietf.org/doc/html/rfc7009#section-2.2.1[OAuth2Error response].
+<1> `revocationRequestConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất https://datatracker.ietf.org/doc/html/rfc7009#section-2.1[yêu cầu revocation OAuth2] từ `HttpServletRequest` thành một instance của `OAuth2TokenRevocationAuthenticationToken`.
+<2> `revocationRequestConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationConverter`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OAuth2TokenRevocationAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationProvider`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `revocationResponseHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2TokenRevocationAuthenticationToken` "`authenticated`" và trả về https://datatracker.ietf.org/doc/html/rfc7009#section-2.2[phản hồi revocation OAuth2].
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthenticationException` và trả về https://datatracker.ietf.org/doc/html/rfc7009#section-2.2.1[phản hồi `OAuth2Error`].
 
-`OAuth2TokenRevocationEndpointConfigurer` configures the `OAuth2TokenRevocationEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OAuth2TokenRevocationEndpointFilter` is the `Filter` that processes OAuth2 revocation requests.
+`OAuth2TokenRevocationEndpointConfigurer` cấu hình `OAuth2TokenRevocationEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OAuth2TokenRevocationEndpointFilter` là `Filter` xử lý các yêu cầu revocation OAuth2.
 
-`OAuth2TokenRevocationEndpointFilter` is configured with the following defaults:
+`OAuth2TokenRevocationEndpointFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- An `OAuth2TokenRevocationAuthenticationConverter`.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `OAuth2TokenRevocationAuthenticationProvider`.
-* `*AuthenticationSuccessHandler*` -- An internal implementation that handles an "`authenticated`" `OAuth2TokenRevocationAuthenticationToken` and returns the OAuth2 revocation response.
-* `*AuthenticationFailureHandler*` -- An `OAuth2ErrorAuthenticationFailureHandler`.
+* `*AuthenticationConverter*` -- Một `OAuth2TokenRevocationAuthenticationConverter`.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `OAuth2TokenRevocationAuthenticationProvider`.
+* `*AuthenticationSuccessHandler*` -- Một implementation nội bộ xử lý `OAuth2TokenRevocationAuthenticationToken` "`authenticated`" và trả về phản hồi revocation OAuth2.
+* `*AuthenticationFailureHandler*` -- Một `OAuth2ErrorAuthenticationFailureHandler`.
 
 [[oauth2AuthorizationServer-oauth2-client-registration-endpoint]]
-== OAuth2 Client Registration Endpoint
+== Endpoint Client Registration OAuth2
 
-`OAuth2ClientRegistrationEndpointConfigurer` provides the ability to customize the https://datatracker.ietf.org/doc/html/rfc7591#section-3[OAuth2 Client Registration endpoint].
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for https://datatracker.ietf.org/doc/html/rfc7591#section-3.1[Client Registration requests].
+`OAuth2ClientRegistrationEndpointConfigurer` cung cấp khả năng tùy chỉnh https://datatracker.ietf.org/doc/html/rfc7591#section-3[endpoint Client Registration OAuth2].
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho https://datatracker.ietf.org/doc/html/rfc7591#section-3.1[các yêu cầu Client Registration].
 
-`OAuth2ClientRegistrationEndpointConfigurer` provides the following configuration options:
+`OAuth2ClientRegistrationEndpointConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -699,44 +699,44 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `clientRegistrationRequestConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract a https://datatracker.ietf.org/doc/html/rfc7591#section-3.1[Client Registration request] from `HttpServletRequest` to an instance of `OAuth2ClientRegistrationAuthenticationToken`.
-<2> `clientRegistrationRequestConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OAuth2ClientRegistrationAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `clientRegistrationResponseHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling an "`authenticated`" `OAuth2ClientRegistrationAuthenticationToken` and returning the https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.1[Client Registration response].
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling an `OAuth2AuthenticationException` and returning the https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.2[Client Registration Error response].
+<1> `clientRegistrationRequestConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất https://datatracker.ietf.org/doc/html/rfc7591#section-3.1[yêu cầu Client Registration] từ `HttpServletRequest` thành một instance của `OAuth2ClientRegistrationAuthenticationToken`.
+<2> `clientRegistrationRequestConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationConverter`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OAuth2ClientRegistrationAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationProvider`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `clientRegistrationResponseHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2ClientRegistrationAuthenticationToken` "`authenticated`" và trả về https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.1[phản hồi Client Registration].
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthenticationException` và trả về https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.2[phản hồi lỗi Client Registration].
 
 [NOTE]
-The OAuth2 Client Registration endpoint is disabled by default.
+Endpoint Client Registration OAuth2 bị tắt theo mặc định.
 
-`OAuth2ClientRegistrationEndpointConfigurer` configures the `OAuth2ClientRegistrationEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OAuth2ClientRegistrationEndpointFilter` is the `Filter` that processes https://datatracker.ietf.org/doc/html/rfc7591#section-3.1[Client Registration requests] and returns the https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.1[OAuth2ClientRegistration response].
+`OAuth2ClientRegistrationEndpointConfigurer` cấu hình `OAuth2ClientRegistrationEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OAuth2ClientRegistrationEndpointFilter` là `Filter` xử lý https://datatracker.ietf.org/doc/html/rfc7591#section-3.1[các yêu cầu Client Registration] và trả về https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.1[phản hồi `OAuth2ClientRegistration`].
 
-`OAuth2ClientRegistrationEndpointFilter` is configured with the following defaults:
+`OAuth2ClientRegistrationEndpointFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- An `OAuth2ClientRegistrationAuthenticationConverter`.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `OAuth2ClientRegistrationAuthenticationProvider`.
-* `*AuthenticationSuccessHandler*` -- An internal implementation that handles an "`authenticated`" `OAuth2ClientRegistrationAuthenticationToken` and returns the `OAuth2ClientRegistration` response.
-* `*AuthenticationFailureHandler*` -- An internal implementation that uses the `OAuth2Error` associated with the `OAuth2AuthenticationException` and returns the `OAuth2Error` response.
+* `*AuthenticationConverter*` -- Một `OAuth2ClientRegistrationAuthenticationConverter`.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `OAuth2ClientRegistrationAuthenticationProvider`.
+* `*AuthenticationSuccessHandler*` -- Một implementation nội bộ xử lý `OAuth2ClientRegistrationAuthenticationToken` "`authenticated`" và trả về phản hồi `OAuth2ClientRegistration`.
+* `*AuthenticationFailureHandler*` -- Một implementation nội bộ sử dụng `OAuth2Error` liên kết với `OAuth2AuthenticationException` và trả về phản hồi `OAuth2Error`.
 
-The OAuth2 Client Registration endpoint is an https://datatracker.ietf.org/doc/html/rfc7591#section-3[OAuth2 protected resource], which *REQUIRES* an access token to be sent as a bearer token in the Client Registration request.
+Endpoint Client Registration OAuth2 là một https://datatracker.ietf.org/doc/html/rfc7591#section-3[OAuth2 protected resource], *REQUIRES* gửi access token dưới dạng bearer token trong yêu cầu Client Registration.
 
 [NOTE]
-OAuth2 resource server support is autoconfigured, however, a `JwtDecoder` `@Bean` is *REQUIRED* for the OAuth2 Client Registration endpoint.
+Hỗ trợ OAuth2 resource server được tự động cấu hình, tuy nhiên `@Bean` `JwtDecoder` *REQUIRED* cho endpoint Client Registration OAuth2.
 
 [IMPORTANT]
-The access token in a Client Registration request *REQUIRES* the OAuth2 scope `client.create`.
+Access token trong yêu cầu Client Registration *REQUIRES* OAuth2 scope `client.create`.
 
 [TIP]
-To allow open client registration (no access token in request), configure `OAuth2ClientRegistrationAuthenticationProvider.setOpenRegistrationAllowed(true)`.
+Để cho phép client registration mở (không có access token trong request), hãy cấu hình `OAuth2ClientRegistrationAuthenticationProvider.setOpenRegistrationAllowed(true)`.
 
 [[oauth2AuthorizationServer-oauth2-authorization-server-metadata-endpoint]]
-== OAuth2 Authorization Server Metadata Endpoint
+== Endpoint Metadata Authorization Server OAuth2
 
-`OAuth2AuthorizationServerMetadataEndpointConfigurer` provides the ability to customize the https://datatracker.ietf.org/doc/html/rfc8414#section-3[OAuth2 Authorization Server Metadata endpoint].
-It defines an extension point that lets you customize the https://datatracker.ietf.org/doc/html/rfc8414#section-3.2[OAuth2 Authorization Server Metadata response].
+`OAuth2AuthorizationServerMetadataEndpointConfigurer` cung cấp khả năng tùy chỉnh https://datatracker.ietf.org/doc/html/rfc8414#section-3[endpoint Metadata Authorization Server OAuth2].
+Nó định nghĩa một extension point cho phép bạn tùy chỉnh https://datatracker.ietf.org/doc/html/rfc8414#section-3.2[phản hồi Metadata Authorization Server OAuth2].
 
-`OAuth2AuthorizationServerMetadataEndpointConfigurer` provides the following configuration option:
+`OAuth2AuthorizationServerMetadataEndpointConfigurer` cung cấp tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -754,29 +754,29 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `authorizationServerMetadataCustomizer()`: The `Consumer` providing access to the `OAuth2AuthorizationServerMetadata.Builder` allowing the ability to customize the claims of the Authorization Server's configuration.
+<1> `authorizationServerMetadataCustomizer()`: `Consumer` cung cấp quyền truy cập vào `OAuth2AuthorizationServerMetadata.Builder`, cho phép tùy chỉnh các claim trong cấu hình của Authorization Server.
 
-`OAuth2AuthorizationServerMetadataEndpointConfigurer` configures the `OAuth2AuthorizationServerMetadataEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OAuth2AuthorizationServerMetadataEndpointFilter` is the `Filter` that returns the https://datatracker.ietf.org/doc/html/rfc8414#section-3.2[OAuth2AuthorizationServerMetadata response].
+`OAuth2AuthorizationServerMetadataEndpointConfigurer` cấu hình `OAuth2AuthorizationServerMetadataEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OAuth2AuthorizationServerMetadataEndpointFilter` là `Filter` trả về https://datatracker.ietf.org/doc/html/rfc8414#section-3.2[phản hồi `OAuth2AuthorizationServerMetadata`].
 
 [[oauth2AuthorizationServer-jwk-set-endpoint]]
-== JWK Set Endpoint
+== Endpoint JWK Set
 
-`OAuth2AuthorizationServerConfigurer` provides support for the https://datatracker.ietf.org/doc/html/rfc7517[JWK Set endpoint].
+`OAuth2AuthorizationServerConfigurer` cung cấp hỗ trợ cho https://datatracker.ietf.org/doc/html/rfc7517[endpoint JWK Set].
 
-`OAuth2AuthorizationServerConfigurer` configures the `NimbusJwkSetEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`NimbusJwkSetEndpointFilter` is the `Filter` that returns the https://datatracker.ietf.org/doc/html/rfc7517#section-5[JWK Set].
+`OAuth2AuthorizationServerConfigurer` cấu hình `NimbusJwkSetEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`NimbusJwkSetEndpointFilter` là `Filter` trả về https://datatracker.ietf.org/doc/html/rfc7517#section-5[JWK Set].
 
 [NOTE]
-The JWK Set endpoint is configured *only* if a `JWKSource<SecurityContext>` `@Bean` is registered.
+Endpoint JWK Set được cấu hình *chỉ* nếu đã đăng ký `@Bean` `JWKSource<SecurityContext>`.
 
 [[oauth2AuthorizationServer-oidc-provider-configuration-endpoint]]
-== OpenID Connect 1.0 Provider Configuration Endpoint
+== Endpoint Provider Configuration OpenID Connect 1.0
 
-`OidcProviderConfigurationEndpointConfigurer` provides the ability to customize the https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig[OpenID Connect 1.0 Provider Configuration endpoint].
-It defines an extension point that lets you customize the https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfigurationResponse[OpenID Provider Configuration response].
+`OidcProviderConfigurationEndpointConfigurer` cung cấp khả năng tùy chỉnh https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig[endpoint Provider Configuration OpenID Connect 1.0].
+Nó định nghĩa một extension point cho phép bạn tùy chỉnh https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfigurationResponse[phản hồi OpenID Provider Configuration].
 
-`OidcProviderConfigurationEndpointConfigurer` provides the following configuration option:
+`OidcProviderConfigurationEndpointConfigurer` cung cấp tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -797,18 +797,18 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `providerConfigurationCustomizer()`: The `Consumer` providing access to the `OidcProviderConfiguration.Builder` allowing the ability to customize the claims of the OpenID Provider's configuration.
+<1> `providerConfigurationCustomizer()`: `Consumer` cung cấp quyền truy cập vào `OidcProviderConfiguration.Builder`, cho phép tùy chỉnh các claim trong cấu hình của OpenID Provider.
 
-`OidcProviderConfigurationEndpointConfigurer` configures the `OidcProviderConfigurationEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OidcProviderConfigurationEndpointFilter` is the `Filter` that returns the https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfigurationResponse[OidcProviderConfiguration response].
+`OidcProviderConfigurationEndpointConfigurer` cấu hình `OidcProviderConfigurationEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OidcProviderConfigurationEndpointFilter` là `Filter` trả về https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfigurationResponse[phản hồi `OidcProviderConfiguration`].
 
 [[oauth2AuthorizationServer-oidc-logout-endpoint]]
-== OpenID Connect 1.0 Logout Endpoint
+== Endpoint Logout OpenID Connect 1.0
 
-`OidcLogoutEndpointConfigurer` provides the ability to customize the https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout[OpenID Connect 1.0 Logout endpoint].
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for RP-Initiated Logout requests.
+`OidcLogoutEndpointConfigurer` cung cấp khả năng tùy chỉnh https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout[endpoint Logout OpenID Connect 1.0].
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho các yêu cầu RP-Initiated Logout.
 
-`OidcLogoutEndpointConfigurer` provides the following configuration options:
+`OidcLogoutEndpointConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -834,45 +834,45 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `logoutRequestConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract a https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout[Logout request] from `HttpServletRequest` to an instance of `OidcLogoutAuthenticationToken`.
-<2> `logoutRequestConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OidcLogoutAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `logoutResponseHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling an "`authenticated`" `OidcLogoutAuthenticationToken` and performing the logout.
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling an `OAuth2AuthenticationException` and returning the error response.
+<1> `logoutRequestConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout[yêu cầu Logout] từ `HttpServletRequest` thành một instance của `OidcLogoutAuthenticationToken`.
+<2> `logoutRequestConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationConverter`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OidcLogoutAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationProvider`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `logoutResponseHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OidcLogoutAuthenticationToken` "`authenticated`" và thực hiện logout.
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthenticationException` và trả về phản hồi lỗi.
 
-`OidcLogoutEndpointConfigurer` configures the `OidcLogoutEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OidcLogoutEndpointFilter` is the `Filter` that processes https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout[RP-Initiated Logout requests] and performs the logout of the End-User.
+`OidcLogoutEndpointConfigurer` cấu hình `OidcLogoutEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OidcLogoutEndpointFilter` là `Filter` xử lý https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout[các yêu cầu RP-Initiated Logout] và thực hiện logout của End-User.
 
-`OidcLogoutEndpointFilter` is configured with the following defaults:
+`OidcLogoutEndpointFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- An `OidcLogoutAuthenticationConverter`.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `OidcLogoutAuthenticationProvider`.
-* `*AuthenticationSuccessHandler*` -- An `OidcLogoutAuthenticationSuccessHandler`.
-* `*AuthenticationFailureHandler*` -- An internal implementation that uses the `OAuth2Error` associated with the `OAuth2AuthenticationException` and returns the `OAuth2Error` response.
+* `*AuthenticationConverter*` -- Một `OidcLogoutAuthenticationConverter`.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `OidcLogoutAuthenticationProvider`.
+* `*AuthenticationSuccessHandler*` -- Một `OidcLogoutAuthenticationSuccessHandler`.
+* `*AuthenticationFailureHandler*` -- Một implementation nội bộ sử dụng `OAuth2Error` liên kết với `OAuth2AuthenticationException` và trả về phản hồi `OAuth2Error`.
 
 [NOTE]
-`OidcLogoutAuthenticationProvider` uses a xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-session-registry[`SessionRegistry`] to look up the `SessionInformation` instance associated to the End-User requesting to be logged out.
+`OidcLogoutAuthenticationProvider` sử dụng xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-session-registry[`SessionRegistry`] để tra cứu instance `SessionInformation` liên kết với End-User đang yêu cầu logout.
 
 [TIP]
-`OidcClientInitiatedLogoutSuccessHandler` is the corresponding configuration in Spring Security’s OAuth2 Client support for configuring xref:servlet/oauth2/login/advanced.adoc#oauth2login-advanced-oidc-logout[OpenID Connect 1.0 RP-Initiated Logout].
+`OidcClientInitiatedLogoutSuccessHandler` là cấu hình tương ứng trong hỗ trợ OAuth2 Client của Spring Security để cấu hình xref:servlet/oauth2/login/advanced.adoc#oauth2login-advanced-oidc-logout[OpenID Connect 1.0 RP-Initiated Logout].
 
 [[oauth2AuthorizationServer-oidc-logout-endpoint-customizing-logout-request-validation]]
-=== Customizing Logout Request Validation
+=== Tùy chỉnh validation yêu cầu Logout
 
-`OidcLogoutAuthenticationValidator` is the default validator used for validating specific OpenID Connect RP-Initiated Logout Request parameters.
-The default implementation validates the `post_logout_redirect_uri` parameter.
-If validation fails, an `OAuth2AuthenticationException` is thrown.
+`OidcLogoutAuthenticationValidator` là validator mặc định được sử dụng để validation các tham số cụ thể của yêu cầu OpenID Connect RP-Initiated Logout.
+Implementation mặc định validation tham số `post_logout_redirect_uri`.
+Nếu validation thất bại, một `OAuth2AuthenticationException` sẽ được ném ra.
 
-`OidcLogoutAuthenticationProvider` provides the ability to override the default logout request validation by supplying a custom authentication validator of type `Consumer<OidcLogoutAuthenticationContext>` to `setAuthenticationValidator()`.
+`OidcLogoutAuthenticationProvider` cung cấp khả năng ghi đè validation yêu cầu logout mặc định bằng cách cung cấp một authentication validator tùy chỉnh có kiểu `Consumer<OidcLogoutAuthenticationContext>` cho `setAuthenticationValidator()`.
 
 [TIP]
-`OidcLogoutAuthenticationContext` holds the `OidcLogoutAuthenticationToken`, which contains the logout request parameters.
+`OidcLogoutAuthenticationContext` chứa `OidcLogoutAuthenticationToken`, vốn chứa các tham số của yêu cầu logout.
 
 [IMPORTANT]
-If validation fails, the authentication validator *MUST* throw `OAuth2AuthenticationException`.
+Nếu validation thất bại, authentication validator *MUST* ném `OAuth2AuthenticationException`.
 
-The following example shows how to configure `OidcLogoutAuthenticationProvider` with a custom authentication validator:
+Ví dụ sau cho thấy cách cấu hình `OidcLogoutAuthenticationProvider` với authentication validator tùy chỉnh:
 
 [source,java]
 ----
@@ -918,12 +918,12 @@ static class CustomPostLogoutRedirectUriValidator implements Consumer<OidcLogout
 ----
 
 [[oauth2AuthorizationServer-oidc-user-info-endpoint]]
-== OpenID Connect 1.0 UserInfo Endpoint
+== Endpoint UserInfo OpenID Connect 1.0
 
-`OidcUserInfoEndpointConfigurer` provides the ability to customize the https://openid.net/specs/openid-connect-core-1_0.html#UserInfo[OpenID Connect 1.0 UserInfo endpoint].
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for https://openid.net/specs/openid-connect-core-1_0.html#UserInfoRequest[UserInfo requests].
+`OidcUserInfoEndpointConfigurer` cung cấp khả năng tùy chỉnh https://openid.net/specs/openid-connect-core-1_0.html#UserInfo[endpoint UserInfo OpenID Connect 1.0].
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho https://openid.net/specs/openid-connect-core-1_0.html#UserInfoRequest[các yêu cầu UserInfo].
 
-`OidcUserInfoEndpointConfigurer` provides the following configuration options:
+`OidcUserInfoEndpointConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -950,39 +950,39 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `userInfoRequestConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract an https://openid.net/specs/openid-connect-core-1_0.html#UserInfoRequest[UserInfo request] from `HttpServletRequest` to an instance of `OidcUserInfoAuthenticationToken`.
-<2> `userInfoRequestConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OidcUserInfoAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `userInfoResponseHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling an "`authenticated`" `OidcUserInfoAuthenticationToken` and returning the https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse[UserInfo response].
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling an `OAuth2AuthenticationException` and returning the https://openid.net/specs/openid-connect-core-1_0.html#UserInfoError[UserInfo Error response].
-<7> `userInfoMapper()`: The `Function` used to extract claims from `OidcUserInfoAuthenticationContext` to an instance of `OidcUserInfo`.
+<1> `userInfoRequestConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất https://openid.net/specs/openid-connect-core-1_0.html#UserInfoRequest[yêu cầu UserInfo] từ `HttpServletRequest` thành một instance của `OidcUserInfoAuthenticationToken`.
+<2> `userInfoRequestConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationConverter`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OidcUserInfoAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationProvider`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `userInfoResponseHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OidcUserInfoAuthenticationToken` "`authenticated`" và trả về https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse[phản hồi UserInfo].
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthenticationException` và trả về https://openid.net/specs/openid-connect-core-1_0.html#UserInfoError[phản hồi lỗi UserInfo].
+<7> `userInfoMapper()`: `Function` được sử dụng để trích xuất claim từ `OidcUserInfoAuthenticationContext` thành một instance của `OidcUserInfo`.
 
-`OidcUserInfoEndpointConfigurer` configures the `OidcUserInfoEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OidcUserInfoEndpointFilter` is the `Filter` that processes https://openid.net/specs/openid-connect-core-1_0.html#UserInfoRequest[UserInfo requests] and returns the https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse[OidcUserInfo response].
+`OidcUserInfoEndpointConfigurer` cấu hình `OidcUserInfoEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OidcUserInfoEndpointFilter` là `Filter` xử lý https://openid.net/specs/openid-connect-core-1_0.html#UserInfoRequest[các yêu cầu UserInfo] và trả về https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse[phản hồi `OidcUserInfo`].
 
-`OidcUserInfoEndpointFilter` is configured with the following defaults:
+`OidcUserInfoEndpointFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- An internal implementation that obtains the `Authentication` from the `SecurityContext` and creates an `OidcUserInfoAuthenticationToken` with the principal.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `OidcUserInfoAuthenticationProvider`, which is associated with an internal implementation of `userInfoMapper` that extracts https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims[standard claims] from the https://openid.net/specs/openid-connect-core-1_0.html#IDToken[ID Token] based on the https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims[scopes requested] during authorization.
-* `*AuthenticationSuccessHandler*` -- An internal implementation that handles an "`authenticated`" `OidcUserInfoAuthenticationToken` and returns the `OidcUserInfo` response.
-* `*AuthenticationFailureHandler*` -- An internal implementation that uses the `OAuth2Error` associated with the `OAuth2AuthenticationException` and returns the `OAuth2Error` response.
+* `*AuthenticationConverter*` -- Một implementation nội bộ lấy `Authentication` từ `SecurityContext` và tạo `OidcUserInfoAuthenticationToken` với principal.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `OidcUserInfoAuthenticationProvider`, liên kết với implementation nội bộ của `userInfoMapper` để trích xuất https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims[các claim chuẩn] từ https://openid.net/specs/openid-connect-core-1_0.html#IDToken[`ID Token`] dựa trên https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims[các scope được yêu cầu] trong quá trình authorization.
+* `*AuthenticationSuccessHandler*` -- Một implementation nội bộ xử lý `OidcUserInfoAuthenticationToken` "`authenticated`" và trả về phản hồi `OidcUserInfo`.
+* `*AuthenticationFailureHandler*` -- Một implementation nội bộ sử dụng `OAuth2Error` liên kết với `OAuth2AuthenticationException` và trả về phản hồi `OAuth2Error`.
 
 [TIP]
-You can customize the ID Token by providing an xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-customizer[`OAuth2TokenCustomizer<JwtEncodingContext>`] `@Bean`.
+Bạn có thể tùy chỉnh ID Token bằng cách cung cấp `@Bean` xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-customizer[`OAuth2TokenCustomizer<JwtEncodingContext>`].
 
-The OpenID Connect 1.0 UserInfo endpoint is an OAuth2 protected resource, which *REQUIRES* an access token to be sent as a bearer token in the https://openid.net/specs/openid-connect-core-1_0.html#UserInfoRequest[UserInfo request].
+Endpoint UserInfo OpenID Connect 1.0 là một OAuth2 protected resource, *REQUIRES* gửi access token dưới dạng bearer token trong https://openid.net/specs/openid-connect-core-1_0.html#UserInfoRequest[yêu cầu UserInfo].
 
 [NOTE]
-OAuth2 resource server support is autoconfigured, however, a `JwtDecoder` `@Bean` is *REQUIRED* for the OpenID Connect 1.0 UserInfo endpoint.
+Hỗ trợ OAuth2 resource server được tự động cấu hình, tuy nhiên `@Bean` `JwtDecoder` *REQUIRED* cho endpoint UserInfo OpenID Connect 1.0.
 
 [[oauth2AuthorizationServer-oidc-client-registration-endpoint]]
-== OpenID Connect 1.0 Client Registration Endpoint
+== Endpoint Client Registration OpenID Connect 1.0
 
-`OidcClientRegistrationEndpointConfigurer` provides the ability to customize the https://openid.net/specs/openid-connect-registration-1_0.html#ClientRegistration[OpenID Connect 1.0 Client Registration endpoint].
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationRequest[Client Registration requests] or https://openid.net/specs/openid-connect-registration-1_0.html#ReadRequest[Client Read requests].
+`OidcClientRegistrationEndpointConfigurer` cung cấp khả năng tùy chỉnh https://openid.net/specs/openid-connect-registration-1_0.html#ClientRegistration[endpoint Client Registration OpenID Connect 1.0].
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationRequest[các yêu cầu Client Registration] hoặc https://openid.net/specs/openid-connect-registration-1_0.html#ReadRequest[các yêu cầu Client Read].
 
-`OidcClientRegistrationEndpointConfigurer` provides the following configuration options:
+`OidcClientRegistrationEndpointConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -1008,36 +1008,36 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `clientRegistrationRequestConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract a https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationRequest[Client Registration request] or https://openid.net/specs/openid-connect-registration-1_0.html#ReadRequest[Client Read request] from `HttpServletRequest` to an instance of `OidcClientRegistrationAuthenticationToken`.
-<2> `clientRegistrationRequestConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OidcClientRegistrationAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `clientRegistrationResponseHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling an "`authenticated`" `OidcClientRegistrationAuthenticationToken` and returning the https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationResponse[Client Registration response] or https://openid.net/specs/openid-connect-registration-1_0.html#ReadResponse[Client Read response].
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling an `OAuth2AuthenticationException` and returning the https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationError[Client Registration Error response] or https://openid.net/specs/openid-connect-registration-1_0.html#ReadError[Client Read Error response].
+<1> `clientRegistrationRequestConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationRequest[yêu cầu Client Registration] hoặc https://openid.net/specs/openid-connect-registration-1_0.html#ReadRequest[yêu cầu Client Read] từ `HttpServletRequest` thành một instance của `OidcClientRegistrationAuthenticationToken`.
+<2> `clientRegistrationRequestConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationConverter`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OidcClientRegistrationAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập vào `List` gồm các ``AuthenticationProvider`` mặc định và (tùy chọn) được thêm vào, cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `clientRegistrationResponseHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OidcClientRegistrationAuthenticationToken` "`authenticated`" và trả về https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationResponse[phản hồi Client Registration] hoặc https://openid.net/specs/openid-connect-registration-1_0.html#ReadResponse[phản hồi Client Read].
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý `OAuth2AuthenticationException` và trả về https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationError[phản hồi lỗi Client Registration] hoặc https://openid.net/specs/openid-connect-registration-1_0.html#ReadError[phản hồi lỗi Client Read].
 
 [NOTE]
-The OpenID Connect 1.0 Client Registration endpoint is disabled by default.
+Endpoint Client Registration OpenID Connect 1.0 bị tắt theo mặc định.
 
-`OidcClientRegistrationEndpointConfigurer` configures the `OidcClientRegistrationEndpointFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OidcClientRegistrationEndpointFilter` is the `Filter` that processes https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationRequest[Client Registration requests] and returns the https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationResponse[OidcClientRegistration response].
+`OidcClientRegistrationEndpointConfigurer` cấu hình `OidcClientRegistrationEndpointFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của authorization server OAuth2.
+`OidcClientRegistrationEndpointFilter` là `Filter` xử lý https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationRequest[các yêu cầu Client Registration] và trả về https://openid.net/specs/openid-connect-registration-1_0.html#RegistrationResponse[phản hồi `OidcClientRegistration`].
 
 [TIP]
-`OidcClientRegistrationEndpointFilter` also processes https://openid.net/specs/openid-connect-registration-1_0.html#ReadRequest[Client Read requests] and returns the https://openid.net/specs/openid-connect-registration-1_0.html#ReadResponse[OidcClientRegistration response].
+`OidcClientRegistrationEndpointFilter` cũng xử lý https://openid.net/specs/openid-connect-registration-1_0.html#ReadRequest[các yêu cầu Client Read] và trả về https://openid.net/specs/openid-connect-registration-1_0.html#ReadResponse[phản hồi `OidcClientRegistration`].
 
-`OidcClientRegistrationEndpointFilter` is configured with the following defaults:
+`OidcClientRegistrationEndpointFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- An `OidcClientRegistrationAuthenticationConverter`.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `OidcClientRegistrationAuthenticationProvider` and `OidcClientConfigurationAuthenticationProvider`.
-* `*AuthenticationSuccessHandler*` -- An internal implementation that handles an "`authenticated`" `OidcClientRegistrationAuthenticationToken` and returns the `OidcClientRegistration` response.
-* `*AuthenticationFailureHandler*` -- An internal implementation that uses the `OAuth2Error` associated with the `OAuth2AuthenticationException` and returns the `OAuth2Error` response.
+* `*AuthenticationConverter*` -- Một `OidcClientRegistrationAuthenticationConverter`.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `OidcClientRegistrationAuthenticationProvider` và `OidcClientConfigurationAuthenticationProvider`.
+* `*AuthenticationSuccessHandler*` -- Một implementation nội bộ xử lý `OidcClientRegistrationAuthenticationToken` "`authenticated`" và trả về phản hồi `OidcClientRegistration`.
+* `*AuthenticationFailureHandler*` -- Một implementation nội bộ sử dụng `OAuth2Error` liên kết với `OAuth2AuthenticationException` và trả về phản hồi `OAuth2Error`.
 
-The OpenID Connect 1.0 Client Registration endpoint is an https://openid.net/specs/openid-connect-registration-1_0.html#ClientRegistration[OAuth2 protected resource], which *REQUIRES* an access token to be sent as a bearer token in the Client Registration (or Client Read) request.
+Endpoint Client Registration OpenID Connect 1.0 là một https://openid.net/specs/openid-connect-registration-1_0.html#ClientRegistration[OAuth2 protected resource], *REQUIRES* gửi access token dưới dạng bearer token trong yêu cầu Client Registration (hoặc Client Read).
 
 [NOTE]
-OAuth2 resource server support is autoconfigured, however, a `JwtDecoder` `@Bean` is *REQUIRED* for the OpenID Connect 1.0 Client Registration endpoint.
+Hỗ trợ OAuth2 resource server được tự động cấu hình, tuy nhiên `@Bean` `JwtDecoder` *REQUIRED* cho endpoint Client Registration OpenID Connect 1.0.
 
 [IMPORTANT]
-The access token in a Client Registration request *REQUIRES* the OAuth2 scope `client.create`.
+Access token trong yêu cầu Client Registration *REQUIRES* OAuth2 scope `client.create`.
 
 [IMPORTANT]
-The access token in a Client Read request *REQUIRES* the OAuth2 scope `client.read`.
+Access token trong yêu cầu Client Read *REQUIRES* OAuth2 scope `client.read`.
