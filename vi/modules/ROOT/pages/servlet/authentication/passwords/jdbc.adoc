@@ -1,34 +1,34 @@
 [[servlet-authentication-jdbc]]
 = JDBC Authentication
 
-Spring Security's `JdbcDaoImpl` implements xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[`UserDetailsService`] to provide support for username-and-password-based authentication that is retrieved by using JDBC.
-`JdbcUserDetailsManager` extends `JdbcDaoImpl` to provide management of `UserDetails` through the `UserDetailsManager` interface.
-`UserDetails`-based authentication is used by Spring Security when it is configured to xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-input[accept a username/password] for authentication.
+`JdbcDaoImpl` của Spring Security triển khai xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[`UserDetailsService`] để cung cấp hỗ trợ cho authentication dựa trên username và password được truy xuất bằng JDBC.
+`JdbcUserDetailsManager` mở rộng `JdbcDaoImpl` để cung cấp khả năng quản lý `UserDetails` thông qua interface `UserDetailsManager`.
+Spring Security sử dụng authentication dựa trên `UserDetails` khi được cấu hình để xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-input[chấp nhận username/password] cho authentication.
 
-In the following sections, we discuss:
+Trong các phần sau, chúng ta thảo luận về:
 
-* The <<servlet-authentication-jdbc-schema>> used by Spring Security JDBC Authentication
+* <<servlet-authentication-jdbc-schema>> được Spring Security JDBC Authentication sử dụng
 * <<servlet-authentication-jdbc-datasource>>
 * <<servlet-authentication-jdbc-bean>>
 
 [[servlet-authentication-jdbc-schema]]
-== Default Schema
+== Schema mặc định
 
-Spring Security provides default queries for JDBC-based authentication.
-This section provides the corresponding default schemas used with the default queries.
-You need to adjust the schema to match any customizations to the queries and the database dialect you use.
+Spring Security cung cấp các truy vấn mặc định cho authentication dựa trên JDBC.
+Phần này cung cấp các schema mặc định tương ứng được sử dụng cùng với các truy vấn mặc định.
+Bạn cần điều chỉnh schema để phù hợp với mọi tùy chỉnh đối với các truy vấn và database dialect mà bạn sử dụng.
 
 [[servlet-authentication-jdbc-schema-user]]
-=== User Schema
+=== Schema người dùng
 
-`JdbcDaoImpl` requires tables to load the password, account status (enabled or disabled) and a list of authorities (roles) for the user.
+`JdbcDaoImpl` yêu cầu các bảng để tải password, trạng thái account (enabled hoặc disabled) và danh sách authority (role) của người dùng.
 
 [NOTE]
 ====
-The default schema is also exposed as a classpath resource named `org/springframework/security/core/userdetails/jdbc/users.ddl`.
+Schema mặc định cũng được cung cấp dưới dạng resource trên classpath có tên `org/springframework/security/core/userdetails/jdbc/users.ddl`.
 ====
 
-.Default User Schema
+.Schema người dùng mặc định
 [source,sql]
 ----
 create table users(
@@ -45,9 +45,9 @@ create table authorities (
 create unique index ix_auth_username on authorities (username,authority);
 ----
 
-Oracle is a popular database choice but requires a slightly different schema:
+Oracle là một lựa chọn database phổ biến nhưng yêu cầu schema hơi khác:
 
-.Default User Schema for Oracle Databases
+.Schema người dùng mặc định cho database Oracle
 [source,sql]
 ----
 CREATE TABLE USERS (
@@ -66,11 +66,11 @@ ALTER TABLE AUTHORITIES ADD CONSTRAINT AUTHORITIES_FK1 FOREIGN KEY (USERNAME) RE
 ----
 
 [[servlet-authentication-jdbc-schema-group]]
-=== Group Schema
+=== Schema nhóm
 
-If your application uses groups, you need to provide the groups schema:
+Nếu ứng dụng của bạn sử dụng các nhóm, bạn cần cung cấp schema nhóm:
 
-.Default Group Schema
+.Schema nhóm mặc định
 [source,sql]
 ----
 create table groups (
@@ -93,12 +93,12 @@ create table group_members (
 ----
 
 [[servlet-authentication-jdbc-datasource]]
-== Setting up a DataSource
+== Thiết lập một DataSource
 
-Before we configure `JdbcUserDetailsManager`, we must create a `DataSource`.
-In our example, we set up an {spring-framework-reference-url}data-access/jdbc/embedded-database-support.html[embedded DataSource] that is initialized with the <<servlet-authentication-jdbc-schema,default user schema>>.
+Trước khi cấu hình `JdbcUserDetailsManager`, chúng ta phải tạo một `DataSource`.
+Trong ví dụ này, chúng ta thiết lập một {spring-framework-reference-url}data-access/jdbc/embedded-database-support.html[DataSource nhúng] được khởi tạo với <<servlet-authentication-jdbc-schema,schema người dùng mặc định>>.
 
-.Embedded Data Source
+.DataSource nhúng
 [tabs]
 ======
 Java::
@@ -137,13 +137,13 @@ fun dataSource(): DataSource {
 ----
 ======
 
-In a production environment, you want to ensure that you set up a connection to an external database.
+Trong môi trường production, bạn cần đảm bảo rằng mình thiết lập kết nối đến một database bên ngoài.
 
 [[servlet-authentication-jdbc-bean]]
-== JdbcUserDetailsManager Bean
+== Bean JdbcUserDetailsManager
 
-In this sample, we use xref:features/authentication/password-storage.adoc#authentication-password-storage-boot-cli[Spring Boot CLI] to encode a password value of `password` and get the encoded password of `+{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW+`.
-See the xref:features/authentication/password-storage.adoc#authentication-password-storage[PasswordEncoder] section for more details about how to store passwords.
+Trong ví dụ này, chúng ta sử dụng xref:features/authentication/password-storage.adoc#authentication-password-storage-boot-cli[Spring Boot CLI] để mã hóa giá trị password là `password` và nhận được password đã mã hóa là `+{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW+`.
+Xem phần xref:features/authentication/password-storage.adoc#authentication-password-storage[PasswordEncoder] để biết thêm chi tiết về cách lưu trữ password.
 
 .JdbcUserDetailsManager
 
