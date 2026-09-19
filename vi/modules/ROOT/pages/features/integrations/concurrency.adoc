@@ -45,8 +45,8 @@ fun run() {
 ----
 ======
 
-Dù rất đơn giản, nó giúp việc truyền SecurityContext từ `Thread` này sang `Thread` khác diễn ra liền mạch.
-Điều này quan trọng vì trong hầu hết trường hợp, SecurityContextHolder hoạt động theo từng Thread.
+Dù rất đơn giản, nó giúp việc truyền `SecurityContext` từ `Thread` này sang `Thread` khác diễn ra liền mạch.
+Điều này quan trọng vì trong hầu hết trường hợp, `SecurityContextHolder` hoạt động theo từng `Thread`.
 Ví dụ, bạn có thể đã sử dụng hỗ trợ xref:servlet/appendix/namespace/method-security.adoc#nsa-global-method-security[<global-method-security>] của Spring Security để bảo vệ một dịch vụ.
 Giờ đây, bạn có thể dễ dàng truyền `SecurityContext` của `Thread` hiện tại sang `Thread` gọi dịch vụ được bảo vệ.
 Ví dụ về cách thực hiện việc này nằm bên dưới:
@@ -191,7 +191,7 @@ executor.execute(originalRunnable)
 Lưu ý rằng trong ví dụ này, chúng ta chỉ tạo `SecurityContext` thủ công.
 Tuy nhiên, việc lấy `SecurityContext` ở đâu hoặc bằng cách nào không quan trọng (tức là nếu muốn, chúng ta có thể lấy nó từ `SecurityContextHolder`).
 * Tạo một delegateExecutor chịu trách nhiệm thực thi các ``Runnable`` được gửi đến
-* Cuối cùng, tạo một `DelegatingSecurityContextExecutor` chịu trách nhiệm bọc mọi Runnable được truyền vào phương thức execute bằng một `DelegatingSecurityContextRunnable`.
+* Cuối cùng, tạo một `DelegatingSecurityContextExecutor` chịu trách nhiệm bọc mọi Runnable được truyền vào method execute bằng một `DelegatingSecurityContextRunnable`.
 Sau đó, nó truyền Runnable đã được bọc cho delegateExecutor.
 Trong trường hợp này, cùng một `SecurityContext` sẽ được sử dụng cho mọi Runnable được gửi đến `DelegatingSecurityContextExecutor`.
 Điều này hữu ích nếu chúng ta đang chạy các tác vụ nền cần được thực hiện bởi một người dùng có đặc quyền cao hơn.
