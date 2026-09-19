@@ -18,7 +18,7 @@ image:{icondir}/number_1.png[] Trước tiên, user gửi một request chưa đ
 
 image:{icondir}/number_2.png[] xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] của Spring Security cho biết request chưa được authentication bị __Denied__ bằng cách ném một `AccessDeniedException`.
 
-image:{icondir}/number_3.png[] Vì user chưa được authentication, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] khởi động __Start Authentication__.
+image:{icondir}/number_3.png[] Vì user chưa được authentication, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] khởi động __Bắt đầu authentication__.
 xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] được cấu hình là một instance của javadoc:org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint[], gửi một header WWW-Authenticate.
 `RequestCache` thường là một `NullRequestCache` không lưu request vì client có khả năng replay các request mà nó đã gửi ban đầu.
 
@@ -45,16 +45,16 @@ image:{icondir}/number_1.png[] Khi user gửi username và password, `BasicAuthe
 image:{icondir}/number_2.png[] Tiếp theo, `UsernamePasswordAuthenticationToken` được truyền vào `AuthenticationManager` để được authentication.
 Chi tiết về cấu trúc của `AuthenticationManager` phụ thuộc vào cách xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd[lưu trữ thông tin user].
 
-image:{icondir}/number_3.png[] Nếu authentication thất bại thì __Failure__.
+image:{icondir}/number_3.png[] Nếu authentication thất bại thì __Thất bại__.
 
 . xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder] được xóa.
-. `RememberMeServices.loginFail` is invoked.
+. `RememberMeServices.loginFail` được gọi.
 Nếu remember me chưa được cấu hình thì đây là no-op.
 Xem interface javadoc:org.springframework.security.web.authentication.RememberMeServices[] trong Javadoc.
 . `AuthenticationEntryPoint` được gọi để kích hoạt việc gửi lại WWW-Authenticate.
 Xem interface javadoc:org.springframework.security.web.AuthenticationEntryPoint[] trong Javadoc.
 
-image:{icondir}/number_4.png[] Nếu authentication thành công thì __Success__.
+image:{icondir}/number_4.png[] Nếu authentication thành công thì __Thành công__.
 
 * Mọi `Authentication` đã được authentication trước đó trong xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] được load và các authority của nó được thêm vào xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] được trả về.
 . xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication] được set trên xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder].
