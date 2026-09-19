@@ -1,5 +1,5 @@
 [[test-webflux]]
-= Reactive Test Support
+= Hỗ trợ kiểm thử Reactive
 :page-section-summary-toc: 1
 
-Spring Security supports two basic modes for testing reactive applications.
+Spring Security hỗ trợ hai chế độ cơ bản để kiểm thử các ứng dụng Reactive.
