@@ -1,0 +1,66 @@
+# Bilingual Antora playbook for the documentation-only Spring Security fork.
+# English is served at the site root; Vietnamese under /vi/.
+
+antora:
+  extensions:
+  - require: '@springio/antora-extensions/override-navigation-builder-extension'
+  - require: '@springio/antora-extensions/static-page-extension'
+  - require: ./antora/extensions/language-switcher-extension.js
+    locales:
+    - code: en
+      label: English
+      component: security
+    - code: vi
+      label: Tiếng Việt
+      component: vi
+  - require: ./antora/extensions/reference-fallback-extension.js
+    component_fallbacks:
+    - component: vi
+      fallback: security
+  - require: '@springio/antora-extensions/root-component-extension'
+    root_component_name: security
+
+site:
+  title: Spring Security
+
+content:
+  sources:
+  - url: .
+    branches: HEAD
+    edit_url: false
+    start_path: docs
+  - url: .
+    branches: HEAD
+    start_path: vi
+
+urls:
+  latest_version_segment: ''
+
+asciidoc:
+  sourcemap: true
+  extensions:
+  - '@asciidoctor/tabs'
+  - '@springio/asciidoctor-extensions'
+  - '@springio/asciidoctor-extensions/javadoc-extension'
+  attributes:
+    chomp: all
+    hide-uri-scheme: '@'
+    page-pagination: ''
+    page-stackoverflow-url: https://stackoverflow.com/tags/spring-security
+    tabs-sync-option: '@'
+    github-repo: 'spring-projects/spring-security'
+    github-ref: 'main'
+    javadoc-location: 'https://docs.spring.io/spring-security/site/docs/current/api/'
+
+ui:
+  bundle:
+    url: https://github.com/spring-io/antora-ui-spring/releases/download/v0.4.26/ui-bundle.zip
+  supplemental_files: ./antora/ui
+
+output:
+  dir: ./build/site
+
+runtime:
+  log:
+    format: pretty
+    failure_level: fatal
