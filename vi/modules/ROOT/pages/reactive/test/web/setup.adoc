@@ -1,6 +1,6 @@
-= WebTestClient Security Setup
+= Thiết lập Security cho WebTestClient
 
-The basic setup looks like this:
+Thiết lập cơ bản như sau:
 
 [tabs]
 ======
@@ -23,7 +23,7 @@ public class HelloWebfluxMethodApplicationTests {
 	public void setup() {
 		this.rest = WebTestClient
 			.bindToApplicationContext(this.context)
-			// add Spring Security test Support
+			// thêm hỗ trợ kiểm thử Spring Security
 			.apply(springSecurity())
 			.configureClient()
 			.filter(basicAuthentication("user", "password"))
@@ -52,7 +52,7 @@ class HelloWebfluxMethodApplicationTests {
     fun setup() {
         this.rest = WebTestClient
             .bindToApplicationContext(this.context)
-            // add Spring Security test Support
+            // thêm hỗ trợ kiểm thử Spring Security
             .apply(springSecurity())
             .configureClient()
             .filter(basicAuthentication("user", "password"))
