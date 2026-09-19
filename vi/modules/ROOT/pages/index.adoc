@@ -2,21 +2,21 @@
 
 [NOTE]
 ====
-Spring Security's documentation can be {site-url}/spring-security-docs.zip[downloaded] as a zip file.
+Tài liệu Spring Security có thể được {site-url}/spring-security-docs.zip[tải xuống] dưới dạng tệp zip.
 ====
 
-Spring Security is a framework that provides xref:features/authentication/index.adoc[authentication], xref:features/authorization/index.adoc[authorization], and xref:features/exploits/index.adoc[protection against common attacks].
-With first class support for securing both xref:servlet/index.adoc[imperative] and xref:reactive/index.adoc[reactive] applications, it is the de-facto standard for securing Spring-based applications.
+Spring Security là một framework cung cấp xref:features/authentication/index.adoc[authentication], xref:features/authorization/index.adoc[authorization] và xref:features/exploits/index.adoc[khả năng bảo vệ khỏi các cuộc tấn công phổ biến].
+Với hỗ trợ hàng đầu cho việc bảo mật cả các ứng dụng xref:servlet/index.adoc[imperative] và xref:reactive/index.adoc[reactive], đây là tiêu chuẩn trên thực tế để bảo mật các ứng dụng dựa trên Spring.
 
-For a complete list of features, see the xref:features/index.adoc[Features] section of the reference.
+Để xem danh sách đầy đủ các tính năng, hãy xem phần xref:features/index.adoc[Tính năng] trong tài liệu tham khảo.
 
-== Getting Started
+== Bắt đầu
 
-If you are ready to start securing an application see the Getting Started sections for xref:servlet/getting-started.adoc[servlet] and xref:reactive/getting-started.adoc[reactive]. These sections will walk you through creating your first Spring Security applications.
+Nếu bạn đã sẵn sàng bắt đầu bảo mật một ứng dụng, hãy xem các phần Bắt đầu cho xref:servlet/getting-started.adoc[servlet] và xref:reactive/getting-started.adoc[reactive]. Các phần này sẽ hướng dẫn bạn tạo các ứng dụng Spring Security đầu tiên.
 
-If you want to understand how Spring Security works, you can refer to the xref:servlet/architecture.adoc[Architecture] section.
-// FIXME add link to reactive architecture
+Nếu bạn muốn hiểu cách Spring Security hoạt động, bạn có thể tham khảo phần xref:servlet/architecture.adoc[Kiến trúc].
+// FIXME thêm liên kết đến kiến trúc reactive
 
-If you are already familiar with Spring Security or are upgrading, check out xref:whats-new.adoc[what's new in the latest release].
+Nếu bạn đã quen thuộc với Spring Security hoặc đang nâng cấp, hãy xem xref:whats-new.adoc[có gì mới trong bản phát hành mới nhất].
 
-If you have any questions, there is a wonderful xref:community.adoc[community] that would love to help you!
+Nếu bạn có bất kỳ câu hỏi nào, có một xref:community.adoc[cộng đồng] tuyệt vời luôn sẵn lòng trợ giúp bạn!
