@@ -1,15 +1,15 @@
 [[servlet-saml2login-metadata]]
-= Saml 2.0 Metadata
+= Metadata SAML 2.0
 
-Spring Security can <<parsing-asserting-party-metadata,parse asserting party metadata>> to produce an `AssertingPartyMetadata` instance as well as <<publishing-relying-party-metadata,publish relying party metadata>> from a `RelyingPartyRegistration` instance.
+Spring Security có thể <<parsing-asserting-party-metadata,phân tích metadata của asserting party>> để tạo một instance `AssertingPartyMetadata`, đồng thời <<publishing-relying-party-metadata,xuất bản metadata của relying party>> từ một instance `RelyingPartyRegistration`.
 
 [[parsing-asserting-party-metadata]]
-== Parsing `<saml2:IDPSSODescriptor>` metadata
+== Phân tích metadata `<saml2:IDPSSODescriptor>`
 
-You can parse an asserting party's metadata xref:servlet/saml2/login/overview.adoc#servlet-saml2login-relyingpartyregistrationrepository[using `RelyingPartyRegistrations`].
+Bạn có thể phân tích metadata của asserting party xref:servlet/saml2/login/overview.adoc#servlet-saml2login-relyingpartyregistrationrepository[bằng cách sử dụng `RelyingPartyRegistrations`].
 
-When using the OpenSAML vendor support, the resulting `AssertingPartyMetadata` will be of type `OpenSamlAssertingPartyDetails`.
-This means you'll be able to do get the underlying OpenSAML XMLObject by doing the following:
+Khi sử dụng phần hỗ trợ vendor của OpenSAML, `AssertingPartyMetadata` thu được sẽ có kiểu `OpenSamlAssertingPartyDetails`.
+Điều này có nghĩa là bạn có thể lấy XMLObject OpenSAML bên dưới bằng cách thực hiện như sau:
 
 [tabs]
 ======
@@ -33,19 +33,19 @@ val openSamlEntityDescriptor: EntityDescriptor = details.getEntityDescriptor()
 ======
 
 [[using-assertingpartymetadatarepository]]
-=== Using `AssertingPartyMetadataRepository`
+=== Sử dụng `AssertingPartyMetadataRepository`
 
-You can also be more targeted than `RelyingPartyRegistrations` by using `AssertingPartyMetadataRepository`, an interface that allows for only retrieving the asserting party metadata.
+Bạn cũng có thể nhắm mục tiêu cụ thể hơn so với `RelyingPartyRegistrations` bằng cách sử dụng `AssertingPartyMetadataRepository`, một interface chỉ cho phép truy xuất metadata của asserting party.
 
-This allows three valuable features:
+Điều này cung cấp ba tính năng hữu ích:
 
-* Implementations can refresh asserting party metadata in an expiry-aware fashion
-* Implementations of `RelyingPartyRegistrationRepository` can more easily articulate a relationship between a relying party and its one or many corresponding asserting parties
-* Implementations can verify metadata signatures
+* Các implementation có thể làm mới metadata của asserting party theo cách nhận biết thời điểm hết hạn
+* Các implementation của `RelyingPartyRegistrationRepository` có thể dễ dàng thể hiện mối quan hệ giữa một relying party và một hoặc nhiều asserting party tương ứng
+* Các implementation có thể xác minh chữ ký metadata
 
-For example, `OpenSaml5AssertingPartyMetadataRepository` uses OpenSAML's `MetadataResolver`, and API whose implementations regularly refresh the underlying metadata in an expiry-aware fashion.
+Ví dụ, `OpenSaml5AssertingPartyMetadataRepository` sử dụng `MetadataResolver` của OpenSAML, một API mà các implementation của nó thường xuyên làm mới metadata bên dưới theo cách nhận biết thời điểm hết hạn.
 
-This means that you can now create a refreshable `RelyingPartyRegistrationRepository` in just a few lines of code:
+Điều này có nghĩa là giờ đây bạn có thể tạo một `RelyingPartyRegistrationRepository` có khả năng làm mới chỉ với vài dòng code:
 
 [tabs]
 ======
@@ -120,11 +120,11 @@ class RefreshableRelyingPartyRegistrationRepository : IterableRelyingPartyRegist
 ======
 
 [TIP]
-`OpenSaml5AssertingPartyMetadataRepository` also ships with a constructor so you can provide a custom `MetadataResolver`. Since the underlying `MetadataResolver` is doing the expiring and refreshing, if you use the constructor directly, you will only get these features by providing an implementation that does so.
+`OpenSaml5AssertingPartyMetadataRepository` cũng cung cấp một constructor để bạn có thể truyền vào một `MetadataResolver` tùy chỉnh. Vì `MetadataResolver` bên dưới thực hiện việc theo dõi thời điểm hết hạn và làm mới, nếu bạn gọi trực tiếp constructor, bạn chỉ nhận được các tính năng này khi cung cấp một implementation thực hiện việc đó.
 
-=== Verifying Metadata Signatures
+=== Xác minh chữ ký metadata
 
-You can also verify metadata signatures using `OpenSaml5AssertingPartyMetadataRepository` by providing the appropriate set of ``Saml2X509Credential``s as follows:
+Bạn cũng có thể xác minh chữ ký metadata bằng cách sử dụng `OpenSaml5AssertingPartyMetadataRepository` và cung cấp tập hợp ``Saml2X509Credential``s phù hợp như sau:
 
 [tabs]
 ======
@@ -149,12 +149,12 @@ OpenSaml5AssertingPartyMetadataRepository.withMetadataLocation("https://idp.exam
 ======
 
 [NOTE]
-If no credentials are provided, the component will not perform signature validation.
+Nếu không cung cấp credential nào, component sẽ không thực hiện validation chữ ký.
 
 [[publishing-relying-party-metadata]]
-== Producing `<saml2:SPSSODescriptor>` Metadata
+== Tạo metadata `<saml2:SPSSODescriptor>`
 
-You can publish a metadata endpoint using the `saml2Metadata` DSL method, as you'll see below:
+Bạn có thể xuất bản một metadata endpoint bằng method DSL `saml2Metadata`, như minh họa bên dưới:
 
 [tabs]
 ======
@@ -180,12 +180,12 @@ http {
 ----
 ======
 
-You can use this metadata endpoint to register your relying party with your asserting party.
-This is often as simple as finding the correct form field to supply the metadata endpoint.
+Bạn có thể sử dụng metadata endpoint này để đăng ký relying party của mình với asserting party.
+Việc này thường đơn giản như tìm đúng trường biểu mẫu để cung cấp metadata endpoint.
 
-By default, the metadata endpoint is `+/saml2/metadata+`, though it also responds to `+/saml2/metadata/{registrationId}+` and `+/saml2/service-provider-metadata/{registrationId}+`.
+Theo mặc định, metadata endpoint là `+/saml2/metadata+`, nhưng nó cũng phản hồi tại `+/saml2/metadata/{registrationId}+` và `+/saml2/service-provider-metadata/{registrationId}+`.
 
-You can change this by calling the `metadataUrl` method in the DSL:
+Bạn có thể thay đổi điều này bằng cách gọi method `metadataUrl` trong DSL:
 
 [tabs]
 ======
@@ -206,9 +206,9 @@ saml2Metadata {
 ----
 ======
 
-== Changing the Way a `RelyingPartyRegistration` Is Looked Up
+== Thay đổi cách tra cứu một `RelyingPartyRegistration`
 
-If you have a different strategy for identifying which `RelyingPartyRegistration` to use, you can configure your own `Saml2MetadataResponseResolver` like the one below:
+Nếu bạn có một chiến lược khác để xác định `RelyingPartyRegistration` nào cần sử dụng, bạn có thể cấu hình `Saml2MetadataResponseResolver` của riêng mình như dưới đây:
 
 [tabs]
 ======
