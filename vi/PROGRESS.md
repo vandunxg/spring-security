@@ -122,10 +122,40 @@
 101. [x] `modules/ROOT/pages/servlet/saml2/saml-extension-migration.adoc`
 102. [x] `modules/ROOT/pages/servlet/exploits/index.adoc`
 103. [x] `modules/ROOT/pages/servlet/exploits/csrf.adoc`
+104. [x] `modules/ROOT/pages/servlet/exploits/headers.adoc`
+105. [x] `modules/ROOT/pages/servlet/exploits/http.adoc`
+106. [x] `modules/ROOT/pages/servlet/exploits/firewall.adoc`
+107. [x] `modules/ROOT/pages/servlet/integrations/index.adoc`
+108. [x] `modules/ROOT/pages/servlet/integrations/concurrency.adoc`
+109. [x] `modules/ROOT/pages/servlet/integrations/localization.adoc`
+110. [x] `modules/ROOT/pages/servlet/integrations/servlet-api.adoc`
+111. [x] `modules/ROOT/pages/servlet/integrations/data.adoc`
+112. [x] `modules/ROOT/pages/servlet/integrations/mvc.adoc`
+113. [x] `modules/ROOT/pages/servlet/integrations/websocket.adoc`
+114. [x] `modules/ROOT/pages/servlet/integrations/cors.adoc`
+115. [x] `modules/ROOT/pages/servlet/integrations/jsp-taglibs.adoc`
+116. [x] `modules/ROOT/pages/servlet/integrations/observability.adoc`
+117. [x] `modules/ROOT/pages/servlet/configuration/java.adoc`
+118. [x] `modules/ROOT/pages/servlet/configuration/kotlin.adoc`
+119. [x] `modules/ROOT/pages/servlet/configuration/xml-namespace.adoc`
+120. [x] `modules/ROOT/pages/servlet/test/index.adoc`
+121. [x] `modules/ROOT/pages/servlet/test/method.adoc`
+122. [x] `modules/ROOT/pages/servlet/test/mockmvc/index.adoc`
+123. [x] `modules/ROOT/pages/servlet/test/mockmvc/setup.adoc`
+124. [x] `modules/ROOT/pages/servlet/test/mockmvc/request-post-processors.adoc`
+125. [x] `modules/ROOT/pages/servlet/test/mockmvc/authentication.adoc`
+126. [x] `modules/ROOT/pages/servlet/test/mockmvc/csrf.adoc`
+127. [x] `modules/ROOT/pages/servlet/test/mockmvc/form-login.adoc`
+128. [x] `modules/ROOT/pages/servlet/test/mockmvc/http-basic.adoc`
+129. [x] `modules/ROOT/pages/servlet/test/mockmvc/oauth2.adoc`
+130. [x] `modules/ROOT/pages/servlet/test/mockmvc/logout.adoc`
+131. [x] `modules/ROOT/pages/servlet/test/mockmvc/request-builders.adoc`
+132. [x] `modules/ROOT/pages/servlet/test/mockmvc/result-matchers.adoc`
+133. [x] `modules/ROOT/pages/servlet/test/mockmvc/result-handlers.adoc`
 
 ## Trang tiếp theo
 
-1. [ ] `modules/ROOT/pages/servlet/exploits/headers.adoc`
+1. [ ] `modules/ROOT/pages/servlet/appendix/index.adoc`
 
 ## Kiểm tra chất lượng
 
