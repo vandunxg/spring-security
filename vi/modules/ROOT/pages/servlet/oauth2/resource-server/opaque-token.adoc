@@ -1,25 +1,25 @@
-= OAuth 2.0 Resource Server Opaque Token
+= Opaque Token của OAuth 2.0 Resource Server
 :figures: servlet/oauth2
 
 [[oauth2resourceserver-opaque-minimaldependencies]]
-== Minimal Dependencies for Introspection
-As described in xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-minimaldependencies[Minimal Dependencies for JWT] most of Resource Server support is collected in `spring-security-oauth2-resource-server`.
-However unless a custom <<oauth2resourceserver-opaque-introspector,`OpaqueTokenIntrospector`>> is provided, the Resource Server will fallback to `SpringOpaqueTokenIntrospector`.
-This means that only `spring-security-oauth2-resource-server` is necessary in order to have a working minimal Resource Server that supports opaque Bearer Tokens.
+== Dependency tối thiểu cho introspection
+Như đã mô tả trong xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-minimaldependencies[Dependency tối thiểu cho JWT], phần lớn phần hỗ trợ Resource Server được tập hợp trong `spring-security-oauth2-resource-server`.
+Tuy nhiên, nếu không cung cấp một `OpaqueTokenIntrospector` tùy chỉnh, Resource Server sẽ fallback về `SpringOpaqueTokenIntrospector`.
+Điều này có nghĩa là chỉ cần `spring-security-oauth2-resource-server` để có một Resource Server tối thiểu hoạt động được và hỗ trợ opaque Bearer Token.
 
 [[oauth2resourceserver-opaque-minimalconfiguration]]
-== Minimal Configuration for Introspection
+== Cấu hình tối thiểu cho introspection
 
-Typically, an opaque token can be verified via an https://tools.ietf.org/html/rfc7662[OAuth 2.0 Introspection Endpoint], hosted by the authorization server.
-This can be handy when revocation is a requirement.
+Thông thường, opaque token có thể được xác minh thông qua https://tools.ietf.org/html/rfc7662[OAuth 2.0 Introspection Endpoint] do Authorization Server lưu trữ.
+Điều này hữu ích khi yêu cầu đặt ra là phải thu hồi token.
 
-When using https://spring.io/projects/spring-boot[Spring Boot], configuring an application as a resource server that uses introspection consists of two basic steps.
-First, include the needed dependencies and second, indicate the introspection endpoint details.
+Khi sử dụng https://spring.io/projects/spring-boot[Spring Boot], việc cấu hình một ứng dụng làm resource server sử dụng introspection gồm hai bước cơ bản.
+Thứ nhất, thêm các dependency cần thiết; thứ hai, chỉ định thông tin chi tiết của introspection endpoint.
 
 [[oauth2resourceserver-opaque-introspectionuri]]
-=== Specifying the Authorization Server
+=== Chỉ định Authorization Server
 
-To specify where the introspection endpoint is, simply do:
+Để chỉ định vị trí của introspection endpoint, chỉ cần làm như sau:
 
 [source,yaml]
 ----
@@ -33,25 +33,25 @@ spring:
           client-secret: secret
 ----
 
-Where `https://idp.example.com/introspect` is the introspection endpoint hosted by your authorization server and `client-id` and `client-secret` are the credentials needed to hit that endpoint.
+Trong đó, `https://idp.example.com/introspect` là introspection endpoint do Authorization Server của bạn lưu trữ, còn `client-id` và `client-secret` là các credential cần thiết để gọi endpoint đó.
 
-Resource Server will use these properties to further self-configure and subsequently validate incoming JWTs.
+Resource Server sẽ sử dụng các property này để tự cấu hình thêm và sau đó xác thực JWT đến.
 
 [NOTE]
-When using introspection, the authorization server's word is the law.
-If the authorization server responses that the token is valid, then it is.
+Khi sử dụng introspection, kết luận của Authorization Server là quyết định cuối cùng.
+Nếu Authorization Server phản hồi rằng token hợp lệ thì token đó hợp lệ.
 
-And that's it!
+Vậy là xong!
 
-=== Startup Expectations
+=== Kỳ vọng khi khởi động
 
-When this property and these dependencies are used, Resource Server will automatically configure itself to validate Opaque Bearer Tokens.
+Khi sử dụng property và các dependency này, Resource Server sẽ tự động cấu hình để xác thực Opaque Bearer Token.
 
-This startup process is quite a bit simpler than for JWTs since no endpoints need to be discovered and no additional validation rules get added.
+Quy trình khởi động này đơn giản hơn khá nhiều so với JWT vì không cần discovery endpoint và không thêm quy tắc xác thực nào khác.
 
-=== Runtime Expectations
+=== Kỳ vọng khi chạy
 
-Once the application is started up, Resource Server will attempt to process any request containing an `Authorization: Bearer` header:
+Sau khi ứng dụng khởi động, Resource Server sẽ cố gắng xử lý mọi request chứa header `Authorization: Bearer`:
 
 [source,http]
 ----
@@ -59,52 +59,52 @@ GET / HTTP/1.1
 Authorization: Bearer some-token-value # Resource Server will process this
 ----
 
-So long as this scheme is indicated, Resource Server will attempt to process the request according to the Bearer Token specification.
+Miễn là scheme này được chỉ định, Resource Server sẽ cố gắng xử lý request theo đặc tả Bearer Token.
 
-Given an Opaque Token, Resource Server will
+Với một Opaque Token, Resource Server sẽ
 
-1. Query the provided introspection endpoint using the provided credentials and the token
-2. Inspect the response for an `{ 'active' : true }` attribute
-3. Map each scope to an authority with the prefix `SCOPE_`
+1. Truy vấn introspection endpoint đã cung cấp bằng credential và token đã cung cấp
+2. Kiểm tra response để tìm attribute `{ 'active' : true }`
+3. Ánh xạ mỗi scope thành một authority với tiền tố `SCOPE_`
 
-The resulting `Authentication#getPrincipal`, by default, is a Spring Security javadoc:org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal[] object, and `Authentication#getName` maps to the token's `sub` property, if one is present.
+Kết quả của `Authentication#getPrincipal`, theo mặc định, là một object Spring Security javadoc:org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal[], còn `Authentication#getName` ánh xạ tới property `sub` của token nếu property này tồn tại.
 
-From here, you may want to jump to:
+Từ đây, bạn có thể chuyển tới:
 
 * <<oauth2resourceserver-opaque-architecture>>
-* <<oauth2resourceserver-opaque-attributes,Looking Up Attributes Post-Authentication>>
-* <<oauth2resourceserver-opaque-authorization-extraction,Extracting Authorities Manually>>
-* <<oauth2resourceserver-opaque-jwt-introspector,Using Introspection with JWTs>>
+* <<oauth2resourceserver-opaque-attributes,Tra cứu attribute sau authentication>>
+* <<oauth2resourceserver-opaque-authorization-extraction,Trích xuất authority thủ công>>
+* <<oauth2resourceserver-opaque-jwt-introspector,Sử dụng introspection với JWT>>
 
 [[oauth2resourceserver-opaque-architecture]]
-== How Opaque Token Authentication Works
+== Authentication bằng Opaque Token hoạt động như thế nào
 
-Next, let's see the architectural components that Spring Security uses to support https://tools.ietf.org/html/rfc7662[opaque token] Authentication in servlet-based applications, like the one we just saw.
+Tiếp theo, hãy xem các thành phần kiến trúc mà Spring Security sử dụng để hỗ trợ authentication bằng https://tools.ietf.org/html/rfc7662[opaque token] trong các ứng dụng dựa trên Servlet, như ứng dụng vừa xem.
 
-javadoc:org.springframework.security.oauth2.server.resource.authentication.OpaqueTokenAuthenticationProvider[] is an xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationprovider[`AuthenticationProvider`] implementation that leverages a <<oauth2resourceserver-opaque-introspector,`OpaqueTokenIntrospector`>> to authenticate an opaque token.
+javadoc:org.springframework.security.oauth2.server.resource.authentication.OpaqueTokenAuthenticationProvider[] là một implementation của xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationprovider[`AuthenticationProvider`], sử dụng <<oauth2resourceserver-opaque-introspector,`OpaqueTokenIntrospector`>> để authentication một opaque token.
 
-Let's take a look at how `OpaqueTokenAuthenticationProvider` works within Spring Security.
-The figure explains details of how the xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationmanager[`AuthenticationManager`] in figures from xref:servlet/oauth2/resource-server/index.adoc#oauth2resourceserver-authentication-bearertokenauthenticationfilter[Reading the Bearer Token] works.
+Hãy xem `OpaqueTokenAuthenticationProvider` hoạt động như thế nào trong Spring Security.
+Hình minh họa giải thích chi tiết cách xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationmanager[`AuthenticationManager`] trong các hình ở xref:servlet/oauth2/resource-server/index.adoc#oauth2resourceserver-authentication-bearertokenauthenticationfilter[Đọc Bearer Token] hoạt động.
 
-.`OpaqueTokenAuthenticationProvider` Usage
+.Cách sử dụng `OpaqueTokenAuthenticationProvider`
 [.invert-dark]
 image::{figures}/opaquetokenauthenticationprovider.png[]
 
-image:{icondir}/number_1.png[] The authentication `Filter` from xref:servlet/oauth2/resource-server/index.adoc#oauth2resourceserver-authentication-bearertokenauthenticationfilter[Reading the Bearer Token] passes a `BearerTokenAuthenticationToken` to the `AuthenticationManager` which is implemented by xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager[`ProviderManager`].
+image:{icondir}/number_1.png[] `Filter` authentication từ xref:servlet/oauth2/resource-server/index.adoc#oauth2resourceserver-authentication-bearertokenauthenticationfilter[Đọc Bearer Token] truyền một `BearerTokenAuthenticationToken` tới `AuthenticationManager`, được triển khai bởi xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager[`ProviderManager`].
 
-image:{icondir}/number_2.png[] The `ProviderManager` is configured to use an xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationprovider[AuthenticationProvider] of type `OpaqueTokenAuthenticationProvider`.
+image:{icondir}/number_2.png[] `ProviderManager` được cấu hình để sử dụng xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationprovider[AuthenticationProvider] có kiểu `OpaqueTokenAuthenticationProvider`.
 
 [[oauth2resourceserver-opaque-architecture-introspector]]
-image:{icondir}/number_3.png[] `OpaqueTokenAuthenticationProvider` introspects the opaque token and adds granted authorities using an <<oauth2resourceserver-opaque-introspector,`OpaqueTokenIntrospector`>>.
-When authentication is successful, the xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] that is returned is of type `BearerTokenAuthentication` and has a principal that is the `OAuth2AuthenticatedPrincipal` returned by the configured <<oauth2resourceserver-opaque-introspector,`OpaqueTokenIntrospector`>> and a set of authorities that contains at least `FACTOR_BEARER`.
-Ultimately, the returned `BearerTokenAuthentication` will be set on the xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] by the authentication `Filter`.
+image:{icondir}/number_3.png[] `OpaqueTokenAuthenticationProvider` thực hiện introspection opaque token và thêm các authority được cấp bằng một <<oauth2resourceserver-opaque-introspector,`OpaqueTokenIntrospector`>>.
+Khi authentication thành công, xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] được trả về có kiểu `BearerTokenAuthentication`, với principal là `OAuth2AuthenticatedPrincipal` do <<oauth2resourceserver-opaque-introspector,`OpaqueTokenIntrospector`>> đã cấu hình trả về, và một tập authority chứa ít nhất `FACTOR_BEARER`.
+Cuối cùng, `BearerTokenAuthentication` được trả về sẽ được `Filter` authentication đặt vào xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`].
 
 [[oauth2resourceserver-opaque-attributes]]
-== Looking Up Attributes Post-Authentication
+== Tra cứu attribute sau authentication
 
-Once a token is authenticated, an instance of `BearerTokenAuthentication` is set in the `SecurityContext`.
+Sau khi token được authentication, một instance của `BearerTokenAuthentication` được đặt trong `SecurityContext`.
 
-This means that it's available in `@Controller` methods when using `@EnableWebMvc` in your configuration:
+Điều này có nghĩa là nó khả dụng trong các method `@Controller` khi sử dụng `@EnableWebMvc` trong cấu hình:
 
 [tabs]
 ======
@@ -129,7 +129,7 @@ fun foo(authentication: BearerTokenAuthentication): String {
 ----
 ======
 
-Since `BearerTokenAuthentication` holds an `OAuth2AuthenticatedPrincipal`, that also means that it's available to controller methods, too:
+Vì `BearerTokenAuthentication` chứa một `OAuth2AuthenticatedPrincipal`, điều đó cũng có nghĩa là nó khả dụng trong các method của controller:
 
 [tabs]
 ======
@@ -154,11 +154,11 @@ fun foo(@AuthenticationPrincipal principal: OAuth2AuthenticatedPrincipal): Strin
 ----
 ======
 
-=== Looking Up Attributes Via SpEL
+=== Tra cứu attribute qua SpEL
 
-Of course, this also means that attributes can be accessed via SpEL.
+Tất nhiên, điều này cũng có nghĩa là có thể truy cập các attribute qua SpEL.
 
-For example, if using `@EnableGlobalMethodSecurity` so that you can use `@PreAuthorize` annotations, you can do:
+Ví dụ, nếu sử dụng `@EnableGlobalMethodSecurity` để có thể dùng annotation `@PreAuthorize`, bạn có thể làm như sau:
 
 [tabs]
 ======
@@ -184,14 +184,14 @@ fun forFoosEyesOnly(): String {
 ======
 
 [[oauth2resourceserver-opaque-sansboot]]
-== Overriding or Replacing Boot Auto Configuration
+== Ghi đè hoặc thay thế Boot Auto Configuration
 
-There are two ``@Bean``s that Spring Boot generates on Resource Server's behalf.
+Có hai ``@Bean`` được Spring Boot tạo thay cho Resource Server.
 
-The first is a `SecurityFilterChain` that configures the app as a resource server.
-When use Opaque Token, this `SecurityFilterChain` looks like:
+Bean đầu tiên là một `SecurityFilterChain` cấu hình ứng dụng thành resource server.
+Khi sử dụng Opaque Token, `SecurityFilterChain` này có dạng:
 
-.Default Opaque Token Configuration
+.Cấu hình Opaque Token mặc định
 [tabs]
 ======
 Java::
@@ -230,11 +230,11 @@ open fun filterChain(http: HttpSecurity): SecurityFilterChain {
 ----
 ======
 
-If the application doesn't expose a `SecurityFilterChain` bean, then Spring Boot will expose the above default one.
+Nếu ứng dụng không expose một bean `SecurityFilterChain`, Spring Boot sẽ expose bean mặc định như trên.
 
-Replacing this is as simple as exposing the bean within the application:
+Việc thay thế bean này đơn giản là expose bean đó trong ứng dụng:
 
-.Custom Opaque Token Configuration
+.Cấu hình Opaque Token tùy chỉnh
 [tabs]
 ======
 Java::
@@ -291,12 +291,12 @@ class MyCustomSecurityConfiguration {
 ----
 ======
 
-The above requires the scope of `message:read` for any URL that starts with `/messages/`.
+Phần trên yêu cầu scope `message:read` đối với mọi URL bắt đầu bằng `/messages/`.
 
-Methods on the `oauth2ResourceServer` DSL will also override or replace auto configuration.
+Các method trên DSL `oauth2ResourceServer` cũng sẽ ghi đè hoặc thay thế auto-configuration.
 
 [[oauth2resourceserver-opaque-introspector]]
-For example, the second `@Bean` Spring Boot creates is an `OpaqueTokenIntrospector`, <<oauth2resourceserver-opaque-architecture-introspector,which decodes `String` tokens into validated instances of `OAuth2AuthenticatedPrincipal`>>:
+Ví dụ, `@Bean` thứ hai Spring Boot tạo là một `OpaqueTokenIntrospector`, <<oauth2resourceserver-opaque-architecture-introspector,giải mã token `String` thành các instance đã được xác thực của `OAuth2AuthenticatedPrincipal`>>:
 
 [tabs]
 ======
@@ -323,17 +323,17 @@ fun introspector(): OpaqueTokenIntrospector {
 ----
 ======
 
-If the application doesn't expose an <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> bean, then Spring Boot will expose the above default one.
+Nếu ứng dụng không expose bean <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>>, Spring Boot sẽ expose bean mặc định như trên.
 
-And its configuration can be overridden using `introspectionUri()` and `introspectionClientCredentials()` or replaced using `introspector()`.
+Có thể ghi đè cấu hình của bean này bằng `introspectionUri()` và `introspectionClientCredentials()`, hoặc thay thế bằng `introspector()`.
 
-If the application doesn't expose an `OpaqueTokenAuthenticationConverter` bean, then spring-security will build `BearerTokenAuthentication`.
+Nếu ứng dụng không expose bean `OpaqueTokenAuthenticationConverter`, spring-security sẽ xây dựng `BearerTokenAuthentication`.
 
-Or, if you're not using Spring Boot at all, then all of these components - the filter chain, an <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> and an `OpaqueTokenAuthenticationConverter` can be specified in XML.
+Hoặc, nếu hoàn toàn không sử dụng Spring Boot, tất cả các thành phần này - filter chain, một <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> và một `OpaqueTokenAuthenticationConverter` - có thể được chỉ định trong XML.
 
-The filter chain is specified like so:
+Filter chain được chỉ định như sau:
 
-.Default Opaque Token Configuration
+.Cấu hình Opaque Token mặc định
 [tabs]
 ======
 Xml::
@@ -350,9 +350,9 @@ Xml::
 ----
 ======
 
-And the <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> like so:
+Và <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> như sau:
 
-.Opaque Token Introspector
+.Introspector cho Opaque Token
 [tabs]
 ======
 Xml::
@@ -368,9 +368,9 @@ Xml::
 ----
 ======
 
-And the `OpaqueTokenAuthenticationConverter` like so:
+Và `OpaqueTokenAuthenticationConverter` như sau:
 
-.Opaque Token Authentication Converter
+.Authentication Converter cho Opaque Token
 [tabs]
 ======
 Xml::
@@ -383,11 +383,11 @@ Xml::
 ======
 
 [[oauth2resourceserver-opaque-introspectionuri-dsl]]
-=== Using `introspectionUri()`
+=== Sử dụng `introspectionUri()`
 
-An authorization server's Introspection Uri can be configured <<oauth2resourceserver-opaque-introspectionuri,as a configuration property>> or it can be supplied in the DSL:
+Introspection Uri của Authorization Server có thể được cấu hình <<oauth2resourceserver-opaque-introspectionuri,như một configuration property>> hoặc được cung cấp trong DSL:
 
-.Introspection URI Configuration
+.Cấu hình Introspection URI
 [tabs]
 ======
 Java::
@@ -452,14 +452,14 @@ Xml::
 ----
 ======
 
-Using `introspectionUri()` takes precedence over any configuration property.
+Sử dụng `introspectionUri()` được ưu tiên hơn mọi configuration property.
 
 [[oauth2resourceserver-opaque-introspector-dsl]]
-=== Using `introspector()`
+=== Sử dụng `introspector()`
 
-More powerful than `introspectionUri()` is `introspector()`, which will completely replace any Boot auto configuration of <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>>:
+Mạnh hơn `introspectionUri()` là `introspector()`, method này sẽ thay thế hoàn toàn mọi auto-configuration của Boot đối với <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>>:
 
-.Introspector Configuration
+.Cấu hình Introspector
 [tabs]
 ======
 Java::
@@ -522,12 +522,12 @@ Xml::
 ----
 ======
 
-This is handy when deeper configuration, like <<oauth2resourceserver-opaque-authorization-extraction,authority mapping>>, <<oauth2resourceserver-opaque-jwt-introspector,JWT revocation>>, or <<oauth2resourceserver-opaque-timeouts,request timeouts>>, is necessary.
+Điều này hữu ích khi cần cấu hình chuyên sâu hơn, chẳng hạn như <<oauth2resourceserver-opaque-authorization-extraction,ánh xạ authority>>, <<oauth2resourceserver-opaque-jwt-introspector,thu hồi JWT>> hoặc <<oauth2resourceserver-opaque-timeouts,request timeout>>.
 
 [[oauth2resourceserver-opaque-introspector-bean]]
-=== Exposing a `OpaqueTokenIntrospector` `@Bean`
+=== Expose `@Bean` `OpaqueTokenIntrospector`
 
-Or, exposing a <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> `@Bean` has the same effect as `introspector()`:
+Hoặc, expose `@Bean` <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> cũng có tác dụng tương tự `introspector()`:
 
 [source,java]
 ----
@@ -539,17 +539,17 @@ public OpaqueTokenIntrospector introspector() {
 ----
 
 [[oauth2resourceserver-opaque-authorization]]
-== Configuring Authorization
+== Cấu hình authorization
 
-An OAuth 2.0 Introspection endpoint will typically return a `scope` attribute, indicating the scopes (or authorities) it's been granted, for example:
+OAuth 2.0 Introspection endpoint thường trả về một attribute `scope`, cho biết các scope (hoặc authority) đã được cấp, ví dụ:
 
 `{ ..., "scope" : "messages contacts"}`
 
-When this is the case, Resource Server will attempt to coerce these scopes into a list of granted authorities, prefixing each scope with the string "SCOPE_".
+Trong trường hợp này, Resource Server sẽ cố gắng chuyển các scope này thành một danh sách authority được cấp, thêm chuỗi "SCOPE_" làm tiền tố cho mỗi scope.
 
-This means that to protect an endpoint or method with a scope derived from an Opaque Token, the corresponding expressions should include this prefix:
+Điều này có nghĩa là để bảo vệ một endpoint hoặc method bằng scope lấy từ Opaque Token, các expression tương ứng phải chứa tiền tố này:
 
-.Authorization Opaque Token Configuration
+.Cấu hình authorization cho Opaque Token
 [tabs]
 ======
 Java::
@@ -617,7 +617,7 @@ Xml::
 ----
 ======
 
-Or similarly with method security:
+Hoặc tương tự với method security:
 
 [tabs]
 ======
@@ -639,26 +639,26 @@ fun getMessages(): List<Message?> {}
 ======
 
 [[method-security-has-scope]]
-=== Using `hasScope` in Method Security
+=== Sử dụng `hasScope` trong Method Security
 
-Because method security expressions can evaluation `AuthorizationManager` instances, you can also use the `hasScope` API by publishing a `DefaultOAuth2AuthorizationManagerFactory` `@Bean`:
+Vì expression của method security có thể đánh giá các instance `AuthorizationManager`, bạn cũng có thể sử dụng API `hasScope` bằng cách publish một `@Bean` `DefaultOAuth2AuthorizationManagerFactory`:
 
 include-code::./MethodSecurityHasScopeConfiguration[tag=declare-factory,indent=0]
 
-and then doing:
+và sau đó làm như sau:
 
 include-code::./MessageService[tag=protected-method,indent=0]
 
-If you are using xref:servlet/authentication/mfa.adoc[Spring Security's MFA feature], then you can supply its `AuthorizationManagerFactory` instance to ensure that your authentication factors are automatically checked as well by including it in your `DefaultOAuth2AuthorizationManagerFactory` constructor as follows:
+Nếu đang sử dụng xref:servlet/authentication/mfa.adoc[tính năng MFA của Spring Security], bạn có thể cung cấp instance `AuthorizationManagerFactory` của tính năng này để đảm bảo các factor authentication cũng được tự động kiểm tra, bằng cách truyền nó vào constructor của `DefaultOAuth2AuthorizationManagerFactory` như sau:
 
 include-code::./MethodSecurityHasScopeMfaConfiguration[tag=declare-factory,indent=0]
 
 [[oauth2resourceserver-opaque-authorization-extraction]]
-=== Extracting Authorities Manually
+=== Trích xuất authority thủ công
 
-By default, Opaque Token support will extract the scope claim from an introspection response and parse it into individual `GrantedAuthority` instances.
+Theo mặc định, phần hỗ trợ Opaque Token sẽ trích xuất claim scope từ introspection response và phân tích thành các instance `GrantedAuthority` riêng lẻ.
 
-For example, if the introspection response were:
+Ví dụ, nếu introspection response là:
 
 [source,json]
 ----
@@ -668,9 +668,9 @@ For example, if the introspection response were:
 }
 ----
 
-Then Resource Server would generate an `Authentication` with two authorities, one for `message:read` and the other for `message:write`.
+Resource Server sẽ tạo một `Authentication` với hai authority, một cho `message:read` và một cho `message:write`.
 
-This can, of course, be customized using a custom <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> that takes a look at the attribute set and converts in its own way:
+Tất nhiên, có thể tùy chỉnh điều này bằng một <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> tùy chỉnh, xem xét tập attribute và chuyển đổi theo cách riêng:
 
 [tabs]
 ======
@@ -721,7 +721,7 @@ class CustomAuthoritiesOpaqueTokenIntrospector : OpaqueTokenIntrospector {
 ----
 ======
 
-Thereafter, this custom introspector can be configured simply by exposing it as a `@Bean`:
+Sau đó, có thể cấu hình introspector tùy chỉnh này đơn giản bằng cách expose nó dưới dạng `@Bean`:
 
 [tabs]
 ======
@@ -747,45 +747,45 @@ fun introspector(): OpaqueTokenIntrospector {
 ======
 
 [[oauth2resourceserver-opaque-timeouts]]
-== Configuring Timeouts
+== Cấu hình timeout
 
-By default, Resource Server uses connection and socket timeouts of 30 seconds each for coordinating with the authorization server.
+Theo mặc định, Resource Server sử dụng connection timeout và socket timeout đều là 30 giây khi giao tiếp với Authorization Server.
 
-This may be too short in some scenarios.
-Further, it doesn't take into account more sophisticated patterns like back-off and discovery.
+Trong một số tình huống, thời gian này có thể quá ngắn.
+Ngoài ra, cách này không tính đến các pattern phức tạp hơn như back-off và discovery.
 
 [[opaque-token-timeouts-rest-client]]
-=== Using `RestClientOpaqueTokenIntrospector`
+=== Sử dụng `RestClientOpaqueTokenIntrospector`
 
-You can use `RestClientOpaqueTokenIntrospector`, which uses `RestClient` to communicate with the introspection endpoint.
+Bạn có thể sử dụng `RestClientOpaqueTokenIntrospector`, class này dùng `RestClient` để giao tiếp với introspection endpoint.
 
 [TIP]
 ====
-When using Spring Boot, you can inject `OAuth2ResourceServerProperties` to obtain the introspection URI and client credentials.
+Khi sử dụng Spring Boot, bạn có thể inject `OAuth2ResourceServerProperties` để lấy introspection URI và client credential.
 ====
 
-.Minimal configuration using the builder
+.Cấu hình tối thiểu bằng builder
 include-code::./RestClientOpaqueTokenIntrospectorConfiguration[tag=restclient-simple,indent=0]
 
-To customize timeouts, build a `RestClient` with a custom `RequestFactory` and pass it to the introspector:
+Để tùy chỉnh timeout, hãy xây dựng một `RestClient` với `RequestFactory` tùy chỉnh và truyền nó cho introspector:
 
-.Custom timeouts
+.Timeout tùy chỉnh
 include-code::./RestClientOpaqueTokenIntrospectorConfiguration[tag=restclient-timeouts,indent=0]
 
 [TIP]
 ====
-If you prefer to use `RestTemplate`, you can use `SpringOpaqueTokenIntrospector` instead, which accepts an instance of `RestOperations`.
+Nếu muốn sử dụng `RestTemplate`, bạn có thể dùng `SpringOpaqueTokenIntrospector` để thay thế; class này nhận một instance của `RestOperations`.
 ====
 
 [[oauth2resourceserver-opaque-jwt-introspector]]
-== Using Introspection with JWTs
+== Sử dụng introspection với JWT
 
-A common question is whether or not introspection is compatible with JWTs.
-Spring Security's Opaque Token support has been designed to not care about the format of the token -- it will gladly pass any token to the introspection endpoint provided.
+Một câu hỏi thường gặp là introspection có tương thích với JWT hay không.
+Phần hỗ trợ Opaque Token của Spring Security được thiết kế để không quan tâm đến format của token -- nó sẽ chuyển bất kỳ token nào tới introspection endpoint được cung cấp.
 
-So, let's say that you've got a requirement that requires you to check with the authorization server on each request, in case the JWT has been revoked.
+Giả sử có một yêu cầu buộc bạn phải kiểm tra với Authorization Server trong mỗi request, phòng trường hợp JWT đã bị thu hồi.
 
-Even though you are using the JWT format for the token, your validation method is introspection, meaning you'd want to do:
+Dù đang sử dụng format JWT cho token, method xác thực của bạn là introspection, nghĩa là bạn sẽ làm như sau:
 
 [source,yaml]
 ----
@@ -799,13 +799,13 @@ spring:
           client-secret: secret
 ----
 
-In this case, the resulting `Authentication` would be `BearerTokenAuthentication`.
-Any attributes in the corresponding `OAuth2AuthenticatedPrincipal` would be whatever was returned by the introspection endpoint.
+Trong trường hợp này, `Authentication` kết quả sẽ là `BearerTokenAuthentication`.
+Mọi attribute trong `OAuth2AuthenticatedPrincipal` tương ứng sẽ là các giá trị do introspection endpoint trả về.
 
-But, let's say that, oddly enough, the introspection endpoint only returns whether or not the token is active.
-Now what?
+Nhưng giả sử, khá đặc biệt, introspection endpoint chỉ trả về việc token có active hay không.
+Khi đó phải làm gì?
 
-In this case, you can create a custom <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> that still hits the endpoint, but then updates the returned principal to have the JWTs claims as the attributes:
+Trong trường hợp này, bạn có thể tạo một <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> tùy chỉnh, vẫn gọi endpoint đó nhưng sau đó cập nhật principal được trả về để các claim của JWT trở thành attribute:
 
 [tabs]
 ======
@@ -866,7 +866,7 @@ class JwtOpaqueTokenIntrospector : OpaqueTokenIntrospector {
 ----
 ======
 
-Thereafter, this custom introspector can be configured simply by exposing it as a `@Bean`:
+Sau đó, có thể cấu hình introspector tùy chỉnh này đơn giản bằng cách expose nó dưới dạng `@Bean`:
 
 [tabs]
 ======
@@ -892,18 +892,18 @@ fun introspector(): OpaqueTokenIntrospector {
 ======
 
 [[oauth2resourceserver-opaque-userinfo]]
-== Calling a `/userinfo` Endpoint
+== Gọi endpoint `/userinfo`
 
-Generally speaking, a Resource Server doesn't care about the underlying user, but instead about the authorities that have been granted.
+Nói chung, Resource Server không quan tâm đến user bên dưới mà quan tâm đến các authority đã được cấp.
 
-That said, at times it can be valuable to tie the authorization statement back to a user.
+Tuy vậy, đôi khi việc liên kết quyết định authorization với một user có thể hữu ích.
 
-If an application is also using `spring-security-oauth2-client`, having set up the appropriate `ClientRegistrationRepository`, then this is quite simple with a custom <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>>.
-This implementation below does three things:
+Nếu ứng dụng cũng sử dụng `spring-security-oauth2-client` và đã thiết lập `ClientRegistrationRepository` phù hợp, việc này khá đơn giản với một <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>> tùy chỉnh.
+Implementation dưới đây thực hiện ba việc:
 
-* Delegates to the introspection endpoint, to affirm the token's validity
-* Looks up the appropriate client registration associated with the `/userinfo` endpoint
-* Invokes and returns the response from the `/userinfo` endpoint
+* Ủy quyền cho introspection endpoint để khẳng định tính hợp lệ của token
+* Tra cứu client registration phù hợp được liên kết với endpoint `/userinfo`
+* Gọi và trả về response từ endpoint `/userinfo`
 
 [tabs]
 ======
@@ -960,8 +960,8 @@ class UserInfoOpaqueTokenIntrospector : OpaqueTokenIntrospector {
 ----
 ======
 
-If you aren't using `spring-security-oauth2-client`, it's still quite simple.
-You will simply need to invoke the `/userinfo` with your own instance of `WebClient`:
+Nếu không sử dụng `spring-security-oauth2-client`, việc này vẫn khá đơn giản.
+Bạn chỉ cần gọi `/userinfo` bằng instance `WebClient` của riêng mình:
 
 [tabs]
 ======
@@ -1001,7 +1001,7 @@ class UserInfoOpaqueTokenIntrospector : OpaqueTokenIntrospector {
 ----
 ======
 
-Either way, having created your <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>>, you should publish it as a `@Bean` to override the defaults:
+Dù theo cách nào, sau khi tạo <<oauth2resourceserver-opaque-architecture-introspector,`OpaqueTokenIntrospector`>>, bạn nên publish nó dưới dạng `@Bean` để ghi đè các mặc định:
 
 [tabs]
 ======
