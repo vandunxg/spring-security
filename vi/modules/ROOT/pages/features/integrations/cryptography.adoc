@@ -61,13 +61,13 @@ Thay vào đó, hãy tìm trong kho dữ liệu của bạn một cơ chế đ�
 
 [[spring-security-crypto-keygenerators]]
 == Bộ sinh khóa
-Class javadoc:org.springframework.security.crypto.keygen.KeyGenerators[] cung cấp một số phương thức factory tiện dụng để xây dựng các loại bộ sinh khóa khác nhau.
+Class javadoc:org.springframework.security.crypto.keygen.KeyGenerators[] cung cấp một số method factory tiện dụng để xây dựng các loại bộ sinh khóa khác nhau.
 Bằng cách sử dụng class này, bạn có thể tạo một javadoc:org.springframework.security.crypto.keygen.BytesKeyGenerator[] để sinh các khóa `byte[]`.
 Bạn cũng có thể xây dựng một javadoc:org.springframework.security.crypto.keygen.StringKeyGenerator[] để sinh các khóa dạng chuỗi.
 `KeyGenerators` là một class an toàn trong môi trường đa luồng.
 
 === BytesKeyGenerator
-Bạn có thể sử dụng các phương thức factory `KeyGenerators.secureRandom` để sinh một `BytesKeyGenerator` được hỗ trợ bởi một instance `SecureRandom`:
+Bạn có thể sử dụng các method factory `KeyGenerators.secureRandom` để sinh một `BytesKeyGenerator` được hỗ trợ bởi một instance `SecureRandom`:
 
 .BytesKeyGenerator
 include-code::./CryptoKeyGeneratorTests[tag=bytes-key-generator,indent=0]
@@ -78,13 +78,13 @@ Một biến thể `KeyGenerators.secureRandom` cho phép kiểm soát độ dà
 .KeyGenerators.secureRandom
 include-code::./CryptoKeyGeneratorTests[tag=bytes-key-generator-custom-length,indent=0]
 
-Sử dụng phương thức factory `KeyGenerators.shared` để xây dựng một BytesKeyGenerator luôn trả về cùng một khóa trong mọi lần gọi:
+Sử dụng method factory `KeyGenerators.shared` để xây dựng một BytesKeyGenerator luôn trả về cùng một khóa trong mọi lần gọi:
 
 .KeyGenerators.shared
 include-code::./CryptoKeyGeneratorTests[tag=bytes-key-generator-shared,indent=0]
 
 === StringKeyGenerator
-Bạn có thể sử dụng phương thức factory `KeyGenerators.string` để xây dựng một `KeyGenerator` 8 byte, `SecureRandom`, mã hóa hex từng khóa thành một `String`:
+Bạn có thể sử dụng method factory `KeyGenerators.string` để xây dựng một `KeyGenerator` 8 byte, `SecureRandom`, mã hóa hex từng khóa thành một `String`:
 
 .StringKeyGenerator
 include-code::./CryptoKeyGeneratorTests[tag=string-key-generator,indent=0]
