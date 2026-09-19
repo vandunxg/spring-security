@@ -1,17 +1,17 @@
 [[servlet-authorization-authorizationfilter]]
-= Authorize HttpServletRequests
+= Ủy quyền HttpServletRequest
 :figures: servlet/authorization
 
-Spring Security allows you to xref:servlet/authorization/index.adoc[model your authorization] at the request level.
-For example, with Spring Security you can say that all pages under `/admin` require one authority while all other pages simply require authentication.
+Spring Security cho phép bạn xref:servlet/authorization/index.adoc[mô hình hóa authorization] ở cấp request.
+Ví dụ, với Spring Security, bạn có thể quy định rằng mọi trang dưới `/admin` yêu cầu một authority, còn mọi trang khác chỉ yêu cầu authentication.
 
-By default, Spring Security requires that every request be authenticated.
-That said, any time you use xref:servlet/configuration/java.adoc#jc-httpsecurity[an `HttpSecurity` instance], it's necessary to declare your authorization rules.
+Theo mặc định, Spring Security yêu cầu mọi request phải được authenticated.
+Tuy vậy, bất cứ khi nào sử dụng xref:servlet/configuration/java.adoc#jc-httpsecurity[một instance `HttpSecurity`], bạn đều cần khai báo các quy tắc authorization.
 
 [[activate-request-security]]
-Whenever you have an `HttpSecurity` instance, you should at least do:
+Khi có một instance `HttpSecurity`, ít nhất bạn nên thực hiện như sau:
 
-.Use authorizeHttpRequests
+.Sử dụng authorizeHttpRequests
 [tabs]
 ======
 Java::
@@ -45,54 +45,54 @@ Xml::
 ----
 ======
 
-This tells Spring Security that any endpoint in your application requires that the security context at a minimum be authenticated in order to allow it.
+Điều này cho Spring Security biết rằng mọi endpoint trong ứng dụng ít nhất phải có security context được authenticated thì mới được phép truy cập.
 
-In many cases, your authorization rules will be more sophisticated than that, so please consider the following use cases:
+Trong nhiều trường hợp, các quy tắc authorization của bạn sẽ phức tạp hơn, vì vậy hãy xem xét các trường hợp sử dụng sau:
 
-* I have an app that uses `authorizeRequests` and I want to <<migrate-authorize-requests,migrate it to `authorizeHttpRequests`>>
-* I want to <<request-authorization-architecture,understand how the `AuthorizationFilter` components work>>
-* I want to <<match-requests, match requests>> based on a pattern; specifically <<match-by-regex,regex>>
-* I want to match request, and I map Spring MVC to <<mvc-not-default-servlet, something other than the default servlet>>
-* I want to <<authorize-requests, authorize requests>>
-* I want to <<match-by-custom, match a request programmatically>>
-* I want to <<authorize-requests, authorize a request programmatically>>
-* I want to <<remote-authorization-manager, delegate request authorization>> to a policy agent
-* I want to <<customizing-authorization-managers,customize how authorization managers are created>>
+* Tôi có một ứng dụng sử dụng `authorizeRequests` và muốn <<migrate-authorize-requests,di chuyển sang `authorizeHttpRequests`>>
+* Tôi muốn <<request-authorization-architecture,tìm hiểu cách các component `AuthorizationFilter` hoạt động>>
+* Tôi muốn <<match-requests,so khớp request>> dựa trên một pattern, cụ thể là <<match-by-regex,biểu thức chính quy>>
+* Tôi muốn so khớp request và ánh xạ Spring MVC tới <<mvc-not-default-servlet,một servlet khác servlet mặc định>>
+* Tôi muốn <<authorize-requests,ủy quyền request>>
+* Tôi muốn <<match-by-custom,so khớp request bằng chương trình>>
+* Tôi muốn <<authorize-requests,ủy quyền request bằng chương trình>>
+* Tôi muốn <<remote-authorization-manager,ủy quyền request>> cho một policy agent
+* Tôi muốn <<customizing-authorization-managers,tùy chỉnh cách tạo authorization manager>>
 
 [[request-authorization-architecture]]
-== Understanding How Request Authorization Components Work
+== Tìm hiểu cách các component authorization request hoạt động
 
 [NOTE]
-This section builds on xref:servlet/architecture.adoc#servlet-architecture[Servlet Architecture and Implementation] by digging deeper into how xref:servlet/authorization/index.adoc#servlet-authorization[authorization] works at the request level in Servlet-based applications.
+Phần này dựa trên xref:servlet/architecture.adoc#servlet-architecture[Kiến trúc và triển khai Servlet] để đi sâu hơn vào cách xref:servlet/authorization/index.adoc#servlet-authorization[authorization] hoạt động ở cấp request trong các ứng dụng dựa trên Servlet.
 
-.Authorize HttpServletRequest
+.Ủy quyền HttpServletRequest
 [.invert-dark]
 image::{figures}/authorizationfilter.png[]
 
-* image:{icondir}/number_1.png[] First, the `AuthorizationFilter` constructs a `Supplier` that retrieves an  xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication] from the xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder].
-* image:{icondir}/number_2.png[] Second, it passes the `Supplier<Authentication>` and the `HttpServletRequest` to the xref:servlet/architecture.adoc#authz-authorization-manager[`AuthorizationManager`].
-The `AuthorizationManager` matches the request to the patterns in `authorizeHttpRequests`, and runs the corresponding rule.
-** image:{icondir}/number_3.png[] If authorization is denied, xref:servlet/authorization/events.adoc[an `AuthorizationDeniedEvent` is published], and an `AccessDeniedException` is thrown.
-In this case the xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] handles the `AccessDeniedException`.
-** image:{icondir}/number_4.png[] If access is granted, xref:servlet/authorization/events.adoc[an `AuthorizationGrantedEvent` is published] and `AuthorizationFilter` continues with the xref:servlet/architecture.adoc#servlet-filters-review[FilterChain] which allows the application to process normally.
+* image:{icondir}/number_1.png[] Đầu tiên, `AuthorizationFilter` tạo một `Supplier` lấy xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication] từ xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder].
+* image:{icondir}/number_2.png[] Thứ hai, nó truyền `Supplier<Authentication>` và `HttpServletRequest` tới xref:servlet/architecture.adoc#authz-authorization-manager[`AuthorizationManager`].
+`AuthorizationManager` so khớp request với các pattern trong `authorizeHttpRequests` và thực thi quy tắc tương ứng.
+** image:{icondir}/number_3.png[] Nếu authorization bị từ chối, xref:servlet/authorization/events.adoc[một `AuthorizationDeniedEvent` được publish] và một `AccessDeniedException` được throw.
+Trong trường hợp này, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] xử lý `AccessDeniedException`.
+** image:{icondir}/number_4.png[] Nếu access được cấp, xref:servlet/authorization/events.adoc[một `AuthorizationGrantedEvent` được publish] và `AuthorizationFilter` tiếp tục với xref:servlet/architecture.adoc#servlet-filters-review[FilterChain], cho phép ứng dụng xử lý bình thường.
 
-=== `AuthorizationFilter` Is Last By Default
+=== `AuthorizationFilter` mặc định ở vị trí cuối
 
-The `AuthorizationFilter` is last in xref:servlet/architecture.adoc#servlet-filterchain-figure[the Spring Security filter chain] by default.
-This means that Spring Security's xref:servlet/authentication/index.adoc[authentication filters], xref:servlet/exploits/index.adoc[exploit protections], and other filter integrations do not require authorization.
-If you add filters of your own before the `AuthorizationFilter`, they will also not require authorization; otherwise, they will.
+Theo mặc định, `AuthorizationFilter` ở vị trí cuối trong xref:servlet/architecture.adoc#servlet-filterchain-figure[filter chain của Spring Security].
+Điều này có nghĩa là xref:servlet/authentication/index.adoc[các authentication filter], xref:servlet/exploits/index.adoc[các cơ chế bảo vệ khỏi exploit] và các tích hợp filter khác của Spring Security không yêu cầu authorization.
+Nếu thêm filter của riêng bạn trước `AuthorizationFilter`, các filter đó cũng không yêu cầu authorization; nếu không, chúng sẽ yêu cầu.
 
-A place where this typically becomes important is when you are adding {spring-framework-reference-url}web.html#spring-web[Spring MVC] endpoints.
-Because they are executed by the {spring-framework-reference-url}web.html#mvc-servlet[`DispatcherServlet`] and this comes after the `AuthorizationFilter`, your endpoints need to be <<authorizing-endpoints,included in `authorizeHttpRequests` to be permitted>>.
+Điều này thường trở nên quan trọng khi bạn thêm các endpoint {spring-framework-reference-url}web.html#spring-web[Spring MVC].
+Vì chúng được thực thi bởi {spring-framework-reference-url}web.html#mvc-servlet[`DispatcherServlet`] và servlet này chạy sau `AuthorizationFilter`, các endpoint của bạn cần được <<authorizing-endpoints,đưa vào `authorizeHttpRequests` để được cho phép>>.
 
-=== All Dispatches Are Authorized
+=== Mọi dispatch đều được authorization
 
-The `AuthorizationFilter` runs not just on every request, but on every dispatch.
-This means that the `REQUEST` dispatch needs authorization, but also ``FORWARD``s, ``ERROR``s, and ``INCLUDE``s.
+`AuthorizationFilter` không chỉ chạy trên mọi request mà còn trên mọi dispatch.
+Điều này có nghĩa là dispatch `REQUEST` cần authorization, cũng như các dispatch ``FORWARD``, ``ERROR`` và ``INCLUDE``.
 
-For example, {spring-framework-reference-url}web.html#spring-web[Spring MVC] can `FORWARD` the request to a view resolver that renders a Thymeleaf template, like so:
+Ví dụ, {spring-framework-reference-url}web.html#spring-web[Spring MVC] có thể `FORWARD` request tới một view resolver render template Thymeleaf như sau:
 
-.Sample Forwarding Spring MVC Controller
+.Controller Spring MVC chuyển tiếp mẫu
 [tabs]
 ======
 Java::
@@ -122,14 +122,14 @@ class MyController {
 ----
 ======
 
-In this case, authorization happens twice; once for authorizing `/endpoint` and once for forwarding to Thymeleaf to render the "endpoint" template.
+Trong trường hợp này, authorization diễn ra hai lần: một lần để ủy quyền cho `/endpoint` và một lần để chuyển tiếp tới Thymeleaf render template "endpoint".
 
-For that reason, you may want to <<match-by-dispatcher-type, permit all `FORWARD` dispatches>>.
+Vì lý do đó, bạn có thể muốn <<match-by-dispatcher-type,cho phép mọi dispatch `FORWARD`>>.
 
-Another example of this principle is {spring-boot-reference-url}reference/web/servlet.html#web.servlet.spring-mvc.error-handling[how Spring Boot handles errors].
-If the container catches an exception, say like the following:
+Một ví dụ khác của nguyên tắc này là {spring-boot-reference-url}reference/web/servlet.html#web.servlet.spring-mvc.error-handling[cách Spring Boot xử lý lỗi].
+Nếu container bắt được một exception, chẳng hạn như sau:
 
-.Sample Erroring Spring MVC Controller
+.Controller Spring MVC gây lỗi mẫu
 [tabs]
 ======
 Java::
@@ -159,27 +159,27 @@ class MyController {
 ----
 ======
 
-then Boot will dispatch it to the `ERROR` dispatch.
+thì Boot sẽ dispatch nó tới dispatch `ERROR`.
 
-In that case, authorization also happens twice; once for authorizing `/endpoint` and once for dispatching the error.
+Trong trường hợp đó, authorization cũng diễn ra hai lần: một lần để ủy quyền cho `/endpoint` và một lần để dispatch lỗi.
 
-For that reason, you may want to <<match-by-dispatcher-type, permit all `ERROR` dispatches>>.
+Vì lý do đó, bạn có thể muốn <<match-by-dispatcher-type,cho phép mọi dispatch `ERROR`>>.
 
-=== `Authentication` Lookup is Deferred
+=== Việc tra cứu `Authentication` được trì hoãn
 
-Remember that xref:servlet/authorization/architecture.adoc#_the_authorizationmanager[the `AuthorizationManager` API uses a `Supplier<Authentication>`].
+Hãy nhớ rằng xref:servlet/authorization/architecture.adoc#_the_authorizationmanager[API `AuthorizationManager` sử dụng một `Supplier<Authentication>`].
 
-This matters with `authorizeHttpRequests` when requests are <<authorize-requests,always permitted or always denied>>.
-In those cases, xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[the `Authentication`] is not queried, making for a faster request.
+Điều này quan trọng với `authorizeHttpRequests` khi request <<authorize-requests,luôn được cho phép hoặc luôn bị từ chối>>.
+Trong các trường hợp đó, xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] không được truy vấn, giúp request nhanh hơn.
 
 [[authorizing-endpoints]]
-== Authorizing an Endpoint
+== Ủy quyền cho một endpoint
 
-You can configure Spring Security to have different rules by adding more rules in order of precedence.
+Bạn có thể cấu hình Spring Security với các quy tắc khác nhau bằng cách thêm các quy tắc theo thứ tự ưu tiên.
 
-If you want to require that `/endpoint` only be accessible by end users with the `USER` authority, then you can do:
+Nếu muốn yêu cầu chỉ end user có authority `USER` mới truy cập được `/endpoint`, bạn có thể thực hiện như sau:
 
-.Authorize an Endpoint
+.Ủy quyền cho một endpoint
 [tabs]
 ======
 Java::
@@ -227,17 +227,17 @@ Xml::
 ----
 ======
 
-As you can see, the declaration can be broken up in to pattern/rule pairs.
+Như bạn có thể thấy, khai báo có thể được chia thành các cặp pattern/rule.
 
-`AuthorizationFilter` processes these pairs in the order listed, applying only the first match to the request.
-This means that even though `/**` would also match for `/endpoint` the above rules are not a problem.
-The way to read the above rules is "if the request is `/endpoint`, then require the `USER` authority; else, only require authentication".
+`AuthorizationFilter` xử lý các cặp này theo thứ tự được liệt kê và chỉ áp dụng kết quả so khớp đầu tiên cho request.
+Điều này có nghĩa là dù `/**` cũng khớp với `/endpoint`, các quy tắc trên vẫn không có vấn đề.
+Có thể đọc các quy tắc trên như sau: "nếu request là `/endpoint` thì yêu cầu authority `USER`; nếu không thì chỉ yêu cầu authentication".
 
-Spring Security supports several patterns and several rules; you can also programmatically create your own of each.
+Spring Security hỗ trợ nhiều pattern và nhiều rule; bạn cũng có thể tạo các pattern và rule của riêng mình bằng chương trình.
 
-Once authorized, you can test it using xref:servlet/test/method.adoc#test-method-withmockuser[Security's test support] in the following way:
+Sau khi cấu hình authorization, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
 
-.Test Endpoint Authorization
+.Kiểm thử authorization của endpoint
 [tabs]
 ======
 Java::
@@ -267,26 +267,26 @@ void anyWhenUnauthenticatedThenUnauthorized() {
 ======
 
 [[match-requests]]
-== Matching Requests
+== So khớp request
 
-Above you've already seen <<authorizing-endpoints, two ways to match requests>>.
+Ở trên, bạn đã thấy <<authorizing-endpoints,hai cách so khớp request>>.
 
-The first you saw was the simplest, which is to match any request.
+Cách đầu tiên là đơn giản nhất: so khớp mọi request.
 
-The second is to match by a URI pattern.
-Spring Security supports two languages for URI pattern-matching: <<match-by-ant,Ant>> (as seen above) and <<match-by-regex,Regular Expressions>>.
+Cách thứ hai là so khớp theo pattern URI.
+Spring Security hỗ trợ hai ngôn ngữ để so khớp pattern URI: <<match-by-ant,Ant>> (như ở trên) và <<match-by-regex,biểu thức chính quy>>.
 
 [[match-by-ant]]
-=== Matching Using Ant
-Ant is the default language that Spring Security uses to match requests.
+=== So khớp bằng Ant
+Ant là ngôn ngữ mặc định mà Spring Security sử dụng để so khớp request.
 
-You can use it to match a single endpoint or a directory, and you can even capture placeholders for later use.
-You can also refine it to match a specific set of HTTP methods.
+Bạn có thể dùng nó để so khớp một endpoint hoặc một thư mục, thậm chí capture placeholder để sử dụng sau.
+Bạn cũng có thể tinh chỉnh nó để so khớp một tập HTTP method cụ thể.
 
-Let's say that you instead of wanting to match the `/endpoint` endpoint, you want to match all endpoints under the `/resource` directory.
-In that case, you can do something like the following:
+Giả sử thay vì muốn so khớp endpoint `/endpoint`, bạn muốn so khớp mọi endpoint dưới thư mục `/resource`.
+Trong trường hợp đó, bạn có thể thực hiện như sau:
 
-.Match with Ant
+.So khớp bằng Ant
 [tabs]
 ======
 Java::
@@ -323,11 +323,11 @@ Xml::
 ----
 ======
 
-The way to read this is "if the request is `/resource` or some subdirectory, require the `USER` authority; otherwise, only require authentication"
+Có thể đọc quy tắc này như sau: "nếu request là `/resource` hoặc một thư mục con, yêu cầu authority `USER`; nếu không thì chỉ yêu cầu authentication".
 
-You can also extract path values from the request, as seen below:
+Bạn cũng có thể trích xuất giá trị path từ request như dưới đây:
 
-.Authorize and Extract
+.Ủy quyền và trích xuất
 [tabs]
 ======
 Java::
@@ -364,9 +364,9 @@ Xml::
 ----
 ======
 
-Once authorized, you can test it using xref:servlet/test/method.adoc#test-method-withmockuser[Security's test support] in the following way:
+Sau khi cấu hình authorization, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
 
-.Test Directory Authorization
+.Kiểm thử authorization của thư mục
 [tabs]
 ======
 Java::
@@ -396,18 +396,18 @@ void anyWhenUnauthenticatedThenUnauthorized() {
 ======
 
 [NOTE]
-Spring Security only matches paths.
-If you want to match query parameters, you will need a custom request matcher.
+Spring Security chỉ so khớp path.
+Nếu muốn so khớp query parameter, bạn sẽ cần một request matcher tùy chỉnh.
 
 [[match-by-regex]]
-=== Matching Using Regular Expressions
-Spring Security supports matching requests against a regular expression.
-This can come in handy if you want to apply more strict matching criteria than `**` on a subdirectory.
+=== So khớp bằng biểu thức chính quy
+Spring Security hỗ trợ so khớp request với một biểu thức chính quy.
+Điều này hữu ích nếu bạn muốn áp dụng tiêu chí so khớp chặt chẽ hơn `**` trên một thư mục con.
 
-For example, consider a path that contains the username and the rule that all usernames must be alphanumeric.
-You can use javadoc:org.springframework.security.web.util.matcher.RegexRequestMatcher[] to respect this rule, like so:
+Ví dụ, hãy xét một path chứa username và quy tắc rằng mọi username phải là chữ và số.
+Bạn có thể sử dụng javadoc:org.springframework.security.web.util.matcher.RegexRequestMatcher[] để tuân thủ quy tắc này như sau:
 
-.Match with Regex
+.So khớp bằng Regex
 [tabs]
 ======
 Java::
@@ -445,14 +445,14 @@ Xml::
 ======
 
 [[match-by-httpmethod]]
-=== Matching By Http Method
+=== So khớp theo Http Method
 
-You can also match rules by HTTP method.
-One place where this is handy is when authorizing by permissions granted, like being granted a `read` or `write` privilege.
+Bạn cũng có thể so khớp rule theo HTTP method.
+Điều này hữu ích khi ủy quyền theo permission được cấp, chẳng hạn privilege `read` hoặc `write`.
 
-To require all ``GET``s to have the `read` permission and all ``POST``s to have the `write` permission, you can do something like this:
+Để yêu cầu mọi ``GET`` có permission `read` và mọi ``POST`` có permission `write`, bạn có thể thực hiện như sau:
 
-.Match by HTTP Method
+.So khớp theo HTTP Method
 [tabs]
 ======
 Java::
@@ -492,14 +492,14 @@ Xml::
 ----
 ======
 
-These authorization rules should read as: "if the request is a GET, then require `read` permission; else, if the request is a POST, then require `write` permission; else, deny the request"
+Các quy tắc authorization này có thể được đọc như sau: "nếu request là GET thì yêu cầu permission `read`; nếu không, nếu request là POST thì yêu cầu permission `write`; nếu không thì từ chối request".
 
 [TIP]
-Denying the request by default is a healthy security practice since it turns the set of rules into an allow list.
+Từ chối request theo mặc định là một thực hành bảo mật tốt vì nó biến tập rule thành allow list.
 
-Once authorized, you can test it using xref:servlet/test/method.adoc#test-method-withmockuser[Security's test support] in the following way:
+Sau khi cấu hình authorization, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
 
-.Test Http Method Authorization
+.Kiểm thử authorization của Http Method
 [tabs]
 ======
 Java::
@@ -537,17 +537,17 @@ void postWhenNoWriteAuthorityThenForbidden() {
 ======
 
 [[match-by-dispatcher-type]]
-=== Matching By Dispatcher Type
+=== So khớp theo Dispatcher Type
 
 [NOTE]
-This feature is not currently supported in XML
+Tính năng này hiện chưa được hỗ trợ trong XML
 
-As stated earlier, Spring Security <<_all_dispatches_are_authorized, authorizes all dispatcher types by default>>.
-And even though xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontext[the security context] established on the `REQUEST` dispatch carries over to subsequent dispatches, subtle mismatches can sometimes cause an unexpected `AccessDeniedException`.
+Như đã nêu ở trên, theo mặc định Spring Security <<_all_dispatches_are_authorized,ủy quyền cho mọi dispatcher type>>.
+Mặc dù xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontext[security context] được thiết lập trên dispatch `REQUEST` được truyền sang các dispatch tiếp theo, những khác biệt nhỏ trong so khớp đôi khi có thể gây ra `AccessDeniedException` ngoài dự kiến.
 
-To address that, you can configure Spring Security Java configuration to allow dispatcher types like `FORWARD` and `ERROR`, like so:
+Để giải quyết điều đó, bạn có thể cấu hình Java configuration của Spring Security cho phép các dispatcher type như `FORWARD` và `ERROR` như sau:
 
-.Match by Dispatcher Type
+.So khớp theo Dispatcher Type
 [tabs]
 ======
 Java::
@@ -578,13 +578,13 @@ http {
 ======
 
 [[match-by-mvc]]
-=== Matching by Servlet Path
+=== So khớp theo Servlet Path
 
-Generally speaking, you can use `requestMatchers(String)` as demonstrated above.
+Nói chung, bạn có thể sử dụng `requestMatchers(String)` như minh họa ở trên.
 
-However, if you have authorization rules from multiple servlets, you need to specify those:
+Tuy nhiên, nếu có các quy tắc authorization từ nhiều servlet, bạn cần chỉ rõ chúng:
 
-.Match by PathPatternRequestMatcher
+.So khớp bằng PathPatternRequestMatcher
 [tabs]
 ======
 Java::
@@ -635,24 +635,24 @@ Xml::
 ----
 ======
 
-This is because Spring Security requires all URIs to be absolute (minus the context path).
+Điều này là do Spring Security yêu cầu mọi URI phải là absolute (không bao gồm context path).
 
 [TIP]
 =====
-There are several other components that create request matchers for you like {spring-boot-api-url}org/springframework/boot/security/autoconfigure/web/servlet/PathRequest.html[`PathRequest#toStaticResources#atCommonLocations`]
+Có một số component khác tạo request matcher cho bạn, chẳng hạn {spring-boot-api-url}org/springframework/boot/security/autoconfigure/web/servlet/PathRequest.html[`PathRequest#toStaticResources#atCommonLocations`]
 =====
 
-If most of your authorization rules sit under the same servlet path, you can xref:servlet/integrations/mvc.adoc#mvc-requestmatcher[publish a `PathPatternRequestMatcher.Builder` bean] with that base path; Spring Security then applies it to the string overloads of `authorizeHttpRequests((authorize) -> authorize.requestMatchers(...))`, `HttpSecurity#securityMatcher(...)` / `#securityMatchers(...)`, and `WebSecurityCustomizer#ignoring().requestMatchers(...)`.
+Nếu phần lớn quy tắc authorization của bạn nằm dưới cùng một servlet path, bạn có thể xref:servlet/integrations/mvc.adoc#mvc-requestmatcher[publish một bean `PathPatternRequestMatcher.Builder`] với base path đó; khi ấy Spring Security áp dụng nó cho các overload nhận string của `authorizeHttpRequests((authorize) -> authorize.requestMatchers(...))`, `HttpSecurity#securityMatcher(...)` / `#securityMatchers(...)` và `WebSecurityCustomizer#ignoring().requestMatchers(...)`.
 
 [[match-by-custom]]
-=== Using a Custom Matcher
+=== Sử dụng matcher tùy chỉnh
 
 [NOTE]
-This feature is not currently supported in XML
+Tính năng này hiện chưa được hỗ trợ trong XML
 
-In Java configuration, you can create your own javadoc:org.springframework.security.web.util.matcher.RequestMatcher[] and supply it to the DSL like so:
+Trong Java configuration, bạn có thể tạo javadoc:org.springframework.security.web.util.matcher.RequestMatcher[] của riêng mình và cung cấp nó cho DSL như sau:
 
-.Authorize by Dispatcher Type
+.Ủy quyền theo Dispatcher Type
 [tabs]
 ======
 Java::
@@ -682,12 +682,12 @@ http {
 ======
 
 [TIP]
-Because javadoc:org.springframework.security.web.util.matcher.RequestMatcher[] is a functional interface, you can supply it as a lambda in the DSL.
-However, if you want to extract values from the request, you will need to have a concrete class since that requires overriding a `default` method.
+Vì javadoc:org.springframework.security.web.util.matcher.RequestMatcher[] là một functional interface, bạn có thể cung cấp nó dưới dạng lambda trong DSL.
+Tuy nhiên, nếu muốn trích xuất giá trị từ request, bạn sẽ cần một class cụ thể vì việc đó yêu cầu override một method `default`.
 
-Once authorized, you can test it using xref:servlet/test/method.adoc#test-method-withmockuser[Security's test support] in the following way:
+Sau khi cấu hình authorization, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
 
-.Test Custom Authorization
+.Kiểm thử authorization tùy chỉnh
 [tabs]
 ======
 Java::
@@ -711,25 +711,25 @@ void printWhenNoPrintAuthorityThenForbidden() {
 ======
 
 [[authorize-requests]]
-== Authorizing Requests
+== Ủy quyền request
 
-Once a request is matched, you can authorize it in several ways <<match-requests, already seen>> like `permitAll`, `denyAll`, and `hasAuthority`.
+Sau khi request được so khớp, bạn có thể ủy quyền theo nhiều cách <<match-requests,đã được đề cập ở trên>>, như `permitAll`, `denyAll` và `hasAuthority`.
 
-As a quick summary, here are the authorization rules built into the DSL:
+Tóm tắt nhanh, dưới đây là các quy tắc authorization được tích hợp trong DSL:
 
-* `permitAll` - The request requires no authorization and is a public endpoint; note that in this case, xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[the `Authentication`] is never retrieved from the session
-* `denyAll` - The request is not allowed under any circumstances; note that in this case, the `Authentication` is never retrieved from the session
-* `hasAuthority` - The request requires that the `Authentication` have xref:servlet/authorization/architecture.adoc#authz-authorities[a `GrantedAuthority`] that matches the given value
-* `hasRole` - A shortcut for `hasAuthority` that prefixes `ROLE_` or whatever is configured as the default prefix
-* `hasAnyAuthority` - The request requires that the `Authentication` have a `GrantedAuthority` that matches any of the given values
-* `hasAnyRole` - A shortcut for `hasAnyAuthority` that prefixes `ROLE_` or whatever is configured as the default prefix
-* `hasAllRoles` - A shortcut for `hasAllAuthorities` that prefixes `ROLE_` or whatever is configured as the default prefix
-* `hasAllAuthorities` - The request requires that the `Authentication` have a `GrantedAuthority` that matches all of the given values
-* `access` - The request uses this custom `AuthorizationManager` to determine access
+* `permitAll` - Request không yêu cầu authorization và là một public endpoint; lưu ý rằng trong trường hợp này, xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] không bao giờ được lấy từ session
+* `denyAll` - Request không được phép trong bất kỳ trường hợp nào; lưu ý rằng trong trường hợp này, `Authentication` không bao giờ được lấy từ session
+* `hasAuthority` - Request yêu cầu `Authentication` có xref:servlet/authorization/architecture.adoc#authz-authorities[một `GrantedAuthority`] khớp với giá trị đã cho
+* `hasRole` - Shortcut cho `hasAuthority`, thêm tiền tố `ROLE_` hoặc tiền tố mặc định đã được cấu hình
+* `hasAnyAuthority` - Request yêu cầu `Authentication` có một `GrantedAuthority` khớp với bất kỳ giá trị nào đã cho
+* `hasAnyRole` - Shortcut cho `hasAnyAuthority`, thêm tiền tố `ROLE_` hoặc tiền tố mặc định đã được cấu hình
+* `hasAllRoles` - Shortcut cho `hasAllAuthorities`, thêm tiền tố `ROLE_` hoặc tiền tố mặc định đã được cấu hình
+* `hasAllAuthorities` - Request yêu cầu `Authentication` có một `GrantedAuthority` khớp với tất cả giá trị đã cho
+* `access` - Request sử dụng `AuthorizationManager` tùy chỉnh này để quyết định access
 
-Having now learned the patterns, rules, and how they can be paired together, you should be able to understand what is going on in this more complex example:
+Sau khi đã tìm hiểu pattern, rule và cách ghép chúng, bạn có thể hiểu điều gì đang xảy ra trong ví dụ phức tạp hơn sau đây:
 
-.Authorize Requests
+.Ủy quyền request
 [tabs]
 ======
 Java::
@@ -758,70 +758,70 @@ SecurityFilterChain web(HttpSecurity http) throws Exception {
 }
 ----
 ======
-<1> There are multiple authorization rules specified.
-Each rule is considered in the order they were declared.
-<2> Dispatches `FORWARD` and `ERROR` are permitted to allow {spring-framework-reference-url}web.html#spring-web[Spring MVC] to render views and Spring Boot to render errors
-<3> We specified multiple URL patterns that any user can access.
-Specifically, any user can access a request if the URL starts with "/static/", equals "/signup", or equals "/about".
-<4> Any URL that starts with "/admin/" will be restricted to users who have the role "ROLE_ADMIN".
-You will notice that since we are invoking the `hasRole` method we do not need to specify the "ROLE_" prefix.
-<5> Any URL that starts with "/db/" requires the user to have both been granted the "db" permission as well as be a "ROLE_ADMIN".
-You will notice that since we are using the `hasAllAuthorities` expression we must specify the "ROLE_" prefix.
-<6> Any URL that has not already been matched on is denied access.
-This is a good strategy if you do not want to accidentally forget to update your authorization rules.
+<1> Có nhiều quy tắc authorization được chỉ định.
+Mỗi quy tắc được xem xét theo thứ tự khai báo.
+<2> Các dispatch `FORWARD` và `ERROR` được cho phép để {spring-framework-reference-url}web.html#spring-web[Spring MVC] render view và Spring Boot render lỗi.
+<3> Chúng ta đã chỉ định nhiều pattern URL mà mọi user đều có thể truy cập.
+Cụ thể, mọi user có thể truy cập request nếu URL bắt đầu bằng "/static/", bằng "/signup" hoặc bằng "/about".
+<4> Mọi URL bắt đầu bằng "/admin/" sẽ bị giới hạn cho user có role "ROLE_ADMIN".
+Bạn sẽ thấy rằng vì đang gọi method `hasRole`, chúng ta không cần chỉ định tiền tố "ROLE_".
+<5> Mọi URL bắt đầu bằng "/db/" yêu cầu user vừa được cấp permission "db", vừa là một "ROLE_ADMIN".
+Bạn sẽ thấy rằng vì đang sử dụng expression `hasAllAuthorities`, chúng ta phải chỉ định tiền tố "ROLE_".
+<6> Mọi URL chưa được so khớp trước đó đều bị từ chối access.
+Đây là một chiến lược tốt nếu bạn không muốn vô tình quên cập nhật các quy tắc authorization.
 
 [[customizing-authorization-managers]]
-== Customizing Authorization Managers
+== Tùy chỉnh Authorization Manager
 
-When you use the `authorizeHttpRequests` DSL, Spring Security takes care of creating the appropriate `AuthorizationManager` instances for you.
-In certain cases, you may want to customize what is created in order to have complete control over how authorization decisions are made xref:servlet/authorization/architecture.adoc#authz-delegate-authorization-manager[at the framework level].
+Khi sử dụng DSL `authorizeHttpRequests`, Spring Security sẽ đảm nhiệm việc tạo các instance `AuthorizationManager` phù hợp cho bạn.
+Trong một số trường hợp, bạn có thể muốn tùy chỉnh những gì được tạo để kiểm soát hoàn toàn cách đưa ra quyết định authorization xref:servlet/authorization/architecture.adoc#authz-delegate-authorization-manager[ở cấp framework].
 
-In order to take control of creating instances of `AuthorizationManager` for authorizing HTTP requests, you can create a custom xref:servlet/authorization/architecture.adoc#authz-authorization-manager-factory[`AuthorizationManagerFactory`].
-For example, let's say you want to create a convention that authenticated users must be authenticated _AND_ have the `USER` role.
-To do this, you can create a custom implementation for HTTP requests as in the following example:
+Để kiểm soát việc tạo các instance `AuthorizationManager` dùng cho authorization request HTTP, bạn có thể tạo xref:servlet/authorization/architecture.adoc#authz-authorization-manager-factory[`AuthorizationManagerFactory`] tùy chỉnh.
+Ví dụ, giả sử bạn muốn tạo một quy ước rằng user đã authenticated phải được authenticated _VÀ_ có role `USER`.
+Để làm vậy, bạn có thể tạo một triển khai tùy chỉnh cho request HTTP như trong ví dụ sau:
 
 include-code::./CustomHttpRequestsAuthorizationManagerFactory[tag=class,indent=0]
 
-Now, whenever you <<activate-request-security,require authentication>>, Spring Security will automatically invoke your custom factory to create an instance of `AuthorizationManager` that requires authentication _AND_ the `USER` role.
+Giờ đây, bất cứ khi nào bạn <<activate-request-security,yêu cầu authentication>>, Spring Security sẽ tự động gọi factory tùy chỉnh của bạn để tạo một instance `AuthorizationManager` yêu cầu authentication _VÀ_ role `USER`.
 
 [TIP]
-We use this as a simple example of creating a custom `AuthorizationManagerFactory`, though it is also possible (and often simpler) to replace a specific `AuthorizationManager` only for a particular request.
-See <<remote-authorization-manager>> for an example.
+Đây là một ví dụ đơn giản về cách tạo `AuthorizationManagerFactory` tùy chỉnh; tuy nhiên, bạn cũng có thể (và thường đơn giản hơn) thay thế một `AuthorizationManager` cụ thể chỉ cho một request nhất định.
+Xem <<remote-authorization-manager>> để biết ví dụ.
 
 [[authorization-expressions]]
-== Expressing Authorization with SpEL
+== Biểu đạt authorization bằng SpEL
 
-While using a concrete `AuthorizationManager` is recommended, there are some cases where an expression is necessary, like with `<intercept-url>` or with JSP Taglibs.
-For that reason, this section will focus on examples from those domains.
+Mặc dù nên sử dụng `AuthorizationManager` cụ thể, có một số trường hợp cần expression, chẳng hạn với `<intercept-url>` hoặc JSP Taglib.
+Vì lý do đó, phần này sẽ tập trung vào các ví dụ trong những lĩnh vực đó.
 
-Given that, let's cover Spring Security's Web Security Authorization SpEL API a bit more in depth.
+Vì vậy, hãy cùng tìm hiểu sâu hơn một chút về Web Security Authorization SpEL API của Spring Security.
 
-Spring Security encapsulates all of its authorization fields and methods in a set of root objects.
-The most generic root object is called `SecurityExpressionRoot` and it forms the basis for `WebSecurityExpressionRoot`.
-Spring Security supplies this root object to `StandardEvaluationContext` when preparing to evaluate an authorization expression.
+Spring Security đóng gói tất cả field và method authorization trong một tập root object.
+Root object tổng quát nhất có tên `SecurityExpressionRoot` và là nền tảng của `WebSecurityExpressionRoot`.
+Spring Security cung cấp root object này cho `StandardEvaluationContext` khi chuẩn bị đánh giá một expression authorization.
 
 [[using-authorization-expression-fields-and-methods]]
-=== Using Authorization Expression Fields and Methods
+=== Sử dụng field và method của authorization expression
 
-The first thing this provides is an enhanced set of authorization fields and methods to your SpEL expressions.
-What follows is a quick overview of the most common methods:
+Điều đầu tiên mà cơ chế này cung cấp là một tập field và method authorization nâng cao cho các SpEL expression của bạn.
+Dưới đây là tổng quan nhanh về những method phổ biến nhất:
 
-* `permitAll` - The request requires no authorization to be invoked; note that in this case, xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[the `Authentication`] is never retrieved from the session
-* `denyAll` - The request is not allowed under any circumstances; note that in this case, the `Authentication` is never retrieved from the session
-* `hasAuthority` - The request requires that the `Authentication` have xref:servlet/authorization/architecture.adoc#authz-authorities[a `GrantedAuthority`] that matches the given value
-* `hasRole` - A shortcut for `hasAuthority` that prefixes `ROLE_` or whatever is configured as the default prefix
-* `hasAnyAuthority` - The request requires that the `Authentication` have a `GrantedAuthority` that matches any of the given values
-* `hasAnyRole` - A shortcut for `hasAnyAuthority` that prefixes `ROLE_` or whatever is configured as the default prefix
-* `hasPermission` - A hook into your `PermissionEvaluator` instance for doing object-level authorization
+* `permitAll` - Request không yêu cầu authorization để được gọi; lưu ý rằng trong trường hợp này, xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] không bao giờ được lấy từ session
+* `denyAll` - Request không được phép trong bất kỳ trường hợp nào; lưu ý rằng trong trường hợp này, `Authentication` không bao giờ được lấy từ session
+* `hasAuthority` - Request yêu cầu `Authentication` có xref:servlet/authorization/architecture.adoc#authz-authorities[một `GrantedAuthority`] khớp với giá trị đã cho
+* `hasRole` - Shortcut cho `hasAuthority`, thêm tiền tố `ROLE_` hoặc tiền tố mặc định đã được cấu hình
+* `hasAnyAuthority` - Request yêu cầu `Authentication` có một `GrantedAuthority` khớp với bất kỳ giá trị nào đã cho
+* `hasAnyRole` - Shortcut cho `hasAnyAuthority`, thêm tiền tố `ROLE_` hoặc tiền tố mặc định đã được cấu hình
+* `hasPermission` - Hook tới instance `PermissionEvaluator` của bạn để thực hiện authorization ở cấp object
 
-And here is a brief look at the most common fields:
+Và dưới đây là cái nhìn khái quát về những field phổ biến nhất:
 
-* `authentication` - The `Authentication` instance associated with this method invocation
-* `principal` - The `Authentication#getPrincipal` associated with this method invocation
+* `authentication` - Instance `Authentication` liên kết với lần gọi method này
+* `principal` - `Authentication#getPrincipal` liên kết với lần gọi method này
 
-Having now learned the patterns, rules, and how they can be paired together, you should be able to understand what is going on in this more complex example:
+Sau khi đã tìm hiểu pattern, rule và cách ghép chúng, bạn có thể hiểu điều gì đang xảy ra trong ví dụ phức tạp hơn sau đây:
 
-.Authorize Requests Using SpEL
+.Ủy quyền request bằng SpEL
 [tabs]
 ======
 Xml::
@@ -836,23 +836,23 @@ Xml::
 </http>
 ----
 ======
-<1> We specified a URL pattern that any user can access.
-Specifically, any user can access a request if the URL starts with "/static/".
-<2> Any URL that starts with "/admin/" will be restricted to users who have the role "ROLE_ADMIN".
-You will notice that since we are invoking the `hasRole` method we do not need to specify the "ROLE_" prefix.
-<3> Any URL that starts with "/db/" requires the user to have both been granted the "db" permission as well as be a "ROLE_ADMIN".
-You will notice that since we are using the `hasRole` expression we do not need to specify the "ROLE_" prefix.
-<4> Any URL that has not already been matched on is denied access.
-This is a good strategy if you do not want to accidentally forget to update your authorization rules.
+<1> Chúng ta đã chỉ định một pattern URL mà mọi user đều có thể truy cập.
+Cụ thể, mọi user có thể truy cập request nếu URL bắt đầu bằng "/static/".
+<2> Mọi URL bắt đầu bằng "/admin/" sẽ bị giới hạn cho user có role "ROLE_ADMIN".
+Bạn sẽ thấy rằng vì đang gọi method `hasRole`, chúng ta không cần chỉ định tiền tố "ROLE_".
+<3> Mọi URL bắt đầu bằng "/db/" yêu cầu user vừa được cấp permission "db", vừa là một "ROLE_ADMIN".
+Bạn sẽ thấy rằng vì đang sử dụng expression `hasRole`, chúng ta không cần chỉ định tiền tố "ROLE_".
+<4> Mọi URL chưa được so khớp trước đó đều bị từ chối access.
+Đây là một chiến lược tốt nếu bạn không muốn vô tình quên cập nhật các quy tắc authorization.
 
 [[using_path_parameters]]
-=== Using Path Parameters
+=== Sử dụng path parameter
 
-Additionally, Spring Security provides a mechanism for discovering path parameters so they can also be accessed in the SpEL expression as well.
+Ngoài ra, Spring Security cung cấp một cơ chế phát hiện path parameter để chúng cũng có thể được truy cập trong SpEL expression.
 
-For example, you can access a path parameter in your SpEL expression in the following way:
+Ví dụ, bạn có thể truy cập path parameter trong SpEL expression như sau:
 
-.Authorize Request using SpEL path variable
+.Ủy quyền request bằng path variable của SpEL
 [tabs]
 ======
 Xml::
@@ -866,15 +866,15 @@ Xml::
 ----
 ======
 
-This expression refers to the path variable after `/resource/` and requires that it is equal to `Authentication#getName`.
+Expression này tham chiếu tới path variable sau `/resource/` và yêu cầu nó bằng `Authentication#getName`.
 
 [[remote-authorization-manager]]
-=== Use an Authorization Database, Policy Agent, or Other Service
-If you want to configure Spring Security to use a separate service for authorization, you can create your own `AuthorizationManager` and match it to `anyRequest`.
+=== Sử dụng authorization database, policy agent hoặc service khác
+Nếu muốn cấu hình Spring Security sử dụng một service riêng cho authorization, bạn có thể tạo `AuthorizationManager` của riêng mình và so khớp nó với `anyRequest`.
 
-First, your `AuthorizationManager` may look something like this:
+Trước tiên, `AuthorizationManager` của bạn có thể trông như sau:
 
-.Open Policy Agent Authorization Manager
+.Authorization Manager của Open Policy Agent
 [tabs]
 ======
 Java::
@@ -885,15 +885,15 @@ Java::
 public final class OpenPolicyAgentAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
     @Override
     public AuthorizationResult authorize(Supplier<Authentication> authentication, RequestAuthorizationContext context) {
-        // make request to Open Policy Agent
+        // thực hiện request tới Open Policy Agent
     }
 }
 ----
 ======
 
-Then, you can wire it into Spring Security in the following way:
+Sau đó, bạn có thể wire nó vào Spring Security như sau:
 
-.Any Request Goes to Remote Service
+.Mọi request đều chuyển tới remote service
 [tabs]
 ======
 Java::
@@ -914,11 +914,11 @@ SecurityFilterChain web(HttpSecurity http, AuthorizationManager<RequestAuthoriza
 ======
 
 [[favor-permitall]]
-=== Favor `permitAll` over `ignoring`
-When you have static resources it can be tempting to configure the filter chain to ignore these values.
-A more secure approach is to permit them using `permitAll` like so:
+=== Ưu tiên `permitAll` thay vì `ignoring`
+Khi có static resource, bạn có thể muốn cấu hình filter chain bỏ qua các giá trị này.
+Cách tiếp cận an toàn hơn là cho phép chúng bằng `permitAll` như sau:
 
-.Permit Static Resources
+.Cho phép static resource
 [tabs]
 ======
 Java::
@@ -945,27 +945,27 @@ http {
 ----
 ======
 
-It's more secure because even with static resources it's important to write secure headers, which Spring Security cannot do if the request is ignored.
+Điều này an toàn hơn vì ngay cả với static resource, việc ghi secure header vẫn quan trọng, nhưng Spring Security không thể làm vậy nếu request bị bỏ qua.
 
-In this past, this came with a performance tradeoff since the session was consulted by Spring Security on every request.
-As of Spring Security 6, however, the session is no longer pinged unless required by the authorization rule.
-Because the performance impact is now addressed, Spring Security recommends using at least `permitAll` for all requests.
+Trước đây, cách này phải đánh đổi hiệu năng vì Spring Security tham vấn session trên mọi request.
+Tuy nhiên, từ Spring Security 6, session không còn bị truy vấn trừ khi quy tắc authorization yêu cầu.
+Vì ảnh hưởng hiệu năng hiện đã được giải quyết, Spring Security khuyến nghị sử dụng ít nhất `permitAll` cho mọi request.
 
 [[migrate-authorize-requests]]
-== Migrating from `authorizeRequests`
+== Di chuyển từ `authorizeRequests`
 
 [NOTE]
-`AuthorizationFilter` supersedes javadoc:org.springframework.security.web.access.intercept.FilterSecurityInterceptor[].
-To remain backward compatible, `FilterSecurityInterceptor` remains the default.
-This section discusses how `AuthorizationFilter` works and how to override the default configuration.
+`AuthorizationFilter` thay thế javadoc:org.springframework.security.web.access.intercept.FilterSecurityInterceptor[].
+Để duy trì backward compatibility, `FilterSecurityInterceptor` vẫn là mặc định.
+Phần này thảo luận cách `AuthorizationFilter` hoạt động và cách override cấu hình mặc định.
 
-The javadoc:org.springframework.security.web.access.intercept.AuthorizationFilter[] provides xref:servlet/authorization/index.adoc#servlet-authorization[authorization] for ``HttpServletRequest``s.
-It is inserted into the xref:servlet/architecture.adoc#servlet-filterchainproxy[FilterChainProxy] as one of the xref:servlet/architecture.adoc#servlet-security-filters[Security Filters].
+javadoc:org.springframework.security.web.access.intercept.AuthorizationFilter[] cung cấp xref:servlet/authorization/index.adoc#servlet-authorization[authorization] cho các ``HttpServletRequest``.
+Nó được chèn vào xref:servlet/architecture.adoc#servlet-filterchainproxy[FilterChainProxy] như một trong các xref:servlet/architecture.adoc#servlet-security-filters[Security Filter].
 
-You can override the default when you declare a `SecurityFilterChain`.
-Instead of using javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity#authorizeRequests()[authorizeRequests], use `authorizeHttpRequests`, like so:
+Bạn có thể override mặc định khi khai báo một `SecurityFilterChain`.
+Thay vì sử dụng javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity#authorizeRequests()[authorizeRequests], hãy dùng `authorizeHttpRequests` như sau:
 
-.Use authorizeHttpRequests
+.Sử dụng authorizeHttpRequests
 [tabs]
 ======
 Java::
@@ -985,22 +985,22 @@ SecurityFilterChain web(HttpSecurity http) throws AuthenticationException {
 ----
 ======
 
-This improves on `authorizeRequests` in a number of ways:
+Điều này cải thiện `authorizeRequests` theo một số cách:
 
-1. Uses the simplified `AuthorizationManager` API instead of metadata sources, config attributes, decision managers, and voters.
-This simplifies reuse and customization.
-2. Delays `Authentication` lookup.
-Instead of the authentication needing to be looked up for every request, it will only look it up in requests where an authorization decision requires authentication.
-3. Bean-based configuration support.
+1. Sử dụng API `AuthorizationManager` đơn giản hóa thay vì metadata source, config attribute, decision manager và voter.
+Điều này đơn giản hóa việc tái sử dụng và tùy chỉnh.
+2. Trì hoãn việc tra cứu `Authentication`.
+Thay vì phải tra cứu authentication cho mọi request, hệ thống chỉ tra cứu trong những request mà quyết định authorization yêu cầu authentication.
+3. Hỗ trợ cấu hình dựa trên bean.
 
-When `authorizeHttpRequests` is used instead of `authorizeRequests`, then javadoc:org.springframework.security.web.access.intercept.AuthorizationFilter[] is used instead of javadoc:org.springframework.security.web.access.intercept.FilterSecurityInterceptor[].
+Khi dùng `authorizeHttpRequests` thay cho `authorizeRequests`, javadoc:org.springframework.security.web.access.intercept.AuthorizationFilter[] sẽ được dùng thay cho javadoc:org.springframework.security.web.access.intercept.FilterSecurityInterceptor[].
 
-=== Migrating Expressions
+=== Di chuyển expression
 
-Where possible, it is recommended that you use type-safe authorization managers instead of SpEL.
-For Java configuration, javadoc:org.springframework.security.web.access.expression.WebExpressionAuthorizationManager[] is available to help migrate legacy SpEL.
+Khi có thể, bạn nên sử dụng authorization manager type-safe thay vì SpEL.
+Với Java configuration, javadoc:org.springframework.security.web.access.expression.WebExpressionAuthorizationManager[] có sẵn để hỗ trợ di chuyển SpEL legacy.
 
-To use `WebExpressionAuthorizationManager`, you can construct one with the expression you are trying to migrate, like so:
+Để sử dụng `WebExpressionAuthorizationManager`, bạn có thể tạo một instance với expression cần di chuyển như sau:
 
 [tabs]
 ======
@@ -1019,7 +1019,7 @@ Kotlin::
 ----
 ======
 
-To migrate several, you can use `WebExpressionAuthorizationManager#withDefaults`:
+Để di chuyển nhiều expression, bạn có thể dùng `WebExpressionAuthorizationManager#withDefaults`:
 
 [tabs]
 ======
@@ -1042,7 +1042,7 @@ var authz = WebExpressionAuthorizationManager.withDefaults()
 ----
 ======
 
-If you are referring to a bean in your expression like so: `@webSecurity.check(authentication, request)`, it's recommended that you instead call the bean directly, which will look something like the following:
+Nếu expression của bạn tham chiếu tới một bean như sau: `@webSecurity.check(authentication, request)`, bạn nên gọi trực tiếp bean đó, tương tự như sau:
 
 [tabs]
 ======
@@ -1063,9 +1063,9 @@ Kotlin::
 ----
 ======
 
-For complex instructions that include bean references as well as other expressions, it is recommended that you change those to implement `AuthorizationManager` and refer to them by calling `.access(AuthorizationManager)`.
+Với các chỉ dẫn phức tạp bao gồm tham chiếu bean cùng các expression khác, bạn nên thay đổi chúng để triển khai `AuthorizationManager` và tham chiếu bằng cách gọi `.access(AuthorizationManager)`.
 
-If you are not able to do that, you can publish javadoc:org.springframework.security.web.access.expression.WebExpressionAuthorizationManager$Builder[] as a bean:
+Nếu không thể làm vậy, bạn có thể publish javadoc:org.springframework.security.web.access.expression.WebExpressionAuthorizationManager$Builder[] dưới dạng bean:
 
 [tabs]
 ======
@@ -1090,15 +1090,15 @@ fun authz(): WebExpressionAuthorizationManager.Builder {
 ----
 ======
 
-Then, expressions passed to that builder will be able to refer to beans.
+Khi đó, các expression truyền vào builder sẽ có thể tham chiếu tới bean.
 
 [[security-matchers]]
-== Security Matchers
+== Security Matcher
 
-The javadoc:org.springframework.security.web.util.matcher.RequestMatcher[] interface is used to determine if a request matches a given rule.
-We use `securityMatchers` to determine if xref:servlet/configuration/java.adoc#jc-httpsecurity[a given `HttpSecurity`] should be applied to a given request.
-The same way, we can use `requestMatchers` to determine the authorization rules that we should apply to a given request.
-Look at the following example:
+Interface javadoc:org.springframework.security.web.util.matcher.RequestMatcher[] được sử dụng để xác định request có khớp với một rule nhất định hay không.
+Chúng ta sử dụng `securityMatchers` để xác định liệu xref:servlet/configuration/java.adoc#jc-httpsecurity[một `HttpSecurity` nhất định] có nên được áp dụng cho một request nhất định hay không.
+Tương tự, chúng ta có thể dùng `requestMatchers` để xác định các quy tắc authorization cần áp dụng cho một request nhất định.
+Hãy xem ví dụ sau:
 
 [tabs]
 ======
@@ -1150,15 +1150,15 @@ open class SecurityConfig {
 ----
 ======
 
-<1> Configure `HttpSecurity` to only be applied to URLs that start with `/api/`
-<2> Allow access to URLs that start with `/api/user/` to users with the `USER` role
-<3> Allow access to URLs that start with `/api/admin/` to users with the `ADMIN` role
-<4> Any other request that doesn't match the rules above, will require authentication
+<1> Cấu hình `HttpSecurity` chỉ được áp dụng cho các URL bắt đầu bằng `/api/`
+<2> Cho phép user có role `USER` truy cập các URL bắt đầu bằng `/api/user/`
+<3> Cho phép user có role `ADMIN` truy cập các URL bắt đầu bằng `/api/admin/`
+<4> Mọi request khác không khớp với các rule trên sẽ yêu cầu authentication
 
-The `securityMatcher(s)` and `requestMatcher(s)` methods will construct ``RequestMatcher``s using a javadoc:org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher$Builder[] bean, if available.
-You can read more about the Spring MVC integration xref:servlet/integrations/mvc.adoc[here].
+Các method `securityMatcher(s)` và `requestMatcher(s)` sẽ tạo ``RequestMatcher`` bằng bean javadoc:org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher$Builder[], nếu có.
+Bạn có thể đọc thêm về tích hợp Spring MVC xref:servlet/integrations/mvc.adoc[tại đây].
 
-If you want to use a specific `RequestMatcher`, just pass an implementation to the `securityMatcher` and/or `requestMatcher` methods:
+Nếu muốn sử dụng một `RequestMatcher` cụ thể, chỉ cần truyền một implementation vào method `securityMatcher` và/hoặc `requestMatcher`:
 
 [tabs]
 ======
@@ -1226,13 +1226,13 @@ open class SecurityConfig {
 ----
 ======
 
-<1> Import the static factory methods from `PathPatternRequestMatcher` and `RegexRequestMatcher` to create `RequestMatcher` instances.
-<2> Configure `HttpSecurity` to only be applied to URLs that start with `/api/`, using `PathPatternRequestMatcher`
-<3> Allow access to URLs that start with `/api/user/` to users with the `USER` role, using `PathPatternRequestMatcher`
-<4> Allow access to URLs that start with `/api/admin/` to users with the `ADMIN` role, using `RegexRequestMatcher`
-<5> Allow access to URLs that match the `MyCustomRequestMatcher` to users with the `SUPERVISOR` role, using a custom `RequestMatcher`
+<1> Import các static factory method từ `PathPatternRequestMatcher` và `RegexRequestMatcher` để tạo instance `RequestMatcher`.
+<2> Cấu hình `HttpSecurity` chỉ được áp dụng cho các URL bắt đầu bằng `/api/`, sử dụng `PathPatternRequestMatcher`.
+<3> Cho phép user có role `USER` truy cập các URL bắt đầu bằng `/api/user/`, sử dụng `PathPatternRequestMatcher`.
+<4> Cho phép user có role `ADMIN` truy cập các URL bắt đầu bằng `/api/admin/`, sử dụng `RegexRequestMatcher`.
+<5> Cho phép user có role `SUPERVISOR` truy cập các URL khớp với `MyCustomRequestMatcher`, sử dụng `RequestMatcher` tùy chỉnh.
 
-== Further Reading
+== Đọc thêm
 
-Now that you have secured your application's requests, consider xref:servlet/authorization/method-security.adoc[securing its methods].
-You can also read further on xref:servlet/test/index.adoc[testing your application] or on integrating Spring Security with other aspects of your application like xref:servlet/integrations/data.adoc[the data layer] or xref:servlet/integrations/observability.adoc[tracing and metrics].
+Bây giờ bạn đã bảo mật các request của ứng dụng, hãy cân nhắc xref:servlet/authorization/method-security.adoc[bảo mật các method của ứng dụng].
+Bạn cũng có thể đọc thêm về xref:servlet/test/index.adoc[kiểm thử ứng dụng] hoặc về việc tích hợp Spring Security với các khía cạnh khác của ứng dụng, chẳng hạn như xref:servlet/integrations/data.adoc[tầng dữ liệu] hoặc xref:servlet/integrations/observability.adoc[tracing và metric].
