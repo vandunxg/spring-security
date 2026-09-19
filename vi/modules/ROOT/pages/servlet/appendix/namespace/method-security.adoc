@@ -1,129 +1,129 @@
-= Method Security
+= Bảo mật phương thức
 
 [[nsa-method-security]]
 == <method-security>
-This element is the primary means of adding support for securing methods on Spring Security beans.
-Methods can be secured by the use of annotations (defined at the interface or class level) or by defining a set of pointcuts.
+Phần tử này là phương thức chính để bổ sung hỗ trợ bảo mật các phương thức trên các bean Spring Security.
+Có thể bảo mật các phương thức bằng cách sử dụng các annotation (được định nghĩa ở cấp interface hoặc class) hoặc bằng cách định nghĩa một tập pointcut.
 
 [[nsa-method-security-attributes]]
-=== <method-security> attributes
+=== Các thuộc tính của <method-security>
 
 [[nsa-method-security-pre-post-enabled]]
 * **pre-post-enabled**
-Enables Spring Security's pre and post invocation annotations (@PreFilter, @PreAuthorize, @PostFilter, @PostAuthorize) for this application context.
-Defaults to "true".
+Bật các annotation pre và post invocation của Spring Security (@PreFilter, @PreAuthorize, @PostFilter, @PostAuthorize) cho application context này.
+Mặc định là "true".
 
 [[nsa-method-security-secured-enabled]]
 * **secured-enabled**
-Enables Spring Security's @Secured annotation for this application context.
-Defaults to "false".
+Bật annotation @Secured của Spring Security cho application context này.
+Mặc định là "false".
 
 [[nsa-method-security-jsr250-enabled]]
 * **jsr250-enabled**
-Enables JSR-250 authorization annotations (@RolesAllowed, @PermitAll, @DenyAll) for this application context.
-Defaults to "false".
+Bật các authorization annotation JSR-250 (@RolesAllowed, @PermitAll, @DenyAll) cho application context này.
+Mặc định là "false".
 
 [[nsa-method-security-mode]]
 * **mode**
-If set to "aspectj", then uses AspectJ to intercept method invocations.
+Nếu được đặt thành "aspectj", AspectJ sẽ được sử dụng để intercept các lần gọi phương thức.
 
 [[nsa-method-security-proxy-target-class]]
 * **proxy-target-class**
-If true, class based proxying will be used instead of interface based proxying.
-Defaults to "false".
+Nếu là true, proxy dựa trên class sẽ được sử dụng thay cho proxy dựa trên interface.
+Mặc định là "false".
 
 [[nsa-method-security-security-context-holder-strategy-ref]]
 * **security-context-holder-strategy-ref**
-Specifies a SecurityContextHolderStrategy to use when retrieving the SecurityContext.
-Defaults to the value returned by SecurityContextHolder.getContextHolderStrategy().
+Chỉ định một SecurityContextHolderStrategy được sử dụng khi lấy SecurityContext.
+Mặc định là giá trị được trả về bởi SecurityContextHolder.getContextHolderStrategy().
 
 [[nsa-method-security-observation-registry-ref]]
 * **observation-registry-ref**
-A reference to the `ObservationRegistry` used for the `FilterChain` and related components
+Một tham chiếu đến `ObservationRegistry` được sử dụng cho `FilterChain` và các component liên quan
 
 [[nsa-method-security-children]]
-=== Child Elements of <method-security>
+=== Các phần tử con của <method-security>
 
 * xref:servlet/appendix/namespace/http.adoc#nsa-expression-handler[expression-handler]
 * <<nsa-protect-pointcut,protect-pointcut>>
 
 [[nsa-global-method-security]]
 == <global-method-security>
-This element is the primary means of adding support for securing methods on Spring Security beans.
-Methods can be secured by the use of annotations (defined at the interface or class level) or by defining a set of pointcuts as child elements, using AspectJ syntax.
+Phần tử này là phương thức chính để bổ sung hỗ trợ bảo mật các phương thức trên các bean Spring Security.
+Có thể bảo mật các phương thức bằng cách sử dụng các annotation (được định nghĩa ở cấp interface hoặc class) hoặc bằng cách định nghĩa một tập pointcut dưới dạng các phần tử con, sử dụng cú pháp AspectJ.
 
 
 [[nsa-global-method-security-attributes]]
-=== <global-method-security> Attributes
+=== Các thuộc tính của <global-method-security>
 
 [NOTE]
 =====
-`<global-method-security>` is deprecated in favor of `<method-security>`.
-If you need to use `<global-method-security>`, please include the `spring-security-access` dependency in your build configuration.
+`<global-method-security>` đã deprecated và được thay thế bằng `<method-security>`.
+Nếu cần sử dụng `<global-method-security>`, hãy thêm dependency `spring-security-access` vào cấu hình build.
 =====
 
 [[nsa-global-method-security-access-decision-manager-ref]]
 * **access-decision-manager-ref**
-Method security uses the same `AccessDecisionManager` configuration as web security, but this can be overridden using this attribute.
-By default an AffirmativeBased implementation is used for with a RoleVoter and an AuthenticatedVoter.
+Bảo mật phương thức sử dụng cùng cấu hình `AccessDecisionManager` như web security, nhưng có thể ghi đè cấu hình này bằng thuộc tính này.
+Mặc định, một implementation AffirmativeBased được sử dụng cùng với một RoleVoter và một AuthenticatedVoter.
 
 
 [[nsa-global-method-security-authentication-manager-ref]]
 * **authentication-manager-ref**
-A reference to an `AuthenticationManager` that should be used for method security.
+Một tham chiếu đến `AuthenticationManager` sẽ được sử dụng cho method security.
 
 
 [[nsa-global-method-security-jsr250-annotations]]
 * **jsr250-annotations**
-Specifies whether JSR-250 style attributes are to be used (for example "RolesAllowed").
-This will require the javax.annotation.security classes on the classpath.
-Setting this to true also adds a `Jsr250Voter` to the `AccessDecisionManager`, so you need to make sure you do this if you are using a custom implementation and want to use these annotations.
+Chỉ định có sử dụng các thuộc tính theo kiểu JSR-250 hay không (ví dụ: "RolesAllowed").
+Điều này yêu cầu các class javax.annotation.security có trên classpath.
+Đặt giá trị này thành true cũng thêm một `Jsr250Voter` vào `AccessDecisionManager`, vì vậy cần đảm bảo thực hiện việc này nếu bạn đang sử dụng một implementation tùy chỉnh và muốn sử dụng các annotation này.
 
 
 [[nsa-global-method-security-metadata-source-ref]]
 * **metadata-source-ref**
-An external `MethodSecurityMetadataSource` instance can be supplied which will take priority over other sources (such as the default annotations).
+Có thể cung cấp một instance `MethodSecurityMetadataSource` bên ngoài; instance này sẽ được ưu tiên hơn các nguồn khác (chẳng hạn các annotation mặc định).
 
 
 [[nsa-global-method-security-mode]]
 * **mode**
-This attribute can be set to "aspectj" to specify that AspectJ should be used instead of the default Spring AOP.
-Secured methods must be woven with the `AnnotationSecurityAspect` from the `spring-security-aspects` module.
+Có thể đặt thuộc tính này thành "aspectj" để chỉ định sử dụng AspectJ thay cho Spring AOP mặc định.
+Các phương thức được bảo mật phải được weave bằng `AnnotationSecurityAspect` từ module `spring-security-aspects`.
 
-It is important to note that AspectJ follows Java's rule that annotations on interfaces are not inherited.
-This means that methods that define the Security annotations on the interface will not be secured.
-Instead, you must place the Security annotation on the class when using AspectJ.
+Điều quan trọng cần lưu ý là AspectJ tuân theo quy tắc của Java rằng các annotation trên interface không được kế thừa.
+Điều này có nghĩa là các phương thức định nghĩa Security annotation trên interface sẽ không được bảo mật.
+Thay vào đó, khi sử dụng AspectJ, bạn phải đặt Security annotation trên class.
 
 
 [[nsa-global-method-security-order]]
 * **order**
-Allows the advice "order" to be set for the method security interceptor.
+Cho phép đặt "order" của advice cho method security interceptor.
 
 
 [[nsa-global-method-security-pre-post-annotations]]
 * **pre-post-annotations**
-Specifies whether the use of Spring Security's pre and post invocation annotations (@PreFilter, @PreAuthorize, @PostFilter, @PostAuthorize) should be enabled for this application context.
-Defaults to "disabled".
+Chỉ định có bật việc sử dụng các annotation pre và post invocation của Spring Security (@PreFilter, @PreAuthorize, @PostFilter, @PostAuthorize) cho application context này hay không.
+Mặc định là "disabled".
 
 
 [[nsa-global-method-security-proxy-target-class]]
 * **proxy-target-class**
-If true, class based proxying will be used instead of interface based proxying.
+Nếu là true, proxy dựa trên class sẽ được sử dụng thay cho proxy dựa trên interface.
 
 
 [[nsa-global-method-security-run-as-manager-ref]]
 * **run-as-manager-ref**
-A reference to an optional `RunAsManager` implementation which will be used by the configured `MethodSecurityInterceptor`
+Một tham chiếu đến implementation `RunAsManager` tùy chọn sẽ được `MethodSecurityInterceptor` đã cấu hình sử dụng
 
 
 [[nsa-global-method-security-secured-annotations]]
 * **secured-annotations**
-Specifies whether the use of Spring Security's @Secured annotations should be enabled for this application context.
-Defaults to "disabled".
+Chỉ định có bật việc sử dụng các annotation @Secured của Spring Security cho application context này hay không.
+Mặc định là "disabled".
 
 
 [[nsa-global-method-security-children]]
-=== Child Elements of <global-method-security>
+=== Các phần tử con của <global-method-security>
 
 
 * <<nsa-after-invocation-provider,after-invocation-provider>>
@@ -135,12 +135,12 @@ Defaults to "disabled".
 
 [[nsa-after-invocation-provider]]
 == <after-invocation-provider>
-This element can be used to decorate an `AfterInvocationProvider` for use by the security interceptor maintained by the `<global-method-security>` namespace.
-You can define zero or more of these within the `global-method-security` element, each with a `ref` attribute pointing to an `AfterInvocationProvider` bean instance within your application context.
+Phần tử này có thể được sử dụng để bọc một `AfterInvocationProvider` nhằm cho security interceptor do namespace `<global-method-security>` quản lý sử dụng.
+Bạn có thể định nghĩa không hoặc nhiều phần tử như vậy bên trong phần tử `global-method-security`, mỗi phần tử có thuộc tính `ref` trỏ đến một instance bean `AfterInvocationProvider` trong application context.
 
 
 [[nsa-after-invocation-provider-parents]]
-=== Parent Elements of <after-invocation-provider>
+=== Các phần tử cha của <after-invocation-provider>
 
 
 * <<nsa-global-method-security,global-method-security>>
@@ -148,27 +148,27 @@ You can define zero or more of these within the `global-method-security` element
 
 
 [[nsa-after-invocation-provider-attributes]]
-=== <after-invocation-provider> Attributes
+=== Các thuộc tính của <after-invocation-provider>
 
 [NOTE]
 =====
-`<after-invocation-provider>` is deprecated in favor of `<method-security>` and xref:servlet/authorization/method-security.adoc[`@PostFilter` and `@PostAuthorize`].
-If you need to use `<after-invocation-provider>`, please include the `spring-security-access` dependency in your build configuration while planning to migrate to a modern option.
+`<after-invocation-provider>` đã deprecated và được thay thế bằng `<method-security>` cùng xref:servlet/authorization/method-security.adoc[`@PostFilter` và `@PostAuthorize`].
+Nếu cần sử dụng `<after-invocation-provider>`, hãy thêm dependency `spring-security-access` vào cấu hình build trong khi lập kế hoạch chuyển sang một tùy chọn hiện đại hơn.
 =====
 
 [[nsa-after-invocation-provider-ref]]
 * **ref**
-Defines a reference to a Spring bean that implements `AfterInvocationProvider`.
+Định nghĩa một tham chiếu đến Spring bean triển khai `AfterInvocationProvider`.
 
 
 [[nsa-pre-post-annotation-handling]]
 == <pre-post-annotation-handling>
-Allows the default expression-based mechanism for handling Spring Security's pre and post invocation annotations (@PreFilter, @PreAuthorize, @PostFilter, @PostAuthorize) to be replaced entirely.
-Only applies if these annotations are enabled.
+Cho phép thay thế hoàn toàn cơ chế dựa trên expression mặc định để xử lý các annotation pre và post invocation của Spring Security (@PreFilter, @PreAuthorize, @PostFilter, @PostAuthorize).
+Chỉ áp dụng khi các annotation này được bật.
 
 
 [[nsa-pre-post-annotation-handling-parents]]
-=== Parent Elements of <pre-post-annotation-handling>
+=== Các phần tử cha của <pre-post-annotation-handling>
 
 
 * <<nsa-global-method-security,global-method-security>>
@@ -176,7 +176,7 @@ Only applies if these annotations are enabled.
 
 
 [[nsa-pre-post-annotation-handling-children]]
-=== Child Elements of <pre-post-annotation-handling>
+=== Các phần tử con của <pre-post-annotation-handling>
 
 
 * <<nsa-invocation-attribute-factory,invocation-attribute-factory>>
@@ -187,16 +187,16 @@ Only applies if these annotations are enabled.
 
 [[nsa-invocation-attribute-factory]]
 == <invocation-attribute-factory>
-Defines the PrePostInvocationAttributeFactory instance which is used to generate pre and post invocation metadata from the annotated methods.
+Định nghĩa instance PrePostInvocationAttributeFactory được sử dụng để tạo metadata pre và post invocation từ các phương thức có annotation.
 
 [NOTE]
 =====
-`<invocation-attribute-factory>` is deprecated in favor of `<method-security>` and xref:servlet/authorization/method-security.adoc[`@PostFilter` and `@PostAuthorize`].
-If you need to use `<invocation-attribute-factory>`, please include the `spring-security-access` dependency in your build configuration while planning to migrate to a modern option.
+`<invocation-attribute-factory>` đã deprecated và được thay thế bằng `<method-security>` cùng xref:servlet/authorization/method-security.adoc[`@PostFilter` và `@PostAuthorize`].
+Nếu cần sử dụng `<invocation-attribute-factory>`, hãy thêm dependency `spring-security-access` vào cấu hình build trong khi lập kế hoạch chuyển sang một tùy chọn hiện đại hơn.
 =====
 
 [[nsa-invocation-attribute-factory-parents]]
-=== Parent Elements of <invocation-attribute-factory>
+=== Các phần tử cha của <invocation-attribute-factory>
 
 
 * <<nsa-pre-post-annotation-handling,pre-post-annotation-handling>>
@@ -204,26 +204,26 @@ If you need to use `<invocation-attribute-factory>`, please include the `spring-
 
 
 [[nsa-invocation-attribute-factory-attributes]]
-=== <invocation-attribute-factory> Attributes
+=== Các thuộc tính của <invocation-attribute-factory>
 
 
 [[nsa-invocation-attribute-factory-ref]]
 * **ref**
-Defines a reference to a Spring bean Id.
+Định nghĩa một tham chiếu đến Id của Spring bean.
 
 
 [[nsa-post-invocation-advice]]
 == <post-invocation-advice>
-Customizes the `PostInvocationAdviceProvider` with the ref as the `PostInvocationAuthorizationAdvice` for the <pre-post-annotation-handling> element.
+Tùy chỉnh `PostInvocationAdviceProvider`, sử dụng ref làm `PostInvocationAuthorizationAdvice` cho phần tử <pre-post-annotation-handling>.
 
 [NOTE]
 =====
-`<post-invocation-advice>` is deprecated in favor of `<method-security>` and xref:servlet/authorization/method-security.adoc[`@PostFilter` and `@PostAuthorize`].
-If you need to use `<post-invocation-advice>`, please include the `spring-security-access` dependency in your build configuration while planning to migrate to a modern option.
+`<post-invocation-advice>` đã deprecated và được thay thế bằng `<method-security>` cùng xref:servlet/authorization/method-security.adoc[`@PostFilter` và `@PostAuthorize`].
+Nếu cần sử dụng `<post-invocation-advice>`, hãy thêm dependency `spring-security-access` vào cấu hình build trong khi lập kế hoạch chuyển sang một tùy chọn hiện đại hơn.
 =====
 
 [[nsa-post-invocation-advice-parents]]
-=== Parent Elements of <post-invocation-advice>
+=== Các phần tử cha của <post-invocation-advice>
 
 
 * <<nsa-pre-post-annotation-handling,pre-post-annotation-handling>>
@@ -231,26 +231,26 @@ If you need to use `<post-invocation-advice>`, please include the `spring-securi
 
 
 [[nsa-post-invocation-advice-attributes]]
-=== <post-invocation-advice> Attributes
+=== Các thuộc tính của <post-invocation-advice>
 
 
 [[nsa-post-invocation-advice-ref]]
 * **ref**
-Defines a reference to a Spring bean Id.
+Định nghĩa một tham chiếu đến Id của Spring bean.
 
 
 [[nsa-pre-invocation-advice]]
 == <pre-invocation-advice>
-Customizes the `PreInvocationAuthorizationAdviceVoter` with the ref as the `PreInvocationAuthorizationAdviceVoter` for the <pre-post-annotation-handling> element.
+Tùy chỉnh `PreInvocationAuthorizationAdviceVoter`, sử dụng ref làm `PreInvocationAuthorizationAdviceVoter` cho phần tử <pre-post-annotation-handling>.
 
 [NOTE]
 =====
-`<pre-invocation-advice>` is deprecated in favor of `<method-security>` and xref:servlet/authorization/method-security.adoc[`@PreFilter` and `@PreAuthorize`].
-If you need to use `<pre-invocation-advice>`, please include the `spring-security-access` dependency in your build configuration while planning to migrate to a modern option.
+`<pre-invocation-advice>` đã deprecated và được thay thế bằng `<method-security>` cùng xref:servlet/authorization/method-security.adoc[`@PreFilter` và `@PreAuthorize`].
+Nếu cần sử dụng `<pre-invocation-advice>`, hãy thêm dependency `spring-security-access` vào cấu hình build trong khi lập kế hoạch chuyển sang một tùy chọn hiện đại hơn.
 =====
 
 [[nsa-pre-invocation-advice-parents]]
-=== Parent Elements of <pre-invocation-advice>
+=== Các phần tử cha của <pre-invocation-advice>
 
 
 * <<nsa-pre-post-annotation-handling,pre-post-annotation-handling>>
@@ -258,22 +258,22 @@ If you need to use `<pre-invocation-advice>`, please include the `spring-securit
 
 
 [[nsa-pre-invocation-advice-attributes]]
-=== <pre-invocation-advice> Attributes
+=== Các thuộc tính của <pre-invocation-advice>
 
 
 [[nsa-pre-invocation-advice-ref]]
 * **ref**
-Defines a reference to a Spring bean Id.
+Định nghĩa một tham chiếu đến Id của Spring bean.
 
 
 [[nsa-protect-pointcut]]
-== Securing Methods using
+== Bảo mật phương thức bằng
 `<protect-pointcut>`
-Rather than defining security attributes on an individual method or class basis using the `@Secured` annotation, you can define cross-cutting security constraints across whole sets of methods and interfaces in your service layer using the `<protect-pointcut>` element.
-You can find an example in the xref:servlet/authorization/method-security.adoc#ns-protect-pointcut[namespace introduction].
+Thay vì định nghĩa các thuộc tính bảo mật riêng cho từng phương thức hoặc class bằng annotation `@Secured`, bạn có thể định nghĩa các ràng buộc bảo mật cross-cutting trên toàn bộ tập phương thức và interface trong service layer bằng phần tử `<protect-pointcut>`.
+Bạn có thể tìm thấy ví dụ trong xref:servlet/authorization/method-security.adoc#ns-protect-pointcut[phần giới thiệu namespace].
 
 [[nsa-protect-pointcut-parents]]
-=== Parent Elements of <protect-pointcut>
+=== Các phần tử cha của <protect-pointcut>
 
 
 * <<nsa-global-method-security,global-method-security>>
@@ -282,43 +282,43 @@ You can find an example in the xref:servlet/authorization/method-security.adoc#n
 
 
 [[nsa-protect-pointcut-attributes]]
-=== <protect-pointcut> Attributes
+=== Các thuộc tính của <protect-pointcut>
 
 
 [[nsa-protect-pointcut-access]]
 * **access**
-Access configuration attributes list that applies to all methods matching the pointcut, e.g.
+Danh sách các thuộc tính cấu hình quyền truy cập áp dụng cho tất cả phương thức khớp với pointcut, ví dụ:
 "ROLE_A,ROLE_B"
 
 
 [[nsa-protect-pointcut-expression]]
 * **expression**
-An AspectJ expression, including the `execution` keyword.
-For example, `execution(int com.foo.TargetObject.countLength(String))`.
+Một expression AspectJ, bao gồm keyword `execution`.
+Ví dụ: `execution(int com.foo.TargetObject.countLength(String))`.
 
 
 [[nsa-intercept-methods]]
 == <intercept-methods>
-Can be used inside a bean definition to add a security interceptor to the bean and set up access configuration attributes for the bean's methods
+Có thể được sử dụng bên trong định nghĩa bean để thêm security interceptor vào bean và thiết lập các thuộc tính cấu hình quyền truy cập cho các phương thức của bean
 
 
 [[nsa-intercept-methods-attributes]]
-=== <intercept-methods> Attributes
+=== Các thuộc tính của <intercept-methods>
 
 [[nsa-intercept-methods-use-authorization-manager]]
 * **use-authorization-manager**
-Use AuthorizationManager API instead of AccessDecisionManager (defaults to true)
+Sử dụng API AuthorizationManager thay vì AccessDecisionManager (mặc định là true)
 
 [[nsa-intercept-methods-authorization-manager-ref]]
 * **authorization-manager-ref**
-Optional AuthorizationManager bean ID to be used instead of the default (supersedes use-authorization-manager)
+ID bean AuthorizationManager tùy chọn được sử dụng thay cho giá trị mặc định (ghi đè use-authorization-manager)
 
 [[nsa-intercept-methods-access-decision-manager-ref]]
 * **access-decision-manager-ref**
-Optional AccessDecisionManager bean ID to be used by the created method security interceptor.
+ID bean AccessDecisionManager tùy chọn được method security interceptor được tạo sử dụng.
 
 [[nsa-intercept-methods-children]]
-=== Child Elements of <intercept-methods>
+=== Các phần tử con của <intercept-methods>
 
 
 * <<nsa-protect,protect>>
@@ -327,33 +327,33 @@ Optional AccessDecisionManager bean ID to be used by the created method security
 
 [[nsa-method-security-metadata-source]]
 == <method-security-metadata-source>
-Creates a MethodSecurityMetadataSource instance
+Tạo một instance MethodSecurityMetadataSource
 
 [NOTE]
 =====
-`<method-security-metadata-source>` is deprecated in favor of xref:servlet/authorization/method-security.adoc[`<method-security>`].
-If you need to use `<method-security-metadata-source>`, please include the `spring-security-access` dependency in your build configuration while planning to migrate to a modern option.
+`<method-security-metadata-source>` đã deprecated và được thay thế bằng xref:servlet/authorization/method-security.adoc[`<method-security>`].
+Nếu cần sử dụng `<method-security-metadata-source>`, hãy thêm dependency `spring-security-access` vào cấu hình build trong khi lập kế hoạch chuyển sang một tùy chọn hiện đại hơn.
 =====
 
 [[nsa-method-security-metadata-source-attributes]]
-=== <method-security-metadata-source> Attributes
+=== Các thuộc tính của <method-security-metadata-source>
 
 
 [[nsa-method-security-metadata-source-id]]
 * **id**
-A bean identifier, used for referring to the bean elsewhere in the context.
+Một định danh bean, được sử dụng để tham chiếu đến bean ở nơi khác trong context.
 
 
 [[nsa-method-security-metadata-source-use-expressions]]
 * **use-expressions**
-Enables the use of expressions in the 'access' attributes in <intercept-url> elements rather than the traditional list of configuration attributes.
-Defaults to 'false'.
-If enabled, each attribute should contain a single Boolean expression.
-If the expression evaluates to 'true', access will be granted.
+Bật việc sử dụng expression trong các thuộc tính 'access' của phần tử <intercept-url> thay cho danh sách thuộc tính cấu hình truyền thống.
+Mặc định là 'false'.
+Nếu được bật, mỗi thuộc tính phải chứa một Boolean expression duy nhất.
+Nếu expression được đánh giá là 'true', quyền truy cập sẽ được cấp.
 
 
 [[nsa-method-security-metadata-source-children]]
-=== Child Elements of <method-security-metadata-source>
+=== Các phần tử con của <method-security-metadata-source>
 
 
 * <<nsa-protect,protect>>
@@ -362,12 +362,12 @@ If the expression evaluates to 'true', access will be granted.
 
 [[nsa-protect]]
 == <protect>
-Defines a protected method and the access control configuration attributes that apply to it.
-We strongly advise you NOT to mix "protect" declarations with any services provided "global-method-security".
+Định nghĩa một phương thức được bảo vệ và các thuộc tính cấu hình access control áp dụng cho phương thức đó.
+Chúng tôi đặc biệt khuyến cáo bạn KHÔNG trộn các khai báo "protect" với bất kỳ service nào do "global-method-security" cung cấp.
 
 
 [[nsa-protect-parents]]
-=== Parent Elements of <protect>
+=== Các phần tử cha của <protect>
 
 
 * <<nsa-intercept-methods,intercept-methods>>
@@ -376,15 +376,15 @@ We strongly advise you NOT to mix "protect" declarations with any services provi
 
 
 [[nsa-protect-attributes]]
-=== <protect> Attributes
+=== Các thuộc tính của <protect>
 
 
 [[nsa-protect-access]]
 * **access**
-Access configuration attributes list that applies to the method, e.g.
+Danh sách các thuộc tính cấu hình quyền truy cập áp dụng cho phương thức, ví dụ:
 "ROLE_A,ROLE_B".
 
 
 [[nsa-protect-method]]
 * **method**
-A method name
+Tên phương thức
