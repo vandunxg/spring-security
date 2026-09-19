@@ -1,20 +1,20 @@
-= OAuth 2.0 Resource Server JWT
+= JWT của Resource Server OAuth 2.0
 
 [[webflux-oauth2resourceserver-jwt-minimaldependencies]]
-== Minimal Dependencies for JWT
+== Dependency tối thiểu cho JWT
 
-Most Resource Server support is collected into `spring-security-oauth2-resource-server`.
-However, the support for decoding and verifying JWTs is in `spring-security-oauth2-jose`, meaning that both are necessary to have a working resource server that supports JWT-encoded Bearer Tokens.
+Phần lớn hỗ trợ cho Resource Server được tập hợp trong `spring-security-oauth2-resource-server`.
+Tuy nhiên, hỗ trợ giải mã và xác minh JWT nằm trong `spring-security-oauth2-jose`, nghĩa là cần cả hai để có một resource server hoạt động và hỗ trợ Bearer Token được mã hóa bằng JWT.
 
 [[webflux-oauth2resourceserver-jwt-minimalconfiguration]]
-== Minimal Configuration for JWTs
+== Cấu hình tối thiểu cho JWT
 
-When using https://spring.io/projects/spring-boot[Spring Boot], configuring an application as a resource server consists of two basic steps.
-First, include the needed dependencies. Second, indicate the location of the authorization server.
+Khi sử dụng https://spring.io/projects/spring-boot[Spring Boot], việc cấu hình một ứng dụng thành Resource Server gồm hai bước cơ bản.
+Trước tiên, thêm các dependency cần thiết. Tiếp theo, chỉ ra vị trí của Authorization Server.
 
-=== Specifying the Authorization Server
+=== Chỉ định Authorization Server
 
-In a Spring Boot application, you need to specify which authorization server to use:
+Trong một ứng dụng Spring Boot, bạn cần chỉ định authorization server sẽ sử dụng:
 
 [source,yml]
 ----
@@ -26,36 +26,36 @@ spring:
           issuer-uri: https://idp.example.com/issuer
 ----
 
-Where `https://idp.example.com/issuer` is the value contained in the `iss` claim for JWT tokens that the authorization server issues.
-This resource server uses this property to further self-configure, discover the authorization server's public keys, and subsequently validate incoming JWTs.
+Trong đó, `https://idp.example.com/issuer` là giá trị nằm trong claim `iss` của các JWT mà authorization server phát hành.
+Resource Server sử dụng property này để tự cấu hình thêm, phát hiện public key của authorization server, sau đó xác thực các JWT đến.
 
 [NOTE]
 ====
-To use the `issuer-uri` property, it must also be true that one of `https://idp.example.com/issuer/.well-known/openid-configuration`, `https://idp.example.com/.well-known/openid-configuration/issuer`, or `https://idp.example.com/.well-known/oauth-authorization-server/issuer` is a supported endpoint for the authorization server.
-This endpoint is referred to as a https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig[Provider Configuration] endpoint or a https://tools.ietf.org/html/rfc8414#section-3[Authorization Server Metadata] endpoint.
+Để sử dụng property `issuer-uri`, một trong các endpoint `https://idp.example.com/issuer/.well-known/openid-configuration`, `https://idp.example.com/.well-known/openid-configuration/issuer` hoặc `https://idp.example.com/.well-known/oauth-authorization-server/issuer` cũng phải là endpoint được authorization server hỗ trợ.
+Endpoint này được gọi là endpoint https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig[Cấu hình Provider] hoặc endpoint https://tools.ietf.org/html/rfc8414#section-3[Metadata của Authorization Server].
 ====
 
-=== Startup Expectations
+=== Hành vi khi khởi động
 
-When this property and these dependencies are used, Resource Server automatically configures itself to validate JWT-encoded Bearer Tokens.
+Khi sử dụng property và các dependency này, Resource Server tự động cấu hình để xác thực Bearer Token được mã hóa bằng JWT.
 
-It achieves this through a deterministic discovery process it launches at the first request containing a JWT:
+Resource Server thực hiện việc này thông qua một quy trình discovery có tính xác định, được khởi chạy khi có request đầu tiên chứa JWT:
 
-. Hit the Provider Configuration or Authorization Server Metadata endpoint, processing the response for the `jwks_url` property.
-. Configure the validation strategy to query `jwks_url` for valid public keys.
-. Configure the validation strategy to validate each JWT's `iss` claim against `https://idp.example.com`.
+. Truy cập endpoint Cấu hình Provider hoặc Metadata của Authorization Server, xử lý response để lấy property `jwks_url`.
+. Cấu hình chiến lược xác thực để truy vấn `jwks_url` lấy các public key hợp lệ.
+. Cấu hình chiến lược xác thực để xác thực claim `iss` của từng JWT đối chiếu với `https://idp.example.com`.
 
-One benefit of deferring this process is that Resource Server startup is not coupled to the authorization server's availability.
+Một lợi ích của việc trì hoãn quy trình này là quá trình khởi động Resource Server không phụ thuộc vào khả dụng của authorization server.
 
 [NOTE]
 ====
-This deferral is managed by javadoc:org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder[`SupplierReactiveJwtDecoder`].
-Consider wrapping any <<webflux-oauth2resourceserver-decoder-bean,`JwtDecoder` `@Bean`>> you declare in order to preserve this behavior.
+Việc trì hoãn này được quản lý bởi javadoc:org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder[`SupplierReactiveJwtDecoder`].
+Hãy cân nhắc bọc mọi <<webflux-oauth2resourceserver-decoder-bean,`JwtDecoder` `@Bean`>> mà bạn khai báo để duy trì hành vi này.
 ====
 
-=== Runtime Expectations
+=== Hành vi khi chạy
 
-Once the application is started up, Resource Server tries to process any request that contains an `Authorization: Bearer` header:
+Sau khi ứng dụng khởi động, Resource Server cố gắng xử lý mọi request chứa header `Authorization: Bearer`:
 
 [source,html]
 ----
@@ -63,30 +63,30 @@ GET / HTTP/1.1
 Authorization: Bearer some-token-value # Resource Server will process this
 ----
 
-So long as this scheme is indicated, Resource Server tries to process the request according to the Bearer Token specification.
+Miễn là scheme này được chỉ định, Resource Server cố gắng xử lý request theo đặc tả Bearer Token.
 
-Given a well-formed JWT, Resource Server:
+Với một JWT có định dạng đúng, Resource Server sẽ:
 
-. Validates its signature against a public key obtained from the `jwks_url` endpoint during startup and matched against the JWTs header.
-. Validates the JWTs `exp` and `nbf` timestamps and the JWTs `iss` claim.
-. Maps each scope to an authority with the prefix `SCOPE_`.
+. Xác thực chữ ký của JWT bằng public key lấy từ endpoint `jwks_url` trong quá trình khởi động và đối chiếu với header của JWT.
+. Xác thực timestamp `exp`, `nbf` và claim `iss` của JWT.
+. Ánh xạ mỗi scope thành một authority với tiền tố `SCOPE_`.
 
 [NOTE]
 ====
-As the authorization server makes available new keys, Spring Security automatically rotates the keys used to validate the JWT tokens.
+Khi authorization server cung cấp các key mới, Spring Security tự động xoay vòng các key được sử dụng để xác thực JWT.
 ====
 
-By default, the resulting `Authentication#getPrincipal` is a Spring Security `Jwt` object, and `Authentication#getName` maps to the JWT's `sub` property, if one is present.
+Theo mặc định, `Authentication#getPrincipal` nhận được là một object `Jwt` của Spring Security, còn `Authentication#getName` ánh xạ đến property `sub` của JWT nếu property này tồn tại.
 
-From here, consider jumping to:
+Từ đây, bạn có thể chuyển đến:
 
-* <<webflux-oauth2resourceserver-jwt-jwkseturi,How to Configure without Tying Resource Server startup to an authorization server's availability>>
-* <<webflux-oauth2resourceserver-jwt-sansboot,How to Configure without Spring Boot>>
+* <<webflux-oauth2resourceserver-jwt-jwkseturi,Cách cấu hình mà không ràng buộc quá trình khởi động Resource Server với khả dụng của authorization server>>
+* <<webflux-oauth2resourceserver-jwt-sansboot,Cách cấu hình mà không dùng Spring Boot>>
 
 [[webflux-oauth2resourceserver-jwt-jwkseturi]]
-=== Specifying the Authorization Server JWK Set Uri Directly
+=== Chỉ định trực tiếp Uri của JWK Set của Authorization Server
 
-If the authorization server does not support any configuration endpoints, or if Resource Server must be able to initialize independently from the authorization server, you can supply `jwk-set-uri` as well:
+Nếu authorization server không hỗ trợ configuration endpoint nào, hoặc nếu Resource Server phải có khả năng khởi tạo độc lập với authorization server, bạn cũng có thể cung cấp `jwk-set-uri`:
 
 [source,yaml]
 ----
@@ -101,25 +101,25 @@ spring:
 
 [NOTE]
 ====
-The JWK Set uri is not standardized, but you can typically find it in the authorization server's documentation.
+Uri của JWK Set không được chuẩn hóa, nhưng thông thường bạn có thể tìm thấy nó trong tài liệu của authorization server.
 ====
 
-Consequently, Resource Server does not ping the authorization server at startup.
-We still specify the `issuer-uri` so that Resource Server still validates the `iss` claim on incoming JWTs.
+Do đó, Resource Server không ping authorization server khi khởi động.
+Chúng ta vẫn chỉ định `issuer-uri` để Resource Server tiếp tục xác thực claim `iss` trên các JWT đến.
 
 [NOTE]
 ====
-You can supply this property directly on the <<webflux-oauth2resourceserver-jwt-jwkseturi-dsl,DSL>>.
+Bạn có thể cung cấp property này trực tiếp trên <<webflux-oauth2resourceserver-jwt-jwkseturi-dsl,DSL>>.
 ====
 
 [[webflux-oauth2resourceserver-jwt-sansboot]]
-=== Overriding or Replacing Boot Auto Configuration
+=== Ghi đè hoặc thay thế Auto-configuration của Boot
 
-Spring Boot generates two `@Bean` objects on Resource Server's behalf.
+Spring Boot tạo hai object `@Bean` thay cho Resource Server.
 
-The first bean is a `SecurityWebFilterChain` that configures the application as a resource server. When including `spring-security-oauth2-jose`, this `SecurityWebFilterChain` looks like:
+Bean đầu tiên là một `SecurityWebFilterChain` cấu hình ứng dụng thành Resource Server. Khi thêm `spring-security-oauth2-jose`, `SecurityWebFilterChain` này có dạng:
 
-.Resource Server SecurityWebFilterChain
+.SecurityWebFilterChain của Resource Server
 [tabs]
 ======
 Java::
@@ -155,11 +155,11 @@ fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain 
 ----
 ======
 
-If the application does not expose a `SecurityWebFilterChain` bean, Spring Boot exposes the default one (shown in the preceding listing).
+Nếu ứng dụng không expose bean `SecurityWebFilterChain`, Spring Boot expose bean mặc định (được hiển thị trong listing trước đó).
 
-To replace it, expose the `@Bean` within the application:
+Để thay thế bean này, hãy expose `@Bean` trong ứng dụng:
 
-.Replacing SecurityWebFilterChain
+.Thay thế SecurityWebFilterChain
 [tabs]
 ======
 Java::
@@ -203,11 +203,11 @@ fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain 
 ----
 ======
 
-The preceding configuration requires the scope of `message:read` for any URL that starts with `/messages/`.
+Cấu hình trước đó yêu cầu scope `message:read` đối với mọi URL bắt đầu bằng `/messages/`.
 
-Methods on the `oauth2ResourceServer` DSL also override or replace auto configuration.
+Các method trên DSL `oauth2ResourceServer` cũng ghi đè hoặc thay thế auto-configuration.
 
-For example, the second `@Bean` Spring Boot creates is a `ReactiveJwtDecoder`, which decodes `String` tokens into validated instances of `Jwt`:
+Ví dụ, `@Bean` thứ hai mà Spring Boot tạo là một `ReactiveJwtDecoder`, dùng để giải mã token `String` thành các instance `Jwt` đã được xác thực:
 
 .ReactiveJwtDecoder
 [tabs]
@@ -235,16 +235,16 @@ fun jwtDecoder(): ReactiveJwtDecoder {
 
 [NOTE]
 ====
-Calling javadoc:org.springframework.security.oauth2.jwt.ReactiveJwtDecoders#fromIssuerLocation-java.lang.String-[ReactiveJwtDecoders#fromIssuerLocation] invokes the Provider Configuration or Authorization Server Metadata endpoint to derive the JWK Set URI.
-If the application does not expose a `ReactiveJwtDecoder` bean, Spring Boot exposes the above default one.
+Việc gọi javadoc:org.springframework.security.oauth2.jwt.ReactiveJwtDecoders#fromIssuerLocation-java.lang.String-[ReactiveJwtDecoders#fromIssuerLocation] gọi endpoint Cấu hình Provider hoặc Metadata của Authorization Server để suy ra URI của JWK Set.
+Nếu ứng dụng không expose bean `ReactiveJwtDecoder`, Spring Boot expose bean mặc định nêu trên.
 ====
 
-Its configuration can be overridden by using `jwkSetUri()` or replaced by using `decoder()`.
+Bạn có thể ghi đè cấu hình này bằng `jwkSetUri()` hoặc thay thế bằng `decoder()`.
 
 [[webflux-oauth2resourceserver-jwt-jwkseturi-dsl]]
-==== Using `jwkSetUri()`
+==== Sử dụng `jwkSetUri()`
 
-You can configure an authorization server's JWK Set URI <<webflux-oauth2resourceserver-jwt-jwkseturi,as a configuration property>> or supply it in the DSL:
+Bạn có thể cấu hình URI của JWK Set của authorization server <<webflux-oauth2resourceserver-jwt-jwkseturi,như một configuration property>> hoặc cung cấp URI này trong DSL:
 
 [tabs]
 ======
@@ -287,12 +287,12 @@ fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain 
 ----
 ======
 
-Using `jwkSetUri()` takes precedence over any configuration property.
+Sử dụng `jwkSetUri()` được ưu tiên hơn mọi configuration property.
 
 [[webflux-oauth2resourceserver-jwt-decoder-dsl]]
-==== Using `decoder()`
+==== Sử dụng `decoder()`
 
-`decoder()` is more powerful than `jwkSetUri()`, because it completely replaces any Spring Boot auto-configuration of `JwtDecoder`:
+`decoder()` mạnh hơn `jwkSetUri()` vì nó thay thế hoàn toàn mọi auto-configuration `JwtDecoder` của Spring Boot:
 
 [tabs]
 ======
@@ -335,13 +335,13 @@ fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain 
 ----
 ======
 
-This is handy when you need deeper configuration, such as <<webflux-oauth2resourceserver-jwt-validation,validation>>.
+Điều này hữu ích khi bạn cần cấu hình sâu hơn, chẳng hạn như <<webflux-oauth2resourceserver-jwt-validation,xác thực>>.
 
 [[webflux-oauth2resourceserver-decoder-bean]]
-==== Exposing a `ReactiveJwtDecoder` `@Bean`
+==== Cung cấp `ReactiveJwtDecoder` `@Bean`
 
-Alternately, exposing a `ReactiveJwtDecoder` `@Bean` has the same effect as `decoder()`:
-You can construct one with a `jwkSetUri` like so:
+Ngoài ra, expose một `ReactiveJwtDecoder` `@Bean` có tác dụng tương tự `decoder()`:
+Bạn có thể tạo một decoder với `jwkSetUri` như sau:
 
 [tabs]
 ======
@@ -366,7 +366,7 @@ fun jwtDecoder(): ReactiveJwtDecoder {
 ----
 ======
 
-or you can use the issuer and have `NimbusReactiveJwtDecoder` look up the `jwkSetUri` when `build()` is invoked, like the following:
+hoặc bạn có thể sử dụng issuer để `NimbusReactiveJwtDecoder` tra cứu `jwkSetUri` khi gọi `build()`, như sau:
 
 [tabs]
 ======
@@ -395,7 +395,7 @@ fun jwtDecoder(): ReactiveJwtDecoder {
 ----
 ======
 
-Or, if the defaults work for you, you can also use `JwtDecoders`, which does the above in addition to configuring the decoder's validator:
+Hoặc, nếu các giá trị mặc định phù hợp với bạn, bạn cũng có thể sử dụng `JwtDecoders`, thực hiện các thao tác trên và đồng thời cấu hình validator của decoder:
 
 [tabs]
 ======
@@ -421,16 +421,16 @@ fun jwtDecoder(): ReactiveJwtDecoder {
 ======
 
 [[webflux-oauth2resourceserver-jwt-decoder-algorithm]]
-== Configuring Trusted Algorithms
+== Cấu hình thuật toán đáng tin cậy
 
-By default, `NimbusReactiveJwtDecoder`, and hence Resource Server, trust and verify only tokens that use `RS256`.
+Theo mặc định, `NimbusReactiveJwtDecoder`, và do đó Resource Server, chỉ tin cậy và xác minh các token sử dụng `RS256`.
 
-You can customize this behavior with <<webflux-oauth2resourceserver-jwt-boot-algorithm,Spring Boot>> or by using <<webflux-oauth2resourceserver-jwt-decoder-builder,the NimbusJwtDecoder builder>>.
+Bạn có thể tùy chỉnh hành vi này bằng <<webflux-oauth2resourceserver-jwt-boot-algorithm,Spring Boot>> hoặc sử dụng <<webflux-oauth2resourceserver-jwt-decoder-builder,builder NimbusJwtDecoder>>.
 
 [[webflux-oauth2resourceserver-jwt-boot-algorithm]]
-=== Customizing Trusted Algorithms with Spring Boot
+=== Tùy chỉnh thuật toán đáng tin cậy bằng Spring Boot
 
-The simplest way to set the algorithm is as a property:
+Cách đơn giản nhất để đặt thuật toán là sử dụng property:
 
 [source,yaml]
 ----
@@ -444,9 +444,9 @@ spring:
 ----
 
 [[webflux-oauth2resourceserver-jwt-decoder-builder]]
-=== Customizing Trusted Algorithms by Using a Builder
+=== Tùy chỉnh thuật toán đáng tin cậy bằng Builder
 
-For greater power, though, we can use a builder that ships with `NimbusReactiveJwtDecoder`:
+Tuy nhiên, để có nhiều khả năng tùy chỉnh hơn, chúng ta có thể sử dụng một builder đi kèm `NimbusReactiveJwtDecoder`:
 
 [tabs]
 ======
@@ -477,7 +477,7 @@ fun jwtDecoder(): ReactiveJwtDecoder {
 ----
 ======
 
-Calling `jwsAlgorithm` more than once configures `NimbusReactiveJwtDecoder` to trust more than one algorithm:
+Gọi `jwsAlgorithm` nhiều hơn một lần sẽ cấu hình `NimbusReactiveJwtDecoder` tin cậy nhiều thuật toán:
 
 [tabs]
 ======
@@ -508,7 +508,7 @@ fun jwtDecoder(): ReactiveJwtDecoder {
 ----
 ======
 
-Alternately, you can call `jwsAlgorithms`:
+Ngoài ra, bạn có thể gọi `jwsAlgorithms`:
 
 [tabs]
 ======
@@ -547,15 +547,15 @@ fun jwtDecoder(): ReactiveJwtDecoder {
 ======
 
 [[webflux-oauth2resourceserver-jwt-decoder-public-key]]
-=== Trusting a Single Asymmetric Key
+=== Tin cậy một asymmetric key duy nhất
 
-Simpler than backing a Resource Server with a JWK Set endpoint is to hard-code an RSA public key.
-The public key can be provided with <<webflux-oauth2resourceserver-jwt-decoder-public-key-boot,Spring Boot>> or by <<webflux-oauth2resourceserver-jwt-decoder-public-key-builder,Using a Builder>>.
+Một cách đơn giản hơn so với việc hỗ trợ Resource Server bằng endpoint JWK Set là hard-code một RSA public key.
+Public key có thể được cung cấp bằng <<webflux-oauth2resourceserver-jwt-decoder-public-key-boot,Spring Boot>> hoặc <<webflux-oauth2resourceserver-jwt-decoder-public-key-builder,sử dụng Builder>>.
 
 [[webflux-oauth2resourceserver-jwt-decoder-public-key-boot]]
-==== Via Spring Boot
+==== Qua Spring Boot
 
-You can specify a key with Spring Boot:
+Bạn có thể chỉ định một key bằng Spring Boot:
 
 [source,yaml]
 ----
@@ -567,7 +567,7 @@ spring:
           public-key-location: classpath:my-key.pub
 ----
 
-Alternately, to allow for a more sophisticated lookup, you can post-process the `RsaKeyConversionServicePostProcessor`:
+Ngoài ra, để cho phép việc tra cứu tinh vi hơn, bạn có thể post-process `RsaKeyConversionServicePostProcessor`:
 
 .BeanFactoryPostProcessor
 [tabs]
@@ -598,14 +598,14 @@ fun conversionServiceCustomizer(): BeanFactoryPostProcessor {
 ----
 ======
 
-Specify your key's location:
+Chỉ định vị trí của key:
 
 [source,yaml]
 ----
 key.location: hfds://my-key.pub
 ----
 
-Then autowire the value:
+Sau đó autowire giá trị này:
 
 [tabs]
 ======
@@ -627,9 +627,9 @@ val key: RSAPublicKey? = null
 ======
 
 [[webflux-oauth2resourceserver-jwt-decoder-public-key-builder]]
-==== Using a Builder
+==== Sử dụng Builder
 
-To wire an `RSAPublicKey` directly, use the appropriate `NimbusReactiveJwtDecoder` builder:
+Để wire trực tiếp một `RSAPublicKey`, hãy sử dụng builder phù hợp của `NimbusReactiveJwtDecoder`:
 
 [tabs]
 ======
@@ -655,10 +655,10 @@ fun jwtDecoder(): ReactiveJwtDecoder {
 ======
 
 [[webflux-oauth2resourceserver-jwt-decoder-secret-key]]
-=== Trusting a Single Symmetric Key
+=== Tin cậy một symmetric key duy nhất
 
-You can also use a single symmetric key.
-You can load in your `SecretKey` and use the appropriate `NimbusReactiveJwtDecoder` builder:
+Bạn cũng có thể sử dụng một symmetric key duy nhất.
+Bạn có thể nạp `SecretKey` của mình và sử dụng builder phù hợp của `NimbusReactiveJwtDecoder`:
 
 [tabs]
 ======
@@ -684,18 +684,18 @@ fun jwtDecoder(): ReactiveJwtDecoder {
 ======
 
 [[webflux-oauth2resourceserver-jwt-authorization]]
-=== Configuring Authorization
+=== Cấu hình authorization
 
-A JWT that is issued from an OAuth 2.0 Authorization Server typically has either a `scope` or an `scp` attribute, indicating the scopes (or authorities) it has been granted -- for example:
+JWT được phát hành từ OAuth 2.0 Authorization Server thường có một attribute `scope` hoặc `scp`, cho biết các scope (hoặc authority) đã được cấp cho nó, ví dụ:
 
 [source,json]
 ----
 { ..., "scope" : "messages contacts"}
 ----
 
-When this is the case, Resource Server tries to coerce these scopes into a list of granted authorities, prefixing each scope with the string, `SCOPE_`.
+Trong trường hợp này, Resource Server cố gắng chuyển các scope này thành một danh sách authority được cấp, thêm tiền tố `SCOPE_` vào mỗi scope.
 
-This means that, to protect an endpoint or method with a scope derived from a JWT, the corresponding expressions should include this prefix:
+Điều này có nghĩa là để bảo vệ một endpoint hoặc method bằng một scope lấy từ JWT, các expression tương ứng phải bao gồm tiền tố này:
 
 [tabs]
 ======
@@ -740,7 +740,7 @@ fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain 
 ----
 ======
 
-You can do something similar with method security:
+Bạn có thể thực hiện tương tự với method security:
 
 [tabs]
 ======
@@ -762,13 +762,13 @@ fun getMessages(): Flux<Message> { }
 ======
 
 [[webflux-oauth2resourceserver-jwt-authorization-extraction]]
-==== Extracting Authorities Manually
+==== Trích xuất authority thủ công
 
-However, there are a number of circumstances where this default is insufficient.
-For example, some authorization servers do not use the `scope` attribute. Instead, they have their own custom attribute.
-At other times, the resource server may need to adapt the attribute or a composition of attributes into internalized authorities.
+Tuy nhiên, có một số trường hợp giá trị mặc định này không đủ.
+Ví dụ, một số authorization server không sử dụng attribute `scope`. Thay vào đó, chúng có attribute tùy chỉnh riêng.
+Trong những trường hợp khác, resource server có thể cần chuyển đổi một attribute hoặc tổ hợp các attribute thành các authority nội bộ.
 
-To this end, the DSL exposes `jwtAuthenticationConverter()`:
+Để thực hiện việc này, DSL cung cấp `jwtAuthenticationConverter()`:
 
 [tabs]
 ======
@@ -825,10 +825,10 @@ fun grantedAuthoritiesExtractor(): Converter<Jwt, Mono<AbstractAuthenticationTok
 ----
 ======
 
-`jwtAuthenticationConverter()` is responsible for converting a `Jwt` into an `Authentication`.
-As part of its configuration, we can supply a subsidiary converter to go from `Jwt` to a `Collection` of granted authorities.
+`jwtAuthenticationConverter()` chịu trách nhiệm chuyển đổi một `Jwt` thành một `Authentication`.
+Trong cấu hình của nó, chúng ta có thể cung cấp một converter phụ để chuyển từ `Jwt` thành một `Collection` các authority được cấp.
 
-That final converter might be something like the following `GrantedAuthoritiesExtractor`:
+Converter cuối cùng đó có thể giống như `GrantedAuthoritiesExtractor` sau:
 
 [tabs]
 ======
@@ -867,7 +867,7 @@ internal class GrantedAuthoritiesExtractor : Converter<Jwt, Collection<GrantedAu
 ----
 ======
 
-For more flexibility, the DSL supports entirely replacing the converter with any class that implements `Converter<Jwt, Mono<AbstractAuthenticationToken>>`:
+Để linh hoạt hơn, DSL hỗ trợ thay thế hoàn toàn converter bằng bất kỳ class nào triển khai `Converter<Jwt, Mono<AbstractAuthenticationToken>>`:
 
 [tabs]
 ======
@@ -895,21 +895,21 @@ internal class CustomAuthenticationConverter : Converter<Jwt, Mono<AbstractAuthe
 ======
 
 [[webflux-oauth2resourceserver-jwt-validation]]
-=== Configuring Validation
+=== Cấu hình validation
 
-Using <<webflux-oauth2resourceserver-jwt-minimalconfiguration,minimal Spring Boot configuration>>, indicating the authorization server's issuer URI, Resource Server defaults to verifying the `iss` claim as well as the `exp` and `nbf` timestamp claims.
+Khi sử dụng <<webflux-oauth2resourceserver-jwt-minimalconfiguration,cấu hình Spring Boot tối thiểu>> và chỉ định issuer URI của authorization server, theo mặc định Resource Server sẽ xác minh claim `iss` cũng như các claim timestamp `exp` và `nbf`.
 
-In circumstances where you need to customize validation needs, Resource Server ships with two standard validators and also accepts custom `OAuth2TokenValidator` instances.
+Trong trường hợp cần tùy chỉnh việc validation, Resource Server cung cấp hai validator tiêu chuẩn và cũng chấp nhận các instance `OAuth2TokenValidator` tùy chỉnh.
 
 [[webflux-oauth2resourceserver-jwt-validation-clockskew]]
-==== Customizing Timestamp Validation
+==== Tùy chỉnh validation timestamp
 
-JWT instances typically have a window of validity, with the start of the window indicated in the `nbf` claim and the end indicated in the `exp` claim.
+Các instance JWT thường có một khoảng thời gian hợp lệ, trong đó thời điểm bắt đầu được chỉ ra trong claim `nbf` và thời điểm kết thúc được chỉ ra trong claim `exp`.
 
-However, every server can experience clock drift, which can cause tokens to appear to be expired to one server but not to another.
-This can cause some implementation heartburn, as the number of collaborating servers increases in a distributed system.
+Tuy nhiên, mọi server đều có thể gặp clock drift, khiến token có vẻ hết hạn trên server này nhưng chưa hết hạn trên server khác.
+Điều này có thể gây khó khăn trong triển khai khi số lượng server phối hợp với nhau trong một hệ thống phân tán tăng lên.
 
-Resource Server uses `JwtTimestampValidator` to verify a token's validity window, and you can configure it with a `clockSkew` to alleviate the clock drift problem:
+Resource Server sử dụng `JwtTimestampValidator` để xác minh khoảng thời gian hợp lệ của token, và bạn có thể cấu hình nó với `clockSkew` để giảm vấn đề clock drift:
 
 [tabs]
 ======
@@ -950,13 +950,13 @@ fun jwtDecoder(): ReactiveJwtDecoder {
 
 [NOTE]
 ====
-By default, Resource Server configures a clock skew of 60 seconds.
+Theo mặc định, Resource Server cấu hình clock skew là 60 giây.
 ====
 
 [[webflux-oauth2resourceserver-validation-rfc9068]]
-=== Configuring RFC 9068 Validation
+=== Cấu hình validation RFC 9068
 
-If you need to require tokens that meet https://datatracker.ietf.org/doc/rfc9068/[RFC 9068], you can configure validation in the following way:
+Nếu cần yêu cầu các token đáp ứng https://datatracker.ietf.org/doc/rfc9068/[RFC 9068], bạn có thể cấu hình validation như sau:
 
 [tabs]
 ======
@@ -994,9 +994,9 @@ fun jwtDecoder(): JwtDecoder {
 ======
 
 [[webflux-oauth2resourceserver-validation-custom]]
-==== Configuring a Custom Validator
+==== Cấu hình validator tùy chỉnh
 
-You can Add a check for the `aud` claim with the `OAuth2TokenValidator` API:
+Bạn có thể thêm bước kiểm tra claim `aud` bằng API `OAuth2TokenValidator`:
 
 [tabs]
 ======
@@ -1034,7 +1034,7 @@ class AudienceValidator : OAuth2TokenValidator<Jwt> {
 ----
 ======
 
-Then, to add into a resource server, you can specify the `ReactiveJwtDecoder` instance:
+Sau đó, để thêm validator vào một Resource Server, bạn có thể chỉ định instance `ReactiveJwtDecoder`:
 
 [tabs]
 ======
