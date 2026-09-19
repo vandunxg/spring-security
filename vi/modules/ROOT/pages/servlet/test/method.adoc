@@ -1,13 +1,13 @@
 [[test-method]]
-= Testing Method Security
+= Kiểm thử method security
 
-This section demonstrates how to use Spring Security's Test support to test method-based security.
-We first introduce a `MessageService` that requires the user to be authenticated to be able to access it:
+Phần này trình bày cách sử dụng Test support của Spring Security để kiểm thử bảo mật dựa trên method.
+Trước tiên, chúng ta giới thiệu một `MessageService` yêu cầu người dùng phải được authenticated để có thể truy cập:
 
 include-code::./HelloMessageService[tag=authenticated,indent=0]
 
-The result of `getMessage` is a `String` that says "`Hello`" to the current Spring Security `Authentication`.
-The following listing shows example output:
+Kết quả của `getMessage` là một `String` chứa lời chào "`Hello`" đến `Authentication` hiện tại của Spring Security.
+Danh sách sau hiển thị output mẫu:
 
 [source,text]
 ----
@@ -15,77 +15,77 @@ Hello org.springframework.security.authentication.UsernamePasswordAuthentication
 ----
 
 [[test-method-setup]]
-== Security Test Setup
+== Thiết lập kiểm thử security
 
-Before we can use the Spring Security test support, we must perform some setup:
+Trước khi có thể sử dụng test support của Spring Security, chúng ta phải thực hiện một số thiết lập:
 
 include-code::./WithMockUserTests[tag=setup,indent=0]
 
-<1> `@ExtendWith` instructs the spring-test module that it should create an `ApplicationContext`. For additional information, refer to the {spring-framework-reference-url}testing.html#testcontext-junit-jupiter-extension[Spring reference].
-<2> `@ContextConfiguration` instructs the spring-test the configuration to use to create the `ApplicationContext`. Since no configuration is specified, the default configuration locations will be tried. This is no different than using the existing Spring Test support. For additional information, refer to the {spring-framework-reference-url}testing.html#spring-testing-annotation-contextconfiguration[Spring Reference].
+<1> `@ExtendWith` chỉ dẫn cho module spring-test rằng module này phải tạo một `ApplicationContext`. Để biết thêm thông tin, xem {spring-framework-reference-url}testing.html#testcontext-junit-jupiter-extension[tài liệu tham khảo Spring].
+<2> `@ContextConfiguration` chỉ dẫn cho spring-test cấu hình cần sử dụng để tạo `ApplicationContext`. Vì không chỉ định cấu hình, các vị trí cấu hình mặc định sẽ được thử. Điều này không khác với việc sử dụng Spring Test support hiện có. Để biết thêm thông tin, xem {spring-framework-reference-url}testing.html#spring-testing-annotation-contextconfiguration[Tài liệu tham khảo Spring].
 
 [NOTE]
 ====
-Spring Security hooks into Spring Test support through the `WithSecurityContextTestExecutionListener`, which ensures that our tests are run with the correct user.
-It does this by populating the `SecurityContextHolder` prior to running our tests.
-If you use reactive method security, you also need `ReactorContextTestExecutionListener`, which populates `ReactiveSecurityContextHolder`.
-After the test is done, it clears out the `SecurityContextHolder`.
-If you need only Spring Security related support, you can replace `@ContextConfiguration` with `@SecurityTestExecutionListeners`.
+Spring Security kết nối vào Spring Test support thông qua `WithSecurityContextTestExecutionListener`, đảm bảo các test của chúng ta được chạy với đúng người dùng.
+Listener này thực hiện việc đó bằng cách điền `SecurityContextHolder` trước khi chạy các test.
+Nếu sử dụng reactive method security, bạn cũng cần `ReactorContextTestExecutionListener`, listener này điền `ReactiveSecurityContextHolder`.
+Sau khi test hoàn tất, listener xóa `SecurityContextHolder`.
+Nếu chỉ cần support liên quan đến Spring Security, bạn có thể thay `@ContextConfiguration` bằng `@SecurityTestExecutionListeners`.
 ====
 
-Remember, we added the `@PreAuthorize` annotation to our `HelloMessageService`, so it requires an authenticated user to invoke it.
-If we run the tests, we expect the following test will pass:
+Hãy nhớ rằng chúng ta đã thêm annotation `@PreAuthorize` vào `HelloMessageService`, vì vậy cần có authenticated user để gọi service này.
+Nếu chạy các test, chúng ta kỳ vọng test sau sẽ pass:
 
 include-code::./WithMockUserSampleTests[tag=snippet,indent=0]
 
 [[test-method-withmockuser]]
 == @WithMockUser
 
-The question is "How could we most easily run the test as a specific user?"
-The answer is to use `@WithMockUser`.
-The following test will be run as a user with the username "user", the password "password", and the roles "ROLE_USER".
+Câu hỏi là: "Làm thế nào để chạy test dưới một người dùng cụ thể một cách dễ dàng nhất?"
+Câu trả lời là sử dụng `@WithMockUser`.
+Test sau sẽ được chạy dưới một người dùng có username là "user", password là "password" và role là "ROLE_USER".
 
 include-code::./WithMockUserTests[tag=mock-user,indent=0]
 
-Specifically the following is true:
+Cụ thể, các điều sau là đúng:
 
-* The user with a username of `user` does not have to exist, since we mock the user object.
-* The `Authentication` that is populated in the `SecurityContext` is of type `UsernamePasswordAuthenticationToken`.
-* The principal on the `Authentication` is Spring Security's `User` object.
-* The `User` has a username of `user`.
-* The `User` has a password of `password`.
-* A single `GrantedAuthority` named `ROLE_USER` is used.
+* Người dùng có username là `user` không cần tồn tại, vì chúng ta mock user object.
+* `Authentication` được điền vào `SecurityContext` có kiểu `UsernamePasswordAuthenticationToken`.
+* principal trên `Authentication` là `User` object của Spring Security.
+* `User` có username là `user`.
+* `User` có password là `password`.
+* Một `GrantedAuthority` duy nhất có tên `ROLE_USER` được sử dụng.
 
-The preceding example is handy, because it lets us use a lot of defaults.
-What if we wanted to run the test with a different username?
-The following test would run with a username of `customUser` (again, the user does not need to actually exist):
+Ví dụ trước khá tiện lợi vì cho phép chúng ta sử dụng nhiều giá trị mặc định.
+Nếu muốn chạy test với username khác thì sao?
+Test sau sẽ chạy với username là `customUser` (một lần nữa, user không cần thực sự tồn tại):
 
 include-code::./WithMockUserTests[tag=custom-user,indent=0]
 
-We can also easily customize the roles.
-For example, the following test is invoked with a username of `admin` and roles of `ROLE_USER` and `ROLE_ADMIN`.
+Chúng ta cũng có thể dễ dàng tùy chỉnh các role.
+Ví dụ, test sau được gọi với username là `admin` và các role `ROLE_USER`, `ROLE_ADMIN`.
 
 include-code::./WithMockUserTests[tag=custom-roles,indent=0]
 
-If we do not want the value to automatically be prefixed with `ROLE_` we can use the `authorities` attribute.
-For example, the following test is invoked with a username of `admin` and the `USER` and `ADMIN` authorities.
+Nếu không muốn giá trị được tự động thêm tiền tố `ROLE_`, chúng ta có thể sử dụng attribute `authorities`.
+Ví dụ, test sau được gọi với username là `admin` và các authority `USER`, `ADMIN`.
 
 include-code::./WithMockUserTests[tag=custom-authorities,indent=0]
 
-It can be a bit tedious to place the annotation on every test method.
-Instead, we can place the annotation at the class level. Then every test uses the specified user.
-The following example runs every test with a user whose username is `admin`, whose password is `password`, and who has the `ROLE_USER` and `ROLE_ADMIN` roles:
+Việc đặt annotation trên mọi test method có thể hơi mất công.
+Thay vào đó, chúng ta có thể đặt annotation ở cấp class. Khi đó, mọi test đều sử dụng user được chỉ định.
+Ví dụ sau chạy mọi test với một user có username là `admin`, password là `password` và có các role `ROLE_USER`, `ROLE_ADMIN`:
 
 include-code::./WithMockUserClassTests[tag=snippet,indent=0]
 
-If you use JUnit 5's `@Nested` test support, you can also place the annotation on the enclosing class to apply to all nested classes.
-The following example runs every test with a user whose username is `admin`, whose password is `password`, and who has the `ROLE_USER` and `ROLE_ADMIN` roles for both test methods.
+Nếu sử dụng test support `@Nested` của JUnit 5, bạn cũng có thể đặt annotation trên enclosing class để áp dụng cho tất cả nested class.
+Ví dụ sau chạy mọi test với một user có username là `admin`, password là `password` và có các role `ROLE_USER`, `ROLE_ADMIN` cho cả hai test method:
 
 include-code::./WithMockUserNestedTests[tag=snippet,indent=0]
 
-By default, the `SecurityContext` is set during the `TestExecutionListener.beforeTestMethod` event.
-This is the equivalent of happening before JUnit's `@Before`.
-You can change this to happen during the `TestExecutionListener.beforeTestExecution` event, which is after JUnit's `@Before` but before the test method is invoked:
+Theo mặc định, `SecurityContext` được thiết lập trong event `TestExecutionListener.beforeTestMethod`.
+Điều này tương đương với việc diễn ra trước `@Before` của JUnit.
+Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi test method được gọi:
 
 [source,java]
 ----
@@ -96,15 +96,15 @@ You can change this to happen during the `TestExecutionListener.beforeTestExecut
 [[test-method-withanonymoususer]]
 == @WithAnonymousUser
 
-Using `@WithAnonymousUser` allows running as an anonymous user.
-This is especially convenient when you wish to run most of your tests with a specific user but want to run a few tests as an anonymous user.
-The following example runs `withMockUser1` and `withMockUser2` by using <<test-method-withmockuser,@WithMockUser>> and `anonymous` as an anonymous user:
+Sử dụng `@WithAnonymousUser` cho phép chạy dưới một anonymous user.
+Điều này đặc biệt tiện lợi khi bạn muốn chạy phần lớn test với một user cụ thể nhưng muốn chạy một vài test dưới anonymous user.
+Ví dụ sau chạy `withMockUser1` và `withMockUser2` bằng cách sử dụng <<test-method-withmockuser,@WithMockUser>> và `anonymous` làm anonymous user:
 
 include-code::./WithUserClassLevelAuthenticationTests[tag=snippet,indent=0]
 
-By default, the `SecurityContext` is set during the `TestExecutionListener.beforeTestMethod` event.
-This is the equivalent of happening before JUnit's `@Before`.
-You can change this to happen during the `TestExecutionListener.beforeTestExecution` event, which is after JUnit's `@Before` but before the test method is invoked:
+Theo mặc định, `SecurityContext` được thiết lập trong event `TestExecutionListener.beforeTestMethod`.
+Điều này tương đương với việc diễn ra trước `@Before` của JUnit.
+Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi test method được gọi:
 
 [source,java]
 ----
@@ -115,34 +115,34 @@ You can change this to happen during the `TestExecutionListener.beforeTestExecut
 [[test-method-withuserdetails]]
 == @WithUserDetails
 
-While `@WithMockUser` is a convenient way to get started, it may not work in all instances.
-For example, some applications expect the `Authentication` principal to be of a specific type.
-This is done so that the application can refer to the principal as the custom type and reduce coupling on Spring Security.
+Mặc dù `@WithMockUser` là cách thuận tiện để bắt đầu, annotation này có thể không hoạt động trong mọi trường hợp.
+Ví dụ, một số application mong đợi principal của `Authentication` có một kiểu cụ thể.
+Điều này cho phép application tham chiếu principal dưới dạng kiểu tùy chỉnh và giảm coupling với Spring Security.
 
-The custom principal is often returned by a custom `UserDetailsService` that returns an object that implements both `UserDetails` and the custom type.
-For situations like this, it is useful to create the test user by using a custom `UserDetailsService`.
-That is exactly what `@WithUserDetails` does.
+Custom principal thường được trả về bởi một `UserDetailsService` tùy chỉnh, service này trả về một object vừa implement `UserDetails` vừa implement kiểu tùy chỉnh.
+Trong những tình huống như vậy, việc tạo test user bằng một `UserDetailsService` tùy chỉnh sẽ rất hữu ích.
+Đó chính xác là việc `@WithUserDetails` thực hiện.
 
-Assuming we have a `UserDetailsService` exposed as a bean, the following test is invoked with an `Authentication` of type `UsernamePasswordAuthenticationToken` and a principal that is returned from the `UserDetailsService` with the username of `user`:
+Giả sử chúng ta có một `UserDetailsService` được expose dưới dạng bean, test sau được gọi với một `Authentication` có kiểu `UsernamePasswordAuthenticationToken` và một principal được `UserDetailsService` trả về với username là `user`:
 
 include-code::./WithUserDetailsTests[tag=user-details,indent=0]
 
-We can also customize the username used to lookup the user from our `UserDetailsService`.
-For example, this test can be run with a principal that is returned from the `UserDetailsService` with the username of `customUsername`:
+Chúng ta cũng có thể tùy chỉnh username được sử dụng để tra cứu user từ `UserDetailsService`.
+Ví dụ, test này có thể chạy với một principal được `UserDetailsService` trả về với username là `customUsername`:
 
 include-code::./WithUserDetailsTests[tag=user-details-custom-username,indent=0]
 
-We can also provide an explicit bean name to look up the `UserDetailsService`.
-The following test looks up the username of `customUsername` by using the `UserDetailsService` with a bean name of `myUserDetailsService`:
+Chúng ta cũng có thể cung cấp rõ bean name để tra cứu `UserDetailsService`.
+Test sau tra cứu username `customUsername` bằng cách sử dụng `UserDetailsService` có bean name là `myUserDetailsService`:
 
 include-code::./WithCustomUserDetailsTests[tag=custom-user-details-service,indent=0]
 
-As we did with `@WithMockUser`, we can also place our annotation at the class level so that every test uses the same user.
-However, unlike `@WithMockUser`, `@WithUserDetails` requires the user to exist.
+Tương tự như với `@WithMockUser`, chúng ta cũng có thể đặt annotation ở cấp class để mọi test sử dụng cùng một user.
+Tuy nhiên, không giống `@WithMockUser`, `@WithUserDetails` yêu cầu user phải tồn tại.
 
-By default, the `SecurityContext` is set during the `TestExecutionListener.beforeTestMethod` event.
-This is the equivalent of happening before JUnit's `@Before`.
-You can change this to happen during the `TestExecutionListener.beforeTestExecution` event, which is after JUnit's `@Before` but before the test method is invoked:
+Theo mặc định, `SecurityContext` được thiết lập trong event `TestExecutionListener.beforeTestMethod`.
+Điều này tương đương với việc diễn ra trước `@Before` của JUnit.
+Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi test method được gọi:
 
 [source,java]
 ----
@@ -152,32 +152,32 @@ You can change this to happen during the `TestExecutionListener.beforeTestExecut
 [[test-method-withsecuritycontext]]
 == @WithSecurityContext
 
-We have seen that `@WithMockUser` is an excellent choice if we do not use a custom `Authentication` principal.
-Next, we discovered that `@WithUserDetails` lets us use a custom `UserDetailsService` to create our `Authentication` principal but requires the user to exist.
-We now see an option that allows the most flexibility.
+Chúng ta đã thấy `@WithMockUser` là lựa chọn tuyệt vời nếu không sử dụng custom `Authentication` principal.
+Tiếp đó, chúng ta phát hiện `@WithUserDetails` cho phép sử dụng một `UserDetailsService` tùy chỉnh để tạo `Authentication` principal, nhưng yêu cầu user phải tồn tại.
+Bây giờ, chúng ta sẽ xem một tùy chọn linh hoạt nhất.
 
-We can create our own annotation that uses the `@WithSecurityContext` to create any `SecurityContext` we want.
-For example, we might create an annotation named `@WithMockCustomUser`:
+Chúng ta có thể tạo annotation riêng sử dụng `@WithSecurityContext` để tạo bất kỳ `SecurityContext` nào mình muốn.
+Ví dụ, chúng ta có thể tạo một annotation tên là `@WithMockCustomUser`:
 
 include-code::./WithMockCustomUser[tag=snippet,indent=0]
 
-You can see that `@WithMockCustomUser` is annotated with the `@WithSecurityContext` annotation.
-This is what signals to Spring Security test support that we intend to create a `SecurityContext` for the test.
-The `@WithSecurityContext` annotation requires that we specify a `SecurityContextFactory` to create a new `SecurityContext`, given our `@WithMockCustomUser` annotation.
-The following listing shows our `WithMockCustomUserSecurityContextFactory` implementation:
+Bạn có thể thấy `@WithMockCustomUser` được đánh dấu bằng annotation `@WithSecurityContext`.
+Điều này báo hiệu cho Spring Security test support rằng chúng ta muốn tạo một `SecurityContext` cho test.
+Annotation `@WithSecurityContext` yêu cầu chúng ta chỉ định một `SecurityContextFactory` để tạo `SecurityContext` mới, dựa trên annotation `@WithMockCustomUser` của chúng ta.
+Dưới đây là implementation `WithMockCustomUserSecurityContextFactory`:
 
 include-code::./WithMockCustomUserSecurityContextFactory[tag=snippet,indent=0]
 
-We can now annotate a test class or a test method with our new annotation and Spring Security's `WithSecurityContextTestExecutionListener` to ensure that our `SecurityContext` is populated appropriately.
+Giờ đây, chúng ta có thể đánh dấu một test class hoặc test method bằng annotation mới và `WithSecurityContextTestExecutionListener` của Spring Security để đảm bảo `SecurityContext` được điền phù hợp.
 
-When creating your own `WithSecurityContextFactory` implementations, it is nice to know that they can be annotated with standard Spring annotations.
-For example, the `WithUserDetailsSecurityContextFactory` uses the `@Autowired` annotation to acquire the `UserDetailsService`:
+Khi tạo các implementation `WithSecurityContextFactory` của riêng mình, thật hữu ích khi biết rằng chúng có thể được đánh dấu bằng các annotation Spring tiêu chuẩn.
+Ví dụ, `WithUserDetailsSecurityContextFactory` sử dụng annotation `@Autowired` để lấy `UserDetailsService`:
 
 include-code::./WithUserDetailsSecurityContextFactory[tag=snippet,indent=0]
 
-By default, the `SecurityContext` is set during the `TestExecutionListener.beforeTestMethod` event.
-This is the equivalent of happening before JUnit's `@Before`.
-You can change this to happen during the `TestExecutionListener.beforeTestExecution` event, which is after JUnit's `@Before` but before the test method is invoked:
+Theo mặc định, `SecurityContext` được thiết lập trong event `TestExecutionListener.beforeTestMethod`.
+Điều này tương đương với việc diễn ra trước `@Before` của JUnit.
+Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi test method được gọi:
 
 [source,java]
 ----
@@ -186,26 +186,26 @@ You can change this to happen during the `TestExecutionListener.beforeTestExecut
 
 [NOTE]
 ====
-`@WithMockUser`, `@WithUserDetails`, and `@WithSecurityContext` populate the xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] for the test thread.
-This cannot apply to full HTTP requests a test makes to a running server since those requests are handled by a different thread.
-For end-to-end HTTP tests, xref:servlet/authentication/index.adoc[authenticate] the request itself (for example, with HTTP Basic or a bearer token).
+`@WithMockUser`, `@WithUserDetails` và `@WithSecurityContext` điền xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] cho test thread.
+Điều này không thể áp dụng cho các HTTP request đầy đủ mà test gửi đến server đang chạy, vì các request đó được xử lý bởi một thread khác.
+Đối với HTTP test end-to-end, hãy xref:servlet/authentication/index.adoc[xác thực] chính request đó (ví dụ bằng HTTP Basic hoặc bearer token).
 ====
 
 
 [[test-method-meta-annotations]]
-== Test Meta Annotations
+== Meta annotation cho test
 
-If you reuse the same user within your tests often, it is not ideal to have to repeatedly specify the attributes.
-For example, if you have many tests related to an administrative user with a username of `admin` and roles of `ROLE_USER` and `ROLE_ADMIN`, you have to write:
+Nếu thường xuyên sử dụng lại cùng một user trong các test, việc phải lặp đi lặp lại các attribute là không lý tưởng.
+Ví dụ, nếu có nhiều test liên quan đến một user quản trị với username là `admin` và các role `ROLE_USER`, `ROLE_ADMIN`, bạn phải viết:
 
 include-code::./WithMockUserTests[tag=snippet,indent=0]
 
-Rather than repeating this everywhere, we can use a meta annotation.
-For example, we could create a meta annotation named `WithMockAdmin`:
+Thay vì lặp lại ở mọi nơi, chúng ta có thể sử dụng meta annotation.
+Ví dụ, chúng ta có thể tạo một meta annotation tên là `WithMockAdmin`:
 
 include-code::./WithMockAdmin[tag=snippet,indent=0]
 
-Now we can use `@WithMockAdmin` in the same way as the more verbose `@WithMockUser`.
+Giờ đây, chúng ta có thể sử dụng `@WithMockAdmin` giống như `@WithMockUser` đầy đủ hơn.
 
-Meta annotations work with any of the testing annotations described above.
-For example, this means we could create a meta annotation for `@WithUserDetails("admin")` as well.
+Meta annotation hoạt động với bất kỳ testing annotation nào được mô tả ở trên.
+Ví dụ, điều này có nghĩa là chúng ta cũng có thể tạo meta annotation cho `@WithUserDetails("admin")`.
