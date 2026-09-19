@@ -1,15 +1,15 @@
 [[jackson]]
-= Jackson Support
+= Hỗ trợ Jackson
 
-Spring Security provides Jackson 3 support for persisting Spring Security related classes.
-This can improve the performance of serializing Spring Security related classes when working with distributed sessions (i.e. session replication, Spring Session, etc).
+Spring Security cung cấp hỗ trợ Jackson 3 để lưu trữ các class liên quan đến Spring Security.
+Điều này có thể cải thiện hiệu năng tuần tự hóa các class liên quan đến Spring Security khi làm việc với các session phân tán (tức là nhân bản session, Spring Session, v.v.).
 
 [NOTE]
 ====
-Jackson 2 support is still available but deprecated for removal, so you are encouraged to migrate to Jackson 3.
+Hỗ trợ Jackson 2 vẫn khả dụng nhưng đã deprecated để loại bỏ, vì vậy bạn được khuyến khích di chuyển sang Jackson 3.
 ====
 
-To use it, register `SecurityJacksonModules.getModules(ClassLoader)` with `JsonMapper.Builder` (https://github.com/FasterXML/jackson-databind[jackson-databind]):
+Để sử dụng, hãy đăng ký `SecurityJacksonModules.getModules(ClassLoader)` với `JsonMapper.Builder` (https://github.com/FasterXML/jackson-databind[jackson-databind]):
 
 [tabs]
 ======
@@ -46,11 +46,11 @@ val json: String = mapper.writeValueAsString(context)
 
 [NOTE]
 ====
-Using `SecurityJacksonModules` as above enables automatic inclusion of type information and configure a
-`PolymorphicTypeValidator` that handles the validation of class names.
+Việc sử dụng `SecurityJacksonModules` như trên cho phép tự động đưa thông tin kiểu vào và cấu hình một
+`PolymorphicTypeValidator` xử lý việc xác thực tên class.
 ====
 
-If needed, you can add custom classes to the validation handling.
+Nếu cần, bạn có thể thêm các class tùy chỉnh vào quá trình xử lý xác thực.
 
 [tabs]
 ======
@@ -81,7 +81,7 @@ val mapper = JsonMapper.builder()
 
 [NOTE]
 ====
-The following Spring Security modules provide Jackson support:
+Các module Spring Security sau đây cung cấp hỗ trợ Jackson:
 
 - spring-security-core (javadoc:org.springframework.security.jackson.CoreJacksonModule[])
 - spring-security-web (javadoc:org.springframework.security.web.jackson.WebJacksonModule[], javadoc:org.springframework.security.web.jackson.WebServletJacksonModule[], javadoc:org.springframework.security.web.server.jackson.WebServerJacksonModule[])
