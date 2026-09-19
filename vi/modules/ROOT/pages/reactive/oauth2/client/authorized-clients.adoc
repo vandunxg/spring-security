@@ -1,13 +1,13 @@
 [[oauth2-client-additional-features]]
-= [[oauth2Client-additional-features]]Authorized Client Features
+= [[oauth2Client-additional-features]]Tính năng Authorized Client
 
-This section covers additional features provided by Spring Security for OAuth2 Client.
+Phần này trình bày các tính năng bổ sung do Spring Security cung cấp cho OAuth2 Client.
 
 [[oauth2-client-registered-authorized-client]]
-== [[oauth2Client-registered-authorized-client]]Resolving an Authorized Client
+== [[oauth2Client-registered-authorized-client]]Phân giải một Authorized Client
 
-The `@RegisteredOAuth2AuthorizedClient` annotation provides the capability of resolving a method parameter to an argument value of type `OAuth2AuthorizedClient`.
-This is a convenient alternative compared to accessing the `OAuth2AuthorizedClient` using the `ReactiveOAuth2AuthorizedClientManager` or `ReactiveOAuth2AuthorizedClientService`.
+Annotation `@RegisteredOAuth2AuthorizedClient` cung cấp khả năng phân giải một tham số method thành một giá trị đối số có kiểu `OAuth2AuthorizedClient`.
+Đây là một giải pháp thay thế thuận tiện cho việc truy cập `OAuth2AuthorizedClient` bằng `ReactiveOAuth2AuthorizedClientManager` hoặc `ReactiveOAuth2AuthorizedClientService`.
 
 [tabs]
 ======
@@ -43,22 +43,22 @@ class OAuth2ClientController {
 ----
 ======
 
-The `@RegisteredOAuth2AuthorizedClient` annotation is handled by `OAuth2AuthorizedClientArgumentResolver`, which directly uses a xref:reactive/oauth2/client/core.adoc#oauth2Client-authorized-manager-provider[ReactiveOAuth2AuthorizedClientManager] and therefore inherits it's capabilities.
+Annotation `@RegisteredOAuth2AuthorizedClient` được xử lý bởi `OAuth2AuthorizedClientArgumentResolver`, thành phần trực tiếp sử dụng xref:reactive/oauth2/client/core.adoc#oauth2Client-authorized-manager-provider[ReactiveOAuth2AuthorizedClientManager] và do đó kế thừa các khả năng của nó.
 
 [[oauth2-client-web-client]]
-== [[oauth2Client-webclient-webflux]]WebClient integration for Reactive Environments
+== [[oauth2Client-webclient-webflux]]Tích hợp WebClient cho các môi trường Reactive
 
-The OAuth 2.0 Client support integrates with `WebClient` using an `ExchangeFilterFunction`.
+Tính năng hỗ trợ OAuth 2.0 Client tích hợp với `WebClient` bằng `ExchangeFilterFunction`.
 
-The `ServerOAuth2AuthorizedClientExchangeFilterFunction` provides a simple mechanism for requesting protected resources by using an `OAuth2AuthorizedClient` and including the associated `OAuth2AccessToken` as a Bearer Token.
-It directly uses an xref:reactive/oauth2/client/core.adoc#oauth2Client-authorized-manager-provider[ReactiveOAuth2AuthorizedClientManager] and therefore inherits the following capabilities:
+`ServerOAuth2AuthorizedClientExchangeFilterFunction` cung cấp một cơ chế đơn giản để yêu cầu các resource được bảo vệ bằng cách sử dụng `OAuth2AuthorizedClient` và đưa `OAuth2AccessToken` liên kết vào dưới dạng Bearer Token.
+Nó trực tiếp sử dụng xref:reactive/oauth2/client/core.adoc#oauth2Client-authorized-manager-provider[ReactiveOAuth2AuthorizedClientManager] và do đó kế thừa các khả năng sau:
 
-* An `OAuth2AccessToken` will be requested if the client has not yet been authorized.
-** `authorization_code` - triggers the Authorization Request redirect to initiate the flow
-** `client_credentials` - the access token is obtained directly from the Token Endpoint
-* If the `OAuth2AccessToken` is expired, it will be refreshed (or renewed) if a `ReactiveOAuth2AuthorizedClientProvider` is available to perform the authorization
+* Một `OAuth2AccessToken` sẽ được yêu cầu nếu client chưa được authorization.
+** `authorization_code` - kích hoạt redirect của Authorization Request để bắt đầu flow
+** `client_credentials` - access token được lấy trực tiếp từ Token Endpoint
+* Nếu `OAuth2AccessToken` đã hết hạn, nó sẽ được refresh (hoặc renew) nếu có `ReactiveOAuth2AuthorizedClientProvider` để thực hiện authorization
 
-The following code shows an example of how to configure `WebClient` with OAuth 2.0 Client support:
+Đoạn code sau minh họa cách cấu hình `WebClient` với tính năng hỗ trợ OAuth 2.0 Client:
 
 [tabs]
 ======
@@ -91,11 +91,11 @@ fun webClient(authorizedClientManager: ReactiveOAuth2AuthorizedClientManager): W
 ======
 
 [[oauth2-client-web-client-authorized-client]]
-=== Providing the Authorized Client
+=== Cung cấp Authorized Client
 
-The `ServerOAuth2AuthorizedClientExchangeFilterFunction` determines the client to use (for a request) by resolving the `OAuth2AuthorizedClient` from the `ClientRequest.attributes()` (request attributes).
+`ServerOAuth2AuthorizedClientExchangeFilterFunction` xác định client cần sử dụng (cho một request) bằng cách phân giải `OAuth2AuthorizedClient` từ `ClientRequest.attributes()` (request attributes).
 
-The following code shows how to set an `OAuth2AuthorizedClient` as a request attribute:
+Đoạn code sau minh họa cách đặt một `OAuth2AuthorizedClient` làm request attribute:
 
 [tabs]
 ======
@@ -138,9 +138,9 @@ fun index(@RegisteredOAuth2AuthorizedClient("okta") authorizedClient: OAuth2Auth
 ----
 ======
 
-<1> `oauth2AuthorizedClient()` is a `static` method in `ServerOAuth2AuthorizedClientExchangeFilterFunction`.
+<1> `oauth2AuthorizedClient()` là một method `static` trong `ServerOAuth2AuthorizedClientExchangeFilterFunction`.
 
-The following code shows how to set the `ClientRegistration.getRegistrationId()` as a request attribute:
+Đoạn code sau minh họa cách đặt `ClientRegistration.getRegistrationId()` làm request attribute:
 
 [tabs]
 ======
@@ -182,16 +182,16 @@ fun index(): Mono<String> {
 }
 ----
 ======
-<1> `clientRegistrationId()` is a `static` method in `ServerOAuth2AuthorizedClientExchangeFilterFunction`.
+<1> `clientRegistrationId()` là một method `static` trong `ServerOAuth2AuthorizedClientExchangeFilterFunction`.
 
 [[oauth2-client-web-client-default-authorized-client]]
-=== Defaulting the Authorized Client
+=== Đặt Authorized Client mặc định
 
-If neither `OAuth2AuthorizedClient` or `ClientRegistration.getRegistrationId()` is provided as a request attribute, the `ServerOAuth2AuthorizedClientExchangeFilterFunction` can determine the _default_ client to use depending on it's configuration.
+Nếu cả `OAuth2AuthorizedClient` lẫn `ClientRegistration.getRegistrationId()` đều không được cung cấp dưới dạng request attribute, `ServerOAuth2AuthorizedClientExchangeFilterFunction` có thể xác định client _mặc định_ cần sử dụng tùy theo cấu hình của nó.
 
-If `setDefaultOAuth2AuthorizedClient(true)` is configured and the user has authenticated using `ServerHttpSecurity.oauth2Login()`, the `OAuth2AccessToken` associated with the current `OAuth2AuthenticationToken` is used.
+Nếu cấu hình `setDefaultOAuth2AuthorizedClient(true)` và user đã authentication bằng `ServerHttpSecurity.oauth2Login()`, `OAuth2AccessToken` liên kết với `OAuth2AuthenticationToken` hiện tại sẽ được sử dụng.
 
-The following code shows the specific configuration:
+Đoạn code sau minh họa cấu hình cụ thể:
 
 [tabs]
 ======
@@ -227,12 +227,12 @@ fun webClient(authorizedClientManager: ReactiveOAuth2AuthorizedClientManager): W
 
 [WARNING]
 ====
-It is recommended to be cautious with this feature since all HTTP requests will receive the access token.
+Bạn nên thận trọng khi sử dụng tính năng này vì tất cả HTTP request sẽ nhận access token.
 ====
 
-Alternatively, if `setDefaultClientRegistrationId("okta")` is configured with a valid `ClientRegistration`, the `OAuth2AccessToken` associated with the `OAuth2AuthorizedClient` is used.
+Ngoài ra, nếu `setDefaultClientRegistrationId("okta")` được cấu hình với một `ClientRegistration` hợp lệ, `OAuth2AccessToken` liên kết với `OAuth2AuthorizedClient` sẽ được sử dụng.
 
-The following code shows the specific configuration:
+Đoạn code sau minh họa cấu hình cụ thể:
 
 [tabs]
 ======
@@ -268,5 +268,5 @@ fun webClient(authorizedClientManager: ReactiveOAuth2AuthorizedClientManager): W
 
 [WARNING]
 ====
-It is recommended to be cautious with this feature since all HTTP requests will receive the access token.
+Bạn nên thận trọng khi sử dụng tính năng này vì tất cả HTTP request sẽ nhận access token.
 ====
