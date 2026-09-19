@@ -1,13 +1,13 @@
 = Reactive
 
-If you have already performed the xref:migration/index.adoc[initial migration steps] for your Reactive application, you're now ready to perform steps specific to Reactive applications.
+Nếu bạn đã thực hiện xref:migration/index.adoc[các bước migration ban đầu] cho ứng dụng Reactive của mình, giờ bạn đã sẵn sàng thực hiện các bước dành riêng cho ứng dụng Reactive.
 
-== Validate `typ` Header with `JwtTypeValidator`
+== Xác thực Header `typ` bằng `JwtTypeValidator`
 
-If when following the 6.5 preparatory steps you set `validateTypes` to `false`, you can now remove it.
-You can also remove explicitly adding `JwtTypeValidator` to the list of defaults.
+Nếu khi thực hiện các bước chuẩn bị cho 6.5 bạn đã đặt `validateTypes` thành `false`, giờ bạn có thể xóa cấu hình này.
+Bạn cũng có thể xóa phần thêm tường minh `JwtTypeValidator` vào danh sách mặc định.
 
-For example, change this:
+Ví dụ, thay đổi từ:
 
 [tabs]
 ======
@@ -19,7 +19,7 @@ Java::
 JwtDecoder jwtDecoder() {
 	NimbusReactiveJwtDecoder jwtDecoder = NimbusReactiveJwtDecoder.withIssuerLocation(location)
         .validateTypes(false) <1>
-        // ... your remaining configuration
+        // ... cấu hình còn lại của bạn
         .build();
 	jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithValidators(
 		new JwtIssuerValidator(location), JwtTypeValidator.jwt())); <2>
@@ -35,7 +35,7 @@ Kotlin::
 fun jwtDecoder(): JwtDecoder {
     val jwtDecoder = NimbusReactiveJwtDecoder.withIssuerLocation(location)
         .validateTypes(false) <1>
-        // ... your remaining configuration
+        // ... cấu hình còn lại của bạn
         .build()
     jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithValidators(
         JwtIssuerValidator(location), JwtTypeValidator.jwt())) <2>
@@ -43,10 +43,10 @@ fun jwtDecoder(): JwtDecoder {
 }
 ----
 ======
-<1> - Switch off Nimbus verifying the `typ`
-<2> - Add the default `typ` validator
+<1> - Tắt việc Nimbus xác minh `typ`
+<2> - Thêm validator `typ` mặc định
 
-to this:
+thành:
 
 [tabs]
 ======
@@ -57,7 +57,7 @@ Java::
 @Bean
 NimbusReactiveJwtDecoder jwtDecoder() {
 	NimbusJwtDecoder jwtDecoder = NimbusReactiveJwtDecoder.withIssuerLocation(location)
-        // ... your remaining configuration <1>
+        // ... cấu hình còn lại của bạn <1>
         .build();
 	jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(location)); <2>
 	return jwtDecoder;
@@ -71,12 +71,12 @@ Kotlin::
 @Bean
 fun jwtDecoder(): NimbusReactiveJwtDecoder {
     val jwtDecoder = NimbusReactiveJwtDecoder.withIssuerLocation(location)
-        // ... your remaining configuration
+        // ... cấu hình còn lại của bạn
         .build()
     jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(location)) <2>
     return jwtDecoder
 }
 ----
 ======
-<1> - `validateTypes` now defaults to `false`
-<2> - `JwtTypeValidator#jwt` is added by all `createDefaultXXX` methods
+<1> - `validateTypes` hiện mặc định là `false`
+<2> - `JwtTypeValidator#jwt` được tất cả các method `createDefaultXXX` thêm vào
