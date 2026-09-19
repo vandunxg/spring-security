@@ -1,10 +1,10 @@
 [[taglibs]]
-= JSP Tag Libraries
-Spring Security has its own taglib, which provides basic support for accessing security information and applying security constraints in JSPs.
+= Thư viện thẻ JSP
+Spring Security có taglib riêng, cung cấp hỗ trợ cơ bản để truy cập thông tin bảo mật và áp dụng các ràng buộc bảo mật trong JSP.
 
 
-== Declaring the Taglib
-To use any of the tags, you must have the security taglib declared in your JSP:
+== Khai báo Taglib
+Để sử dụng bất kỳ thẻ nào, bạn phải khai báo security taglib trong JSP:
 
 [source,xml]
 ----
@@ -12,154 +12,154 @@ To use any of the tags, you must have the security taglib declared in your JSP:
 ----
 
 [[taglibs-authorize]]
-== The authorize Tag
-This tag is used to determine whether its contents should be evaluated or not.
-In Spring Security 3.0, it can be used in two ways.
+== Tag authorize
+Thẻ này được dùng để xác định nội dung của nó có được đánh giá hay không.
+Trong Spring Security 3.0, thẻ này có thể được sử dụng theo hai cách.
 
 [NOTE]
 ====
-The legacy options from Spring Security 2.0 are also supported, but discouraged.
+Các tùy chọn cũ của Spring Security 2.0 cũng được hỗ trợ, nhưng không được khuyến khích.
 ====
 
-The first approach uses a xref:servlet/authorization/authorize-http-requests.adoc#authorization-expressions[web-security expression], which is specified in the `access` attribute of the tag.
-The expression evaluation is delegated to the `SecurityExpressionHandler<FilterInvocation>` defined in the application context (you should have web expressions enabled in your `<http>` namespace configuration to make sure this service is available).
-So, for example, you might have:
+Cách đầu tiên sử dụng xref:servlet/authorization/authorize-http-requests.adoc#authorization-expressions[biểu thức web-security], được chỉ định trong thuộc tính `access` của thẻ.
+Việc đánh giá biểu thức được ủy quyền cho `SecurityExpressionHandler<FilterInvocation>` được định nghĩa trong ApplicationContext (bạn nên bật web expressions trong cấu hình namespace `<http>` để đảm bảo service này khả dụng).
+Ví dụ, bạn có thể có:
 
 [source,xml]
 ----
 <sec:authorize access="hasRole('supervisor')">
 
-This content will only be visible to users who have the "supervisor" authority in their list of <tt>GrantedAuthority</tt>s.
+Nội dung này chỉ hiển thị với những user có authority "supervisor" trong danh sách <tt>GrantedAuthority</tt> của họ.
 
 </sec:authorize>
 ----
 
-When used in conjunction with Spring Security's `PermissionEvaluator`, the tag can also be used to check permissions:
+Khi được sử dụng cùng với `PermissionEvaluator` của Spring Security, thẻ này cũng có thể được dùng để kiểm tra permission:
 
 [source,xml]
 ----
 <sec:authorize access="hasPermission(#domain,'read') or hasPermission(#domain,'write')">
 
-This content will only be visible to users who have read or write permission to the Object found as a request attribute named "domain".
+Nội dung này chỉ hiển thị với những user có permission đọc hoặc ghi đối với Object được tìm thấy trong request attribute có tên "domain".
 
 </sec:authorize>
 ----
 
-A common requirement is to show only a particular link, assuming the user is actually allowed to click it.
-How can we determine in advance whether something is allowed? This tag can also operate in an alternative mode that lets you define a particular URL as an attribute.
-If the user is allowed to invoke that URL, the tag body is evaluated. Otherwise, it is skipped.
-So you might have something like:
+Một yêu cầu phổ biến là chỉ hiển thị một link cụ thể khi user thực sự được phép nhấp vào link đó.
+Làm thế nào để xác định trước một nội dung có được phép hay không? Thẻ này cũng có thể hoạt động ở một chế độ thay thế, cho phép bạn định nghĩa một URL cụ thể làm thuộc tính.
+Nếu user được authorization để gọi URL đó, phần thân thẻ sẽ được đánh giá. Nếu không, phần thân sẽ bị bỏ qua.
+Ví dụ, bạn có thể có:
 
 [source,xml]
 ----
 <sec:authorize url="/admin">
 
-This content will only be visible to users who are authorized to send requests to the "/admin" URL.
+Nội dung này chỉ hiển thị với những user được authorization để gửi request đến URL "/admin".
 
 </sec:authorize>
 ----
 
-To use this tag, you must also have an instance of `WebInvocationPrivilegeEvaluator` in your application context.
-If you are using the namespace, one is automatically registered.
-This is an instance of `DefaultWebInvocationPrivilegeEvaluator`, which creates a dummy web request for the supplied URL and invokes the security interceptor to see whether the request would succeed or fail.
-This lets you delegate to the access-control setup you defined by using `intercept-url` declarations within the `<http>` namespace configuration and saves having to duplicate the information (such as the required roles) within your JSPs.
+Để sử dụng thẻ này, bạn cũng phải có một instance của `WebInvocationPrivilegeEvaluator` trong ApplicationContext.
+Nếu sử dụng namespace, một instance sẽ được tự động đăng ký.
+Đây là một instance của `DefaultWebInvocationPrivilegeEvaluator`, tạo một web request giả cho URL được cung cấp và gọi security interceptor để xem request sẽ thành công hay thất bại.
+Điều này cho phép bạn ủy quyền cho thiết lập access control được định nghĩa bằng các khai báo `intercept-url` trong cấu hình namespace `<http>`, đồng thời không phải sao chép thông tin (chẳng hạn các role bắt buộc) vào JSP.
 
-If you have xref:servlet/authorization/authorize-http-requests.adoc#match-by-httpmethod[method-based authorization rules], you should combine this approach with the `method` attribute (supplying the HTTP method, such as `POST`) to activate the intended method-based rule.
-For example, if you have a rule `.requestMatchers(POST, "/admin").hasRole("ADMIN")`, then you should do `<sec:authorize method="POST" url="/admin">` to match.
+Nếu có xref:servlet/authorization/authorize-http-requests.adoc#match-by-httpmethod[quy tắc authorization dựa trên method], bạn nên kết hợp cách tiếp cận này với thuộc tính `method` (cung cấp HTTP method, chẳng hạn `POST`) để kích hoạt quy tắc dựa trên method mong muốn.
+Ví dụ, nếu có quy tắc `.requestMatchers(POST, "/admin").hasRole("ADMIN")`, bạn nên dùng `<sec:authorize method="POST" url="/admin">` để đối sánh.
 
-You can store the Boolean result of evaluating the tag (whether it grants or denies access) in a page context scope variable by setting the `var` attribute to the variable name, avoiding the need for duplicating and re-evaluating the condition at other points in the page.
-
-
-=== Disabling Tag Authorization for Testing
-Hiding a link in a page for unauthorized users does not prevent them from accessing the URL.
-They could just type it into their browser directly, for example.
-As part of your testing process, you may want to reveal the hidden areas, to check that links really are secured at the back end.
-If you set the `spring.security.disableUISecurity` system property to `true`, the `authorize` tag still runs but does not hide its contents.
-By default, it also surrounds the content with `<span class="securityHiddenUI">...</span>` tags.
-This lets you to display "`hidden`" content with a particular CSS style, such as a different background color.
-Try running the "`tutorial`" sample application, for example, with this property enabled.
-
-You can also set the `spring.security.securedUIPrefix` and `spring.security.securedUISuffix` properties if you want to change surrounding text from the default `span` tags (or use empty strings to remove it completely).
+Bạn có thể lưu kết quả Boolean của việc đánh giá thẻ (dù thẻ cấp hay từ chối quyền truy cập) vào một biến trong scope page context bằng cách đặt thuộc tính `var` thành tên biến, nhờ đó tránh phải sao chép và đánh giá lại điều kiện ở những vị trí khác trong page.
 
 
-== The authentication Tag
-This tag allows access to the current `Authentication` object stored in the security context.
-It renders a property of the object directly in the JSP.
-So, for example, if the `principal` property of the `Authentication` is an instance of Spring Security's `UserDetails` object, then using `<sec:authentication property="principal.username" />` renders the name of the current user.
+=== Vô hiệu hóa authorization của tag khi kiểm thử
+Việc ẩn một link trên page với user chưa được authorization không ngăn họ truy cập URL.
+Chẳng hạn, họ vẫn có thể nhập trực tiếp URL đó vào trình duyệt.
+Trong quá trình kiểm thử, bạn có thể muốn hiển thị các khu vực bị ẩn để kiểm tra xem các link có thực sự được bảo mật ở back end hay không.
+Nếu đặt system property `spring.security.disableUISecurity` thành `true`, tag `authorize` vẫn chạy nhưng không ẩn nội dung của nó.
+Theo mặc định, tag này cũng bao quanh nội dung bằng các tag `<span class="securityHiddenUI">...</span>`.
+Điều này cho phép bạn hiển thị nội dung "`hidden`" bằng một CSS style cụ thể, chẳng hạn màu nền khác.
+Ví dụ, hãy thử chạy ứng dụng mẫu "`tutorial`" với property này được bật.
 
-Of course, it is not necessary to use JSP tags for this kind of thing, and some people prefer to keep as little logic as possible in the view.
-You can access the `Authentication` object in your MVC controller (by calling `SecurityContextHolder.getContext().getAuthentication()`) and add the data directly to your model for rendering by the view.
+Bạn cũng có thể đặt các property `spring.security.securedUIPrefix` và `spring.security.securedUISuffix` nếu muốn thay đổi phần văn bản bao quanh so với các tag `span` mặc định (hoặc sử dụng chuỗi rỗng để xóa hoàn toàn phần này).
 
 
-== The accesscontrollist Tag
-This tag is only valid when used with Spring Security's ACL module.
-It checks a comma-separated list of required permissions for a specified domain object.
-If the current user has all of those permissions, the tag body is evaluated.
-If they do not, it is skipped.
+== Tag authentication
+Thẻ này cho phép truy cập object `Authentication` hiện tại được lưu trong `SecurityContext`.
+Thẻ render trực tiếp một property của object trong JSP.
+Ví dụ, nếu property `principal` của `Authentication` là một instance của object `UserDetails` của Spring Security, việc sử dụng `<sec:authentication property="principal.username" />` sẽ render tên của user hiện tại.
+
+Tất nhiên, không nhất thiết phải sử dụng tag JSP cho việc này, và một số người thích giữ logic trong view ở mức tối thiểu.
+Bạn có thể truy cập object `Authentication` trong MVC controller (bằng cách gọi `SecurityContextHolder.getContext().getAuthentication()`) và thêm dữ liệu trực tiếp vào model để view render.
+
+
+== Tag accesscontrollist
+Thẻ này chỉ hợp lệ khi được sử dụng với module ACL của Spring Security.
+Thẻ kiểm tra danh sách permission bắt buộc, được phân tách bằng dấu phẩy, cho một domain object được chỉ định.
+Nếu user hiện tại có tất cả permission đó, phần thân thẻ sẽ được đánh giá.
+Nếu không, phần thân sẽ bị bỏ qua.
 
 [CAUTION]
 ====
-In general, this tag should be considered deprecated.
-Instead, use the <<taglibs-authorize>>.
+Nhìn chung, thẻ này nên được xem là deprecated.
+Thay vào đó, hãy sử dụng <<taglibs-authorize>>.
 ====
 
-The following listing shows an example:
+Listing sau đây minh họa một ví dụ:
 
 [source,xml]
 ----
 <sec:accesscontrollist hasPermission="1,2" domainObject="${someObject}">
 
-<!-- This will be shown if the user has all of the permissions represented by the values "1" or "2" on the given object. -->
+<!-- Nội dung này sẽ được hiển thị nếu user có tất cả permission được biểu thị bởi các giá trị "1" hoặc "2" trên object đã cho. -->
 
 </sec:accesscontrollist>
 ----
 
-The permissions are passed to the `PermissionFactory` defined in the application context, converting them to ACL `Permission` instances, so they may be any format that is supported by the factory. They do not have to be integers. They could be strings such as `READ` or `WRITE`.
-If no `PermissionFactory` is found, an instance of `DefaultPermissionFactory` is used.
-The `AclService` from the application context is used to load the `Acl` instance for the supplied object.
-The `Acl` is invoked with the required permissions to check if all of them are granted.
+Các permission được truyền cho `PermissionFactory` được định nghĩa trong ApplicationContext để chuyển đổi chúng thành các instance ACL `Permission`, vì vậy chúng có thể ở bất kỳ định dạng nào được factory hỗ trợ. Chúng không nhất thiết phải là số nguyên. Chúng có thể là các chuỗi như `READ` hoặc `WRITE`.
+Nếu không tìm thấy `PermissionFactory`, một instance của `DefaultPermissionFactory` sẽ được sử dụng.
+`AclService` từ ApplicationContext được sử dụng để tải instance `Acl` cho object được cung cấp.
+`Acl` được gọi với các permission bắt buộc để kiểm tra xem tất cả chúng có được cấp hay không.
 
-This tag also supports the `var` attribute, in the same way as the `authorize` tag.
+Thẻ này cũng hỗ trợ thuộc tính `var`, giống như tag `authorize`.
 
 [[taglibs-csrfinput]]
-== The csrfInput Tag
-If CSRF protection is enabled, this tag inserts a hidden form field with the correct name and value for the CSRF protection token.
-If CSRF protection is not enabled, this tag outputs nothing.
+== Tag csrfInput
+Nếu bật bảo vệ CSRF, thẻ này chèn một trường form ẩn với tên và giá trị đúng của token bảo vệ CSRF.
+Nếu không bật bảo vệ CSRF, thẻ này không xuất gì.
 
-Normally, Spring Security automatically inserts a CSRF form field for any `<form:form>` tags you use, but if for some reason you cannot use `<form:form>`, `csrfInput` is a handy replacement.
+Thông thường, Spring Security tự động chèn trường form CSRF cho mọi tag `<form:form>` mà bạn sử dụng, nhưng nếu vì lý do nào đó bạn không thể dùng `<form:form>`, `csrfInput` là một phương án thay thế tiện dụng.
 
-You should place this tag within an HTML `<form></form>` block, where you would normally place other input fields.
-Do NOT place this tag within a Spring `<form:form></form:form>` block.
-Spring Security handles Spring forms automatically.
-The following listing shows an example:
+Bạn nên đặt thẻ này bên trong block HTML `<form></form>`, tại vị trí thường đặt các trường input khác.
+KHÔNG đặt thẻ này bên trong block Spring `<form:form></form:form>`.
+Spring Security tự động xử lý các form Spring.
+Listing sau đây minh họa một ví dụ:
 
 [source,xml]
 ----
 	<form method="post" action="/do/something">
 		<sec:csrfInput />
-		Name:<br />
+		Tên:<br />
 		<input type="text" name="name" />
 		...
 	</form>
 ----
 
 [[taglibs-csrfmeta]]
-== The csrfMetaTags Tag
-If CSRF protection is enabled, this tag inserts meta tags that contain the CSRF protection token form field and header names and CSRF protection token value.
-These meta tags are useful for employing CSRF protection within JavaScript in your applications.
+== Tag csrfMetaTags
+Nếu bật bảo vệ CSRF, thẻ này chèn các meta tag chứa tên trường form và tên header của token bảo vệ CSRF, cùng giá trị token bảo vệ CSRF.
+Các meta tag này hữu ích để sử dụng bảo vệ CSRF trong JavaScript của ứng dụng.
 
-You should place `csrfMetaTags` within an HTML `<head></head>` block, where you would normally place other meta tags.
-Once you use this tag, you can access the form field name, header name, and token value by using JavaScript.
-JQuery is used in this example to make the task easier.
-The following listing shows an example:
+Bạn nên đặt `csrfMetaTags` bên trong block HTML `<head></head>`, tại vị trí thường đặt các meta tag khác.
+Sau khi sử dụng thẻ này, bạn có thể truy cập tên trường form, tên header và giá trị token bằng JavaScript.
+Ví dụ này sử dụng JQuery để thực hiện công việc dễ dàng hơn.
+Listing sau đây minh họa một ví dụ:
 
 [source,xml]
 ----
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>CSRF Protected JavaScript Page</title>
-		<meta name="description" content="This is the description for this page" />
+		<title>Trang JavaScript được bảo vệ bằng CSRF</title>
+		<meta name="description" content="Đây là phần mô tả cho trang này" />
 		<sec:csrfMetaTags />
 		<script type="text/javascript" language="javascript">
 
@@ -167,19 +167,19 @@ The following listing shows an example:
 			var csrfHeader = $("meta[name='_csrf_header']").attr("content");
 			var csrfToken = $("meta[name='_csrf']").attr("content");
 
-			// using XMLHttpRequest directly to send an x-www-form-urlencoded request
+			// sử dụng XMLHttpRequest trực tiếp để gửi request x-www-form-urlencoded
 			var ajax = new XMLHttpRequest();
 			ajax.open("POST", "https://www.example.org/do/something", true);
 			ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded data");
 			ajax.send(csrfParameter + "=" + csrfToken + "&name=John&...");
 
-			// using XMLHttpRequest directly to send a non-x-www-form-urlencoded request
+			// sử dụng XMLHttpRequest trực tiếp để gửi request không phải x-www-form-urlencoded
 			var ajax = new XMLHttpRequest();
 			ajax.open("POST", "https://www.example.org/do/something", true);
 			ajax.setRequestHeader(csrfHeader, csrfToken);
 			ajax.send("...");
 
-			// using JQuery to send an x-www-form-urlencoded request
+			// sử dụng JQuery để gửi request x-www-form-urlencoded
 			var data = {};
 			data[csrfParameter] = csrfToken;
 			data["name"] = "John";
@@ -191,7 +191,7 @@ The following listing shows an example:
 				...
 			});
 
-			// using JQuery to send a non-x-www-form-urlencoded request
+			// sử dụng JQuery để gửi request không phải x-www-form-urlencoded
 			var headers = {};
 			headers[csrfHeader] = csrfToken;
 			$.ajax({
@@ -209,4 +209,4 @@ The following listing shows an example:
 </html>
 ----
 
-If CSRF protection is not enabled, `csrfMetaTags` outputs nothing.
+Nếu không bật bảo vệ CSRF, `csrfMetaTags` không xuất gì.
