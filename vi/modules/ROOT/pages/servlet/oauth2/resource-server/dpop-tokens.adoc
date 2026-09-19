@@ -1,31 +1,31 @@
 [[oauth2-dpop-bound-access-tokens]]
-= OAuth 2.0 DPoP-bound Access Tokens
+= Access token ràng buộc DPoP của OAuth 2.0
 
-https://datatracker.ietf.org/doc/html/rfc9449[RFC 9449 OAuth 2.0 Demonstrating Proof of Possession (DPoP)] is an application-level mechanism for sender-constraining an access token.
+https://datatracker.ietf.org/doc/html/rfc9449[RFC 9449 OAuth 2.0 Demonstrating Proof of Possession (DPoP)] là một cơ chế ở cấp ứng dụng để ràng buộc access token theo bên gửi.
 
-The primary goal of DPoP is to prevent unauthorized or illegitimate clients from using leaked or stolen access tokens, by binding an access token to a public key upon issuance by the authorization server and requiring that the client proves possession of the corresponding private key when using the access token at the resource server.
+Mục tiêu chính của DPoP là ngăn các client không được ủy quyền hoặc không hợp lệ sử dụng access token bị rò rỉ hoặc đánh cắp, bằng cách ràng buộc access token với một khóa công khai khi authorization server cấp token và yêu cầu client chứng minh quyền sở hữu khóa riêng tương ứng khi sử dụng access token tại resource server.
 
-Access tokens that are sender-constrained via DPoP stand in contrast to the typical bearer token, which can be used by any client in possession of the access token.
+Access token được ràng buộc theo bên gửi thông qua DPoP khác với bearer token thông thường, vốn có thể được sử dụng bởi bất kỳ client nào sở hữu access token đó.
 
-DPoP introduces the concept of a https://datatracker.ietf.org/doc/html/rfc9449#name-dpop-proof-jwts[DPoP Proof], which is a JWT created by the client and sent as a header in an HTTP request.
-A client uses a DPoP proof to prove the possession of a private key corresponding to a certain public key.
+DPoP giới thiệu khái niệm https://datatracker.ietf.org/doc/html/rfc9449#name-dpop-proof-jwts[bằng chứng DPoP], là một JWT được client tạo và gửi dưới dạng header trong HTTP request.
+Client sử dụng bằng chứng DPoP để chứng minh quyền sở hữu khóa riêng tương ứng với một khóa công khai cụ thể.
 
-When the client initiates an <<dpop-access-token-request,access token request>>, it attaches a DPoP proof to the request in an HTTP header.
-The authorization server binds (sender-constrains) the access token to the public key associated in the DPoP proof.
+Khi client khởi tạo một <<dpop-access-token-request,yêu cầu access token>>, client đính kèm bằng chứng DPoP vào request trong một HTTP header.
+Authorization server ràng buộc (ràng buộc theo bên gửi) access token với khóa công khai được liên kết trong bằng chứng DPoP.
 
-When the client initiates a <<dpop-protected-resource-request,protected resource request>>, it again attaches a DPoP proof to the request in an HTTP header.
+Khi client khởi tạo một <<dpop-protected-resource-request,yêu cầu tài nguyên được bảo vệ>>, client lại đính kèm bằng chứng DPoP vào request trong một HTTP header.
 
-The resource server obtains information about the public key bound to the access token, either directly in the access token (JWT) or via the token introspection endpoint.
-The resource server then verifies that the public key bound to the access token matches the public key in the DPoP proof.
-It also verifies that the access token hash in the DPoP proof matches the access token in the request.
+Resource server lấy thông tin về khóa công khai được ràng buộc với access token, trực tiếp trong access token (JWT) hoặc thông qua token introspection endpoint.
+Sau đó, resource server xác minh rằng khóa công khai được ràng buộc với access token khớp với khóa công khai trong bằng chứng DPoP.
+Resource server cũng xác minh rằng hash của access token trong bằng chứng DPoP khớp với access token trong request.
 
 [[dpop-access-token-request]]
-== DPoP Access Token Request
+== Yêu cầu access token DPoP
 
-To request an access token that is bound to a public key using DPoP, the client MUST provide a valid DPoP proof in the `DPoP` header when making an access token request to the authorization server token endpoint.
-This is applicable for all access token requests regardless of authorization grant type (e.g. `authorization_code`, `refresh_token`, `client_credentials`, etc).
+Để yêu cầu một access token được ràng buộc với khóa công khai bằng DPoP, client MUST cung cấp bằng chứng DPoP hợp lệ trong header `DPoP` khi thực hiện yêu cầu access token tới token endpoint của authorization server.
+Điều này áp dụng cho mọi yêu cầu access token, bất kể authorization grant type (ví dụ: `authorization_code`, `refresh_token`, `client_credentials`, v.v.).
 
-The following HTTP request shows an `authorization_code` access token request with a DPoP proof in the `DPoP` header:
+HTTP request sau đây minh họa yêu cầu access token `authorization_code` có bằng chứng DPoP trong header `DPoP`:
 
 [source,shell]
 ----
@@ -41,7 +41,7 @@ grant_type=authorization_code\
 &code_verifier=bEaL42izcC-o-xBk0K2vuJ6U-y1p9r_wW2dFWIWgjz-
 ----
 
-The following shows a representation of the DPoP Proof JWT header and claims:
+Phần sau đây minh họa header và các claim của JWT bằng chứng DPoP:
 
 [source,json]
 ----
@@ -66,7 +66,7 @@ The following shows a representation of the DPoP Proof JWT header and claims:
 }
 ----
 
-The following code shows an example of how to generate the DPoP Proof JWT:
+Đoạn code sau đây minh họa cách tạo JWT bằng chứng DPoP:
 
 [tabs]
 ======
@@ -94,9 +94,9 @@ Jwt dPoPProof = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims));
 ----
 ======
 
-After the authorization server successfully validates the DPoP proof, the public key from the DPoP proof will be bound (sender-constrained) to the issued access token.
+Sau khi authorization server xác minh thành công bằng chứng DPoP, khóa công khai từ bằng chứng DPoP sẽ được ràng buộc (ràng buộc theo bên gửi) với access token đã cấp.
 
-The following access token response shows the `token_type` parameter as `DPoP` to signal to the client that the access token was bound to its DPoP proof public key:
+Phản hồi access token sau đây đặt tham số `token_type` là `DPoP` để báo hiệu cho client rằng access token đã được ràng buộc với khóa công khai trong bằng chứng DPoP:
 
 [source,shell]
 ----
@@ -112,14 +112,14 @@ Cache-Control: no-store
 ----
 
 [[dpop-public-key-confirmation]]
-== Public Key Confirmation
+== Xác nhận khóa công khai
 
-Resource servers MUST be able to identify whether an access token is DPoP-bound and verify the binding to the public key of the DPoP proof.
-The binding is accomplished by associating the public key with the access token in a way that can be accessed by the resource server, such as embedding the public key hash in the access token directly (JWT) or through token introspection.
+Resource server MUST có khả năng xác định access token có được ràng buộc DPoP hay không và xác minh việc ràng buộc với khóa công khai của bằng chứng DPoP.
+Việc ràng buộc được thực hiện bằng cách liên kết khóa công khai với access token theo cách resource server có thể truy cập, chẳng hạn như nhúng trực tiếp hash của khóa công khai vào access token (JWT) hoặc thông qua token introspection.
 
-When an access token is represented as a JWT, the public key hash is contained in the `jkt` claim under the confirmation method (`cnf`) claim.
+Khi access token được biểu diễn dưới dạng JWT, hash của khóa công khai được chứa trong claim `jkt`, bên dưới claim phương thức xác nhận (`cnf`).
 
-The following example shows the claims of a JWT access token containing a `cnf` claim with a `jkt` claim, which is the JWK SHA-256 Thumbprint of the DPoP proof public key:
+Ví dụ sau đây minh họa các claim của JWT access token chứa claim `cnf` với claim `jkt`, là JWK SHA-256 Thumbprint của khóa công khai trong bằng chứng DPoP:
 
 [source,json]
 ----
@@ -136,15 +136,15 @@ The following example shows the claims of a JWT access token containing a `cnf` 
 ----
 
 [[dpop-protected-resource-request]]
-== DPoP Protected Resource Request
+== Yêu cầu tài nguyên được bảo vệ DPoP
 
-Requests to DPoP-protected resources MUST include both a DPoP proof and the DPoP-bound access token.
-The DPoP proof MUST include the `ath` claim with a valid hash of the access token.
-The resource server will calculate the hash of the received access token and verify that it is the same as the `ath` claim in the DPoP proof.
+Request tới tài nguyên được bảo vệ bằng DPoP MUST bao gồm cả bằng chứng DPoP và access token được ràng buộc DPoP.
+Bằng chứng DPoP MUST bao gồm claim `ath` chứa hash hợp lệ của access token.
+Resource server sẽ tính hash của access token nhận được và xác minh rằng hash này giống với claim `ath` trong bằng chứng DPoP.
 
-A DPoP-bound access token is sent using the `Authorization` request header with an authentication scheme of `DPoP`.
+Access token được ràng buộc DPoP được gửi bằng request header `Authorization` với authentication scheme là `DPoP`.
 
-The following HTTP request shows a protected resource request with a DPoP-bound access token in the `Authorization` header and the DPoP proof in the `DPoP` header:
+HTTP request sau đây minh họa request tới tài nguyên được bảo vệ, với access token được ràng buộc DPoP trong header `Authorization` và bằng chứng DPoP trong header `DPoP`:
 
 [source,shell]
 ----
@@ -154,7 +154,7 @@ Authorization: DPoP Kz~8mXK1EalYznwH-LC-1fBAo.4Ljp~zsPE_NeO.gxU
 DPoP: eyJraWQiOiJyc2EtandrLWtpZCIsInR5cCI6ImRwb3Arand0IiwiYWxnIjoiUlMyNTYiLCJqd2siOnsia3R5IjoiUlNBIiwiZSI6IkFRQUIiLCJraWQiOiJyc2EtandrLWtpZCIsIm4iOiIzRmxxSnI1VFJza0lRSWdkRTNEZDdEOWxib1dkY1RVVDhhLWZKUjdNQXZRbTdYWE5vWWttM3Y3TVFMMU5ZdER2TDJsOENBbmMwV2RTVElOVTZJUnZjNUtxbzJRNGNzTlg5U0hPbUVmem9ST2pRcWFoRWN2ZTFqQlhsdW9DWGRZdVlweDRfMXRmUmdHNmlpNFVoeGg2aUk4cU5NSlFYLWZMZnFoYmZZZnhCUVZSUHl3QmtBYklQNHgxRUFzYkM2RlNObWtoQ3hpTU5xRWd4YUlwWThDMmtKZEpfWklWLVdXNG5vRGR6cEtxSGN3bUI4RnNydW1sVllfRE5WdlVTRElpcGlxOVBiUDRIOTlUWE4xbzc0Nm9SYU5hMDdycTFob0NnTVNTeS04NVNhZ0NveGxteUUtRC1vZjlTc01ZOE9sOXQwcmR6cG9iQnVoeUpfbzVkZnZqS3cifX0.eyJodG0iOiJHRVQiLCJodHUiOiJodHRwczovL3Jlc291cmNlLmV4YW1wbGUuY29tL3Jlc291cmNlIiwiYXRoIjoiZlVIeU8ycjJaM0RaNTNFc05yV0JiMHhXWG9hTnk1OUlpS0NBcWtzbVFFbyIsImlhdCI6MTc0NjgwNzEzOCwianRpIjoiM2MyZWU5YmItMDNhYy00MGNmLWI4MTItMDBiZmJhMzQxY2VlIn0.oS6NwjURR6wZemh1ZBNiBjycGeXwnkguLtgiKdCjQSEhFQpEJm04bBa0tdfZgWT17Z2mBgddnNQSkROzUGfssg8rBBldZXOAiduF-whtEGZA-pXXWJilXrwH3Glb6hIOMZOVmIH8fmYCDmqn-sE_DmDIsv57Il2-jdZbgeDcrxADO-6E5gsuNf1jvy7qqHq7INrKX6jRuydti_Re35lecvaAWfTyD7s7tQ_-3x_xLxxPwf_eA6z8OWbc58O2PYoUeO2JKLiOIg6UVZOZzxLEWV42WIKjha_kkoykvsf98W2y8pWOEr65u0VPsn5esw2X3I1eFL_A-XkxstZHRaGXJg
 ----
 
-The following shows a representation of the DPoP Proof JWT header and claims with the `ath` claim:
+Phần sau đây minh họa header và các claim của JWT bằng chứng DPoP có claim `ath`:
 
 [source,json]
 ----
@@ -180,7 +180,7 @@ The following shows a representation of the DPoP Proof JWT header and claims wit
 }
 ----
 
-The following code shows an example of how to generate the DPoP Proof JWT:
+Đoạn code sau đây minh họa cách tạo JWT bằng chứng DPoP:
 
 [tabs]
 ======
