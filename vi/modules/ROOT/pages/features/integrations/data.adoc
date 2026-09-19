@@ -71,6 +71,6 @@ interface MessageRepository : PagingAndSortingRepository<Message?, Long?> {
 ----
 ======
 
-Điều này kiểm tra xem `Authentication.getPrincipal().getId()` có bằng người nhận của `Message` hay không.
+Điều này kiểm tra xem `Authentication.getPrincipal().getId()` có bằng với người nhận của `Message` hay không.
 Lưu ý rằng ví dụ này giả định bạn đã tùy chỉnh principal thành một Object có thuộc tính id.
-Bằng cách công khai bean `SecurityEvaluationContextExtension`, tất cả xref:servlet/authorization/method-security.adoc#authorization-expressions[Các biểu thức bảo mật thông dụng] đều khả dụng trong truy vấn.
+Khi công khai bean `SecurityEvaluationContextExtension`, tất cả xref:servlet/authorization/method-security.adoc#authorization-expressions[Các biểu thức bảo mật thông dụng] đều khả dụng trong truy vấn.
