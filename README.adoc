@@ -26,68 +26,34 @@ You may also want to check out https://docs.spring.io/spring-security/reference/
 == Quick Start
 See https://docs.spring.io/spring-security/reference/servlet/getting-started.html[Hello Spring Security] to get started with a "Hello, World" application.
 
-== Building from Source
-Spring Security uses a https://gradle.org[Gradle]-based build system.
-In the instructions below, https://vimeo.com/34436402[`./gradlew`] is invoked from the root of the source tree and serves as
-a cross-platform, self-contained bootstrap mechanism for the build.
+== Building the Documentation Site
 
-=== Prerequisites
-https://docs.github.com/en/get-started/quickstart/set-up-git[Git] and the https://www.oracle.com/java/technologies/downloads/#java17[JDK17 build].
+This fork is maintained as a documentation-only Spring Security translation project.
+English documentation lives under `docs/` and Vietnamese documentation under `vi/`.
 
-Be sure that your `JAVA_HOME` environment variable points to the `jdk-17` folder extracted from the JDK download.
+* `scripts/sync-spring-security-docs.sh` refreshes the English documentation from the official `spring-projects/spring-security` `main` branch.
+* `.upstream-version` records the upstream commit currently mirrored.
+* `vi/CLAUDE.md` contains the translation rules and `vi/PROGRESS.md` tracks translation progress.
+* `antora-playbook.yml` builds English at the site root and Vietnamese under `/vi/`.
 
-=== Check out sources
-[indent=0]
+Install the Antora toolchain once and build from the repository root:
+
+[source,shell]
 ----
-git clone git@github.com:spring-projects/spring-security.git
-----
-
-=== Install all `spring-*.jar` into your local Maven repository.
-
-[indent=0]
-----
-./gradlew publishToMavenLocal
+$ npm ci --prefix antora
+$ ./antora/node_modules/.bin/antora antora-playbook.yml
 ----
 
-=== Compile and test; build all JARs, distribution zips, and docs
+The generated site is written to `build/site`.
+Pushing to `main` triggers `.github/workflows/deploy-docs.yml` for GitHub Pages.
 
-[indent=0]
+To configure the official upstream remote in a local clone:
+
+[source,shell]
 ----
-./gradlew build
+$ git remote add upstream https://github.com/spring-projects/spring-security.git
+$ ./scripts/sync-spring-security-docs.sh
 ----
-
-The reference docs are not currently included in the distribution zip.
-You can build the reference docs for this branch by running the following command:
-
-----
-./gradlew :spring-security-docs:antora
-----
-
-That command publishes the docs site to the `_docs/build/site_` directory.
-The https://github.com/spring-projects/spring-security/tree/docs-build[playbook branch] describes how to build the reference docs in detail.
-
-Discover more commands with `./gradlew tasks`.
-
-=== IDE setup (IntelliJ)
-
-No special steps are needed to open Spring Security in IntelliJ.
-
-=== IDE setup (Eclipse and VS Code)
-
-To work in Eclipse or VS Code, first generate Eclipse metadata so you can import the project into Eclipse or VS Code:
-
-[indent=0]
-----
-./gradlew cleanEclipse eclipse
-----
-
-If you have not built the project yet, run `./gradlew publishToMavenLocal` first so dependencies are resolved.
-
-*VS Code:* Open the repository root as a folder. The repository includes `.vscode/settings.json` which disables automatic Gradle import so that the generated Eclipse metadata (`.classpath`, `.project`) is used. Do not use the Gradle for Java extension to import the project.
-
-*Eclipse:* File → Import → General → Existing Projects into Workspace, then select the repository root.
-
-The build uses a custom Eclipse plugin to work around Gradle dependency cycles that confuse IDE metadata generation. You may see Eclipse warnings about `xml-apis` from some test dependencies; those are excluded in the build and can be ignored.
 
 == Getting Support
 Check out the https://stackoverflow.com/questions/tagged/spring-security[Spring Security tags on Stack Overflow].
