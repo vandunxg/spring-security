@@ -1,24 +1,24 @@
 [[oauth2AuthorizationServer-core-model-components]]
-= Core Model / Components
+= Mô hình cốt lõi / Các thành phần
 
 [[oauth2AuthorizationServer-registered-client]]
 == RegisteredClient
 
-A `RegisteredClient` is a representation of a client that is https://datatracker.ietf.org/doc/html/rfc6749#section-2[registered] with the authorization server.
-A client must be registered with the authorization server before it can initiate an authorization grant flow, such as `authorization_code` or `client_credentials`.
+`RegisteredClient` là biểu diễn của một client đã được https://datatracker.ietf.org/doc/html/rfc6749#section-2[đăng ký] với Authorization Server.
+Client phải được đăng ký với Authorization Server trước khi có thể khởi tạo một authorization grant flow, chẳng hạn như `authorization_code` hoặc `client_credentials`.
 
-During client registration, the client is assigned a unique https://datatracker.ietf.org/doc/html/rfc6749#section-2.2[client identifier], (optionally) a client secret (depending on https://datatracker.ietf.org/doc/html/rfc6749#section-2.1[client type]), and metadata associated with its unique client identifier.
-The client's metadata can range from human-facing display strings (such as client name) to items specific to a protocol flow (such as the list of valid redirect URIs).
+Trong quá trình đăng ký client, client được cấp một https://datatracker.ietf.org/doc/html/rfc6749#section-2.2[định danh client] duy nhất, một client secret (tùy chọn, phụ thuộc vào https://datatracker.ietf.org/doc/html/rfc6749#section-2.1[loại client]), cùng metadata gắn với định danh client duy nhất đó.
+Metadata của client có thể bao gồm các chuỗi hiển thị dành cho người dùng (chẳng hạn tên client) cho đến các mục cụ thể của một protocol flow (chẳng hạn danh sách redirect URI hợp lệ).
 
 [TIP]
-The corresponding client registration model in Spring Security's OAuth2 Client support is xref:servlet/oauth2/client/core.adoc#oauth2Client-client-registration[ClientRegistration].
+Mô hình đăng ký client tương ứng trong phần hỗ trợ OAuth2 Client của Spring Security là xref:servlet/oauth2/client/core.adoc#oauth2Client-client-registration[ClientRegistration].
 
-The primary purpose of a client is to request access to protected resources.
-The client first requests an access token by authenticating with the authorization server and presenting the authorization grant.
-The authorization server authenticates the client and authorization grant, and, if they are valid, issues an access token.
-The client can now request the protected resource from the resource server by presenting the access token.
+Mục đích chính của client là yêu cầu quyền truy cập vào các protected resource.
+Trước tiên, client yêu cầu một access token bằng cách authentication với Authorization Server và cung cấp authorization grant.
+Authorization Server thực hiện authentication cho client và authorization grant; nếu chúng hợp lệ, server sẽ cấp một access token.
+Sau đó client có thể yêu cầu protected resource từ Resource Server bằng cách cung cấp access token.
 
-The following example shows how to configure a `RegisteredClient` that is allowed to perform the https://datatracker.ietf.org/doc/html/rfc6749#section-4.1[authorization_code grant] flow to request an access token:
+Ví dụ sau minh họa cách cấu hình một `RegisteredClient` được phép thực hiện flow https://datatracker.ietf.org/doc/html/rfc6749#section-4.1[grant authorization_code] để yêu cầu một access token:
 
 [source,java]
 ----
@@ -32,9 +32,9 @@ RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().to
 	.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
 	.build();
 ----
-<1> `\{noop\}` represents the `PasswordEncoder` id for Spring Security's xref:features/authentication/password-storage.adoc#authentication-password-storage-dpe[NoOpPasswordEncoder].
+<1> `\{noop\}` biểu thị id `PasswordEncoder` cho xref:features/authentication/password-storage.adoc#authentication-password-storage-dpe[NoOpPasswordEncoder] của Spring Security.
 
-The corresponding configuration in Spring Security's xref:servlet/oauth2/client/index.adoc[OAuth2 Client support] is:
+Cấu hình tương ứng trong xref:servlet/oauth2/client/index.adoc[phần hỗ trợ OAuth2 Client] của Spring Security là:
 
 [source,yaml]
 ----
@@ -55,7 +55,7 @@ spring:
             issuer-uri: http://localhost:9000
 ----
 
-A `RegisteredClient` has metadata (attributes) associated with its unique Client Identifier and is defined as follows:
+Một `RegisteredClient` có metadata (các thuộc tính) gắn với Client Identifier duy nhất của nó và được định nghĩa như sau:
 
 [source,java]
 ----
@@ -78,26 +78,26 @@ public class RegisteredClient implements Serializable {
 
 }
 ----
-<1> `id`: The ID that uniquely identifies the `RegisteredClient`.
-<2> `clientId`: The client identifier.
-<3> `clientIdIssuedAt`: The time at which the client identifier was issued.
-<4> `clientSecret`: The client's secret. The value should be encoded using Spring Security's xref:features/authentication/password-storage.adoc#authentication-password-storage-dpe[PasswordEncoder].
-<5> `clientSecretExpiresAt`: The time at which the client secret expires.
-<6> `clientName`: A descriptive name used for the client. The name may be used in certain scenarios, such as when displaying the client name in the consent page.
-<7> `clientAuthenticationMethods`: The authentication method(s) that the client may use. The supported values are `client_secret_basic`, `client_secret_post`, https://datatracker.ietf.org/doc/html/rfc7523[`private_key_jwt`], `client_secret_jwt`, and `none` https://datatracker.ietf.org/doc/html/rfc7636[(public clients)].
-<8> `authorizationGrantTypes`: The https://datatracker.ietf.org/doc/html/rfc6749#section-1.3[authorization grant type(s)] that the client can use. The supported values are `authorization_code`, `client_credentials`, `refresh_token`, `urn:ietf:params:oauth:grant-type:device_code`, and `urn:ietf:params:oauth:grant-type:token-exchange`.
-<9> `redirectUris`: The registered https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2[redirect URI(s)] that the client may use in redirect-based flows – for example, `authorization_code` grant.
-<10> `postLogoutRedirectUris`: The post logout redirect URI(s) that the client may use for logout.
-<11> `scopes`: The scope(s) that the client is allowed to request.
-<12> `clientSettings`: The custom settings for the client – for example, require https://datatracker.ietf.org/doc/html/rfc7636[PKCE], require authorization consent, and others.
-<13> `tokenSettings`: The custom settings for the OAuth2 tokens issued to the client – for example, access/refresh token time-to-live, reuse refresh tokens, and others.
+<1> `id`: ID định danh duy nhất `RegisteredClient`.
+<2> `clientId`: Định danh client.
+<3> `clientIdIssuedAt`: Thời điểm định danh client được cấp.
+<4> `clientSecret`: Secret của client. Giá trị này nên được mã hóa bằng xref:features/authentication/password-storage.adoc#authentication-password-storage-dpe[PasswordEncoder] của Spring Security.
+<5> `clientSecretExpiresAt`: Thời điểm client secret hết hạn.
+<6> `clientName`: Tên mô tả được sử dụng cho client. Tên này có thể được sử dụng trong một số tình huống, chẳng hạn khi hiển thị tên client trên trang consent.
+<7> `clientAuthenticationMethods`: Các phương thức authentication mà client có thể sử dụng. Các giá trị được hỗ trợ là `client_secret_basic`, `client_secret_post`, https://datatracker.ietf.org/doc/html/rfc7523[`private_key_jwt`], `client_secret_jwt` và `none` https://datatracker.ietf.org/doc/html/rfc7636[(public client)].
+<8> `authorizationGrantTypes`: Các https://datatracker.ietf.org/doc/html/rfc6749#section-1.3[loại authorization grant] mà client có thể sử dụng. Các giá trị được hỗ trợ là `authorization_code`, `client_credentials`, `refresh_token`, `urn:ietf:params:oauth:grant-type:device_code` và `urn:ietf:params:oauth:grant-type:token-exchange`.
+<9> `redirectUris`: Các https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2[redirect URI] đã đăng ký mà client có thể sử dụng trong các flow dựa trên redirect, ví dụ grant `authorization_code`.
+<10> `postLogoutRedirectUris`: Các redirect URI sau logout mà client có thể sử dụng cho logout.
+<11> `scopes`: Các scope mà client được phép yêu cầu.
+<12> `clientSettings`: Các thiết lập tùy chỉnh cho client, chẳng hạn yêu cầu https://datatracker.ietf.org/doc/html/rfc7636[PKCE], yêu cầu authorization consent và các thiết lập khác.
+<13> `tokenSettings`: Các thiết lập tùy chỉnh cho OAuth2 token được cấp cho client, chẳng hạn thời gian tồn tại của access/refresh token, tái sử dụng refresh token và các thiết lập khác.
 
 [[oauth2AuthorizationServer-client-settings]]
 == ClientSettings
 
-`ClientSettings` contains the configuration settings associated to a `RegisteredClient`.
+`ClientSettings` chứa các thiết lập cấu hình gắn với một `RegisteredClient`.
 
-`ClientSettings` provides the following accessors:
+`ClientSettings` cung cấp các accessor sau:
 
 [source,java]
 ----
@@ -117,29 +117,29 @@ public final class ClientSettings extends AbstractSettings {
 
 }
 ----
-<1> `isRequireProofKey()`: If `true`, the client is required to provide a proof key challenge and verifier when performing the Authorization Code Grant flow (PKCE). The default is `true`.
-<2> `isRequireAuthorizationConsent()`: If `true`, authorization consent is required when the client requests access. The default is `false`.
-<3> `getJwkSetUrl()`: The `URL` for the client's JSON Web Key Set. Used for `private_key_jwt`, `self_signed_tls_client_auth` and `client_secret_jwt` client authentication methods.
-<4> `getTokenEndpointAuthenticationSigningAlgorithm()`: The `JwsAlgorithm` that must be used for signing the JWT used to authenticate the client at the Token Endpoint for `private_key_jwt` and `client_secret_jwt` authentication methods.
-<5> `getX509CertificateSubjectDN()`: The expected subject distinguished name associated to the client `X509Certificate` received during client authentication when using the `tls_client_auth` method.
+<1> `isRequireProofKey()`: Nếu là `true`, client bắt buộc phải cung cấp proof key challenge và verifier khi thực hiện flow Authorization Code Grant (PKCE). Giá trị mặc định là `true`.
+<2> `isRequireAuthorizationConsent()`: Nếu là `true`, authorization consent là bắt buộc khi client yêu cầu quyền truy cập. Giá trị mặc định là `false`.
+<3> `getJwkSetUrl()`: `URL` của JSON Web Key Set của client. Được sử dụng cho các phương thức client authentication `private_key_jwt`, `self_signed_tls_client_auth` và `client_secret_jwt`.
+<4> `getTokenEndpointAuthenticationSigningAlgorithm()`: `JwsAlgorithm` phải được sử dụng để ký JWT dùng để authentication client tại Token Endpoint cho các phương thức authentication `private_key_jwt` và `client_secret_jwt`.
+<5> `getX509CertificateSubjectDN()`: Subject distinguished name dự kiến gắn với `X509Certificate` của client nhận được trong quá trình client authentication khi sử dụng phương thức `tls_client_auth`.
 
 [NOTE]
-https://datatracker.ietf.org/doc/html/rfc7636[Proof Key for Code Exchange (PKCE)] is enabled by default for all clients using the Authorization Code grant. To disable PKCE, set `requireProofKey` to `false`.
+https://datatracker.ietf.org/doc/html/rfc7636[Proof Key for Code Exchange (PKCE)] được bật theo mặc định cho mọi client sử dụng Authorization Code grant. Để tắt PKCE, đặt `requireProofKey` thành `false`.
 
 [[oauth2AuthorizationServer-registered-client-repository]]
 == RegisteredClientRepository
 
-The `RegisteredClientRepository` is the central component where new clients can be registered and existing clients can be queried.
-It is used by other components when following a specific protocol flow, such as client authentication, authorization grant processing, token introspection, dynamic client registration, and others.
+`RegisteredClientRepository` là thành phần trung tâm nơi client mới có thể được đăng ký và các client hiện có có thể được truy vấn.
+Nó được các thành phần khác sử dụng khi thực hiện một protocol flow cụ thể, chẳng hạn client authentication, xử lý authorization grant, token introspection, dynamic client registration và các flow khác.
 
-The provided implementations of `RegisteredClientRepository` are `InMemoryRegisteredClientRepository` and `JdbcRegisteredClientRepository`.
-The `InMemoryRegisteredClientRepository` implementation stores `RegisteredClient` instances in-memory and is recommended *ONLY* to be used during development and testing.
-`JdbcRegisteredClientRepository` is a JDBC implementation that persists `RegisteredClient` instances by using `JdbcOperations`.
+Các implementation được cung cấp của `RegisteredClientRepository` là `InMemoryRegisteredClientRepository` và `JdbcRegisteredClientRepository`.
+Implementation `InMemoryRegisteredClientRepository` lưu các instance `RegisteredClient` trong bộ nhớ và *CHỈ* được khuyến nghị sử dụng trong quá trình phát triển và kiểm thử.
+`JdbcRegisteredClientRepository` là implementation JDBC lưu bền vững các instance `RegisteredClient` bằng `JdbcOperations`.
 
 [NOTE]
-The `RegisteredClientRepository` is a *REQUIRED* component.
+`RegisteredClientRepository` là một thành phần *BẮT BUỘC*.
 
-The following example shows how to register a `RegisteredClientRepository` `@Bean`:
+Ví dụ sau minh họa cách đăng ký `RegisteredClientRepository` `@Bean`:
 
 [source,java]
 ----
@@ -150,7 +150,7 @@ public RegisteredClientRepository registeredClientRepository() {
 }
 ----
 
-Alternatively, you can configure the `RegisteredClientRepository` through the xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-customizing-the-configuration[`OAuth2AuthorizationServerConfigurer`]:
+Ngoài ra, bạn có thể cấu hình `RegisteredClientRepository` thông qua xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-customizing-the-configuration[`OAuth2AuthorizationServerConfigurer`]:
 
 [source,java]
 ----
@@ -168,27 +168,27 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 ----
 
 [NOTE]
-The `OAuth2AuthorizationServerConfigurer` is useful when applying multiple configuration options simultaneously.
+`OAuth2AuthorizationServerConfigurer` hữu ích khi áp dụng đồng thời nhiều tùy chọn cấu hình.
 
 [[oauth2AuthorizationServer-oauth2-authorization]]
 == OAuth2Authorization
 
-An `OAuth2Authorization` is a representation of an OAuth2 authorization, which holds state related to the authorization granted to a xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[client], by the resource owner or itself in the case of the `client_credentials` authorization grant type.
+Một `OAuth2Authorization` là biểu diễn của một OAuth2 authorization, lưu trạng thái liên quan đến authorization được cấp cho xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[client] bởi resource owner, hoặc bởi chính client trong trường hợp authorization grant type `client_credentials`.
 
 [TIP]
-The corresponding authorization model in Spring Security's OAuth2 Client support is xref:servlet/oauth2/client/core.adoc#oauth2Client-authorized-client[OAuth2AuthorizedClient].
+Mô hình authorization tương ứng trong phần hỗ trợ OAuth2 Client của Spring Security là xref:servlet/oauth2/client/core.adoc#oauth2Client-authorized-client[OAuth2AuthorizedClient].
 
-After the successful completion of an authorization grant flow, an `OAuth2Authorization` is created and associates an javadoc:org.springframework.security.oauth2.core.OAuth2AccessToken[], an (optional) javadoc:org.springframework.security.oauth2.core.OAuth2RefreshToken[], and additional state specific to the executed authorization grant type.
+Sau khi một authorization grant flow hoàn tất thành công, một `OAuth2Authorization` được tạo và gắn với một javadoc:org.springframework.security.oauth2.core.OAuth2AccessToken[], một javadoc:org.springframework.security.oauth2.core.OAuth2RefreshToken[] (tùy chọn), cùng trạng thái bổ sung dành riêng cho authorization grant type đã thực thi.
 
-The javadoc:org.springframework.security.oauth2.core.OAuth2Token[] instances associated with an `OAuth2Authorization` vary, depending on the authorization grant type.
+Các instance javadoc:org.springframework.security.oauth2.core.OAuth2Token[] gắn với một `OAuth2Authorization` thay đổi tùy theo authorization grant type.
 
-For the OAuth2 https://datatracker.ietf.org/doc/html/rfc6749#section-4.1[authorization_code grant], an `OAuth2AuthorizationCode`, an `OAuth2AccessToken`, and an (optional) `OAuth2RefreshToken` are associated.
+Đối với OAuth2 https://datatracker.ietf.org/doc/html/rfc6749#section-4.1[grant authorization_code], một `OAuth2AuthorizationCode`, một `OAuth2AccessToken` và một `OAuth2RefreshToken` (tùy chọn) được gắn với nó.
 
-For the OpenID Connect 1.0 https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth[authorization_code grant], an `OAuth2AuthorizationCode`, an javadoc:org.springframework.security.oauth2.core.oidc.OidcIdToken[], an `OAuth2AccessToken`, and an (optional) `OAuth2RefreshToken` are associated.
+Đối với OpenID Connect 1.0 https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth[grant authorization_code], một `OAuth2AuthorizationCode`, một javadoc:org.springframework.security.oauth2.core.oidc.OidcIdToken[], một `OAuth2AccessToken` và một `OAuth2RefreshToken` (tùy chọn) được gắn với nó.
 
-For the OAuth2 https://datatracker.ietf.org/doc/html/rfc6749#section-4.4[client_credentials grant], only an `OAuth2AccessToken` is associated.
+Đối với OAuth2 https://datatracker.ietf.org/doc/html/rfc6749#section-4.4[grant client_credentials], chỉ một `OAuth2AccessToken` được gắn với nó.
 
-`OAuth2Authorization` and its attributes are defined as follows:
+`OAuth2Authorization` và các thuộc tính của nó được định nghĩa như sau:
 
 [source,java]
 ----
@@ -205,35 +205,35 @@ public class OAuth2Authorization implements Serializable {
 
 }
 ----
-<1> `id`: The ID that uniquely identifies the `OAuth2Authorization`.
-<2> `registeredClientId`: The ID that uniquely identifies the xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[RegisteredClient].
-<3> `principalName`: The principal name of the resource owner (or client).
-<4> `authorizationGrantType`: The `AuthorizationGrantType` used.
-<5> `authorizedScopes`: The `Set` of scope(s) authorized for the client.
-<6> `tokens`: The `OAuth2Token` instances (and associated metadata) specific to the executed authorization grant type.
-<7> `attributes`: The additional attributes specific to the executed authorization grant type – for example, the authenticated `Principal`, `OAuth2AuthorizationRequest`, and others.
+<1> `id`: ID định danh duy nhất `OAuth2Authorization`.
+<2> `registeredClientId`: ID định danh duy nhất xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[RegisteredClient].
+<3> `principalName`: Tên principal của resource owner (hoặc client).
+<4> `authorizationGrantType`: `AuthorizationGrantType` được sử dụng.
+<5> `authorizedScopes`: `Set` các scope được authorization cho client.
+<6> `tokens`: Các instance `OAuth2Token` (và metadata gắn với chúng) dành riêng cho authorization grant type đã thực thi.
+<7> `attributes`: Các thuộc tính bổ sung dành riêng cho authorization grant type đã thực thi, chẳng hạn `Principal` đã authentication, `OAuth2AuthorizationRequest` và các thuộc tính khác.
 
-`OAuth2Authorization` and its associated `OAuth2Token` instances have a set lifespan.
-A newly issued `OAuth2Token` is active and becomes inactive when it either expires or is invalidated (revoked).
-The `OAuth2Authorization` is (implicitly) inactive when all associated `OAuth2Token` instances are inactive.
-Each `OAuth2Token` is held in an `OAuth2Authorization.Token`, which provides accessors for `isExpired()`, `isInvalidated()`, and `isActive()`.
+`OAuth2Authorization` và các instance `OAuth2Token` gắn với nó có một vòng đời xác định.
+Một `OAuth2Token` mới được cấp ở trạng thái active và trở thành inactive khi hết hạn hoặc bị vô hiệu hóa (revoked).
+`OAuth2Authorization` (ngầm định) ở trạng thái inactive khi mọi instance `OAuth2Token` gắn với nó đều inactive.
+Mỗi `OAuth2Token` được lưu trong một `OAuth2Authorization.Token`, cung cấp các accessor `isExpired()`, `isInvalidated()` và `isActive()`.
 
-`OAuth2Authorization.Token` also provides `getClaims()`, which returns the claims (if any) associated with the `OAuth2Token`.
+`OAuth2Authorization.Token` cũng cung cấp `getClaims()`, trả về các claim (nếu có) gắn với `OAuth2Token`.
 
 [[oauth2AuthorizationServer-oauth2-authorization-service]]
 == OAuth2AuthorizationService
 
-The `OAuth2AuthorizationService` is the central component where new authorizations are stored and existing authorizations are queried.
-It is used by other components when following a specific protocol flow – for example, client authentication, authorization grant processing, token introspection, token revocation, dynamic client registration, and others.
+`OAuth2AuthorizationService` là thành phần trung tâm nơi các authorization mới được lưu trữ và các authorization hiện có được truy vấn.
+Nó được các thành phần khác sử dụng khi thực hiện một protocol flow cụ thể, chẳng hạn client authentication, xử lý authorization grant, token introspection, token revocation, dynamic client registration và các flow khác.
 
-The provided implementations of `OAuth2AuthorizationService` are `InMemoryOAuth2AuthorizationService` and `JdbcOAuth2AuthorizationService`.
-The `InMemoryOAuth2AuthorizationService` implementation stores `OAuth2Authorization` instances in-memory and is recommended *ONLY* to be used during development and testing.
-`JdbcOAuth2AuthorizationService` is a JDBC implementation that persists `OAuth2Authorization` instances by using `JdbcOperations`.
+Các implementation được cung cấp của `OAuth2AuthorizationService` là `InMemoryOAuth2AuthorizationService` và `JdbcOAuth2AuthorizationService`.
+Implementation `InMemoryOAuth2AuthorizationService` lưu các instance `OAuth2Authorization` trong bộ nhớ và *CHỈ* được khuyến nghị sử dụng trong quá trình phát triển và kiểm thử.
+`JdbcOAuth2AuthorizationService` là implementation JDBC lưu bền vững các instance `OAuth2Authorization` bằng `JdbcOperations`.
 
 [NOTE]
-The `OAuth2AuthorizationService` is an *OPTIONAL* component and defaults to `InMemoryOAuth2AuthorizationService`.
+`OAuth2AuthorizationService` là một thành phần *TÙY CHỌN* và mặc định là `InMemoryOAuth2AuthorizationService`.
 
-The following example shows how to register an `OAuth2AuthorizationService` `@Bean`:
+Ví dụ sau minh họa cách đăng ký `OAuth2AuthorizationService` `@Bean`:
 
 [source,java]
 ----
@@ -243,7 +243,7 @@ public OAuth2AuthorizationService authorizationService() {
 }
 ----
 
-Alternatively, you can configure the `OAuth2AuthorizationService` through the xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-customizing-the-configuration[`OAuth2AuthorizationServerConfigurer`]:
+Ngoài ra, bạn có thể cấu hình `OAuth2AuthorizationService` thông qua xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-customizing-the-configuration[`OAuth2AuthorizationServerConfigurer`]:
 
 [source,java]
 ----
@@ -261,19 +261,19 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 ----
 
 [NOTE]
-The `OAuth2AuthorizationServerConfigurer` is useful when applying multiple configuration options simultaneously.
+`OAuth2AuthorizationServerConfigurer` hữu ích khi áp dụng đồng thời nhiều tùy chọn cấu hình.
 
 [[oauth2AuthorizationServer-oauth2-authorization-consent]]
 == OAuth2AuthorizationConsent
 
-An `OAuth2AuthorizationConsent` is a representation of an authorization "consent" (decision) from an https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1[OAuth2 authorization request flow] – for example, the `authorization_code` grant, which holds the authorities granted to a xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[client] by the resource owner.
+Một `OAuth2AuthorizationConsent` là biểu diễn của "consent" (quyết định) authorization từ một https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1[OAuth2 authorization request flow], chẳng hạn grant `authorization_code`, lưu các authority được resource owner cấp cho xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[client].
 
-When authorizing access to a client, the resource owner may grant only a subset of the authorities requested by the client.
-The typical use case is the `authorization_code` grant flow, in which the client requests scope(s) and the resource owner grants (or denies) access to the requested scope(s).
+Khi authorization quyền truy cập cho một client, resource owner có thể chỉ cấp một tập con các authority mà client yêu cầu.
+Trường hợp sử dụng điển hình là flow grant `authorization_code`, trong đó client yêu cầu các scope và resource owner cấp (hoặc từ chối) quyền truy cập vào các scope được yêu cầu.
 
-After the completion of an OAuth2 authorization request flow, an `OAuth2AuthorizationConsent` is created (or updated) and associates the granted authorities with the client and resource owner.
+Sau khi một OAuth2 authorization request flow hoàn tất, một `OAuth2AuthorizationConsent` được tạo (hoặc cập nhật) và gắn các authority đã cấp với client và resource owner.
 
-`OAuth2AuthorizationConsent` and its attributes are defined as follows:
+`OAuth2AuthorizationConsent` và các thuộc tính của nó được định nghĩa như sau:
 
 [source,java]
 ----
@@ -286,24 +286,24 @@ public final class OAuth2AuthorizationConsent implements Serializable {
 
 }
 ----
-<1> `registeredClientId`: The ID that uniquely identifies the xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[RegisteredClient].
-<2> `principalName`: The principal name of the resource owner.
-<3> `authorities`: The authorities granted to the client by the resource owner. An authority can represent a scope, a claim, a permission, a role, and others.
+<1> `registeredClientId`: ID định danh duy nhất xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[RegisteredClient].
+<2> `principalName`: Tên principal của resource owner.
+<3> `authorities`: Các authority được resource owner cấp cho client. Một authority có thể biểu thị một scope, claim, permission, role và các khái niệm khác.
 
 [[oauth2AuthorizationServer-oauth2-authorization-consent-service]]
 == OAuth2AuthorizationConsentService
 
-The `OAuth2AuthorizationConsentService` is the central component where new authorization consents are stored and existing authorization consents are queried.
-It is primarily used by components that implement an OAuth2 authorization request flow – for example, the `authorization_code` grant.
+`OAuth2AuthorizationConsentService` là thành phần trung tâm nơi các authorization consent mới được lưu trữ và các authorization consent hiện có được truy vấn.
+Nó chủ yếu được các thành phần triển khai OAuth2 authorization request flow sử dụng, chẳng hạn grant `authorization_code`.
 
-The provided implementations of `OAuth2AuthorizationConsentService` are `InMemoryOAuth2AuthorizationConsentService` and `JdbcOAuth2AuthorizationConsentService`.
-The `InMemoryOAuth2AuthorizationConsentService` implementation stores `OAuth2AuthorizationConsent` instances in-memory and is recommended *ONLY* for development and testing.
-`JdbcOAuth2AuthorizationConsentService` is a JDBC implementation that persists `OAuth2AuthorizationConsent` instances by using `JdbcOperations`.
+Các implementation được cung cấp của `OAuth2AuthorizationConsentService` là `InMemoryOAuth2AuthorizationConsentService` và `JdbcOAuth2AuthorizationConsentService`.
+Implementation `InMemoryOAuth2AuthorizationConsentService` lưu các instance `OAuth2AuthorizationConsent` trong bộ nhớ và *CHỈ* được khuyến nghị sử dụng cho phát triển và kiểm thử.
+`JdbcOAuth2AuthorizationConsentService` là implementation JDBC lưu bền vững các instance `OAuth2AuthorizationConsent` bằng `JdbcOperations`.
 
 [NOTE]
-The `OAuth2AuthorizationConsentService` is an *OPTIONAL* component and defaults to `InMemoryOAuth2AuthorizationConsentService`.
+`OAuth2AuthorizationConsentService` là một thành phần *TÙY CHỌN* và mặc định là `InMemoryOAuth2AuthorizationConsentService`.
 
-The following example shows how to register an `OAuth2AuthorizationConsentService` `@Bean`:
+Ví dụ sau minh họa cách đăng ký `OAuth2AuthorizationConsentService` `@Bean`:
 
 [source,java]
 ----
@@ -313,7 +313,7 @@ public OAuth2AuthorizationConsentService authorizationConsentService() {
 }
 ----
 
-Alternatively, you can configure the `OAuth2AuthorizationConsentService` through the xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-customizing-the-configuration[`OAuth2AuthorizationServerConfigurer`]:
+Ngoài ra, bạn có thể cấu hình `OAuth2AuthorizationConsentService` thông qua xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-customizing-the-configuration[`OAuth2AuthorizationServerConfigurer`]:
 
 [source,java]
 ----
@@ -331,14 +331,14 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 ----
 
 [NOTE]
-The `OAuth2AuthorizationServerConfigurer` is useful when applying multiple configuration options simultaneously.
+`OAuth2AuthorizationServerConfigurer` hữu ích khi áp dụng đồng thời nhiều tùy chọn cấu hình.
 
 [[oauth2AuthorizationServer-oauth2-token-context]]
 == OAuth2TokenContext
 
-An `OAuth2TokenContext` is a context object that holds information associated with an `OAuth2Token` and is used by an xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-generator[OAuth2TokenGenerator] and xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-customizer[OAuth2TokenCustomizer].
+Một `OAuth2TokenContext` là đối tượng context lưu thông tin gắn với một `OAuth2Token` và được xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-generator[OAuth2TokenGenerator] cùng xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-customizer[OAuth2TokenCustomizer] sử dụng.
 
-`OAuth2TokenContext` provides the following accessors:
+`OAuth2TokenContext` cung cấp các accessor sau:
 
 [source,java]
 ----
@@ -365,49 +365,49 @@ public interface OAuth2TokenContext extends Context {
 
 }
 ----
-<1> `getRegisteredClient()`: The xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[RegisteredClient] associated with the authorization grant.
-<2> `getPrincipal()`: The `Authentication` instance of the resource owner (or client).
-<3> `getAuthorizationServerContext()`: The xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-configuring-authorization-server-settings[`AuthorizationServerContext`] object that holds information of the Authorization Server runtime environment.
-<4> `getAuthorization()`: The xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-authorization[OAuth2Authorization] associated with the authorization grant.
-<5> `getAuthorizedScopes()`: The scope(s) authorized for the client.
-<6> `getTokenType()`: The `OAuth2TokenType` to generate. The supported values are `code`, `access_token`, `refresh_token`, and `id_token`.
-<7> `getAuthorizationGrantType()`: The `AuthorizationGrantType` associated with the authorization grant.
-<8> `getAuthorizationGrant()`: The `Authentication` instance used by the `AuthenticationProvider` that processes the authorization grant.
+<1> `getRegisteredClient()`: xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[RegisteredClient] gắn với authorization grant.
+<2> `getPrincipal()`: Instance `Authentication` của resource owner (hoặc client).
+<3> `getAuthorizationServerContext()`: Đối tượng xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-configuring-authorization-server-settings[`AuthorizationServerContext`] lưu thông tin về môi trường runtime của Authorization Server.
+<4> `getAuthorization()`: xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-authorization[OAuth2Authorization] gắn với authorization grant.
+<5> `getAuthorizedScopes()`: Các scope được authorization cho client.
+<6> `getTokenType()`: `OAuth2TokenType` cần tạo. Các giá trị được hỗ trợ là `code`, `access_token`, `refresh_token` và `id_token`.
+<7> `getAuthorizationGrantType()`: `AuthorizationGrantType` gắn với authorization grant.
+<8> `getAuthorizationGrant()`: Instance `Authentication` được `AuthenticationProvider` xử lý authorization grant sử dụng.
 
 [[oauth2AuthorizationServer-oauth2-token-generator]]
 == OAuth2TokenGenerator
 
-An `OAuth2TokenGenerator` is responsible for generating an `OAuth2Token` from the information contained in the provided xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-context[OAuth2TokenContext].
+Một `OAuth2TokenGenerator` chịu trách nhiệm tạo `OAuth2Token` từ thông tin chứa trong xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-context[OAuth2TokenContext] được cung cấp.
 
-The `OAuth2Token` generated primarily depends on the type of `OAuth2TokenType` specified in the `OAuth2TokenContext`.
+`OAuth2Token` được tạo chủ yếu phụ thuộc vào kiểu `OAuth2TokenType` được chỉ định trong `OAuth2TokenContext`.
 
-For example, when the `value` for `OAuth2TokenType` is:
+Ví dụ, khi `value` của `OAuth2TokenType` là:
 
-* `code`, then `OAuth2AuthorizationCode` is generated.
-* `access_token`, then `OAuth2AccessToken` is generated.
-* `refresh_token`, then `OAuth2RefreshToken` is generated.
-* `id_token`, then `OidcIdToken` is generated.
+* `code`, thì `OAuth2AuthorizationCode` được tạo.
+* `access_token`, thì `OAuth2AccessToken` được tạo.
+* `refresh_token`, thì `OAuth2RefreshToken` được tạo.
+* `id_token`, thì `OidcIdToken` được tạo.
 
-Furthermore, the format of the generated `OAuth2AccessToken` varies, depending on the `TokenSettings.getAccessTokenFormat()` configured for the xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[RegisteredClient].
-If the format is `OAuth2TokenFormat.SELF_CONTAINED` (the default), then a `Jwt` is generated.
-If the format is `OAuth2TokenFormat.REFERENCE`, then an "opaque" token is generated.
+Ngoài ra, format của `OAuth2AccessToken` được tạo thay đổi tùy theo `TokenSettings.getAccessTokenFormat()` được cấu hình cho xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client[RegisteredClient].
+Nếu format là `OAuth2TokenFormat.SELF_CONTAINED` (mặc định), thì một `Jwt` được tạo.
+Nếu format là `OAuth2TokenFormat.REFERENCE`, thì một token "opaque" được tạo.
 
-Finally, if the generated `OAuth2Token` has a set of claims and implements `ClaimAccessor`, the claims are made accessible from xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-authorization[OAuth2Authorization.Token.getClaims()].
+Cuối cùng, nếu `OAuth2Token` được tạo có một tập claim và triển khai `ClaimAccessor`, các claim có thể được truy cập từ xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-authorization[OAuth2Authorization.Token.getClaims()].
 
-The `OAuth2TokenGenerator` is primarily used by components that implement authorization grant processing – for example, `authorization_code`, `client_credentials`, and `refresh_token`.
+`OAuth2TokenGenerator` chủ yếu được các thành phần triển khai xử lý authorization grant sử dụng, chẳng hạn `authorization_code`, `client_credentials` và `refresh_token`.
 
-The provided implementations are `OAuth2AccessTokenGenerator`, `OAuth2RefreshTokenGenerator`, and `JwtGenerator`.
-The `OAuth2AccessTokenGenerator` generates an "opaque" (`OAuth2TokenFormat.REFERENCE`) access token, and the `JwtGenerator` generates a `Jwt` (`OAuth2TokenFormat.SELF_CONTAINED`).
-
-[NOTE]
-The `OAuth2TokenGenerator` is an *OPTIONAL* component and defaults to a `DelegatingOAuth2TokenGenerator` composed of an `OAuth2AccessTokenGenerator` and `OAuth2RefreshTokenGenerator`.
+Các implementation được cung cấp là `OAuth2AccessTokenGenerator`, `OAuth2RefreshTokenGenerator` và `JwtGenerator`.
+`OAuth2AccessTokenGenerator` tạo một access token "opaque" (`OAuth2TokenFormat.REFERENCE`), còn `JwtGenerator` tạo một `Jwt` (`OAuth2TokenFormat.SELF_CONTAINED`).
 
 [NOTE]
-If a `JwtEncoder` `@Bean` or `JWKSource<SecurityContext>` `@Bean` is registered, then a `JwtGenerator` is additionally composed in the `DelegatingOAuth2TokenGenerator`.
+`OAuth2TokenGenerator` là một thành phần *TÙY CHỌN* và mặc định là `DelegatingOAuth2TokenGenerator` được cấu thành từ `OAuth2AccessTokenGenerator` và `OAuth2RefreshTokenGenerator`.
 
-The `OAuth2TokenGenerator` provides great flexibility, as it can support any custom token format for `access_token` and `refresh_token`.
+[NOTE]
+Nếu một `JwtEncoder` `@Bean` hoặc `JWKSource<SecurityContext>` `@Bean` được đăng ký, một `JwtGenerator` cũng được thêm vào `DelegatingOAuth2TokenGenerator`.
 
-The following example shows how to register an `OAuth2TokenGenerator` `@Bean`:
+`OAuth2TokenGenerator` cung cấp tính linh hoạt cao vì có thể hỗ trợ mọi token format tùy chỉnh cho `access_token` và `refresh_token`.
+
+Ví dụ sau minh họa cách đăng ký `OAuth2TokenGenerator` `@Bean`:
 
 [source,java]
 ----
@@ -422,7 +422,7 @@ public OAuth2TokenGenerator<?> tokenGenerator() {
 }
 ----
 
-Alternatively, you can configure the `OAuth2TokenGenerator` through the xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-customizing-the-configuration[`OAuth2AuthorizationServerConfigurer`]:
+Ngoài ra, bạn có thể cấu hình `OAuth2TokenGenerator` thông qua xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-customizing-the-configuration[`OAuth2AuthorizationServerConfigurer`]:
 
 [source,java]
 ----
@@ -440,18 +440,18 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 ----
 
 [NOTE]
-The `OAuth2AuthorizationServerConfigurer` is useful when applying multiple configuration options simultaneously.
+`OAuth2AuthorizationServerConfigurer` hữu ích khi áp dụng đồng thời nhiều tùy chọn cấu hình.
 
 [[oauth2AuthorizationServer-oauth2-token-customizer]]
 == OAuth2TokenCustomizer
 
-An `OAuth2TokenCustomizer` provides the ability to customize the attributes of an `OAuth2Token`, which are accessible in the provided xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-context[OAuth2TokenContext].
-It is used by an xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-generator[OAuth2TokenGenerator] to let it customize the attributes of the `OAuth2Token` before it is generated.
+Một `OAuth2TokenCustomizer` cung cấp khả năng tùy chỉnh các thuộc tính của một `OAuth2Token`, những thuộc tính này có thể được truy cập trong xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-context[OAuth2TokenContext] được cung cấp.
+Nó được xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-generator[OAuth2TokenGenerator] sử dụng để tùy chỉnh các thuộc tính của `OAuth2Token` trước khi token được tạo.
 
-An `OAuth2TokenCustomizer<OAuth2TokenClaimsContext>` declared with a generic type of `OAuth2TokenClaimsContext` (`implements OAuth2TokenContext`) provides the ability to customize the claims of an "opaque" `OAuth2AccessToken`.
-`OAuth2TokenClaimsContext.getClaims()` provides access to the `OAuth2TokenClaimsSet.Builder`, allowing the ability to add, replace, and remove claims.
+Một `OAuth2TokenCustomizer<OAuth2TokenClaimsContext>` được khai báo với kiểu generic `OAuth2TokenClaimsContext` (`implements OAuth2TokenContext`) cung cấp khả năng tùy chỉnh các claim của một `OAuth2AccessToken` "opaque".
+`OAuth2TokenClaimsContext.getClaims()` cung cấp quyền truy cập vào `OAuth2TokenClaimsSet.Builder`, cho phép thêm, thay thế và xóa claim.
 
-The following example shows how to implement an `OAuth2TokenCustomizer<OAuth2TokenClaimsContext>` and configure it with an `OAuth2AccessTokenGenerator`:
+Ví dụ sau minh họa cách triển khai một `OAuth2TokenCustomizer<OAuth2TokenClaimsContext>` và cấu hình nó với một `OAuth2AccessTokenGenerator`:
 
 [source,java]
 ----
@@ -477,13 +477,13 @@ public OAuth2TokenCustomizer<OAuth2TokenClaimsContext> accessTokenCustomizer() {
 ----
 
 [NOTE]
-If the `OAuth2TokenGenerator` is not provided as a `@Bean` or is not configured through the `OAuth2AuthorizationServerConfigurer`, an `OAuth2TokenCustomizer<OAuth2TokenClaimsContext>` `@Bean` will automatically be configured with an `OAuth2AccessTokenGenerator`.
+Nếu `OAuth2TokenGenerator` không được cung cấp dưới dạng `@Bean` hoặc không được cấu hình thông qua `OAuth2AuthorizationServerConfigurer`, một `OAuth2TokenCustomizer<OAuth2TokenClaimsContext>` `@Bean` sẽ tự động được cấu hình với một `OAuth2AccessTokenGenerator`.
 
-An `OAuth2TokenCustomizer<JwtEncodingContext>` declared with a generic type of `JwtEncodingContext` (`implements OAuth2TokenContext`) provides the ability to customize the headers and claims of a `Jwt`.
-`JwtEncodingContext.getJwsHeader()` provides access to the `JwsHeader.Builder`, allowing the ability to add, replace, and remove headers.
-`JwtEncodingContext.getClaims()` provides access to the `JwtClaimsSet.Builder`, allowing the ability to add, replace, and remove claims.
+Một `OAuth2TokenCustomizer<JwtEncodingContext>` được khai báo với kiểu generic `JwtEncodingContext` (`implements OAuth2TokenContext`) cung cấp khả năng tùy chỉnh header và claim của một `Jwt`.
+`JwtEncodingContext.getJwsHeader()` cung cấp quyền truy cập vào `JwsHeader.Builder`, cho phép thêm, thay thế và xóa header.
+`JwtEncodingContext.getClaims()` cung cấp quyền truy cập vào `JwtClaimsSet.Builder`, cho phép thêm, thay thế và xóa claim.
 
-The following example shows how to implement an `OAuth2TokenCustomizer<JwtEncodingContext>` and configure it with a `JwtGenerator`:
+Ví dụ sau minh họa cách triển khai một `OAuth2TokenCustomizer<JwtEncodingContext>` và cấu hình nó với một `JwtGenerator`:
 
 [source,java]
 ----
@@ -515,25 +515,25 @@ public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
 ----
 
 [NOTE]
-If the `OAuth2TokenGenerator` is not provided as a `@Bean` or is not configured through the `OAuth2AuthorizationServerConfigurer`, an `OAuth2TokenCustomizer<JwtEncodingContext>` `@Bean` will automatically be configured with a `JwtGenerator`.
+Nếu `OAuth2TokenGenerator` không được cung cấp dưới dạng `@Bean` hoặc không được cấu hình thông qua `OAuth2AuthorizationServerConfigurer`, một `OAuth2TokenCustomizer<JwtEncodingContext>` `@Bean` sẽ tự động được cấu hình với một `JwtGenerator`.
 
 [[oauth2AuthorizationServer-session-registry]]
 == SessionRegistry
 
-If OpenID Connect 1.0 is enabled, a `SessionRegistry` instance is used to track authenticated sessions.
-The `SessionRegistry` is used by the default implementation of `SessionAuthenticationStrategy` associated to the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-endpoint[OAuth2 Authorization Endpoint] for registering new authenticated sessions.
+Nếu OpenID Connect 1.0 được bật, một instance `SessionRegistry` được sử dụng để theo dõi các session đã authentication.
+`SessionRegistry` được implementation mặc định của `SessionAuthenticationStrategy` gắn với xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-endpoint[OAuth2 Authorization Endpoint] sử dụng để đăng ký các session đã authentication mới.
 
 [NOTE]
-If a `SessionRegistry` `@Bean` is not registered, the default implementation `SessionRegistryImpl` will be used.
+Nếu một `SessionRegistry` `@Bean` chưa được đăng ký, implementation mặc định `SessionRegistryImpl` sẽ được sử dụng.
 
 [IMPORTANT]
-If a `SessionRegistry` `@Bean` is registered and is an instance of `SessionRegistryImpl`, a `HttpSessionEventPublisher` `@Bean` *SHOULD* also be registered as it's responsible for notifying `SessionRegistryImpl` of session lifecycle events, for example, `SessionDestroyedEvent`, to provide the ability to remove the `SessionInformation` instance.
+Nếu một `SessionRegistry` `@Bean` được đăng ký và là một instance của `SessionRegistryImpl`, một `HttpSessionEventPublisher` `@Bean` cũng *NÊN* được đăng ký vì nó chịu trách nhiệm thông báo cho `SessionRegistryImpl` về các sự kiện vòng đời session, chẳng hạn `SessionDestroyedEvent`, để có thể xóa instance `SessionInformation`.
 
-When a logout is requested by an End-User, the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-logout-endpoint[OpenID Connect 1.0 Logout Endpoint] uses the `SessionRegistry` to lookup the `SessionInformation` associated to the authenticated End-User to perform the logout.
+Khi End-User yêu cầu logout, xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-logout-endpoint[OpenID Connect 1.0 Logout Endpoint] sử dụng `SessionRegistry` để tra cứu `SessionInformation` gắn với End-User đã authentication nhằm thực hiện logout.
 
-If Spring Security's xref:servlet/authentication/session-management.adoc#ns-concurrent-sessions[Concurrent Session Control] feature is being used, it is *RECOMMENDED* to register a `SessionRegistry` `@Bean` to ensure it's shared between Spring Security's Concurrent Session Control and Spring Security Authorization Server's Logout feature.
+Nếu tính năng xref:servlet/authentication/session-management.adoc#ns-concurrent-sessions[Concurrent Session Control] của Spring Security đang được sử dụng, *KHUYẾN NGHỊ* đăng ký một `SessionRegistry` `@Bean` để bảo đảm nó được dùng chung giữa Concurrent Session Control của Spring Security và tính năng Logout của Spring Security Authorization Server.
 
-The following example shows how to register a `SessionRegistry` `@Bean` and `HttpSessionEventPublisher` `@Bean` (required by `SessionRegistryImpl`):
+Ví dụ sau minh họa cách đăng ký `SessionRegistry` `@Bean` và `HttpSessionEventPublisher` `@Bean` (bắt buộc đối với `SessionRegistryImpl`):
 
 [source,java]
 ----
