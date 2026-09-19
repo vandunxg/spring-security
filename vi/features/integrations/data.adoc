@@ -1,0 +1,76 @@
+[[data]]
+= Tích hợp Spring Data
+
+Spring Security cung cấp khả năng tích hợp Spring Data, cho phép tham chiếu đến người dùng hiện tại trong các truy vấn của bạn.
+Việc đưa người dùng vào các truy vấn không chỉ hữu ích mà còn cần thiết để hỗ trợ kết quả phân trang, vì việc lọc kết quả sau đó sẽ không thể mở rộng.
+
+[[data-configuration]]
+== Cấu hình Spring Data & Spring Security
+
+Để sử dụng hỗ trợ này, hãy thêm dependency `org.springframework.security:spring-security-data` và cung cấp một bean thuộc kiểu `SecurityEvaluationContextExtension`.
+Trong cấu hình Java, nội dung này sẽ như sau:
+
+[tabs]
+======
+Java::
++
+[source,java,role="primary"]
+----
+@Bean
+public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
+	return new SecurityEvaluationContextExtension();
+}
+----
+
+Kotlin::
++
+[source,kotlin,role="secondary"]
+----
+@Bean
+fun securityEvaluationContextExtension(): SecurityEvaluationContextExtension {
+    return SecurityEvaluationContextExtension()
+}
+----
+======
+
+Trong cấu hình XML, nội dung này sẽ như sau:
+
+[source,xml]
+----
+<bean class="org.springframework.security.data.repository.query.SecurityEvaluationContextExtension"/>
+----
+
+[[data-query]]
+== Các biểu thức bảo mật trong @Query
+
+Giờ đây có thể sử dụng Spring Security trong các truy vấn của bạn.
+Ví dụ:
+
+[tabs]
+======
+Java::
++
+[source,java,role="primary"]
+----
+@Repository
+public interface MessageRepository extends PagingAndSortingRepository<Message,Long> {
+	@Query("select m from Message m where m.to.id = ?#{ principal?.id }")
+	Page<Message> findInbox(Pageable pageable);
+}
+----
+
+Kotlin::
++
+[source,kotlin,role="secondary"]
+----
+@Repository
+interface MessageRepository : PagingAndSortingRepository<Message?, Long?> {
+    @Query("select m from Message m where m.to.id = ?#{ principal?.id }")
+    fun findInbox(pageable: Pageable?): Page<Message?>?
+}
+----
+======
+
+Điều này kiểm tra xem `Authentication.getPrincipal().getId()` có bằng người nhận của `Message` hay không.
+Lưu ý rằng ví dụ này giả định bạn đã tùy chỉnh principal thành một Object có thuộc tính id.
+Bằng cách công khai bean `SecurityEvaluationContextExtension`, tất cả xref:servlet/authorization/method-security.adoc#authorization-expressions[Các biểu thức bảo mật thông dụng] đều khả dụng trong truy vấn.
