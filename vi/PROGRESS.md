@@ -59,10 +59,40 @@
 38. [x] `modules/ROOT/pages/servlet/authentication/passwords/in-memory.adoc`
 39. [x] `modules/ROOT/pages/servlet/authentication/passwords/jdbc.adoc`
 40. [x] `modules/ROOT/pages/servlet/authentication/passwords/user-details.adoc`
+41. [x] `modules/ROOT/pages/servlet/authentication/passwords/credentials-container.adoc`
+42. [x] `modules/ROOT/pages/servlet/authentication/passwords/erasure.adoc`
+43. [x] `modules/ROOT/pages/servlet/authentication/passwords/user-details-service.adoc`
+44. [x] `modules/ROOT/pages/servlet/authentication/passwords/password-encoder.adoc`
+45. [x] `modules/ROOT/pages/servlet/authentication/passwords/dao-authentication-provider.adoc`
+46. [x] `modules/ROOT/pages/servlet/authentication/passwords/ldap.adoc`
+47. [x] `modules/ROOT/pages/servlet/authentication/mfa.adoc`
+48. [x] `modules/ROOT/pages/servlet/authentication/persistence.adoc`
+49. [x] `modules/ROOT/pages/servlet/authentication/passkeys.adoc`
+50. [x] `modules/ROOT/pages/servlet/authentication/onetimetoken.adoc`
+51. [x] `modules/ROOT/pages/servlet/authentication/session-management.adoc`
+52. [x] `modules/ROOT/pages/servlet/authentication/rememberme.adoc`
+53. [x] `modules/ROOT/pages/servlet/authentication/anonymous.adoc`
+54. [x] `modules/ROOT/pages/servlet/authentication/preauth.adoc`
+55. [x] `modules/ROOT/pages/servlet/authentication/jaas.adoc`
+56. [x] `modules/ROOT/pages/servlet/authentication/cas.adoc`
+57. [x] `modules/ROOT/pages/servlet/authentication/x509.adoc`
+58. [x] `modules/ROOT/pages/servlet/authentication/runas.adoc`
+59. [x] `modules/ROOT/pages/servlet/authentication/logout.adoc`
+60. [x] `modules/ROOT/pages/servlet/authentication/events.adoc`
+61. [x] `modules/ROOT/pages/servlet/authentication/kerberos/index.adoc`
+62. [x] `modules/ROOT/pages/servlet/authentication/kerberos/introduction.adoc`
+63. [x] `modules/ROOT/pages/servlet/authentication/kerberos/ssk.adoc`
+64. [x] `modules/ROOT/pages/servlet/authentication/kerberos/samples.adoc`
+65. [x] `modules/ROOT/pages/servlet/authentication/kerberos/appendix.adoc`
+66. [x] `modules/ROOT/pages/servlet/authorization/index.adoc`
+67. [x] `modules/ROOT/pages/servlet/authorization/architecture.adoc`
+68. [x] `modules/ROOT/pages/servlet/authorization/authorize-http-requests.adoc`
+69. [x] `modules/ROOT/pages/servlet/authorization/method-security.adoc`
+70. [x] `modules/ROOT/pages/servlet/authorization/acls.adoc`
 
 ## Trang tiếp theo
 
-1. [ ] `modules/ROOT/pages/servlet/authentication/passwords/credentials-container.adoc`
+1. [ ] `modules/ROOT/pages/servlet/authorization/events.adoc`
 
 ## Kiểm tra chất lượng
 
