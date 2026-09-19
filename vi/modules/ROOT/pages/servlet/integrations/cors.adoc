@@ -1,17 +1,17 @@
 [[cors]]
 = CORS
 
-Spring Framework provides {spring-framework-reference-url}web/webmvc-cors.html[first class support for CORS].
-CORS must be processed before Spring Security, because the pre-flight request does not contain any cookies (that is, the `JSESSIONID`).
-If the request does not contain any cookies and Spring Security is first, the request determines that the user is not authenticated (since there are no cookies in the request) and rejects it.
+Spring Framework cung cấp {spring-framework-reference-url}web/webmvc-cors.html[hỗ trợ hàng đầu cho CORS].
+CORS phải được xử lý trước Spring Security, vì pre-flight request không chứa cookie nào (cụ thể là `JSESSIONID`).
+Nếu request không chứa cookie nào và Spring Security được xử lý trước, Spring Security sẽ xác định rằng người dùng chưa được authentication (vì request không có cookie nào) và từ chối request đó.
 
 [[cors-configuration-source]]
-== Providing a `CorsConfigurationSource`
+== Cung cấp một `CorsConfigurationSource`
 
-The easiest way to ensure that CORS is handled first is to use the `CorsFilter`.
-Users can integrate the `CorsFilter` with Spring Security by providing a `CorsConfigurationSource`.
-Note that Spring Security will automatically configure CORS only if a `UrlBasedCorsConfigurationSource` instance is present.
-For example, the following will integrate CORS support within Spring Security:
+Cách dễ nhất để đảm bảo CORS được xử lý trước là sử dụng `CorsFilter`.
+Bạn có thể tích hợp `CorsFilter` với Spring Security bằng cách cung cấp một `CorsConfigurationSource`.
+Lưu ý rằng Spring Security sẽ tự động cấu hình CORS chỉ khi có một instance `UrlBasedCorsConfigurationSource`.
+Ví dụ sau tích hợp hỗ trợ CORS trong Spring Security:
 
 [tabs]
 ======
@@ -46,7 +46,7 @@ fun corsConfigurationSource(): UrlBasedCorsConfigurationSource {
 ----
 ======
 
-The following listing does the same thing in XML:
+Đoạn mã sau thực hiện điều tương tự bằng XML:
 
 [source,xml]
 ----
@@ -60,9 +60,9 @@ The following listing does the same thing in XML:
 ----
 
 [[cors-spring-mvc-integration]]
-== Spring MVC Integration
+== Tích hợp Spring MVC
 
-If you use Spring MVC's CORS support, you can omit specifying the `CorsConfigurationSource` and Spring Security uses the CORS configuration provided to Spring MVC:
+Nếu sử dụng hỗ trợ CORS của Spring MVC, bạn có thể bỏ qua việc chỉ định `CorsConfigurationSource` và Spring Security sẽ sử dụng cấu hình CORS được cung cấp cho Spring MVC:
 
 [tabs]
 ======
@@ -107,7 +107,7 @@ open class WebSecurityConfig {
 ----
 ======
 
-The following listing does the same thing in XML:
+Đoạn mã sau thực hiện điều tương tự bằng XML:
 
 [source,xml]
 ----
@@ -119,10 +119,10 @@ The following listing does the same thing in XML:
 ----
 
 [[cors-per-chain-configuration]]
-== Per-Chain Configuration
+== Cấu hình theo từng chain
 
-If you have more than one `CorsConfigurationSource` bean, Spring Security won't automatically configure CORS support for you, because it cannot decide which one to use.
-If you want to specify a different `CorsConfigurationSource` for each `SecurityFilterChain`, you can pass it directly into the `.cors()` DSL.
+Nếu có nhiều hơn một bean `CorsConfigurationSource`, Spring Security sẽ không tự động cấu hình hỗ trợ CORS cho bạn, vì nó không thể quyết định nên sử dụng bean nào.
+Nếu muốn chỉ định một `CorsConfigurationSource` khác nhau cho mỗi `SecurityFilterChain`, bạn có thể truyền trực tiếp nó vào DSL `.cors()`.
 
 [tabs]
 ======
@@ -195,26 +195,26 @@ fun corsConfigurationSource(): UrlBasedCorsConfigurationSource {
 ======
 
 [[cors-preflight-request-handler]]
-== `PreFlightRequestHandler` and `PreFlightRequestFilter`
+== `PreFlightRequestHandler` và `PreFlightRequestFilter`
 
-Spring Framework defines {spring-framework-api-url}org/springframework/web/cors/PreFlightRequestHandler.html[`PreFlightRequestHandler`] for applications that need to handle CORS preflight (`OPTIONS`) requests outside of `CorsFilter`.
-When Spring Security selects a `PreFlightRequestHandler` for a filter chain, it registers {spring-framework-api-url}org/springframework/web/filter/PreFlightRequestFilter.html[`PreFlightRequestFilter`] in the security filter chain (before `CorsFilter`) so preflight can be handled early in the request lifecycle.
+Spring Framework định nghĩa {spring-framework-api-url}org/springframework/web/cors/PreFlightRequestHandler.html[`PreFlightRequestHandler`] cho các ứng dụng cần xử lý CORS preflight request (`OPTIONS`) bên ngoài `CorsFilter`.
+Khi Spring Security chọn một `PreFlightRequestHandler` cho một filter chain, nó đăng ký {spring-framework-api-url}org/springframework/web/filter/PreFlightRequestFilter.html[`PreFlightRequestFilter`] trong security filter chain (trước `CorsFilter`) để preflight có thể được xử lý sớm trong vòng đời request.
 
-You can supply a handler in either of these ways:
+Bạn có thể cung cấp handler theo một trong các cách sau:
 
-* Pass a handler directly with the `preFlightRequestHandler` attribute.
-* Register a `PreFlightRequestHandler` bean when cors is enabled and when no `CorsConfigurationSource` or `CorsFilter` is chosen for that chain.
+* Truyền trực tiếp một handler bằng attribute `preFlightRequestHandler`.
+* Đăng ký một bean `PreFlightRequestHandler` khi CORS được bật và khi không có `CorsConfigurationSource` hoặc `CorsFilter` nào được chọn cho chain đó.
 
-You must not configure both `configurationSource` and `preFlightRequestHandler` on the same `CorsConfigurer`; doing so results in an error at startup.
+Bạn không được cấu hình đồng thời `configurationSource` và `preFlightRequestHandler` trên cùng một `CorsConfigurer`; nếu làm vậy, ứng dụng sẽ gặp lỗi khi khởi động.
 
-The following example explicitly registers a `PreFlightRequestHandler` using the `preFlightRequestHandler`:
+Ví dụ sau đăng ký rõ ràng một `PreFlightRequestHandler` bằng `preFlightRequestHandler`:
 
 include-code::./CorsPreFlightRequestHandlerExample[tag=preflightRequestHandler,indent=0]
 
 [WARNING]
 ====
-CORS is a browser-based security feature.
-By disabling CORS in Spring Security with `.cors(CorsConfigurer::disable)`, you are not removing CORS protection from your browser.
-Instead, you are removing CORS support from Spring Security, and users will not be able to interact with your Spring backend from a cross-origin browser application.
-To fix CORS errors in your application, you must enable CORS support, and provide an appropriate configuration source.
+CORS là một tính năng bảo mật dựa trên trình duyệt.
+Việc vô hiệu hóa CORS trong Spring Security bằng `.cors(CorsConfigurer::disable)` không loại bỏ cơ chế bảo vệ CORS khỏi trình duyệt của bạn.
+Thay vào đó, bạn đang loại bỏ hỗ trợ CORS khỏi Spring Security, và người dùng sẽ không thể tương tác với backend Spring của bạn từ một ứng dụng trình duyệt cross-origin.
+Để khắc phục lỗi CORS trong ứng dụng, bạn phải bật hỗ trợ CORS và cung cấp một nguồn cấu hình phù hợp.
 ====
