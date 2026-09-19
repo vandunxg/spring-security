@@ -1,33 +1,55 @@
 name: Deploy Docs
+
 on:
   push:
-    branches-ignore:
-      - "gh-pages"
-      - "dependabot/**"
-    tags: '**'
-  repository_dispatch:
-    types: request-build-reference # legacy
-  #schedule:
-  #- cron: '0 10 * * *' # Once per day at 10am UTC
+    branches:
+    - main
   workflow_dispatch:
-permissions: read-all
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   build:
+    name: Build Site
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'spring-projects'
     steps:
-    - name: Checkout
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Check Out Code
+      uses: actions/checkout@v4
+    - name: Set Up Node
+      uses: actions/setup-node@v4
       with:
-        ref: docs-build
-        fetch-depth: 1
-    - name: Dispatch (partial build)
-      if: github.ref_type == 'branch'
-      env:
-        GH_TOKEN: ${{ secrets.GH_ACTIONS_REPO_TOKEN }}
-      run: gh workflow run deploy-docs.yml -r $(git rev-parse --abbrev-ref HEAD) -f build-refname=${{ github.ref_name }}
-    - name: Dispatch (full build)
-      if: github.ref_type == 'tag'
-      env:
-        GH_TOKEN: ${{ secrets.GH_ACTIONS_REPO_TOKEN }}
-      run: gh workflow run deploy-docs.yml -r $(git rev-parse --abbrev-ref HEAD)
+        node-version: 22
+        cache: npm
+        cache-dependency-path: antora/package-lock.json
+    - name: Install Antora
+      run: npm ci
+      working-directory: antora
+    - name: Build Site
+      run: ./antora/node_modules/.bin/antora antora-playbook.yml
+    - name: Disable Jekyll
+      run: touch build/site/.nojekyll
+    - name: Configure Pages
+      uses: actions/configure-pages@v5
+    - name: Upload Site
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: build/site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+    - name: Deploy
+      id: deployment
+      uses: actions/deploy-pages@v4
