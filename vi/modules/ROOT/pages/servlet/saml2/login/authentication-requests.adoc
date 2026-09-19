@@ -1,21 +1,21 @@
 [[servlet-saml2login-sp-initiated-factory]]
-= Producing ``<saml2:AuthnRequest>``s
+= Tạo các ``<saml2:AuthnRequest>``
 
-As stated earlier, Spring Security's SAML 2.0 support produces a `<saml2:AuthnRequest>` to commence authentication with the asserting party.
+Như đã nêu trước đó, tính năng hỗ trợ SAML 2.0 của Spring Security tạo một `<saml2:AuthnRequest>` để bắt đầu authentication với bên xác nhận.
 
-Spring Security achieves this in part by registering the `Saml2WebSsoAuthenticationRequestFilter` in the filter chain.
-This filter by default responds to the endpoints `+/saml2/authenticate/{registrationId}+` and `+/saml2/authenticate?registrationId={registrationId}+`.
+Spring Security thực hiện điều này một phần bằng cách đăng ký `Saml2WebSsoAuthenticationRequestFilter` trong chuỗi filter.
+Theo mặc định, filter này phản hồi các endpoint `+/saml2/authenticate/{registrationId}+` và `+/saml2/authenticate?registrationId={registrationId}+`.
 
-For example, if you were deployed to `https://rp.example.com` and you gave your registration an ID of `okta`, you could navigate to:
+Ví dụ, nếu ứng dụng được triển khai tại `https://rp.example.com` và bạn đặt ID cho registration là `okta`, bạn có thể truy cập:
 
 `https://rp.example.org/saml2/authenticate/okta`
 
-and the result would be a redirect that included a `SAMLRequest` parameter containing the signed, deflated, and encoded `<saml2:AuthnRequest>`.
+và kết quả sẽ là một redirect chứa parameter `SAMLRequest` bao gồm `<saml2:AuthnRequest>` đã được ký, nén bằng deflate và mã hóa.
 
 [[configuring-authentication-request-uri]]
-== Configuring the `<saml2:AuthnRequest>` Endpoint
+== Cấu hình endpoint `<saml2:AuthnRequest>`
 
-To configure the endpoint differently from the default, you can set the value in `saml2Login`:
+Để cấu hình endpoint khác với mặc định, bạn có thể đặt giá trị trong `saml2Login`:
 
 [tabs]
 ======
@@ -50,15 +50,15 @@ fun filterChain(http: HttpSecurity): SecurityFilterChain {
 ======
 
 [[servlet-saml2login-store-authn-request]]
-== Changing How the `<saml2:AuthnRequest>` Gets Stored
+== Thay đổi cách lưu trữ `<saml2:AuthnRequest>`
 
-`Saml2WebSsoAuthenticationRequestFilter` uses an `Saml2AuthenticationRequestRepository` to persist an `AbstractSaml2AuthenticationRequest` instance before xref:servlet/saml2/login/authentication-requests.adoc#servlet-saml2login-sp-initiated-factory[sending the `<saml2:AuthnRequest>`] to the asserting party.
+`Saml2WebSsoAuthenticationRequestFilter` sử dụng một `Saml2AuthenticationRequestRepository` để lưu một instance `AbstractSaml2AuthenticationRequest` trước khi xref:servlet/saml2/login/authentication-requests.adoc#servlet-saml2login-sp-initiated-factory[gửi `<saml2:AuthnRequest>`] đến bên xác nhận.
 
-Additionally, `Saml2WebSsoAuthenticationFilter` and `Saml2AuthenticationTokenConverter` use an `Saml2AuthenticationRequestRepository` to load any `AbstractSaml2AuthenticationRequest` as part of xref:servlet/saml2/login/authentication.adoc#servlet-saml2login-authenticate-responses[authenticating the `<saml2:Response>`].
+Ngoài ra, `Saml2WebSsoAuthenticationFilter` và `Saml2AuthenticationTokenConverter` sử dụng một `Saml2AuthenticationRequestRepository` để tải mọi `AbstractSaml2AuthenticationRequest` trong quá trình xref:servlet/saml2/login/authentication.adoc#servlet-saml2login-authenticate-responses[authentication của `<saml2:Response>`].
 
-By default, Spring Security uses an `HttpSessionSaml2AuthenticationRequestRepository`, which stores the `AbstractSaml2AuthenticationRequest` in the `HttpSession`.
+Theo mặc định, Spring Security sử dụng `HttpSessionSaml2AuthenticationRequestRepository`, nơi lưu `AbstractSaml2AuthenticationRequest` trong `HttpSession`.
 
-If you have a custom implementation of `Saml2AuthenticationRequestRepository`, you may configure it by exposing it as a `@Bean` as shown in the following example:
+Nếu có một triển khai tùy chỉnh của `Saml2AuthenticationRequestRepository`, bạn có thể cấu hình nó bằng cách công khai nó dưới dạng `@Bean` như trong ví dụ sau:
 
 [tabs]
 ======
@@ -83,21 +83,21 @@ open fun authenticationRequestRepository(): Saml2AuthenticationRequestRepository
 ----
 ======
 
-=== Caching the `<saml2:AuthnRequest>` by the Relay State
+=== Lưu `<saml2:AuthnRequest>` vào cache theo Relay State
 
-If you don't want to use the session to store the `<saml2:AuthnRequest>`, you can also store it in a distributed cache.
-This can be helpful if you are trying to use `SameSite=Strict` and are losing the authentication request in the redirect from the Identity Provider.
+Nếu không muốn sử dụng session để lưu `<saml2:AuthnRequest>`, bạn cũng có thể lưu nó trong cache phân tán.
+Điều này có thể hữu ích nếu bạn đang cố sử dụng `SameSite=Strict` và làm mất authentication request trong redirect từ Identity Provider.
 
 [NOTE]
 =====
-It's important to remember that there are security benefits to storing it in the session.
-One such benefit is the natural login fixation defense it provides.
-For example, if an application looks the authentication request up from the session, then even if an attacker provides their own SAML response to a victim, the login will fail.
+Điều quan trọng cần nhớ là việc lưu nó trong session mang lại các lợi ích về bảo mật.
+Một trong những lợi ích đó là cơ chế phòng vệ login fixation tự nhiên mà nó cung cấp.
+Ví dụ, nếu một ứng dụng tra authentication request từ session, thì ngay cả khi kẻ tấn công cung cấp SAML response của chính họ cho nạn nhân, login vẫn sẽ thất bại.
 
-On the other hand, if we trust the InResponseTo or RelayState to retrieve the authentication request, then there's no way to know if the SAML response was requested by that handshake.
+Mặt khác, nếu tin cậy InResponseTo hoặc RelayState để truy xuất authentication request, thì không có cách nào biết liệu SAML response có được yêu cầu bởi handshake đó hay không.
 =====
 
-To help with this, Spring Security has `CacheSaml2AuthenticationRequestRepository`, which you can publish as a bean for the filter chain to pick up:
+Để hỗ trợ việc này, Spring Security có `CacheSaml2AuthenticationRequestRepository`, bạn có thể công khai nó dưới dạng bean để chuỗi filter sử dụng:
 
 [tabs]
 ======
@@ -124,15 +124,15 @@ fun authenticationRequestRepository(): Saml2AuthenticationRequestRepository<*> {
 
 
 [[servlet-saml2login-sp-initiated-factory-signing]]
-== Changing How the `<saml2:AuthnRequest>` Gets Sent
+== Thay đổi cách gửi `<saml2:AuthnRequest>`
 
-By default, Spring Security signs each `<saml2:AuthnRequest>` and send it as a GET to the asserting party.
+Theo mặc định, Spring Security ký từng `<saml2:AuthnRequest>` và gửi nó bằng GET đến bên xác nhận.
 
-Many asserting parties don't require a signed `<saml2:AuthnRequest>`.
-This can be configured automatically via `RelyingPartyRegistrations`, or you can supply it manually, like so:
+Nhiều bên xác nhận không yêu cầu `<saml2:AuthnRequest>` được ký.
+Bạn có thể tự động cấu hình điều này thông qua `RelyingPartyRegistrations`, hoặc tự cung cấp như sau:
 
 
-.Not Requiring Signed AuthnRequests
+.Không yêu cầu AuthnRequests được ký
 [tabs]
 ======
 Boot::
@@ -178,14 +178,14 @@ var relyingPartyRegistration: RelyingPartyRegistration =
 ----
 ======
 
-Otherwise, you will need to specify a private key to `RelyingPartyRegistration#signingX509Credentials` so that Spring Security can sign the `<saml2:AuthnRequest>` before sending.
+Nếu không, bạn cần chỉ định một khóa riêng cho `RelyingPartyRegistration#signingX509Credentials` để Spring Security có thể ký `<saml2:AuthnRequest>` trước khi gửi.
 
 [[servlet-saml2login-sp-initiated-factory-algorithm]]
-By default, Spring Security will sign the `<saml2:AuthnRequest>` using `rsa-sha256`, though some asserting parties will require a different algorithm, as indicated in their metadata.
+Theo mặc định, Spring Security sẽ ký `<saml2:AuthnRequest>` bằng `rsa-sha256`, mặc dù một số bên xác nhận sẽ yêu cầu thuật toán khác, như được chỉ ra trong metadata của họ.
 
-You can configure the algorithm based on the asserting party's xref:servlet/saml2/login/overview.adoc#servlet-saml2login-relyingpartyregistrationrepository[metadata using `RelyingPartyRegistrations`].
+Bạn có thể cấu hình thuật toán dựa trên xref:servlet/saml2/login/overview.adoc#servlet-saml2login-relyingpartyregistrationrepository[metadata của bên xác nhận bằng `RelyingPartyRegistrations`].
 
-Or, you can provide it manually:
+Hoặc bạn có thể tự cung cấp:
 
 [tabs]
 ======
@@ -223,13 +223,13 @@ var relyingPartyRegistration: RelyingPartyRegistration =
 ----
 ======
 
-NOTE: The snippet above uses the OpenSAML `SignatureConstants` class to supply the algorithm name.
-But, that's just for convenience.
-Since the datatype is `String`, you can supply the name of the algorithm directly.
+NOTE: Đoạn mã trên sử dụng class `SignatureConstants` của OpenSAML để cung cấp tên thuật toán.
+Tuy nhiên, việc này chỉ nhằm thuận tiện.
+Vì kiểu dữ liệu là `String`, bạn có thể cung cấp trực tiếp tên thuật toán.
 
 [[servlet-saml2login-sp-initiated-factory-binding]]
-Some asserting parties require that the `<saml2:AuthnRequest>` be POSTed.
-This can be configured automatically via `RelyingPartyRegistrations`, or you can supply it manually, like so:
+Một số bên xác nhận yêu cầu `<saml2:AuthnRequest>` phải được POST.
+Bạn có thể tự động cấu hình điều này thông qua `RelyingPartyRegistrations`, hoặc tự cung cấp như sau:
 
 [tabs]
 ======
@@ -262,12 +262,12 @@ var relyingPartyRegistration: RelyingPartyRegistration? =
 ======
 
 [[servlet-saml2login-sp-initiated-factory-custom-authnrequest]]
-== Customizing OpenSAML's `AuthnRequest` Instance
+== Tùy chỉnh đối tượng `AuthnRequest` của OpenSAML
 
-There are a number of reasons that you may want to adjust an `AuthnRequest`.
-For example, you may want `ForceAuthN` to be set to `true`, which Spring Security sets to `false` by default.
+Có một số lý do khiến bạn có thể muốn điều chỉnh một `AuthnRequest`.
+Ví dụ, bạn có thể muốn đặt `ForceAuthN` thành `true`, trong khi theo mặc định Spring Security đặt nó thành `false`.
 
-You can customize elements of OpenSAML's `AuthnRequest` by publishing an `OpenSaml5AuthenticationRequestResolver` as a `@Bean`, like so:
+Bạn có thể tùy chỉnh các phần tử của `AuthnRequest` của OpenSAML bằng cách công khai một `OpenSaml5AuthenticationRequestResolver` dưới dạng `@Bean`, như sau:
 
 [tabs]
 ======
@@ -303,4 +303,3 @@ fun authenticationRequestResolver(registrations : RelyingPartyRegistrationReposi
 }
 ----
 ======
-
