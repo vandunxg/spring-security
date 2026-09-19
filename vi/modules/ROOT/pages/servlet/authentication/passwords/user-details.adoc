@@ -1,24 +1,24 @@
 [[servlet-authentication-userdetails]]
 = UserDetails
 
-javadoc:org.springframework.security.core.userdetails.UserDetails[] is returned by the xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[`UserDetailsService`].
-The xref:servlet/authentication/passwords/dao-authentication-provider.adoc#servlet-authentication-daoauthenticationprovider[`DaoAuthenticationProvider`] validates the `UserDetails` and then returns an xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] that has a principal that is the `UserDetails` returned by the configured `UserDetailsService`.
+javadoc:org.springframework.security.core.userdetails.UserDetails[] được trả về bởi xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[`UserDetailsService`].
+xref:servlet/authentication/passwords/dao-authentication-provider.adoc#servlet-authentication-daoauthenticationprovider[`DaoAuthenticationProvider`] kiểm tra `UserDetails` rồi trả về một xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] có principal là `UserDetails` được `UserDetailsService` đã cấu hình trả về.
 
-== Credentials Management
+== Quản lý credential
 
-Implementing the `CredentialsContainer` interface in classes that store user credentials, such as those extending or implementing `UserDetails`, is strongly recommended, especially in applications where user details are not cached.
-This practice enhances security by ensuring that sensitive data, such as passwords, are not retained in memory longer than necessary.
+Rất khuyến nghị triển khai interface `CredentialsContainer` trong các class lưu credential của người dùng, chẳng hạn các class mở rộng hoặc triển khai `UserDetails`, đặc biệt trong những ứng dụng không cache thông tin người dùng.
+Thực hành này tăng cường bảo mật bằng cách bảo đảm dữ liệu nhạy cảm, chẳng hạn mật khẩu, không được giữ trong bộ nhớ lâu hơn mức cần thiết.
 
 [TIP]
 ====
-In cases where user details are cached, consider creating a copy of the `UserDetails` that does not include credentials and returning the copy in the response from a custom `AuthenticationProvider` instead of the original object.
-This can help prevent the cached instance containing credentials from being referenced by the rest of the application once the authentication process is complete.
+Trong trường hợp thông tin người dùng được cache, hãy cân nhắc tạo một bản sao của `UserDetails` không chứa credential và trả về bản sao đó trong response từ một `AuthenticationProvider` tùy chỉnh thay vì object gốc.
+Điều này có thể giúp ngăn instance đã cache chứa credential bị phần còn lại của ứng dụng tham chiếu đến sau khi quá trình authentication hoàn tất.
 ====
 
-=== When to Implement `CredentialsContainer`
+=== Khi nào nên triển khai `CredentialsContainer`
 
-Applications that do not employ caching mechanisms for `UserDetails` should particularly consider implementing `CredentialsContainer`.
-This approach helps in mitigating the risk associated with retaining sensitive information in memory, which can be vulnerable to attack vectors such as memory dumps.
+Các ứng dụng không sử dụng cơ chế cache cho `UserDetails` nên đặc biệt cân nhắc triển khai `CredentialsContainer`.
+Cách tiếp cận này giúp giảm thiểu rủi ro liên quan đến việc giữ thông tin nhạy cảm trong bộ nhớ, vốn có thể dễ bị các vector tấn công như memory dump khai thác.
 
 [source,java]
 ----
@@ -38,18 +38,18 @@ public class MyUserDetails implements UserDetails, CredentialsContainer {
 }
 ----
 
-=== Implementation Guidelines
+=== Hướng dẫn triển khai
 
-* *Immediate Erasure*: Credentials should be erased immediately after they are no longer needed, typically post-authentication.
-* *Automatic Invocation*: Ensure that `eraseCredentials()` is automatically called by your authentication framework, such as `AuthenticationManager`, once the authentication process is complete.
-* *Consistency*: Apply this practice uniformly across all applications to prevent security lapses that could lead to data breaches.
+* *Xóa ngay*: Credential phải được xóa ngay sau khi không còn cần thiết, thường là sau authentication.
+* *Tự động gọi*: Bảo đảm framework authentication của bạn, chẳng hạn `AuthenticationManager`, tự động gọi `eraseCredentials()` sau khi quá trình authentication hoàn tất.
+* *Tính nhất quán*: Áp dụng thực hành này thống nhất trên tất cả ứng dụng để ngăn các sơ suất về bảo mật có thể dẫn đến rò rỉ dữ liệu.
 
-=== Beyond Basic Interface Implementation
+=== Ngoài việc triển khai interface cơ bản
 
-While interfaces like `CredentialsContainer` provide a framework for credential management, the practical implementation often depends on specific classes and their interactions.
+Mặc dù các interface như `CredentialsContainer` cung cấp framework để quản lý credential, việc triển khai trên thực tế thường phụ thuộc vào các class cụ thể và sự tương tác giữa chúng.
 
-For example, the `DaoAuthenticationProvider` class, adhering to the contract of `AuthenticationProvider`, does not perform credential erasure within its own `authenticate` method.
-Instead, it relies on `ProviderManager`—Spring Security's default implementation of `AuthenticationManager`—to handle the erasure of credentials and other sensitive data post-authentication.
-This separation emphasizes the principle that the `AuthenticationProvider` should not assume the responsibility for credentials management.
+Ví dụ, class `DaoAuthenticationProvider`, tuân thủ contract của `AuthenticationProvider`, không thực hiện việc xóa credential trong method `authenticate` của chính nó.
+Thay vào đó, nó dựa vào `ProviderManager`—implementation mặc định của Spring Security cho `AuthenticationManager`—để xử lý việc xóa credential và dữ liệu nhạy cảm khác sau authentication.
+Sự phân tách này nhấn mạnh nguyên tắc rằng `AuthenticationProvider` không nên đảm nhận trách nhiệm quản lý credential.
 
-Incorporating `CredentialsContainer` into your `UserDetails` implementation aligns with security best practices, reducing potential exposure to data breaches by minimizing the lifespan of sensitive data in memory.
+Đưa `CredentialsContainer` vào implementation `UserDetails` của bạn phù hợp với các thực hành tốt nhất về bảo mật, giảm nguy cơ rò rỉ dữ liệu bằng cách rút ngắn thời gian tồn tại của dữ liệu nhạy cảm trong bộ nhớ.
