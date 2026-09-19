@@ -1,11 +1,11 @@
-= OAuth 2.0 Migrations
+= Di chuyển OAuth 2.0
 
-== Validate `typ` Header with `JwtTypeValidator`
+== Xác thực Header `typ` bằng `JwtTypeValidator`
 
-If when following the 6.5 preparatory steps you set `validateTypes` to `false`, you can now remove it.
-You can also remove explicitly adding `JwtTypeValidator` to the list of defaults.
+Nếu khi thực hiện các bước chuẩn bị cho 6.5, bạn đã đặt `validateTypes` thành `false`, giờ đây bạn có thể loại bỏ nó.
+Bạn cũng có thể loại bỏ việc thêm rõ ràng `JwtTypeValidator` vào danh sách các validator mặc định.
 
-For example, change this:
+Ví dụ, thay đổi đoạn này:
 
 [tabs]
 ======
@@ -17,7 +17,7 @@ Java::
 JwtDecoder jwtDecoder() {
 	NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withIssuerLocation(location)
         .validateTypes(false) <1>
-        // ... your remaining configuration
+        // ... cấu hình còn lại của bạn
         .build();
 	jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithValidators(
 		new JwtIssuerValidator(location), JwtTypeValidator.jwt())); <2>
@@ -33,7 +33,7 @@ Kotlin::
 fun jwtDecoder(): JwtDecoder {
     val jwtDecoder = NimbusJwtDecoder.withIssuerLocation(location)
         .validateTypes(false) <1>
-        // ... your remaining configuration
+        // ... cấu hình còn lại của bạn
         .build()
     jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithValidators(
         JwtIssuerValidator(location), JwtTypeValidator.jwt())) <2>
@@ -41,10 +41,10 @@ fun jwtDecoder(): JwtDecoder {
 }
 ----
 ======
-<1> - Switch off Nimbus verifying the `typ`
-<2> - Add the default `typ` validator
+<1> - Tắt việc Nimbus xác thực `typ`
+<2> - Thêm validator `typ` mặc định
 
-to this:
+thành:
 
 [tabs]
 ======
@@ -55,7 +55,7 @@ Java::
 @Bean
 JwtDecoder jwtDecoder() {
 	NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withIssuerLocation(location)
-        // ... your remaining configuration <1>
+        // ... cấu hình còn lại của bạn <1>
         .build();
 	jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(location)); <2>
 	return jwtDecoder;
@@ -69,23 +69,23 @@ Kotlin::
 @Bean
 fun jwtDecoder(): JwtDecoder {
     val jwtDecoder = NimbusJwtDecoder.withIssuerLocation(location)
-        // ... your remaining configuration
+        // ... cấu hình còn lại của bạn
         .build()
     jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(location)) <2>
     return jwtDecoder
 }
 ----
 ======
-<1> - `validateTypes` now defaults to `false`
-<2> - `JwtTypeValidator#jwt` is added by all `createDefaultXXX` methods
+<1> - `validateTypes` hiện mặc định là `false`
+<2> - `JwtTypeValidator#jwt` được thêm bởi tất cả các method `createDefaultXXX`
 
-== Provide an AuthenticationConverter to BearerTokenAuthenticationFilter
+== Cung cấp một AuthenticationConverter cho BearerTokenAuthenticationFilter
 
-In Spring Security 7, `BearerTokenAuthenticationFilter#setBearerTokenResolver` and `#setAuthenticaionDetailsSource` are deprecated in favor of configuring those on `BearerTokenAuthenticationConverter`.
+Trong Spring Security 7, `BearerTokenAuthenticationFilter#setBearerTokenResolver` và `#setAuthenticaionDetailsSource` đã bị deprecated; thay vào đó, hãy cấu hình chúng trên `BearerTokenAuthenticationConverter`.
 
-The `oauth2ResourceServer` DSL addresses most use cases and you need to nothing.
+DSL `oauth2ResourceServer` đáp ứng hầu hết các trường hợp sử dụng và bạn không cần làm gì.
 
-If you are setting a `BearerTokenResolver` or `AuthenticationDetailsSource` directly on `BearerTokenAuthenticationFilter` similar to the following:
+Nếu bạn đang đặt `BearerTokenResolver` hoặc `AuthenticationDetailsSource` trực tiếp trên `BearerTokenAuthenticationFilter` như sau:
 
 [tabs]
 ======
@@ -108,7 +108,7 @@ filter.setAuthenticationDetailsSource(myAuthenticationDetailsSource)
 ----
 ======
 
-you are encouraged to use `BearerTokenAuthenticationConverter` to specify both:
+bạn nên sử dụng `BearerTokenAuthenticationConverter` để chỉ định cả hai:
 
 [tabs]
 ======
@@ -133,10 +133,10 @@ authenticationConverter.setAuthenticationDetailsSource(myAuthenticationDetailsSo
 val filter = BearerTokenAuthenticationFilter(authenticationManager, authenticationConverter)
 ----
 
-== `NimbusJwtDecoder`'s Default Connect and Read Timeouts Are Now 30 Seconds
+== Các timeout kết nối và đọc mặc định của `NimbusJwtDecoder` hiện là 30 giây
 
-`NimbusJwtDecoder`'s default `RestOperations`, used to fetch a JWK Set when no `RestOperations` is otherwise configured, previously used a 500 millisecond connect and read timeout.
-This value was too short for many deployments and is now 30 seconds, aligning with the connect and read timeouts already used elsewhere in the OAuth2 Client and Resource Server support, such as xref:servlet/oauth2/client/index.adoc[`ClientRegistrations`].
+`RestOperations` mặc định của `NimbusJwtDecoder`, được dùng để lấy một JWK Set khi không có `RestOperations` nào khác được cấu hình, trước đây sử dụng timeout kết nối và đọc 500 mili giây.
+Giá trị này quá ngắn đối với nhiều deployment và hiện là 30 giây, phù hợp với các timeout kết nối và đọc đã được sử dụng ở nơi khác trong phần hỗ trợ OAuth2 Client và Resource Server, chẳng hạn như xref:servlet/oauth2/client/index.adoc[`ClientRegistrations`].
 
-If your application relies on the previous, shorter timeout -- for example, expecting a fast failure when the authorization server is unreachable -- you can restore it either by setting the JDK's `sun.net.client.defaultConnectTimeout` and `sun.net.client.defaultReadTimeout` system properties (in milliseconds), or by providing your own `RestOperations`, as described in xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-timeouts[Configuring Timeouts].
+Nếu ứng dụng của bạn phụ thuộc vào timeout ngắn hơn trước đây -- ví dụ, mong muốn thất bại nhanh khi Authorization Server không thể truy cập -- bạn có thể khôi phục timeout đó bằng cách đặt các system property `sun.net.client.defaultConnectTimeout` và `sun.net.client.defaultReadTimeout` của JDK (tính bằng mili giây), hoặc cung cấp `RestOperations` của riêng bạn, như mô tả trong xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-timeouts[Cấu hình các timeout].
 ======
