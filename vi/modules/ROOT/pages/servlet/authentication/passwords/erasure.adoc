@@ -1,23 +1,23 @@
-== Password Erasure
+== Xóa credential
 
-After successful authentication, it is a security best practice to erase credentials from memory to prevent them from being exposed to potential memory dump attacks.
-`ProviderManager` in Spring Security supports this practice through the `eraseCredentials` method, which should be invoked after the authentication process is complete.
+Sau khi authentication thành công, một thực hành tốt về bảo mật là xóa credential khỏi bộ nhớ để ngăn chúng bị lộ do các cuộc tấn công memory dump tiềm ẩn.
+`ProviderManager` trong Spring Security hỗ trợ thực hành này thông qua method `eraseCredentials`, method này nên được gọi sau khi quy trình authentication hoàn tất.
 
-=== Best Practices
+=== Các thực hành tốt nhất
 
-* *Immediate Erasure*: Credentials should be erased immediately after they are no longer needed, which minimizes the window during which the credentials are exposed in memory.
-* *Automatic Erasure*: Configure `ProviderManager` to automatically erase credentials post-authentication by setting `eraseCredentialsAfterAuthentication` to `true` (the default).
-* *Custom Erasure Strategies*: Implement custom erasure strategies in custom `AuthenticationManager` implementations if the default erasure behavior does not meet specific security requirements.
+* *Xóa ngay*: Credential phải được xóa ngay sau khi không còn cần thiết, giúp giảm thiểu khoảng thời gian credential bị lộ trong bộ nhớ.
+* *Xóa tự động*: Cấu hình `ProviderManager` tự động xóa credential sau authentication bằng cách đặt `eraseCredentialsAfterAuthentication` thành `true` (mặc định).
+* *Chiến lược xóa tùy chỉnh*: Triển khai các chiến lược xóa tùy chỉnh trong các implementation `AuthenticationManager` tùy chỉnh nếu hành vi xóa mặc định không đáp ứng các yêu cầu bảo mật cụ thể.
 
-=== Risk Assessment
+=== Đánh giá rủi ro
 
-Failure to properly erase credentials can lead to several risks:
+Việc không xóa credential đúng cách có thể dẫn đến một số rủi ro:
 
-* *Memory Access Attacks*: Attackers can access raw credentials from memory through exploits like buffer overflow attacks or memory dumps.
-* *Insider Threats*: Malicious insiders with access to systems could potentially extract credentials from application memory.
-* *Accidental Exposure*: In multi-tenant environments, lingering credentials in memory could accidentally be exposed to other tenants.
+* *Tấn công truy cập bộ nhớ*: Kẻ tấn công có thể truy cập credential thô từ bộ nhớ thông qua các exploit như tấn công buffer overflow hoặc memory dump.
+* *Mối đe dọa nội bộ*: Người nội gián độc hại có quyền truy cập hệ thống có thể trích xuất credential từ bộ nhớ ứng dụng.
+* *Lộ ngoài ý muốn*: Trong môi trường multi-tenant, credential còn tồn tại trong bộ nhớ có thể vô tình bị lộ cho các tenant khác.
 
-=== Implementation
+=== Triển khai
 
 [source,java]
 ----
@@ -39,4 +39,4 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 }
 ----
 
-By implementing these practices, organizations can significantly enhance the security of their authentication systems by ensuring that credentials are not left exposed in system memory.
+Bằng cách triển khai các thực hành này, các tổ chức có thể tăng cường đáng kể bảo mật của hệ thống authentication bằng cách bảo đảm credential không bị để lộ trong bộ nhớ hệ thống.
