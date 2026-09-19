@@ -1,19 +1,19 @@
 [[jc-webflux]]
-= WebFlux Security
+= Bảo mật WebFlux
 
-Spring Security's WebFlux support relies on a `WebFilter` and works the same for Spring WebFlux and Spring WebFlux.Fn.
-A few sample applications demonstrate the code:
+Hỗ trợ WebFlux của Spring Security dựa trên một `WebFilter` và hoạt động giống nhau với Spring WebFlux và Spring WebFlux.Fn.
+Một vài ứng dụng mẫu minh họa mã:
 
 * Hello WebFlux {gh-samples-url}/reactive/webflux/java/hello-security[hellowebflux]
 * Hello WebFlux.Fn {gh-samples-url}/reactive/webflux-fn/hello-security[hellowebfluxfn]
 * Hello WebFlux Method {gh-samples-url}/reactive/webflux/java/method[hellowebflux-method]
 
 
-== Minimal WebFlux Security Configuration
+== Cấu hình bảo mật WebFlux tối thiểu
 
-The following listing shows a minimal WebFlux Security configuration:
+Đoạn mã sau đây trình bày một cấu hình bảo mật WebFlux tối thiểu:
 
-.Minimal WebFlux Security Configuration
+.Cấu hình bảo mật WebFlux tối thiểu
 [tabs]
 ======
 Java::
@@ -57,13 +57,13 @@ class HelloWebfluxSecurityConfig {
 -----
 ======
 
-This configuration provides form and HTTP basic authentication, sets up authorization to require an authenticated user for accessing any page, sets up a default login page and a default logout page, sets up security related HTTP headers, adds CSRF protection, and more.
+Cấu hình này cung cấp authentication bằng form và HTTP basic, thiết lập authorization yêu cầu người dùng đã được authentication khi truy cập bất kỳ trang nào, thiết lập trang đăng nhập mặc định và trang đăng xuất mặc định, thiết lập các HTTP header liên quan đến bảo mật, thêm bảo vệ CSRF và nhiều chức năng khác.
 
-== Explicit WebFlux Security Configuration
+== Cấu hình bảo mật WebFlux tường minh
 
-The following page shows an explicit version of the minimal WebFlux Security configuration:
+Trang sau đây trình bày phiên bản tường minh của cấu hình bảo mật WebFlux tối thiểu:
 
-.Explicit WebFlux Security Configuration
+.Cấu hình bảo mật WebFlux tường minh
 [tabs]
 ======
 Java::
@@ -132,19 +132,19 @@ class HelloWebfluxSecurityConfig {
 ======
 
 [NOTE]
-Make sure to import the `org.springframework.security.config.web.server.invoke` function to enable the Kotlin DSL in your class, as the IDE will not always auto-import the method, causing compilation issues.
+Hãy bảo đảm import function `org.springframework.security.config.web.server.invoke` để bật Kotlin DSL trong class của bạn, vì IDE không phải lúc nào cũng tự động import method này, dẫn đến lỗi biên dịch.
 
-This configuration explicitly sets up all the same things as our minimal configuration.
-From here, you can more easily make changes to the defaults.
+Cấu hình này tường minh thiết lập tất cả những thành phần giống như cấu hình tối thiểu.
+Từ đây, bạn có thể dễ dàng thay đổi các giá trị mặc định hơn.
 
-You can find more examples of explicit configuration in unit tests, by searching for https://github.com/spring-projects/spring-security/search?q=path%3Aconfig%2Fsrc%2Ftest%2F+EnableWebFluxSecurity[`EnableWebFluxSecurity` in the `config/src/test/` directory].
+Bạn có thể tìm thêm các ví dụ về cấu hình tường minh trong các unit test bằng cách tìm https://github.com/spring-projects/spring-security/search?q=path%3Aconfig%2Fsrc%2Ftest%2F+EnableWebFluxSecurity[`EnableWebFluxSecurity` trong thư mục `config/src/test/`].
 
 [[jc-webflux-multiple-filter-chains]]
-=== Multiple Chains Support
+=== Hỗ trợ nhiều filter chain
 
-You can configure multiple `SecurityWebFilterChain` instances to separate configuration by `RequestMatcher` instances.
+Bạn có thể cấu hình nhiều instance `SecurityWebFilterChain` để tách cấu hình dựa trên các instance `RequestMatcher`.
 
-For example, you can isolate configuration for URLs that start with `/api`:
+Ví dụ, bạn có thể tách riêng cấu hình cho các URL bắt đầu bằng `/api`:
 
 [tabs]
 ======
@@ -230,84 +230,84 @@ open class MultiSecurityHttpConfig {
 ----
 ======
 
-<1> Configure a `SecurityWebFilterChain` with an `@Order` to specify which `SecurityWebFilterChain` Spring Security should consider first
-<2> Use `PathPatternParserServerWebExchangeMatcher` to state that this `SecurityWebFilterChain` will only apply to URL paths that start with `/api/`
-<3> Specify the authentication mechanisms that will be used for `/api/**` endpoints
-<4> Create another instance of `SecurityWebFilterChain` with lower precedence to match all other URLs
-<5> Specify the authentication mechanisms that will be used for the rest of the application
+<1> Cấu hình một `SecurityWebFilterChain` với `@Order` để chỉ định `SecurityWebFilterChain` nào Spring Security cần xem xét trước
+<2> Sử dụng `PathPatternParserServerWebExchangeMatcher` để chỉ ra rằng `SecurityWebFilterChain` này chỉ áp dụng cho các path URL bắt đầu bằng `/api/`
+<3> Chỉ định các cơ chế authentication sẽ được sử dụng cho các endpoint `/api/**`
+<4> Tạo một instance `SecurityWebFilterChain` khác với precedence thấp hơn để so khớp tất cả URL còn lại
+<5> Chỉ định các cơ chế authentication sẽ được sử dụng cho phần còn lại của ứng dụng
 
-Spring Security selects one `SecurityWebFilterChain` `@Bean` for each request.
-It matches the requests in order by the `securityMatcher` definition.
+Spring Security chọn một `SecurityWebFilterChain` `@Bean` cho mỗi request.
+Nó so khớp các request theo thứ tự dựa trên định nghĩa `securityMatcher`.
 
-In this case, that means that, if the URL path starts with `/api`, Spring Security uses `apiHttpSecurity`.
-If the URL does not start with `/api`, Spring Security defaults to `webHttpSecurity`, which has an implied `securityMatcher` that matches any request.
+Trong trường hợp này, điều đó có nghĩa là nếu path URL bắt đầu bằng `/api`, Spring Security sử dụng `apiHttpSecurity`.
+Nếu URL không bắt đầu bằng `/api`, Spring Security mặc định sử dụng `webHttpSecurity`, vốn có một `securityMatcher` ngầm định so khớp với mọi request.
 
 
 [[modular-serverhttpsecurity-configuration]]
-== Modular ServerHttpSecurity Configuration
+== Cấu hình ServerHttpSecurity theo mô-đun
 
-Many users prefer that their Spring Security configuration lives in a centralized place and will choose to configure it within the `SecurityWebFilterChain` Bean declaration.
-However, there are times that users may want to modularize the configuration.
-This can be done using:
+Nhiều người dùng muốn cấu hình Spring Security của mình nằm ở một nơi tập trung và sẽ chọn cấu hình trong khai báo Bean `SecurityWebFilterChain`.
+Tuy nhiên, đôi khi người dùng muốn chia cấu hình thành các mô-đun.
+Bạn có thể thực hiện việc này bằng:
 
-* xref:#serverhttpsecurity-customizer-bean[Customizer<ServerHttpSecurity> Beans]
-* xref:#top-level-customizer-bean[Top Level ServerHttpSecurity Customizer Beans]
+* xref:#serverhttpsecurity-customizer-bean[Các Bean Customizer<ServerHttpSecurity>]
+* xref:#top-level-customizer-bean[Các Bean Customizer ServerHttpSecurity cấp cao nhất]
 
-// FIXME: this needs to link to appropriate spot
-// NOTE: If you are using Spring Security's xref:servlet/configuration/kotlin.adoc[], then you can also expose `*Dsl -> Unit` Beans as outlined in xref:./kotlin.adoc#modular-httpsecuritydsl-configuration[Modular HttpSecurityDsl Configuration].
+// FIXME: nội dung này cần liên kết đến vị trí phù hợp
+// NOTE: Nếu bạn đang sử dụng xref:servlet/configuration/kotlin.adoc[] của Spring Security, bạn cũng có thể công khai các Bean `*Dsl -> Unit` như được trình bày trong xref:./kotlin.adoc#modular-httpsecuritydsl-configuration[Cấu hình HttpSecurityDsl theo mô-đun].
 
 
 [[serverhttpsecurity-customizer-bean]]
-=== Customizer<ServerHttpSecurity> Beans
+=== Các Bean Customizer<ServerHttpSecurity>
 
-If you would like to modularize your security configuration you can place logic in a `Customizer<ServerHttpSecurity>` Bean.
-For example, the following configuration will ensure all `ServerHttpSecurity` instances are configured to:
+Nếu muốn chia cấu hình bảo mật thành các mô-đun, bạn có thể đặt logic trong một Bean `Customizer<ServerHttpSecurity>`.
+Ví dụ, cấu hình sau đây sẽ bảo đảm tất cả instance `ServerHttpSecurity` được cấu hình để:
 
 include-code::./ServerHttpSecurityCustomizerBeanConfiguration[tag=httpSecurityCustomizer,indent=0]
 
-<1> Set the xref:servlet/exploits/headers.adoc#servlet-headers-csp[Content Security Policy] to `object-src 'none'`
-<2> xref:servlet/exploits/http.adoc#servlet-http-redirect[Redirect any request to https]
+<1> Đặt xref:servlet/exploits/headers.adoc#servlet-headers-csp[Content Security Policy] thành `object-src 'none'`
+<2> xref:servlet/exploits/http.adoc#servlet-http-redirect[Chuyển hướng mọi request sang https]
 
 
 [[top-level-customizer-bean]]
-=== Top Level ServerHttpSecurity Customizer Beans
+=== Các Bean Customizer ServerHttpSecurity cấp cao nhất
 
-If you prefer to have further modularization of your security configuration, Spring Security will automatically apply any top level `HttpSecurity` `Customizer` Beans.
+Nếu muốn mô-đun hóa cấu hình bảo mật thêm nữa, Spring Security sẽ tự động áp dụng mọi Bean `Customizer` `HttpSecurity` cấp cao nhất.
 
-A top level `HttpSecurity` `Customizer` type can be summarized as any `Customizer<T>` that matches `public HttpSecurity.*(Customizer<T>)`.
-This translates to any `Customizer<T>` that is a single argument to a public method on javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity[].
+Có thể tóm tắt kiểu `Customizer` `HttpSecurity` cấp cao nhất là bất kỳ `Customizer<T>` nào khớp với `public HttpSecurity.*(Customizer<T>)`.
+Điều này có nghĩa là bất kỳ `Customizer<T>` nào là một argument duy nhất của một method public trên javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity[].
 
-A few examples can help to clarify.
-If `Customizer<ContentTypeOptionsConfig>` is published as a Bean, it will not be be automatically applied because it is an argument to javadoc:org.springframework.security.config.annotation.web.configurers.HeadersConfigurer#contentTypeOptions(org.springframework.security.config.Customizer)[] which is not a method defined on `HttpSecurity`.
-However, if `Customizer<HeadersConfigurer<HttpSecurity>>` is published as a Bean, it will be automatically applied because it is an argument to javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity#headers(org.springframework.security.config.Customizer)[].
+Một vài ví dụ có thể giúp làm rõ điều này.
+Nếu `Customizer<ContentTypeOptionsConfig>` được khai báo dưới dạng Bean, nó sẽ không được tự động áp dụng vì là argument của javadoc:org.springframework.security.config.annotation.web.configurers.HeadersConfigurer#contentTypeOptions(org.springframework.security.config.Customizer)[], vốn không phải là method được định nghĩa trên `HttpSecurity`.
+Tuy nhiên, nếu `Customizer<HeadersConfigurer<HttpSecurity>>` được khai báo dưới dạng Bean, nó sẽ được tự động áp dụng vì là argument của javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity#headers(org.springframework.security.config.Customizer)[].
 
-For example, the following configuration will ensure that the xref:servlet/exploits/headers.adoc#servlet-headers-csp[Content Security Policy] is set to `object-src 'none'`:
+Ví dụ, cấu hình sau đây sẽ bảo đảm xref:servlet/exploits/headers.adoc#servlet-headers-csp[Content Security Policy] được đặt thành `object-src 'none'`:
 
 include-code::./TopLevelCustomizerBeanConfiguration[tag=headersCustomizer,indent=0]
 
 [[customizer-bean-ordering]]
-=== Customizer Bean Ordering
+=== Thứ tự Bean Customizer
 
-First each xref:#httpsecurity-customizer-bean[Customizer<HttpSecurity> Bean] is applied using {spring-framework-api-url}org/springframework/beans/factory/ObjectProvider.html#orderedStream()[ObjectProvider#orderedStream()].
-This means that if there are multiple `Customizer<HttpSecurity>` Beans, the {spring-framework-api-url}org/springframework/core/annotation/Order.html[@Order] annotation can be added to the Bean definitions to control the ordering.
+Trước tiên, mỗi xref:#httpsecurity-customizer-bean[Bean Customizer<HttpSecurity>] được áp dụng bằng {spring-framework-api-url}org/springframework/beans/factory/ObjectProvider.html#orderedStream()[ObjectProvider#orderedStream()].
+Điều này có nghĩa là nếu có nhiều Bean `Customizer<HttpSecurity>`, bạn có thể thêm annotation {spring-framework-api-url}org/springframework/core/annotation/Order.html[@Order] vào các định nghĩa Bean để kiểm soát thứ tự.
 
-Next every xref:#top-level-customizer-bean[Top Level HttpSecurity Customizer Beans] type is looked up and each is is applied using `ObjectProvider#orderedStream()`.
-If there is are two `Customizer<HeadersConfigurer<HttpSecurity>>` beans and two `Customizer<HttpsRedirectConfigurer<HttpSecurity>>` instances, the order that each `Customizer` type is invoked is undefined.
-However, the order that each instance of `Customizer<HttpsRedirectConfigurer<HttpSecurity>>` is defined by `ObjectProvider#orderedStream()` and can be controlled using `@Order` on the Bean the definitions.
+Tiếp theo, mỗi kiểu xref:#top-level-customizer-bean[Các Bean Customizer HttpSecurity cấp cao nhất] được tìm kiếm và từng kiểu được áp dụng bằng `ObjectProvider#orderedStream()`.
+Nếu có hai bean `Customizer<HeadersConfigurer<HttpSecurity>>` và hai instance `Customizer<HttpsRedirectConfigurer<HttpSecurity>>`, thứ tự gọi từng kiểu `Customizer` là không xác định.
+Tuy nhiên, thứ tự của từng instance `Customizer<HttpsRedirectConfigurer<HttpSecurity>>` được xác định bởi `ObjectProvider#orderedStream()` và có thể được kiểm soát bằng `@Order` trên các định nghĩa Bean.
 
-Finally, the `HttpSecurity` Bean is injected as a Bean.
-All `Customizer` instances are applied before the `HttpSecurity` Bean is created.
-This allows overriding the customizations provided by the `Customizer` Beans.
+Cuối cùng, Bean `HttpSecurity` được inject dưới dạng Bean.
+Tất cả instance `Customizer` được áp dụng trước khi Bean `HttpSecurity` được tạo.
+Điều này cho phép ghi đè các tùy chỉnh do các Bean `Customizer` cung cấp.
 
-You can find an example below that illustrates the ordering:
+Bạn có thể tìm một ví dụ minh họa thứ tự ở bên dưới:
 
 include-code::./CustomizerBeanOrderingConfiguration[tag=sample,indent=0]
 
-<1> First all `Customizer<HttpSecurity>` instances are applied.
-The `adminAuthorization` Bean has the highest `@Order` so it is applied first.
-If there are no `@Order` annotations on the `Customizer<HttpSecurity>` Beans or the `@Order` annotations had the same value, then the order that the `Customizer<HttpSecurity>` instances are applied is undefined.
-<2> The `userAuthorization` is applied next due to being an instance of `Customizer<HttpSecurity>`
-<3> The order that the `Customizer` types are undefined.
-In this example, the order of `contentSecurityPolicy`, `contentTypeOptions`, and `httpsRedirect` are undefined.
-If `@Order(Ordered.HIGHEST_PRECEDENCE)` was added to `contentTypeOptions`, then we would know that `contentTypeOptions` is before `contentSecurityPolicy` (they are the same type), but we do not know if `httpsRedirect` is before or after the `Customizer<HeadersConfigurer<HttpSecurity>>` Beans.
-<4> After all of the `Customizer` Beans are applied, the `HttpSecurity` is passed in as a Bean.
+<1> Trước tiên, tất cả instance `Customizer<HttpSecurity>` được áp dụng.
+Bean `adminAuthorization` có `@Order` cao nhất nên được áp dụng trước.
+Nếu các Bean `Customizer<HttpSecurity>` không có annotation `@Order` hoặc các annotation `@Order` có cùng giá trị, thứ tự áp dụng các instance `Customizer<HttpSecurity>` là không xác định.
+<2> `userAuthorization` được áp dụng tiếp theo vì là một instance của `Customizer<HttpSecurity>`
+<3> Thứ tự của các kiểu `Customizer` là không xác định.
+Trong ví dụ này, thứ tự của `contentSecurityPolicy`, `contentTypeOptions` và `httpsRedirect` là không xác định.
+Nếu thêm `@Order(Ordered.HIGHEST_PRECEDENCE)` vào `contentTypeOptions`, chúng ta sẽ biết `contentTypeOptions` đứng trước `contentSecurityPolicy` (chúng cùng kiểu), nhưng không biết `httpsRedirect` đứng trước hay sau các Bean `Customizer<HeadersConfigurer<HttpSecurity>>`.
+<4> Sau khi tất cả Bean `Customizer` được áp dụng, `HttpSecurity` được truyền vào dưới dạng Bean.
