@@ -1,18 +1,18 @@
 [[rsocket]]
-= RSocket Security
+= Bảo mật RSocket
 
-Spring Security's RSocket support relies on a `SocketAcceptorInterceptor`.
-The main entry point into security is in `PayloadSocketAcceptorInterceptor`, which adapts the RSocket APIs to allow intercepting a `PayloadExchange` with `PayloadInterceptor` implementations.
+Hỗ trợ RSocket của Spring Security dựa trên một `SocketAcceptorInterceptor`.
+Điểm vào chính của security nằm trong `PayloadSocketAcceptorInterceptor`, thành phần điều chỉnh các API RSocket để cho phép intercept một `PayloadExchange` bằng các triển khai `PayloadInterceptor`.
 
-The following example shows a minimal RSocket Security configuration:
+Ví dụ sau minh họa cấu hình Bảo mật RSocket tối thiểu:
 
 * Hello RSocket {gh-samples-url}/reactive/rsocket/hello-security[hellorsocket]
 * https://github.com/rwinch/spring-flights/tree/security[Spring Flights]
 
 
-== Minimal RSocket Security Configuration
+== Cấu hình Bảo mật RSocket tối thiểu
 
-You can find a minimal RSocket Security configuration below:
+Bạn có thể xem cấu hình Bảo mật RSocket tối thiểu dưới đây:
 
 [tabs]
 ======
@@ -56,16 +56,16 @@ open class HelloRSocketSecurityConfig {
 ----
 ======
 
-This configuration enables <<rsocket-authentication-simple,simple authentication>> and sets up <<rsocket-authorization,rsocket-authorization>> to require an authenticated user for any request.
+Cấu hình này bật <<rsocket-authentication-simple,authentication đơn giản>> và thiết lập <<rsocket-authorization,authorization RSocket>> để yêu cầu người dùng đã được authentication cho mọi request.
 
-== Adding SecuritySocketAcceptorInterceptor
+== Thêm SecuritySocketAcceptorInterceptor
 
-For Spring Security to work, we need to apply `SecuritySocketAcceptorInterceptor` to the `ServerRSocketFactory`.
-Doing so connects our `PayloadSocketAcceptorInterceptor` with the RSocket infrastructure.
+Để Spring Security hoạt động, chúng ta cần áp dụng `SecuritySocketAcceptorInterceptor` cho `ServerRSocketFactory`.
+Việc này kết nối `PayloadSocketAcceptorInterceptor` với hạ tầng RSocket.
 
-Spring Boot registers it automatically in `RSocketSecurityAutoConfiguration` when you include {gh-samples-url}/reactive/rsocket/hello-security/build.gradle[the correct dependencies].
+Spring Boot tự động đăng ký nó trong `RSocketSecurityAutoConfiguration` khi bạn thêm {gh-samples-url}/reactive/rsocket/hello-security/build.gradle[các dependency phù hợp].
 
-Or, if you are not using Boot's auto-configuration, you can register it manually in the following way:
+Hoặc, nếu không sử dụng auto-configuration của Boot, bạn có thể đăng ký nó thủ công như sau:
 
 [tabs]
 ======
@@ -94,45 +94,45 @@ fun springSecurityRSocketSecurity(interceptor: SecuritySocketAcceptorInterceptor
 ----
 ======
 
-To customize the interceptor itself, use `RSocketSecurity` to add <<rsocket-authentication,authentication>> and <<rsocket-authorization,authorization>>.
+Để tùy chỉnh chính interceptor này, hãy sử dụng `RSocketSecurity` để thêm <<rsocket-authentication,authentication>> và <<rsocket-authorization,authorization>>.
 
 [[rsocket-authentication]]
-== RSocket Authentication
+== Authentication RSocket
 
-RSocket authentication is performed with `AuthenticationPayloadInterceptor`, which acts as a controller to invoke a `ReactiveAuthenticationManager` instance.
+Authentication RSocket được thực hiện bằng `AuthenticationPayloadInterceptor`, thành phần này hoạt động như một controller để gọi một instance `ReactiveAuthenticationManager`.
 
 [[rsocket-authentication-setup-vs-request]]
-=== Authentication at Setup versus Request Time
+=== Authentication tại thời điểm Setup so với thời điểm Request
 
-Generally, authentication can occur at setup time or at request time or both.
+Thông thường, authentication có thể diễn ra tại thời điểm setup, tại thời điểm request hoặc cả hai.
 
-Authentication at setup time makes sense in a few scenarios.
-A common scenarios is when a single user (such as a mobile connection) uses an RSocket connection.
-In this case, only a single user uses the connection, so authentication can be done once at connection time.
+Authentication tại thời điểm setup phù hợp trong một số tình huống.
+Một tình huống phổ biến là khi một người dùng duy nhất (chẳng hạn một kết nối mobile) sử dụng một kết nối RSocket.
+Trong trường hợp này, chỉ một người dùng sử dụng kết nối, vì vậy authentication có thể được thực hiện một lần tại thời điểm kết nối.
 
-In a scenario where the RSocket connection is shared, it makes sense to send credentials on each request.
-For example, a web application that connects to an RSocket server as a downstream service would make a single connection that all users use.
-In this case, if the RSocket server needs to perform authorization based on the web application's users credentials, authentication for each request makes sense.
+Trong tình huống kết nối RSocket được dùng chung, việc gửi credential trong mỗi request là phù hợp.
+Ví dụ, một web application kết nối đến RSocket server dưới dạng downstream service sẽ tạo một kết nối duy nhất mà tất cả người dùng cùng sử dụng.
+Trong trường hợp này, nếu RSocket server cần thực hiện authorization dựa trên credential của người dùng web application, authentication cho từng request là phù hợp.
 
-In some scenarios, authentication at both setup and for each request makes sense.
-Consider a web application, as described previously.
-If we need to restrict the connection to the web application itself, we can provide a credential with a `SETUP` authority at connection time.
-Then each user can have different authorities but not the `SETUP` authority.
-This means that individual users can make requests but not make additional connections.
+Trong một số tình huống, authentication tại cả thời điểm setup và trong mỗi request là phù hợp.
+Hãy xem xét web application như đã mô tả trước đó.
+Nếu cần giới hạn kết nối chỉ cho bản thân web application, chúng ta có thể cung cấp một credential có authority `SETUP` tại thời điểm kết nối.
+Khi đó, mỗi người dùng có thể có các authority khác nhau nhưng không có authority `SETUP`.
+Điều này có nghĩa là từng người dùng có thể thực hiện request nhưng không thể tạo thêm kết nối.
 
 [[rsocket-authentication-simple]]
-=== Simple Authentication
+=== Authentication đơn giản
 
-Spring Security has support for the https://github.com/rsocket/rsocket/blob/5920ed374d008abb712cb1fd7c9d91778b2f4a68/Extensions/Security/Simple.md[Simple Authentication Metadata Extension].
+Spring Security hỗ trợ https://github.com/rsocket/rsocket/blob/5920ed374d008abb712cb1fd7c9d91778b2f4a68/Extensions/Security/Simple.md[Simple Authentication Metadata Extension].
 
 [NOTE]
 ====
-Basic Authentication evolved into Simple Authentication and is only supported for backward compatibility.
-See `RSocketSecurity.basicAuthentication(Customizer)` for setting it up.
+Basic Authentication đã phát triển thành Simple Authentication và chỉ được hỗ trợ để duy trì backward compatibility.
+Xem `RSocketSecurity.basicAuthentication(Customizer)` để thiết lập.
 ====
 
-The RSocket receiver can decode the credentials by using `AuthenticationPayloadExchangeConverter`, which is automatically setup by using the `simpleAuthentication` portion of the DSL.
-The following example shows an explicit configuration:
+RSocket receiver có thể giải mã credential bằng cách sử dụng `AuthenticationPayloadExchangeConverter`, thành phần được tự động thiết lập khi sử dụng phần `simpleAuthentication` của DSL.
+Ví dụ sau minh họa một cấu hình tường minh:
 
 [tabs]
 ======
@@ -170,7 +170,7 @@ open fun rsocketInterceptor(rsocket: RSocketSecurity): PayloadSocketAcceptorInte
 ----
 ======
 
-The RSocket sender can send credentials by using `SimpleAuthenticationEncoder`, which you can add to Spring's `RSocketStrategies`.
+RSocket sender có thể gửi credential bằng cách sử dụng `SimpleAuthenticationEncoder`, thành phần bạn có thể thêm vào `RSocketStrategies` của Spring.
 
 [tabs]
 ======
@@ -191,7 +191,7 @@ strategies.encoder(SimpleAuthenticationEncoder())
 ----
 ======
 
-You can then use it to send a username and password to the receiver in the setup:
+Sau đó, bạn có thể sử dụng nó để gửi username và password đến receiver trong setup:
 
 [tabs]
 ======
@@ -222,7 +222,7 @@ val requester: Mono<RSocketRequester> = RSocketRequester.builder()
 ----
 ======
 
-Alternatively or additionally, a username and password can be sent in a request.
+Ngoài ra hoặc đồng thời, username và password có thể được gửi trong một request.
 
 [tabs]
 ======
@@ -266,11 +266,11 @@ open fun findRadar(code: String): Mono<AirportLocation> {
 [[rsocket-authentication-jwt]]
 === JWT
 
-Spring Security has support for the https://github.com/rsocket/rsocket/blob/5920ed374d008abb712cb1fd7c9d91778b2f4a68/Extensions/Security/Bearer.md[Bearer Token Authentication Metadata Extension].
-The support comes in the form of authenticating a JWT (determining that the JWT is valid) and then using the JWT to make authorization decisions.
+Spring Security hỗ trợ https://github.com/rsocket/rsocket/blob/5920ed374d008abb712cb1fd7c9d91778b2f4a68/Extensions/Security/Bearer.md[Bearer Token Authentication Metadata Extension].
+Hỗ trợ này thực hiện authentication một JWT (xác định rằng JWT hợp lệ), sau đó sử dụng JWT để đưa ra các quyết định authorization.
 
-The RSocket receiver can decode the credentials by using `BearerPayloadExchangeConverter`, which is automatically setup by using the `jwt` portion of the DSL.
-The following listing shows an example configuration:
+RSocket receiver có thể giải mã credential bằng cách sử dụng `BearerPayloadExchangeConverter`, thành phần được tự động thiết lập khi sử dụng phần `jwt` của DSL.
+Đoạn mã sau minh họa một cấu hình:
 
 [tabs]
 ======
@@ -308,8 +308,8 @@ fun rsocketInterceptor(rsocket: RSocketSecurity): PayloadSocketAcceptorIntercept
 ----
 ======
 
-The configuration above relies on the existence of a `ReactiveJwtDecoder` `@Bean` being present.
-An example of creating one from the issuer can be found below:
+Cấu hình trên dựa vào việc một `@Bean` `ReactiveJwtDecoder` tồn tại.
+Ví dụ tạo một bean từ issuer được trình bày dưới đây:
 
 [tabs]
 ======
@@ -336,8 +336,8 @@ fun jwtDecoder(): ReactiveJwtDecoder {
 ----
 ======
 
-The RSocket sender does not need to do anything special to send the token, because the value is a simple `String`.
-The following example sends the token at setup time:
+RSocket sender không cần làm gì đặc biệt để gửi token vì giá trị này là một `String` đơn giản.
+Ví dụ sau gửi token tại thời điểm setup:
 
 [tabs]
 ======
@@ -367,7 +367,7 @@ val requester = RSocketRequester.builder()
 ----
 ======
 
-Alternatively or additionally, you can send the token in a request:
+Ngoài ra hoặc đồng thời, bạn có thể gửi token trong một request:
 
 [tabs]
 ======
@@ -409,11 +409,11 @@ open fun findRadar(code: String): Mono<AirportLocation> {
 ======
 
 [[rsocket-authorization]]
-== RSocket Authorization
+== Authorization RSocket
 
-RSocket authorization is performed with `AuthorizationPayloadInterceptor`, which acts as a controller to invoke a `ReactiveAuthorizationManager` instance.
-You can use the DSL to set up authorization rules based upon the `PayloadExchange`.
-The following listing shows an example configuration:
+Authorization RSocket được thực hiện bằng `AuthorizationPayloadInterceptor`, thành phần này hoạt động như một controller để gọi một instance `ReactiveAuthorizationManager`.
+Bạn có thể sử dụng DSL để thiết lập các rule authorization dựa trên `PayloadExchange`.
+Đoạn mã sau minh họa một cấu hình:
 
 [tabs]
 ======
@@ -453,17 +453,17 @@ rsocket
     } // <6>
 ----
 ======
-<1> Setting up a connection requires the `ROLE_SETUP` authority.
-<2> If the route is `fetch.profile.me`, authorization only requires the user to be authenticated.
-<3> In this rule, we set up a custom matcher, where authorization requires the user to have the `ROLE_CUSTOM` authority.
-<4> This rule uses custom authorization.
-The matcher expresses a variable with a name of `username` that is made available in the `context`.
-A custom authorization rule is exposed in the `checkFriends` method.
-<5> This rule ensures that a request that does not already have a rule requires the user to be authenticated.
-A request is where the metadata is included.
-It would not include additional payloads.
-<6> This rule ensures that any exchange that does not already have a rule is allowed for anyone.
-In this example, it means that payloads that have no metadata also have no authorization rules.
+<1> Thiết lập một kết nối yêu cầu authority `ROLE_SETUP`.
+<2> Nếu route là `fetch.profile.me`, authorization chỉ yêu cầu người dùng đã được authentication.
+<3> Trong rule này, chúng ta thiết lập một matcher tùy chỉnh, trong đó authorization yêu cầu người dùng có authority `ROLE_CUSTOM`.
+<4> Rule này sử dụng authorization tùy chỉnh.
+Matcher biểu diễn một biến có tên `username`, biến này được cung cấp trong `context`.
+Một rule authorization tùy chỉnh được cung cấp trong method `checkFriends`.
+<5> Rule này đảm bảo rằng một request chưa có rule sẽ yêu cầu người dùng đã được authentication.
+Request là nơi metadata được bao gồm.
+Request đó sẽ không bao gồm các payload bổ sung.
+<6> Rule này đảm bảo rằng bất kỳ exchange nào chưa có rule đều được cho phép với mọi người.
+Trong ví dụ này, điều đó có nghĩa là các payload không có metadata cũng không có rule authorization.
 
-Note that authorization rules are performed in order.
-Only the first authorization rule that matches is invoked.
+Lưu ý rằng các rule authorization được thực thi theo thứ tự.
+Chỉ rule authorization đầu tiên khớp mới được gọi.
