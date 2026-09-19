@@ -1,4 +1,4 @@
-= Servlet Migrations
+= Migration cho Servlet
 :page-section-summary-toc: 1
 
-If you have already performed the xref:migration/index.adoc[initial migration steps] for your Servlet application, you're now ready to perform steps specific to Servlet applications.
+Nếu bạn đã thực hiện xref:migration/index.adoc[các bước migration ban đầu] cho ứng dụng Servlet của mình, giờ bạn đã sẵn sàng thực hiện các bước dành riêng cho các ứng dụng Servlet.
