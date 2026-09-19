@@ -1,7 +1,7 @@
 [[appendix-faq]]
-= Spring Security FAQ
+= Câu hỏi thường gặp về Spring Security
 
-This FAQ has the following sections:
+FAQ này gồm các phần sau:
 
 * <<appendix-faq-general-questions>>
 * <<appendix-faq-common-problems>>
@@ -9,9 +9,9 @@ This FAQ has the following sections:
 * <<appendix-faq-howto>>
 
 [[appendix-faq-general-questions]]
-== General Questions
+== Câu hỏi chung
 
-This FAQ answers the following general questions:
+FAQ này giải đáp các câu hỏi chung sau:
 
 * <<appendix-faq-other-concerns>>
 * <<appendix-faq-web-xml>>
@@ -20,86 +20,86 @@ This FAQ answers the following general questions:
 
 
 [[appendix-faq-other-concerns]]
-=== Can Spring Security take care of all my application security requirements?
+=== Spring Security có thể đáp ứng tất cả yêu cầu security của application không?
 
-Spring Security provides you with a flexible framework for your authentication and authorization requirements, but there are many other considerations for building a secure application that are outside its scope.
-Web applications are vulnerable to all kinds of attacks with which you should be familiar, preferably before you start development so that you can design and code with them in mind from the beginning.
-Check out the https://www.owasp.org/[OWASP website] for information on the major issues that face web application developers and the countermeasures you can use against them.
+Spring Security cung cấp cho bạn một framework linh hoạt để đáp ứng các yêu cầu authentication và authorization, nhưng còn nhiều vấn đề khác khi xây dựng một application an toàn nằm ngoài phạm vi của nó.
+Web application dễ bị mọi loại tấn công, và bạn nên làm quen với chúng, tốt nhất là trước khi bắt đầu phát triển để có thể thiết kế và viết code có tính đến chúng ngay từ đầu.
+Hãy xem https://www.owasp.org/[website OWASP] để biết thông tin về những vấn đề chính mà các nhà phát triển web application phải đối mặt và các biện pháp đối phó có thể sử dụng.
 
 
 [[appendix-faq-web-xml]]
-=== Why Not Use web.xml Security?
+=== Tại sao không sử dụng security của web.xml?
 
-Suppose you are developing an enterprise application based on Spring.
-You typically need to address four security concerns : authentication, web request security, service layer security (your methods that implement business logic), and domain object instance security (different domain objects can have different permissions). With these typical requirements in mind, we have the following considerations:
+Giả sử bạn đang phát triển một enterprise application dựa trên Spring.
+Thông thường, bạn cần xử lý bốn vấn đề security: authentication, security cho web request, security ở service layer (các method triển khai business logic) và security cho instance của domain object (các domain object khác nhau có thể có permission khác nhau). Với các yêu cầu điển hình này, chúng ta có những cân nhắc sau:
 
-* _Authentication_: The servlet specification provides an approach to authentication.
-However, you need to configure the container to perform authentication, which typically requires editing of container-specific "`realm`" settings.
-This makes a non-portable configuration. Also, if you need to write an actual Java class to implement the container's authentication interface, it becomes even more non-portable.
-With Spring Security, you achieve complete portability -- right down to the WAR level.
-Also, Spring Security offers a choice of production-proven authentication providers and mechanisms, meaning you can switch your authentication approaches at deployment time.
-This is particularly valuable for software vendors writing products that need to work in an unknown target environment.
+* _Authentication_: servlet specification cung cấp một cách tiếp cận cho authentication.
+Tuy nhiên, bạn cần cấu hình container để thực hiện authentication, việc này thường yêu cầu chỉnh sửa các thiết lập "`realm`" dành riêng cho container.
+Điều này tạo ra một cấu hình không portable. Ngoài ra, nếu cần viết một Java class thực tế để triển khai authentication interface của container, cấu hình còn kém portable hơn.
+Với Spring Security, bạn đạt được tính portable hoàn toàn, xuống đến cấp WAR.
+Spring Security cũng cung cấp lựa chọn các authentication provider và cơ chế đã được kiểm chứng trong production, nghĩa là bạn có thể chuyển đổi cách authentication tại thời điểm deploy.
+Điều này đặc biệt có giá trị với các nhà cung cấp phần mềm viết sản phẩm cần hoạt động trong một target environment không xác định.
 
-* _Web request security:_ The servlet specification provides an approach to secure your request URIs.
-However, these URIs can be expressed only in the servlet specification's own limited URI path format.
-Spring Security provides a far more comprehensive approach.
-For instance, you can use Ant paths or regular expressions, you can consider parts of the URI other than simply the requested page (for example,
-you can consider HTTP GET parameters), and you can implement your own runtime source of configuration data.
-This means that you can dynamically change your web request security during the actual execution of your web application.
+* _Web request security:_ servlet specification cung cấp một cách để bảo vệ request URI.
+Tuy nhiên, các URI này chỉ có thể được biểu diễn bằng format URI path hạn chế riêng của servlet specification.
+Spring Security cung cấp một cách tiếp cận toàn diện hơn nhiều.
+Chẳng hạn, bạn có thể sử dụng Ant path hoặc regular expression, xem xét các phần khác của URI ngoài page được request (ví dụ,
+bạn có thể xem xét HTTP GET parameter), và triển khai source dữ liệu cấu hình runtime của riêng mình.
+Điều này có nghĩa là bạn có thể thay đổi security cho web request một cách động trong quá trình web application thực thi.
 
-* _Service layer and domain object security:_ The absence of support in the servlet specification for services layer security or domain object instance security represents serious limitations for multi-tiered applications.
-Typically, developers either ignore these requirements or implement security logic within their MVC controller code (or, even worse, inside the views). There are serious disadvantages with this approach:
+* _Security ở service layer và domain object:_ Việc servlet specification không hỗ trợ security ở service layer hoặc security cho instance của domain object tạo ra những hạn chế nghiêm trọng đối với application nhiều tầng.
+Thông thường, developer hoặc bỏ qua các yêu cầu này hoặc triển khai logic security trong code của MVC controller (hoặc tệ hơn nữa, bên trong view). Cách tiếp cận này có những bất lợi nghiêm trọng:
 
-** _Separation of concerns:_ Authorization is a crosscutting concern and should be implemented as such.
-MVC controllers or views that implement authorization code makes it more difficult to test both the controller and the authorization logic, is more difficult to debug, and often leads to code duplication.
+** _Separation of concerns:_ Authorization là một crosscutting concern và nên được triển khai như vậy.
+MVC controller hoặc view triển khai code authorization khiến việc test cả controller lẫn logic authorization khó hơn, debug khó hơn và thường dẫn đến trùng lặp code.
 
-** _Support for rich clients and web services:_ If an additional client type must ultimately be supported, any authorization code embedded within the web layer is non-reusable.
-It should be considered that Spring remoting exporters export only service layer beans (not MVC controllers). As a result, authorization logic needs to be located in the services layer to support a multitude of client types.
+** _Hỗ trợ rich client và web service:_ Nếu cuối cùng cần hỗ trợ thêm một loại client, mọi code authorization được nhúng trong web layer đều không thể tái sử dụng.
+Cần lưu ý rằng Spring remoting exporter chỉ export bean ở service layer (không export MVC controller). Do đó, logic authorization cần được đặt ở service layer để hỗ trợ nhiều loại client.
 
-** _Layering issues:_ An MVC controller or view is the incorrect architectural layer in which to implement authorization decisions concerning services layer methods or domain object instances.
-While the principal may be passed to the services layer to enable it to make the authorization decision, doing so would introduce an additional argument on every services layer method.
-A more elegant approach is to use a `ThreadLocal` to hold the principal, although this would likely increase development time to a point where it would become more economical (on a cost-benefit basis) to use a dedicated security framework.
+** _Vấn đề phân tầng:_ MVC controller hoặc view là architectural layer không phù hợp để triển khai các quyết định authorization liên quan đến method ở service layer hoặc instance của domain object.
+Mặc dù có thể truyền principal vào service layer để layer này đưa ra quyết định authorization, cách đó sẽ thêm một argument vào mọi method ở service layer.
+Một cách tiếp cận thanh lịch hơn là dùng `ThreadLocal` để lưu principal, dù cách này có thể làm thời gian phát triển tăng đến mức xét trên chi phí-lợi ích thì dùng một security framework chuyên dụng sẽ kinh tế hơn.
 
-** _Authorization code quality:_ It is often said of web frameworks that they "`make it easier to do the right things, and harder to do the wrong things`". Security frameworks are the same, because they are designed in an abstract manner for a wide range of purposes.
-Writing your own authorization code from scratch does not provide the "`design check`" a framework would offer, and in-house authorization code typically lacks the improvements that emerge from widespread deployment, peer review, and new versions.
+** _Chất lượng code authorization:_ Người ta thường nói về web framework rằng chúng "`giúp làm điều đúng dễ hơn và làm điều sai khó hơn`". Security framework cũng vậy, vì chúng được thiết kế theo cách trừu tượng cho nhiều mục đích.
+Tự viết code authorization từ đầu không cung cấp "`design check`" mà một framework đem lại, và code authorization nội bộ thường thiếu những cải tiến xuất hiện từ việc triển khai rộng rãi, peer review và các version mới.
 
-For simple applications, servlet specification security may be enough.
-Although when considered within the context of web container portability, configuration requirements, limited web request security flexibility, and non-existent services layer and domain object instance security, it becomes clear why developers often look to alternative solutions.
+Với application đơn giản, security của servlet specification có thể là đủ.
+Tuy nhiên, khi xét trong bối cảnh portability của web container, yêu cầu cấu hình, tính linh hoạt hạn chế của security cho web request và việc không có security ở service layer cũng như instance của domain object, có thể hiểu vì sao developer thường tìm đến các giải pháp thay thế.
 
 
 [[appendix-faq-requirements]]
-=== What Java and Spring Framework versions are required?
+=== Yêu cầu các version Java và Spring Framework nào?
 
-Spring Security 3.0 and 3.1 require at least JDK 1.5 and also require Spring 3.0.3 as a minimum.
-Ideally, you should use the latest release versions to avoid problems.
+Spring Security 3.0 và 3.1 yêu cầu tối thiểu JDK 1.5, đồng thời yêu cầu Spring 3.0.3 là version tối thiểu.
+Tốt nhất, bạn nên dùng các version release mới nhất để tránh vấn đề.
 
-Spring Security 2.0.x requires a minimum JDK version of 1.4 and is built against Spring 2.0.x.
-It should also be compatible with applications that use Spring 2.5.x.
+Spring Security 2.0.x yêu cầu JDK version tối thiểu là 1.4 và được build dựa trên Spring 2.0.x.
+Nó cũng phải tương thích với application sử dụng Spring 2.5.x.
 
 
 [[appendix-faq-start-simple]]
-==== I have a complex scenario. What could be wrong?
+==== Tôi có một scenario phức tạp. Có thể đã sai ở đâu?
 
-(This answer address complex scenarios in general by dealing with a particular scenario.)
+(Câu trả lời này đề cập chung đến các scenario phức tạp thông qua một scenario cụ thể.)
 
-Suppose you are new to Spring Security and need to build an application that supports CAS single sign-on over HTTPS while allowing basic authentication locally for certain URLs, authenticating against multiple back end user information sources (LDAP and JDBC). You have copied some configuration files but have found that it does not work. What could be wrong?
+Giả sử bạn mới dùng Spring Security và cần xây dựng một application hỗ trợ CAS single sign-on qua HTTPS, đồng thời cho phép basic authentication cục bộ đối với một số URL và authentication dựa trên nhiều nguồn thông tin user back end (LDAP và JDBC). Bạn đã sao chép một số file cấu hình nhưng phát hiện nó không hoạt động. Có thể đã sai ở đâu?
 
-You need an understanding of the technologies you intend to use before you can successfully build applications with them.
-Security is complicated.
-Setting up a simple configuration by using a login form and some hard-coded users with Spring Security's namespace is reasonably straightforward.
-Moving to using a backed JDBC database is also easy enough.
-However, if you try to jump straight to a complicated deployment scenario like this scenario, you are almost certain to be frustrated.
-There is a big jump in the learning curve required to set up systems such as CAS, configure LDAP servers, and install SSL certificates properly.
-So you need to take things one step at a time.
+Bạn cần hiểu các công nghệ định sử dụng trước khi có thể xây dựng application thành công với chúng.
+Security rất phức tạp.
+Thiết lập một cấu hình đơn giản bằng login form và một số user hard-code với namespace của Spring Security tương đối dễ dàng.
+Chuyển sang dùng database JDBC làm backend cũng khá dễ.
+Tuy nhiên, nếu cố nhảy thẳng vào một deployment scenario phức tạp như trên, gần như chắc chắn bạn sẽ thất vọng.
+Đường cong học tập để thiết lập các hệ thống như CAS, cấu hình LDAP server và cài đặt SSL certificate đúng cách có bước nhảy rất lớn.
+Vì vậy, bạn cần thực hiện từng bước một.
 
-From a Spring Security perspective, the first thing you should do is follow the "`Getting Started`" guide on the website.
-This will take you through a series of steps to get up and running and get some idea of how the framework operates.
-If you use other technologies with which you are not familiar, you should do some research and try to make sure you can use them in isolation before combining them in a complex system.
+Từ góc nhìn Spring Security, điều đầu tiên bạn nên làm là theo hướng dẫn "`Getting Started`" trên website.
+Hướng dẫn này đưa bạn qua một loạt bước để bắt đầu chạy được và có một số hình dung về cách framework hoạt động.
+Nếu sử dụng các công nghệ khác mà bạn chưa quen, bạn nên nghiên cứu và thử bảo đảm có thể sử dụng chúng độc lập trước khi kết hợp vào một hệ thống phức tạp.
 
 [[appendix-faq-common-problems]]
-== Common Problems
+== Vấn đề thường gặp
 
-This section addresses the most common problems that people encounter when using Spring Security:
+Phần này đề cập đến những vấn đề thường gặp nhất khi sử dụng Spring Security:
 
 * Authentication
 ** <<appendix-faq-bad-credentials>>
@@ -108,13 +108,13 @@ This section addresses the most common problems that people encounter when using
 ** <<appendix-faq-cached-secure-page>>
 ** <<auth-exception-credentials-not-found>>
 ** <<appendix-faq-ldap-authentication>>
-* Session Management
+* Quản lý session
 ** <<appendix-faq-concurrent-session-same-browser>>
 ** <<appendix-faq-new-session-on-authentication>>
 ** <<appendix-faq-tomcat-https-session>>
 ** <<appendix-faq-session-listener-missing>>
 ** <<appendix-faq-unwanted-session-creation>>
-* Miscellaneous
+* Khác
 ** <<appendix-faq-forbidden-csrf>>
 ** <<appendix-faq-no-security-on-forward>>
 ** <<appendix-faq-method-security-in-web-context>>
@@ -122,34 +122,34 @@ This section addresses the most common problems that people encounter when using
 ** <<appendix-faq-method-security-with-taglib>>
 
 [[appendix-faq-bad-credentials]]
-=== When I try to log in, I get an error message that says, "`Bad Credentials`". What is wrong?
+=== Khi cố đăng nhập, tôi nhận được thông báo lỗi "`Bad Credentials`". Có vấn đề gì?
 
-This means that authentication has failed.
-It does not say why, as it is good practice to avoid giving details that might help an attacker guess account names or passwords.
+Điều này có nghĩa là authentication đã thất bại.
+Thông báo không cho biết lý do, vì tránh cung cấp chi tiết có thể giúp attacker đoán tên account hoặc password là một practice tốt.
 
-This also means that, if you ask this question online, you should not expect an answer unless you provide additional information.
-As with any issue, you should check the output from the debug log and note any exception stacktraces and related messages.
-You should step through the code in a debugger to see where the authentication fails and why.
-You should also write a test case which exercises your authentication configuration outside the application.
-If you use hashed passwords, make sure the value stored in your database is _exactly_ the same as the value produced by the `PasswordEncoder` configured in your application.
+Điều này cũng có nghĩa là nếu hỏi câu này trên mạng, bạn không nên mong đợi nhận được câu trả lời trừ khi cung cấp thêm thông tin.
+Như với mọi vấn đề, bạn nên kiểm tra output từ debug log và ghi nhận mọi exception stacktrace cùng các message liên quan.
+Bạn nên step through code trong debugger để xem authentication thất bại ở đâu và vì sao.
+Bạn cũng nên viết một test case thực thi cấu hình authentication bên ngoài application.
+Nếu dùng hashed password, hãy bảo đảm value được lưu trong database _chính xác_ giống value do `PasswordEncoder` được cấu hình trong application tạo ra.
 
 
 [[appendix-faq-login-loop]]
-=== My application goes into an "`endless loop`" when I try to log in. What is going on?
+=== Application của tôi rơi vào "`endless loop`" khi cố đăng nhập. Chuyện gì đang xảy ra?
 
-A common user problem with infinite loop and redirecting to the login page is caused by accidentally configuring the login page as a "`secured`" resource.
-Make sure your configuration allows anonymous access to the login page.
-You can do so with the xref:servlet/authorization/authorize-http-requests.adoc[`authorizeHttpRequests`] DSL.
+Một vấn đề phổ biến khiến user gặp vòng lặp vô hạn và bị redirect về login page là do vô tình cấu hình login page thành resource "`secured`".
+Hãy bảo đảm cấu hình của bạn cho phép anonymous access đến login page.
+Bạn có thể làm điều đó bằng DSL xref:servlet/authorization/authorize-http-requests.adoc[`authorizeHttpRequests`].
 
 [TIP]
 ====
-When you use namespace- or DSL-based configuration, a check is made on loading the application context and a warning message logged if your login page appears to be protected.
+Khi sử dụng cấu hình dựa trên namespace hoặc DSL, một kiểm tra được thực hiện lúc load application context và warning message được ghi log nếu login page có vẻ được bảo vệ.
 ====
 
 [[appendix-faq-anon-access-denied]]
-=== I get an exception with the message "Access is denied (user is anonymous);". What's wrong?
+=== Tôi nhận được exception với message "Access is denied (user is anonymous);". Có vấn đề gì?
 
-This is a debug level message which occurs the first time an anonymous user attempts to access a protected resource.
+Đây là message ở debug level xuất hiện lần đầu anonymous user cố truy cập một protected resource.
 
 [source]
 ----
@@ -159,21 +159,21 @@ at org.springframework.security.vote.AffirmativeBased.decide(AffirmativeBased.ja
 at org.springframework.security.intercept.AbstractSecurityInterceptor.beforeInvocation(AbstractSecurityInterceptor.java:262)
 ----
 
-It is normal and shouldn't be anything to worry about.
+Đây là điều bình thường và không có gì đáng lo.
 
 
 [[appendix-faq-cached-secure-page]]
-=== Why can I still see a secured page even after I have logged out of my application?
+=== Tại sao tôi vẫn thấy secured page ngay cả sau khi đã logout khỏi application?
 
-The most common reason for this is that your browser has cached the page, and you are seeing a copy that is being retrieved from the browsers cache.
-Verify this by checking whether the browser is actually sending the request (check your server access logs and the debug log or use a suitable browser debugging plugin, such as "`Tamper Data`" for Firefox). This has nothing to do with Spring Security, and you should configure your application or server to set the appropriate `Cache-Control` response headers.
-Note that SSL requests are never cached.
+Lý do phổ biến nhất là browser đã cache page và bạn đang xem một bản sao được lấy từ browser cache.
+Hãy xác minh bằng cách kiểm tra browser có thực sự gửi request hay không (kiểm tra server access log và debug log, hoặc dùng browser debugging plugin phù hợp, chẳng hạn "`Tamper Data`" cho Firefox). Điều này không liên quan đến Spring Security; bạn nên cấu hình application hoặc server để đặt các response header `Cache-Control` phù hợp.
+Lưu ý rằng SSL request không bao giờ được cache.
 
 
 [[auth-exception-credentials-not-found]]
-=== I get an exception with a message of "An Authentication object was not found in the SecurityContext". What is wrong?
+=== Tôi nhận được exception với message "An Authentication object was not found in the SecurityContext". Có vấn đề gì?
 
-The following listing shows another debug-level message that occurs the first time an anonymous user attempts to access a protected resource. However, this listing shows what happens when you do not have an `AnonymousAuthenticationFilter` in your filter chain configuration:
+Listing sau hiển thị một message khác ở debug level xuất hiện lần đầu anonymous user cố truy cập một protected resource. Tuy nhiên, listing này cho thấy điều xảy ra khi bạn không có `AnonymousAuthenticationFilter` trong cấu hình filter chain:
 
 [source]
 ----
@@ -184,20 +184,20 @@ at org.springframework.security.intercept.AbstractSecurityInterceptor.credential
 at org.springframework.security.intercept.AbstractSecurityInterceptor.beforeInvocation(AbstractSecurityInterceptor.java:254)
 ----
 
-It is normal and is not something to worry about.
+Đây là điều bình thường và không có gì đáng lo.
 
 
 [[appendix-faq-ldap-authentication]]
-=== I can't get LDAP authentication to work. What's wrong with my configuration?
+=== Tôi không thể làm cho LDAP authentication hoạt động. Cấu hình của tôi có vấn đề gì?
 
-Note that the permissions for an LDAP directory often do not let you read the password for a user.
-Hence, it is often not possible to use the <<appendix-faq-what-is-userdetailservice>> where Spring Security compares the stored password with the one submitted by the user.
-The most common approach is to use LDAP "`bind`", which is one of the operations supported by https://en.wikipedia.org/wiki/Lightweight_Directory_Access_Protocol[the LDAP protocol]. With this approach, Spring Security validates the password by trying to authenticate to the directory as the user.
+Lưu ý rằng permission của LDAP directory thường không cho phép đọc password của user.
+Do đó, thường không thể dùng <<appendix-faq-what-is-userdetailservice>>, trong đó Spring Security so sánh password đã lưu với password user gửi lên.
+Cách tiếp cận phổ biến nhất là sử dụng LDAP "`bind`", một trong các operation được https://en.wikipedia.org/wiki/Lightweight_Directory_Access_Protocol[LDAP protocol] hỗ trợ. Với cách này, Spring Security xác thực password bằng cách thử authentication vào directory với tư cách user.
 
-The most common problem with LDAP authentication is a lack of knowledge of the directory server tree structure and configuration.
-This differs from one company to another, so you have to find it out yourself.
-Before adding a Spring Security LDAP configuration to an application, you should write a simple test by using standard Java LDAP code (without Spring Security involved) and make sure you can get that to work first.
-For example, to authenticate a user, you could use the following code:
+Vấn đề phổ biến nhất với LDAP authentication là thiếu hiểu biết về cấu trúc tree và cấu hình của directory server.
+Điều này khác nhau giữa các công ty, vì vậy bạn phải tự tìm hiểu.
+Trước khi thêm cấu hình Spring Security LDAP vào application, bạn nên viết một test đơn giản bằng code Java LDAP tiêu chuẩn (không dùng Spring Security) và bảo đảm trước tiên có thể làm cho nó hoạt động.
+Ví dụ, để authenticate một user, bạn có thể dùng code sau:
 
 [tabs]
 ======
@@ -238,68 +238,68 @@ fun ldapAuthenticationIsSuccessful() {
 ----
 ======
 
-=== Session Management
+=== Quản lý session
 
-Session management issues are a common source of questions.
-If you are developing Java web applications, you should understand how the session is maintained between the servlet container and the user's browser.
-You should also understand the difference between secure and non-secure cookies and the implications of using HTTP and HTTPS and switching between the two.
-Spring Security has nothing to do with maintaining the session or providing session identifiers.
-This is entirely handled by the servlet container.
+Các vấn đề về quản lý session là nguồn câu hỏi phổ biến.
+Nếu đang phát triển Java web application, bạn nên hiểu session được duy trì như thế nào giữa servlet container và browser của user.
+Bạn cũng nên hiểu sự khác nhau giữa secure cookie và non-secure cookie, cũng như tác động của việc sử dụng HTTP và HTTPS rồi chuyển đổi giữa hai giao thức.
+Spring Security không liên quan đến việc duy trì session hoặc cung cấp session identifier.
+Việc này hoàn toàn do servlet container xử lý.
 
 
 [[appendix-faq-concurrent-session-same-browser]]
-=== I am using Spring Security's concurrent session control to prevent users from logging in more than once at the same time. When I open another browser window after logging in, it does not stop me from logging in again. Why can I log in more than once?
+=== Tôi đang sử dụng concurrent session control của Spring Security để ngăn user đăng nhập nhiều lần cùng lúc. Khi mở một browser window khác sau khi đăng nhập, nó không ngăn tôi đăng nhập lại. Tại sao tôi có thể đăng nhập nhiều lần?
 
-Browsers generally maintain a single session per browser instance.
-You cannot have two separate sessions at once.
-So if you log in again in another window or tab you are just reauthenticating in the same session.
-So, if you log in again in another window or tab, you are reauthenticating in the same session.
-The server does not know anything about tabs, windows, or browser instances.
-All it sees are HTTP requests, and it ties those to a particular session according to the value of the `JSESSIONID` cookie that they contain.
-When a user authenticates during a session, Spring Security's concurrent session control checks the number of _other authenticated sessions_ that they have.
-If they are already authenticated with the same session, re-authenticating has no effect.
+Browser thường duy trì một session duy nhất cho mỗi browser instance.
+Bạn không thể có hai session riêng biệt cùng lúc.
+Vì vậy, nếu đăng nhập lại trong một window hoặc tab khác, bạn chỉ đang re-authenticate trong cùng session.
+Vì vậy, nếu đăng nhập lại trong một window hoặc tab khác, bạn đang re-authenticate trong cùng session.
+Server không biết gì về tab, window hoặc browser instance.
+Nó chỉ thấy các HTTP request và gắn chúng với một session cụ thể dựa trên value của cookie `JSESSIONID` chứa trong request.
+Khi user authenticate trong một session, concurrent session control của Spring Security kiểm tra số _session đã authenticate khác_ mà user đó có.
+Nếu user đã authenticate bằng cùng session, việc re-authenticate không có tác dụng.
 
 
 [[appendix-faq-new-session-on-authentication]]
-=== Why does the session ID change when I authenticate through Spring Security?
+=== Tại sao session ID thay đổi khi tôi authenticate thông qua Spring Security?
 
-With the default configuration, Spring Security changes the session ID when the user authenticates.
-If you use a Servlet 3.1 or newer container, the session ID is simply changed.
-If you use an older container, Spring Security invalidates the existing session, creates a new session, and transfers the session data to the new session.
-Changing the session identifier in this manner prevents "`session-fixation`" attacks.
-You can find more about this online and in the reference manual.
+Với cấu hình mặc định, Spring Security thay đổi session ID khi user authenticate.
+Nếu sử dụng container Servlet 3.1 hoặc mới hơn, session ID chỉ đơn giản được thay đổi.
+Nếu sử dụng container cũ hơn, Spring Security invalidate session hiện tại, tạo session mới và chuyển dữ liệu session sang session mới.
+Thay đổi session identifier theo cách này ngăn chặn tấn công "`session-fixation`".
+Bạn có thể tìm hiểu thêm về việc này trên mạng và trong reference manual.
 
 
 [[appendix-faq-tomcat-https-session]]
-=== I use Tomcat (or some other servlet container) and have enabled HTTPS for my login page, switching back to HTTP afterward. It does not work. I end up back at the login page after authenticating.
-It doesn't work - I just end up back at the login page after authenticating.
+=== Tôi sử dụng Tomcat (hoặc servlet container khác) và đã bật HTTPS cho login page, sau đó chuyển lại HTTP. Việc này không hoạt động. Tôi lại quay về login page sau khi authenticate.
+Việc này không hoạt động, tôi chỉ lại quay về login page sau khi authenticate.
 
-This happens because sessions created under HTTPS, for which the session cookie is marked as "`secure`", cannot subsequently be used under HTTP. The browser does not send the cookie back to the server, and any session state (including the security context information) is lost. Starting a session in HTTP first should work, as the session cookie is not marked as secure.
-However, Spring Security's xref:servlet/authentication/session-management.adoc#ns-session-fixation[Session Fixation Protection] can interfere with this because it results in a new session ID cookie being sent back to the user's browser, usually with the secure flag.
-To get around this, you can disable session fixation protection. However, in newer Servlet containers, you can also configure session cookies to never use the secure flag.
+Điều này xảy ra vì session được tạo dưới HTTPS, với session cookie được đánh dấu là "`secure`", sau đó không thể được sử dụng dưới HTTP. Browser không gửi cookie trở lại server nên mọi session state (bao gồm thông tin security context) bị mất. Bắt đầu session bằng HTTP trước sẽ hoạt động, vì session cookie không được đánh dấu là secure.
+Tuy nhiên, xref:servlet/authentication/session-management.adoc#ns-session-fixation[Session Fixation Protection] của Spring Security có thể gây ảnh hưởng vì nó khiến một session ID cookie mới được gửi về browser của user, thường kèm secure flag.
+Để khắc phục, bạn có thể tắt session fixation protection. Tuy nhiên, trong các Servlet container mới hơn, bạn cũng có thể cấu hình session cookie để không bao giờ dùng secure flag.
 
 
 [IMPORTANT]
 ====
-Switching between HTTP and HTTPS is not a good idea in general, as any application that uses HTTP at all is vulnerable to man-in-the-middle attacks.
-To be truly secure, the user should begin accessing your site in HTTPS and continue using it until they log out.
-Even clicking on an HTTPS link from a page accessed over HTTP is potentially risky.
-If you need more convincing, check out a tool like https://github.com/moxie0/sslstrip/[sslstrip].
+Nhìn chung, chuyển đổi giữa HTTP và HTTPS không phải là ý hay, vì mọi application sử dụng HTTP đều dễ bị tấn công man-in-the-middle.
+Để thực sự an toàn, user nên bắt đầu truy cập site bằng HTTPS và tiếp tục sử dụng nó cho đến khi logout.
+Ngay cả việc click vào link HTTPS từ một page được truy cập qua HTTP cũng tiềm ẩn rủi ro.
+Nếu cần thêm lý do thuyết phục, hãy xem một tool như https://github.com/moxie0/sslstrip/[sslstrip].
 ====
 
 
-===  I am not switching between HTTP and HTTPS, but my session is still lost. What happened?
+=== Tôi không chuyển đổi giữa HTTP và HTTPS, nhưng session vẫn bị mất. Chuyện gì đã xảy ra?
 
-Sessions are maintained either by exchanging a session cookie or by adding a `jsessionid` parameter to URLs (this happens automatically if you use JSTL to output URLs or if you call `HttpServletResponse.encodeUrl` on URLs (before a redirect, for example). If clients have cookies disabled, and you are not rewriting URLs to include the `jsessionid`, the session is lost.
-Note that the use of cookies is preferred for security reasons, as it does not expose the session information in the URL.
+Session được duy trì bằng cách trao đổi session cookie hoặc thêm parameter `jsessionid` vào URL (việc này tự động xảy ra nếu bạn dùng JSTL để output URL hoặc gọi `HttpServletResponse.encodeUrl` trên URL (ví dụ trước một redirect). Nếu client tắt cookie và bạn không rewrite URL để bao gồm `jsessionid`, session sẽ bị mất.
+Lưu ý rằng sử dụng cookie được ưu tiên vì lý do security, vì nó không làm lộ thông tin session trong URL.
 
 [[appendix-faq-session-listener-missing]]
-===  I am trying to use the concurrent session-control support, but it does not let me log back in, even if I am sure I have logged out and have not exceeded the allowed sessions. What is wrong?
+=== Tôi đang cố sử dụng hỗ trợ concurrent session-control, nhưng không thể đăng nhập lại dù chắc chắn đã logout và chưa vượt quá số session cho phép. Có vấn đề gì?
 
-Make sure you have added the listener to your `web.xml` file.
-It is essential to make sure that the Spring Security session registry is notified when a session is destroyed.
-Without it, the session information is not removed from the registry.
-The following example adds a listener in a `web.xml` file:
+Hãy bảo đảm bạn đã thêm listener vào file `web.xml`.
+Điều thiết yếu là phải bảo đảm Spring Security session registry được thông báo khi một session bị destroy.
+Nếu không, thông tin session sẽ không bị xóa khỏi registry.
+Ví dụ sau thêm một listener trong file `web.xml`:
 
 [source,xml]
 ----
@@ -309,56 +309,56 @@ The following example adds a listener in a `web.xml` file:
 ----
 
 [[appendix-faq-unwanted-session-creation]]
-=== Spring Security creates a session somewhere, even though I have configured it not to, by setting the create-session attribute to never. What is wrong?
+=== Spring Security tạo session ở đâu đó dù tôi đã cấu hình không tạo bằng cách đặt attribute create-session thành never. Có vấn đề gì?
 
-This usually means that the user's application is creating a session somewhere but that they are not aware of it.
-The most common culprit is a JSP. Many people are not aware that JSPs create sessions by default.
-To prevent a JSP from creating a session, add the `<%@ page session="false" %>` directive to the top of the page.
+Điều này thường có nghĩa là application của user đang tạo session ở đâu đó nhưng user không biết.
+Thủ phạm phổ biến nhất là JSP. Nhiều người không biết JSP mặc định tạo session.
+Để ngăn JSP tạo session, hãy thêm directive `<%@ page session="false" %>` vào đầu page.
 
-If you have trouble working out where a session is being created, you can add some debugging code to track down the location(s). One way to do this is to add a `javax.servlet.http.HttpSessionListener`, which calls `Thread.dumpStack()` in the `sessionCreated` method, to your application.
+Nếu gặp khó khăn khi xác định session được tạo ở đâu, bạn có thể thêm debug code để truy tìm các vị trí đó. Một cách là thêm `javax.servlet.http.HttpSessionListener` vào application; listener này gọi `Thread.dumpStack()` trong method `sessionCreated`.
 
 [[appendix-faq-forbidden-csrf]]
-=== I get a 403 Forbidden when performing a POST. What is wrong?
+=== Tôi nhận được 403 Forbidden khi thực hiện POST. Có vấn đề gì?
 
-If an HTTP 403 Forbidden error is returned for HTTP POST, but it works for HTTP GET, the issue is most likely related to xref:features/exploits/csrf.adoc#csrf[CSRF]. Either provide the CSRF Token or disable CSRF protection (the latter is not recommended).
+Nếu HTTP POST trả về lỗi HTTP 403 Forbidden nhưng HTTP GET hoạt động, vấn đề rất có thể liên quan đến xref:features/exploits/csrf.adoc#csrf[CSRF]. Hãy cung cấp CSRF Token hoặc tắt CSRF protection (cách sau không được khuyến nghị).
 
 [[appendix-faq-no-security-on-forward]]
-=== I am forwarding a request to another URL by using the RequestDispatcher, but my security constraints are not being applied.
+=== Tôi forward request đến URL khác bằng RequestDispatcher nhưng các security constraint không được áp dụng.
 
-By default, filters are not applied to forwards or includes.
-If you really want the security filters to be applied to forwards or includes, you have to configure these explicitly in your `web.xml` file by using the `<dispatcher>` element, which is a child element of the `<filter-mapping>` element.
+Mặc định, filter không được áp dụng cho forward hoặc include.
+Nếu thực sự muốn security filter được áp dụng cho forward hoặc include, bạn phải cấu hình rõ ràng trong file `web.xml` bằng element `<dispatcher>`, là child element của element `<filter-mapping>`.
 
 
 [[appendix-faq-method-security-in-web-context]]
-=== I have added Spring Security's <global-method-security> element to my application context, but, if I add security annotations to my Spring MVC controller beans (Struts actions etc.), they do not seem to have an effect. Why not?
+=== Tôi đã thêm element <global-method-security> của Spring Security vào application context, nhưng khi thêm security annotation vào Spring MVC controller bean (Struts action, v.v.), chúng dường như không có tác dụng. Tại sao?
 
-In a Spring web application, the application context that holds the Spring MVC beans for the dispatcher servlet is often separate from the main application context.
-It is often defined in a file called `myapp-servlet.xml`, where `myapp` is the name assigned to the Spring `DispatcherServlet` in the `web.xml` file. An application can have multiple `DispatcherServlet` instances, each with its own isolated application context.
-The beans in these "`child`" contexts are not visible to the rest of the application.
-The "`parent`" application context is loaded by the `ContextLoaderListener` you define in your `web.xml` file and is visible to all the child contexts.
-This parent context is usually where you define your security configuration, including the `<global-method-security>` element. As a result, any security constraints applied to methods in these web beans are not enforced, since the beans cannot be seen from the `DispatcherServlet` context.
-You need to either move the `<global-method-security>` declaration to the web context or move the beans you want secured into the main application context.
+Trong một Spring web application, application context chứa các Spring MVC bean cho dispatcher servlet thường tách biệt với main application context.
+Context này thường được định nghĩa trong file có tên `myapp-servlet.xml`, trong đó `myapp` là tên gán cho Spring `DispatcherServlet` trong file `web.xml`. Một application có thể có nhiều instance `DispatcherServlet`, mỗi instance có application context tách biệt riêng.
+Các bean trong những context "`child`" này không hiển thị với phần còn lại của application.
+Application context "`parent`" được load bởi `ContextLoaderListener` mà bạn định nghĩa trong file `web.xml` và hiển thị với tất cả child context.
+Parent context này thường là nơi bạn định nghĩa security configuration, bao gồm element `<global-method-security>`. Do đó, mọi security constraint áp dụng cho method trong các web bean này không được thực thi, vì các bean không thể được nhìn thấy từ `DispatcherServlet` context.
+Bạn cần chuyển declaration `<global-method-security>` sang web context hoặc chuyển các bean cần được bảo vệ vào main application context.
 
-Generally, we recommend applying method security at the service layer rather than on individual web controllers.
+Nhìn chung, chúng tôi khuyến nghị áp dụng method security ở service layer thay vì trên từng web controller.
 
 
 [[appendix-faq-no-filters-no-context]]
-=== I have a user who has definitely been authenticated, but, when I try to access the SecurityContextHolder during some requests, the Authentication is null. Why can I not see the user information?
-Why can't I see the user information?
+=== Tôi có một user chắc chắn đã được authenticate, nhưng khi cố truy cập SecurityContextHolder trong một số request, Authentication lại là null. Tại sao tôi không thấy thông tin user?
+Tại sao tôi không thấy thông tin user?
 
-If you have excluded the request from the security filter chain by using the `filters='none'` attribute in the `<intercept-url>` element that matches the URL pattern, the `SecurityContextHolder` is not populated for that request.
-Check the debug log to see whether the request is passing through the filter chain.
-(You are reading the debug log, right?)
+Nếu đã loại request khỏi security filter chain bằng cách sử dụng attribute `filters='none'` trong element `<intercept-url>` khớp với URL pattern, `SecurityContextHolder` sẽ không được populate cho request đó.
+Hãy kiểm tra debug log để xem request có đi qua filter chain hay không.
+(Bạn đang đọc debug log, đúng không?)
 
 [[appendix-faq-method-security-with-taglib]]
-=== The authorize JSP Tag does not respect my method security annotations when using the URL attribute. Why not?
+=== authorize JSP Tag không tôn trọng method security annotation của tôi khi sử dụng URL attribute. Tại sao?
 
-Method security does not hide links when using the `url` attribute in `<sec:authorize>`, because we cannot readily reverse engineer what URL is mapped to what controller endpoint. We are limited because controllers can rely on headers, the current user, and other details to determine what method to invoke.
+Method security không ẩn link khi sử dụng attribute `url` trong `<sec:authorize>`, vì chúng ta không thể dễ dàng reverse engineer URL nào được map tới controller endpoint nào. Khả năng của chúng ta bị giới hạn vì controller có thể dựa vào header, user hiện tại và các chi tiết khác để xác định method nào cần invoke.
 
 [[appendix-faq-architecture]]
-== Spring Security Architecture Questions
+== Câu hỏi về Spring Security Architecture
 
-This section addresses common Spring Security architecture questions:
+Phần này đề cập đến các câu hỏi thường gặp về Spring Security architecture:
 
 . <<appendix-faq-where-is-class-x>>
 . <<appendix-faq-namespace-to-bean-mapping>>
@@ -369,54 +369,54 @@ This section addresses common Spring Security architecture questions:
 
 
 [[appendix-faq-where-is-class-x]]
-=== How do I know which package class X is in?
+=== Làm thế nào để biết class X nằm trong package nào?
 
-The best way of locating classes is by installing the Spring Security source in your IDE. The distribution includes source jars for each of the modules the project is divided up into.
-Add these to your project source path, and then you can navigate directly to Spring Security classes (`Ctrl-Shift-T` in Eclipse). This also makes debugging easier and lets you troubleshoot exceptions by looking directly at the code where they occur to see what is going on there.
+Cách tốt nhất để tìm class là cài source Spring Security vào IDE. Distribution bao gồm source jar cho từng module mà project được chia thành.
+Thêm các source jar này vào source path của project, sau đó bạn có thể điều hướng trực tiếp đến các class Spring Security (`Ctrl-Shift-T` trong Eclipse). Điều này cũng giúp debug dễ hơn và cho phép troubleshoot exception bằng cách xem trực tiếp code tại nơi chúng xảy ra để hiểu chuyện gì đang diễn ra.
 
 [[appendix-faq-namespace-to-bean-mapping]]
-=== How do the namespace elements map to conventional bean configurations?
+=== Các namespace element map tới conventional bean configuration như thế nào?
 
-There is a general overview of what beans are created by the namespace in the namespace appendix of the reference guide.
-There is also a detailed blog article called "Behind the Spring Security Namespace" on https://spring.io/blog/2010/03/06/behind-the-spring-security-namespace/[blog.springsource.com]. If you want to know the full details, then the code is in the `spring-security-config` module within the Spring Security 3.0 distribution.
-You should probably read the chapters on namespace parsing in the standard Spring Framework reference documentation first.
+Có phần tổng quan về các bean được namespace tạo ra trong namespace appendix của reference guide.
+Ngoài ra còn có bài blog chi tiết tên là "Behind the Spring Security Namespace" trên https://spring.io/blog/2010/03/06/behind-the-spring-security-namespace/[blog.springsource.com]. Nếu muốn biết đầy đủ chi tiết, code nằm trong module `spring-security-config` thuộc Spring Security 3.0 distribution.
+Có lẽ trước tiên bạn nên đọc các chapter về namespace parsing trong tài liệu tham chiếu Spring Framework tiêu chuẩn.
 
 
 [[appendix-faq-role-prefix]]
-=== What does "ROLE_" mean?
+=== "ROLE_" có nghĩa là gì?
 
-`ROLE_` is a way to identify the nature of a given authority.
-An authority prefixed by `ROLE_` means that this authority is a role, likely derived from an RBAC authorization model.
+`ROLE_` là một cách xác định bản chất của một authority cụ thể.
+Authority có tiền tố `ROLE_` nghĩa là authority đó là một role, có thể được suy ra từ authorization model RBAC.
 
-Having a prefix allows for clear differentiation from OAuth 2.0 scopes (which use `SCOPE_`) and authorities granted from other sources as well.
+Có tiền tố cho phép phân biệt rõ với OAuth 2.0 scope (sử dụng `SCOPE_`) cũng như authority được cấp từ các source khác.
 
-You may choose to not prefix your authorities.
-Modern Spring Security authorization components either allow you to supply the entire authority name, rendering the prefix unnecessary.
-An example of this is how xref:servlet/authorization/authorize-http-requests.adoc[`authorizeHttpRequests`] and xref:servlet/authorization/method-security.adoc[`@PreAuthorize`] allow you to call `hasAuthority` or `hasRole`.
+Bạn có thể chọn không thêm tiền tố cho authority.
+Các authorization component hiện đại của Spring Security cho phép bạn cung cấp toàn bộ authority name, khiến tiền tố trở nên không cần thiết.
+Ví dụ là xref:servlet/authorization/authorize-http-requests.adoc[`authorizeHttpRequests`] và xref:servlet/authorization/method-security.adoc[`@PreAuthorize`] cho phép bạn gọi `hasAuthority` hoặc `hasRole`.
 
 [[appendix-faq-what-dependencies]]
-=== How do I know which dependencies to add to my application to work with Spring Security?
+=== Làm thế nào để biết cần thêm dependency nào vào application để làm việc với Spring Security?
 
-It depends on what features you are using and what type of application you are developing.
-With Spring Security 3.0, the project jars are divided into clearly distinct areas of functionality, so it is straightforward to work out which Spring Security jars you need from your application requirements.
-All applications need the `spring-security-core` jar.
-If you are developing a web application, you need the `spring-security-web` jar.
-If you are using security namespace configuration, you need the `spring-security-config` jar. For LDAP support, you need the `spring-security-ldap` jar. And so on.
+Điều này phụ thuộc vào feature bạn sử dụng và loại application bạn đang phát triển.
+Trong Spring Security 3.0, các project jar được chia thành những vùng chức năng tách biệt rõ ràng, vì vậy dễ xác định các Spring Security jar cần thiết từ yêu cầu của application.
+Mọi application đều cần jar `spring-security-core`.
+Nếu phát triển web application, bạn cần jar `spring-security-web`.
+Nếu sử dụng security namespace configuration, bạn cần jar `spring-security-config`. Để hỗ trợ LDAP, bạn cần jar `spring-security-ldap`, v.v.
 
-For third-party jars, the situation is not always quite so obvious.
-A good starting point is to copy those from one of the pre-built sample applications `WEB-INF/lib` directories.
-For a basic application, you can start with the tutorial sample.
-For a basic application, you can start with the tutorial sample.
-If you want to use LDAP with an embedded test server, use the LDAP sample as a starting point.
-The reference manual also includes <<appendix-namespace,an appendix>> that lists the first-level dependencies for each Spring Security module, with some information on whether they are optional and when they are required.
+Với third-party jar, tình hình không phải lúc nào cũng rõ ràng như vậy.
+Một điểm bắt đầu tốt là sao chép chúng từ thư mục `WEB-INF/lib` của một trong các sample application được build sẵn.
+Với application cơ bản, bạn có thể bắt đầu từ tutorial sample.
+Với application cơ bản, bạn có thể bắt đầu từ tutorial sample.
+Nếu muốn sử dụng LDAP với embedded test server, hãy dùng LDAP sample làm điểm bắt đầu.
+Reference manual cũng bao gồm <<appendix-namespace,một appendix>> liệt kê first-level dependency cho mỗi Spring Security module, cùng một số thông tin về việc dependency có optional hay không và khi nào cần đến chúng.
 
-If you build your project with Maven, adding the appropriate Spring Security modules as dependencies to your `pom.xml` file automatically pulls in the core jars that the framework requires.
-Any that are marked as "`optional`" in the Spring Security `pom.xml` files have to be added to your own `pom.xml` file if you need them.
+Nếu build project bằng Maven, việc thêm các Spring Security module phù hợp làm dependency vào file `pom.xml` sẽ tự động kéo theo các core jar mà framework yêu cầu.
+Bất kỳ dependency nào được đánh dấu là "`optional`" trong file `pom.xml` của Spring Security đều phải được thêm vào file `pom.xml` của bạn nếu cần sử dụng.
 
 [[appendix-faq-unboundid-deps]]
-=== What dependencies are needed to run an embedded UnboundID LDAP server?
+=== Cần dependency nào để chạy embedded UnboundID LDAP server?
 
-You need to add the following dependency to your project:
+Bạn cần thêm dependency sau vào project:
 
 [tabs]
 ======
@@ -442,27 +442,27 @@ implementation 'com.unboundid:unboundid-ldapsdk:7.0.1'
 
 
 [[appendix-faq-apacheds-deps]]
-=== What dependencies are needed to run an embedded ApacheDS LDAP server?
+=== Cần dependency nào để chạy embedded ApacheDS LDAP server?
 
-Spring Security 7 removes support for Apache DS.
-Please use <<appendix-faq-unboundid-deps,UnboundID>> instead.
+Spring Security 7 loại bỏ hỗ trợ cho Apache DS.
+Thay vào đó, hãy sử dụng <<appendix-faq-unboundid-deps,UnboundID>>.
 
 [[appendix-faq-what-is-userdetailservice]]
-=== What is a UserDetailsService and do I need one?
+=== UserDetailsService là gì và tôi có cần một UserDetailsService không?
 
-`UserDetailsService` is a DAO interface for loading data that is specific to a user account.
-It has no function other than to load that data for use by other components within the framework.
-It is not responsible for authenticating the user.
-Authenticating a user with a username and password combination is most commonly performed by the `DaoAuthenticationProvider`, which is injected with a `UserDetailsService` to let it load the password (and other data) for a user, to compare it with the submitted value.
-Note that, if you use LDAP, <<appendix-faq-ldap-authentication,this approach may not work>>.
+`UserDetailsService` là một DAO interface dùng để load dữ liệu dành riêng cho một user account.
+Nó không có chức năng nào khác ngoài việc load dữ liệu đó để các component khác trong framework sử dụng.
+Nó không chịu trách nhiệm authenticate user.
+Việc authenticate user bằng cặp username và password thường do `DaoAuthenticationProvider` thực hiện; provider này được inject một `UserDetailsService` để load password (và dữ liệu khác) của user rồi so sánh với value được gửi lên.
+Lưu ý rằng nếu dùng LDAP, <<appendix-faq-ldap-authentication,cách tiếp cận này có thể không hoạt động>>.
 
-If you want to customize the authentication process, you should implement `AuthenticationProvider` yourself.
-See this https://spring.io/blog/2010/08/02/spring-security-in-google-app-engine/[ blog article] for an example that integrate Spring Security authentication with Google App Engine.
+Nếu muốn tùy chỉnh authentication process, bạn nên tự triển khai `AuthenticationProvider`.
+Xem https://spring.io/blog/2010/08/02/spring-security-in-google-app-engine/[bài blog] này để xem ví dụ tích hợp Spring Security authentication với Google App Engine.
 
 [[appendix-faq-howto]]
-== Common How-to Questions
+== Câu hỏi How-to thường gặp
 
-This section addresses common how-to questions about Spring Security:
+Phần này đề cập đến các câu hỏi how-to thường gặp về Spring Security:
 
 . <<appendix-faq-extra-login-fields>>
 . <<appendix-faq-matching-url-fragments>>
@@ -475,62 +475,62 @@ This section addresses common how-to questions about Spring Security:
 
 
 [[appendix-faq-extra-login-fields]]
-=== I need to log in with more information than just the username. How do I add support for extra login fields (such as a company name)?
+=== Tôi cần đăng nhập với nhiều thông tin hơn chỉ username. Làm thế nào để thêm hỗ trợ cho login field bổ sung (chẳng hạn tên công ty)?
 
-This question comes up repeatedly, so you can find more information by searching online.
+Câu hỏi này được đặt đi đặt lại nhiều lần, vì vậy bạn có thể tìm thêm thông tin bằng cách search online.
 
-The submitted login information is processed by an instance of `UsernamePasswordAuthenticationFilter`. You need to customize this class to handle the extra data fields. One option is to use your own customized authentication token class (rather than the standard `UsernamePasswordAuthenticationToken`). Another option is to concatenate the extra fields with the username (for example, by using a `:` character as the separator) and pass them in the username property of `UsernamePasswordAuthenticationToken`.
+Login information được gửi lên được xử lý bởi một instance của `UsernamePasswordAuthenticationFilter`. Bạn cần tùy chỉnh class này để xử lý các data field bổ sung. Một lựa chọn là sử dụng authentication token class tùy chỉnh của riêng bạn (thay vì `UsernamePasswordAuthenticationToken` tiêu chuẩn). Lựa chọn khác là nối các field bổ sung với username (ví dụ dùng ký tự `:` làm separator) rồi truyền chúng trong username property của `UsernamePasswordAuthenticationToken`.
 
-You also need to customize the actual authentication process.
-If you use a custom authentication token class, for example, you will have to write an `AuthenticationProvider` (or extend the standard `DaoAuthenticationProvider`) to handle it. If you have concatenated the fields, you can implement your own `UserDetailsService` to split them up and load the appropriate user data for authentication.
+Bạn cũng cần tùy chỉnh authentication process thực tế.
+Ví dụ, nếu dùng custom authentication token class, bạn phải viết một `AuthenticationProvider` (hoặc extend `DaoAuthenticationProvider` tiêu chuẩn) để xử lý nó. Nếu đã nối các field, bạn có thể triển khai `UserDetailsService` của riêng mình để tách chúng ra và load user data phù hợp cho authentication.
 
 [[appendix-faq-matching-url-fragments]]
-=== How do I apply different intercept-url constraints where only the fragment value of the requested URLs differs (such as /thing1#thing2 and /thing1#thing3)?
+=== Làm thế nào để áp dụng các intercept-url constraint khác nhau khi chỉ fragment value của URL được request khác nhau (chẳng hạn /thing1#thing2 và /thing1#thing3)?
 
-You cannot do this, since the fragment is not transmitted from the browser to the server.
-From the server's perspective, the URLs are identical.
-This is a common question from GWT users.
+Bạn không thể làm vậy, vì fragment không được truyền từ browser đến server.
+Từ góc nhìn server, các URL là giống hệt nhau.
+Đây là câu hỏi phổ biến từ GWT user.
 
 [[appendix-faq-request-details-in-user-service]]
-=== How do I access the user's IP Address (or other web-request data) in a UserDetailsService?
+=== Làm thế nào để truy cập IP Address của user (hoặc web-request data khác) trong UserDetailsService?
 
-You cannot (without resorting to something like thread-local variables), since the only information supplied to the interface is the username.
-Instead of implementing `UserDetailsService`, you should implement `AuthenticationProvider` directly and extract the information from the supplied `Authentication` token.
+Bạn không thể (trừ khi dùng một thứ như thread-local variable), vì thông tin duy nhất được cung cấp cho interface là username.
+Thay vì triển khai `UserDetailsService`, bạn nên triển khai trực tiếp `AuthenticationProvider` và trích xuất thông tin từ `Authentication` token được cung cấp.
 
-In a standard web setup, the `getDetails()` method on the `Authentication` object will return an instance of `WebAuthenticationDetails`. If you need additional information, you can inject a custom `AuthenticationDetailsSource` into the authentication filter you are using.
-If you are using the namespace, for example with the `<form-login>` element, then you should remove this element and replace it with a `<custom-filter>` declaration pointing to an explicitly configured `UsernamePasswordAuthenticationFilter`.
+Trong web setup tiêu chuẩn, method `getDetails()` trên `Authentication` object sẽ trả về một instance của `WebAuthenticationDetails`. Nếu cần thêm thông tin, bạn có thể inject custom `AuthenticationDetailsSource` vào authentication filter đang sử dụng.
+Nếu dùng namespace, chẳng hạn với element `<form-login>`, bạn nên xóa element này và thay bằng declaration `<custom-filter>` trỏ đến `UsernamePasswordAuthenticationFilter` được cấu hình tường minh.
 
 
 [[appendix-faq-access-session-from-user-service]]
-=== How do I access the HttpSession from a UserDetailsService?
+=== Làm thế nào để truy cập HttpSession từ UserDetailsService?
 
-You cannot, since the `UserDetailsService` has no awareness of the servlet API. If you want to store custom user data, you should customize the `UserDetails` object that is returned.
-This can then be accessed at any point, through the thread-local `SecurityContextHolder`. A call to `SecurityContextHolder.getContext().getAuthentication().getPrincipal()` returns this custom object.
+Bạn không thể, vì `UserDetailsService` không biết về servlet API. Nếu muốn lưu custom user data, bạn nên tùy chỉnh `UserDetails` object được trả về.
+Sau đó có thể truy cập object này ở bất kỳ đâu thông qua `SecurityContextHolder` thread-local. Lời gọi `SecurityContextHolder.getContext().getAuthentication().getPrincipal()` trả về custom object này.
 
-If you really need to access the session, you must do so by customizing the web tier.
+Nếu thực sự cần truy cập session, bạn phải làm vậy bằng cách tùy chỉnh web tier.
 
 
 [[appendix-faq-password-in-user-service]]
-=== How do I access the user's password in a UserDetailsService?
+=== Làm thế nào để truy cập password của user trong UserDetailsService?
 
-You cannot (and should not, even if you find a way to do so). You are probably misunderstanding its purpose.
-See "<<appendix-faq-what-is-userdetailservice,What is a UserDetailsService?>>", earlier in the FAQ.
+Bạn không thể (và cũng không nên, ngay cả khi tìm được cách). Có lẽ bạn đang hiểu sai mục đích của nó.
+Xem "<<appendix-faq-what-is-userdetailservice,UserDetailsService là gì?>>" ở phần trước của FAQ.
 
 
 [[appendix-faq-dynamic-url-metadata]]
-=== How do I dynamically define the secured URLs within an application?
+=== Làm thế nào để định nghĩa động các URL được bảo vệ trong application?
 
-People often ask about how to store the mapping between secured URLs and security metadata attributes in a database rather than in the application context.
+Mọi người thường hỏi cách lưu mapping giữa URL được bảo vệ và security metadata attribute trong database thay vì trong application context.
 
-The first thing you should ask yourself is if you really need to do this.
-If an application needs to be secure, it also requires that the security be tested thoroughly based on a defined policy.
-It may require auditing and acceptance testing before being rolled out into a production environment.
-A security-conscious organization should be aware that the benefits of their diligent testing process could be wiped out instantly by letting the security settings be modified at runtime by changing a row or two in a configuration database.
-If you have taken this into account (perhaps by using multiple layers of security within your application), Spring Security lets you fully customize the source of security metadata.
-You can make it fully dynamic if you choose.
+Điều đầu tiên bạn nên tự hỏi là liệu có thực sự cần làm vậy không.
+Nếu application cần an toàn, security cũng cần được test kỹ lưỡng dựa trên một policy đã định nghĩa.
+Có thể cần auditing và acceptance testing trước khi đưa vào production environment.
+Một tổ chức coi trọng security cần nhận thức rằng lợi ích từ quy trình test kỹ lưỡng có thể bị xóa sạch ngay lập tức nếu cho phép sửa security setting tại runtime bằng cách thay đổi một hoặc hai row trong configuration database.
+Nếu đã cân nhắc điều này (có thể bằng cách sử dụng nhiều layer security trong application), Spring Security cho phép bạn tùy chỉnh hoàn toàn source của security metadata.
+Bạn có thể làm cho nó hoàn toàn dynamic nếu muốn.
 
-Both method and web security are protected by implementations of `AuthorizationManager`.
-For web security, you can supply your own implementation of `AuthorizationManager<RequestAuthorizationContext>` and supply it to the filter chain DSL like so:
+Cả method security và web security đều được bảo vệ bởi các implementation của `AuthorizationManager`.
+Đối với web security, bạn có thể cung cấp implementation riêng của `AuthorizationManager<RequestAuthorizationContext>` và truyền nó cho filter chain DSL như sau:
 
 [tabs]
 ======
@@ -581,7 +581,7 @@ http {
 ----
 ======
 
-For method security, you can supply your own implementation of `AuthorizationManager<MethodInvocation>` and supply it to Spring AOP like so:
+Đối với method security, bạn có thể cung cấp implementation riêng của `AuthorizationManager<MethodInvocation>` và truyền nó cho Spring AOP như sau:
 
 [tabs]
 ======
@@ -634,12 +634,12 @@ companion object {
 
 
 [[appendix-faq-ldap-authorities]]
-=== How do I authenticate against LDAP but load user roles from a database?
+=== Làm thế nào để authenticate dựa trên LDAP nhưng load user role từ database?
 
-The `LdapAuthenticationProvider` bean (which handles normal LDAP authentication in Spring Security) is configured with two separate strategy interfaces, one that performs the authentication and one that loads the user authorities, called `LdapAuthenticator` and `LdapAuthoritiesPopulator`, respectively.
-The `DefaultLdapAuthoritiesPopulator` loads the user authorities from the LDAP directory and has various configuration parameters to let you specify how these should be retrieved.
+Bean `LdapAuthenticationProvider` (xử lý LDAP authentication thông thường trong Spring Security) được cấu hình với hai strategy interface riêng biệt: một interface thực hiện authentication và một interface load authority của user, lần lượt có tên `LdapAuthenticator` và `LdapAuthoritiesPopulator`.
+`DefaultLdapAuthoritiesPopulator` load authority của user từ LDAP directory và có nhiều configuration parameter để bạn chỉ định cách truy xuất chúng.
 
-To use JDBC instead, you can implement the interface yourself, by using whatever SQL is appropriate for your schema:
+Để sử dụng JDBC thay thế, bạn có thể tự triển khai interface bằng SQL phù hợp với schema của mình:
 
 [tabs]
 ======
@@ -693,20 +693,20 @@ class MyAuthoritiesPopulator : LdapAuthoritiesPopulator {
 ----
 ======
 
-You would then add a bean of this type to your application context and inject it into the `LdapAuthenticationProvider`. This is covered in the section on configuring LDAP by using explicit Spring beans in the LDAP chapter of the reference manual.
-Note that you cannot use the namespace for configuration in this case.
-You should also consult the xref:attachment$api/java/index.html[Javadoc] for the relevant classes and interfaces.
+Sau đó, bạn thêm một bean thuộc type này vào application context và inject nó vào `LdapAuthenticationProvider`. Việc này được đề cập trong phần cấu hình LDAP bằng explicit Spring bean ở chapter LDAP của reference manual.
+Lưu ý rằng trong trường hợp này bạn không thể sử dụng namespace để cấu hình.
+Bạn cũng nên tham khảo xref:attachment$api/java/index.html[Javadoc] cho các class và interface liên quan.
 
 
 [[appendix-faq-namespace-post-processor]]
-=== I want to modify the property of a bean that is created by the namespace, but there is nothing in the schema to support it. What can I do short of abandoning namespace use?
+=== Tôi muốn sửa property của bean được namespace tạo ra, nhưng schema không có gì hỗ trợ việc đó. Tôi có thể làm gì mà không phải từ bỏ việc sử dụng namespace?
 
-The namespace functionality is intentionally limited, so it does not cover everything that you can do with plain beans.
-If you want to do something simple, such as modifying a bean or injecting a different dependency, you can do so by adding a `BeanPostProcessor` to your configuration.
-You can find more information in the {spring-framework-reference-url}core/beans/factory-extension.html#beans-factory-extension-bpp[Spring Reference Manual]. To do so, you need to know a bit about which beans are created, so you should also read the blog article mentioned in the earlier question on <<appendix-faq-namespace-to-bean-mapping,how the namespace maps to Spring beans>>.
+Chức năng namespace được giới hạn có chủ ý, vì vậy không bao quát mọi việc bạn có thể làm với plain bean.
+Nếu muốn làm điều gì đó đơn giản, chẳng hạn sửa một bean hoặc inject dependency khác, bạn có thể thực hiện bằng cách thêm `BeanPostProcessor` vào configuration.
+Bạn có thể tìm thêm thông tin trong {spring-framework-reference-url}core/beans/factory-extension.html#beans-factory-extension-bpp[Spring Reference Manual]. Để làm vậy, bạn cần biết một chút về các bean được tạo ra, vì vậy cũng nên đọc bài blog được đề cập trong câu hỏi trước về <<appendix-faq-namespace-to-bean-mapping,cách namespace map tới Spring bean>>.
 
-Normally, you would add the functionality you require to the `postProcessBeforeInitialization` method of `BeanPostProcessor`. Suppose that you want to customize the `AuthenticationDetailsSource` used by the `UsernamePasswordAuthenticationFilter` (created by the `form-login` element). You want to extract a particular header called `CUSTOM_HEADER` from the request and use it while authenticating the user.
-The processor class would look like the following listing:
+Thông thường, bạn sẽ thêm functionality cần thiết vào method `postProcessBeforeInitialization` của `BeanPostProcessor`. Giả sử bạn muốn tùy chỉnh `AuthenticationDetailsSource` được `UsernamePasswordAuthenticationFilter` sử dụng (được tạo bởi element `form-login`). Bạn muốn trích xuất một header cụ thể có tên `CUSTOM_HEADER` từ request và sử dụng nó khi authenticate user.
+Processor class sẽ có dạng như listing sau:
 
 [tabs]
 ======
@@ -756,5 +756,5 @@ class CustomBeanPostProcessor : BeanPostProcessor {
 ----
 ======
 
-You would then register this bean in your application context.
-Spring automatically invoke it on the beans defined in the application context.
+Sau đó, bạn đăng ký bean này trong application context.
+Spring tự động invoke nó trên các bean được định nghĩa trong application context.
