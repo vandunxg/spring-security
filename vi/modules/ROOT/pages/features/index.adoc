@@ -1,7 +1,6 @@
 [[features]]
-= Features
+= Tính năng
 :page-section-summary-toc: 1
 
-Spring Security provides comprehensive support for xref:features/authentication/index.adoc[authentication], xref:features/authorization/index.adoc[authorization], and protection against xref:features/exploits/index.adoc#exploits[common exploits].
-It also provides integration with other libraries to simplify its usage.
-
+Spring Security cung cấp hỗ trợ toàn diện cho xref:features/authentication/index.adoc[authentication], xref:features/authorization/index.adoc[authorization] và khả năng bảo vệ chống lại xref:features/exploits/index.adoc#exploits[các exploit phổ biến].
+Nó cũng cung cấp khả năng tích hợp với các thư viện khác để đơn giản hóa việc sử dụng.
