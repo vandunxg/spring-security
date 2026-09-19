@@ -1,13 +1,13 @@
 [[webflux-cors]]
 = CORS
 
-Spring Framework provides {spring-framework-reference-url}web/webflux-cors.html#webflux-cors-intro[first class support for CORS].
-CORS must be processed before Spring Security because the pre-flight request will not contain any cookies (i.e. the `JSESSIONID`).
-If the request does not contain any cookies and Spring Security is first, the request will determine the user is not authenticated (since there are no cookies in the request) and reject it.
+Spring Framework cung cấp {spring-framework-reference-url}web/webflux-cors.html#webflux-cors-intro[hỗ trợ hàng đầu cho CORS].
+CORS phải được xử lý trước Spring Security, vì pre-flight request không chứa cookie nào (cụ thể là `JSESSIONID`).
+Nếu request không chứa cookie nào và Spring Security được xử lý trước, Spring Security sẽ xác định rằng người dùng chưa được authentication (vì request không có cookie nào) và từ chối request đó.
 
-The easiest way to ensure that CORS is handled first is to use the `CorsWebFilter`.
-Users can integrate the `CorsWebFilter` with Spring Security by providing a `CorsConfigurationSource`.
-For example, the following will integrate CORS support within Spring Security:
+Cách dễ nhất để đảm bảo CORS được xử lý trước là sử dụng `CorsWebFilter`.
+Bạn có thể tích hợp `CorsWebFilter` với Spring Security bằng cách cung cấp một `CorsConfigurationSource`.
+Ví dụ sau tích hợp hỗ trợ CORS trong Spring Security:
 
 [tabs]
 ======
@@ -42,7 +42,7 @@ fun corsConfigurationSource(): UrlBasedCorsConfigurationSource {
 ----
 ======
 
-The following will disable the CORS integration within Spring Security:
+Đoạn mã sau vô hiệu hóa tích hợp CORS trong Spring Security:
 
 [tabs]
 ======
@@ -77,8 +77,8 @@ fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain 
 
 [WARNING]
 ====
-CORS is a browser-based security feature.
-By disabling CORS in Spring Security, you are not removing CORS protection from your browser.
-Instead, you are removing CORS support from Spring Security, and users will not be able to interact with your Spring backend from a cross-origin browser application.
-To fix CORS errors in your application, you must enable CORS support, and provide an appropriate configuration source.
+CORS là một tính năng bảo mật dựa trên trình duyệt.
+Việc vô hiệu hóa CORS trong Spring Security không loại bỏ cơ chế bảo vệ CORS khỏi trình duyệt của bạn.
+Thay vào đó, bạn đang loại bỏ hỗ trợ CORS khỏi Spring Security, và người dùng sẽ không thể tương tác với backend Spring của bạn từ một ứng dụng trình duyệt cross-origin.
+Để khắc phục lỗi CORS trong ứng dụng, bạn phải bật hỗ trợ CORS và cung cấp một nguồn cấu hình phù hợp.
 ====
