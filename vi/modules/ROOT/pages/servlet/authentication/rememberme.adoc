@@ -1,20 +1,20 @@
 [[servlet-rememberme]]
-= Remember-Me Authentication
+= Authentication bằng Remember-Me
 
 [[remember-me-overview]]
-Remember-me or persistent-login authentication refers to web sites being able to remember the identity of a principal between sessions.
-This is typically accomplished by sending a cookie to the browser, with the cookie being detected during future sessions and causing automated login to take place.
-Spring Security provides the necessary hooks for these operations to take place and has two concrete remember-me implementations.
-One uses hashing to preserve the security of cookie-based tokens and the other uses a database or other persistent storage mechanism to store the generated tokens.
+Authentication remember-me hoặc persistent-login đề cập đến việc các website có thể ghi nhớ identity của một principal giữa các session.
+Điều này thường được thực hiện bằng cách gửi một cookie đến browser; cookie sẽ được phát hiện trong các session sau và khiến login tự động diễn ra.
+Spring Security cung cấp các hook cần thiết để thực hiện những thao tác này và có hai implementation remember-me cụ thể.
+Một implementation sử dụng hashing để duy trì tính bảo mật của các token dựa trên cookie, còn implementation kia sử dụng database hoặc cơ chế persistent storage khác để lưu các token được tạo.
 
-Note that both implementations require a `UserDetailsService`.
-If you use an authentication provider that does not use a `UserDetailsService` (for example, the LDAP provider), it does not work unless you also have a `UserDetailsService` bean in your application context.
+Lưu ý rằng cả hai implementation đều yêu cầu một `UserDetailsService`.
+Nếu bạn sử dụng một authentication provider không dùng `UserDetailsService` (ví dụ, LDAP provider), nó sẽ không hoạt động trừ khi application context của bạn cũng có một `UserDetailsService` bean.
 
 
 [[remember-me-hash-token]]
-== Simple Hash-Based Token Approach
-This approach uses hashing to achieve a useful remember-me strategy.
-In essence, a cookie is sent to the browser upon successful interactive authentication, with the cookie being composed as follows:
+== Cách tiếp cận Token dựa trên Hash đơn giản
+Cách tiếp cận này sử dụng hashing để triển khai một remember-me strategy hữu ích.
+Về bản chất, một cookie được gửi đến browser sau khi interactive authentication thành công, trong đó cookie được cấu thành như sau:
 
 [source,txt]
 ----
@@ -28,14 +28,14 @@ key:               A private key to prevent modification of the remember-me toke
 algorithmName:     The algorithm used to generate and to verify the remember-me token signature
 ----
 
-The remember-me token is valid only for the period specified and only if the username, password, and key do not change.
-Notably, this has a potential security issue, in that a captured remember-me token is usable from any user agent until such time as the token expires.
-This is the same issue as with digest authentication.
-If a principal is aware that a token has been captured, they can easily change their password and immediately invalidate all remember-me tokens on issue.
-If more significant security is needed, you should use the approach described in the next section.
-Alternatively, remember-me services should not be used at all.
+Remember-me token chỉ hợp lệ trong khoảng thời gian được chỉ định và chỉ khi username, password và key không thay đổi.
+Đáng chú ý, điều này tiềm ẩn vấn đề bảo mật: một remember-me token bị đánh cắp có thể được sử dụng từ bất kỳ user agent nào cho đến khi token hết hạn.
+Đây cũng là vấn đề của digest authentication.
+Nếu principal biết rằng một token đã bị đánh cắp, họ có thể dễ dàng thay đổi password và ngay lập tức vô hiệu hóa mọi remember-me token đã được cấp.
+Nếu cần mức độ bảo mật cao hơn, bạn nên sử dụng cách tiếp cận được mô tả trong phần tiếp theo.
+Ngoài ra, không nên sử dụng remember-me services.
 
-If you are familiar with the topics discussed in the chapter on xref:servlet/configuration/xml-namespace.adoc#ns-config[namespace configuration], you can enable remember-me authentication by adding the `<remember-me>` element:
+Nếu bạn đã quen với các chủ đề được thảo luận trong chương về xref:servlet/configuration/xml-namespace.adoc#ns-config[cấu hình namespace], bạn có thể bật remember-me authentication bằng cách thêm phần tử `<remember-me>`:
 
 [source,xml]
 ----
@@ -45,14 +45,14 @@ If you are familiar with the topics discussed in the chapter on xref:servlet/con
 </http>
 ----
 
-The `UserDetailsService` is normally selected automatically.
-If you have more than one in your application context, you need to specify which one should be used with the `user-service-ref` attribute, where the value is the name of your `UserDetailsService` bean.
+`UserDetailsService` thường được tự động lựa chọn.
+Nếu application context có nhiều hơn một `UserDetailsService`, bạn cần chỉ định service nào sẽ được sử dụng bằng attribute `user-service-ref`; giá trị của attribute này là tên `UserDetailsService` bean của bạn.
 
 [[remember-me-persistent-token]]
-== Persistent Token Approach
-This approach is based on the article https://web.archive.org/web/20180819014446/http://jaspan.com/improved_persistent_login_cookie_best_practice[Improved Persistent Login Cookie Best Practice] with some minor modifications  footnote:[Essentially, the username is not included in the cookie, to prevent exposing a valid login name unnecessarily.
-There is a discussion on this in the comments section of this article.].
-To use this approach with namespace configuration, you would supply a datasource reference:
+== Cách tiếp cận Persistent Token
+Cách tiếp cận này dựa trên bài viết https://web.archive.org/web/20180819014446/http://jaspan.com/improved_persistent_login_cookie_best_practice[Best Practice về Persistent Login Cookie được cải thiện], với một số sửa đổi nhỏ footnote:[Về cơ bản, username không được đưa vào cookie để tránh việc không cần thiết làm lộ một login name hợp lệ.
+Bài viết có thảo luận về vấn đề này trong phần bình luận.].
+Để sử dụng cách tiếp cận này với cấu hình namespace, bạn cần cung cấp một datasource reference:
 
 [source,xml]
 ----
@@ -62,7 +62,7 @@ To use this approach with namespace configuration, you would supply a datasource
 </http>
 ----
 
-The database should contain a `persistent_logins` table, created by using the following SQL (or equivalent):
+Database phải chứa một bảng `persistent_logins`, được tạo bằng SQL sau (hoặc tương đương):
 
 [source,ddl]
 ----
@@ -73,11 +73,11 @@ create table persistent_logins (username varchar(64) not null,
 ----
 
 [[remember-me-impls]]
-== Remember-Me Interfaces and Implementations
-Remember-me is used with `UsernamePasswordAuthenticationFilter` and is implemented through hooks in the `AbstractAuthenticationProcessingFilter` superclass.
-It is also used within `BasicAuthenticationFilter`.
-The hooks invoke a concrete `RememberMeServices` at the appropriate times.
-The following listing shows the interface:
+== Interface và Implementation Remember-Me
+Remember-me được sử dụng với `UsernamePasswordAuthenticationFilter` và được triển khai thông qua các hook trong superclass `AbstractAuthenticationProcessingFilter`.
+Nó cũng được sử dụng bên trong `BasicAuthenticationFilter`.
+Các hook gọi một `RememberMeServices` cụ thể vào những thời điểm thích hợp.
+Danh sách sau đây thể hiện interface:
 
 [source,java]
 ----
@@ -89,41 +89,41 @@ void loginSuccess(HttpServletRequest request, HttpServletResponse response,
 	Authentication successfulAuthentication);
 ----
 
-See the Javadoc for javadoc:org.springframework.security.web.authentication.RememberMeServices[] for a fuller discussion on what the methods do, although note that, at this stage, `AbstractAuthenticationProcessingFilter` calls only the `loginFail()` and `loginSuccess()` methods.
-The `autoLogin()` method is called by `RememberMeAuthenticationFilter` whenever the `SecurityContextHolder` does not contain an `Authentication`.
-This interface, therefore, provides the underlying remember-me implementation with sufficient notification of authentication-related events and delegates to the implementation whenever a candidate web request might contain a cookie and wish to be remembered.
-This design allows any number of remember-me implementation strategies.
+Xem Javadoc của javadoc:org.springframework.security.web.authentication.RememberMeServices[] để thảo luận đầy đủ hơn về chức năng của các method, nhưng lưu ý rằng ở giai đoạn này, `AbstractAuthenticationProcessingFilter` chỉ gọi các method `loginFail()` và `loginSuccess()`.
+Method `autoLogin()` được `RememberMeAuthenticationFilter` gọi bất cứ khi nào `SecurityContextHolder` không chứa một `Authentication`.
+Do đó, interface này cung cấp cho implementation remember-me nền tảng thông báo đầy đủ về các event liên quan đến authentication và ủy quyền cho implementation bất cứ khi nào một web request có khả năng chứa cookie và muốn được ghi nhớ.
+Thiết kế này cho phép có bao nhiêu remember-me implementation strategy tùy ý.
 
-We have seen earlier that Spring Security provides two implementations.
-We look at each of these in turn.
+Trước đó chúng ta đã thấy Spring Security cung cấp hai implementation.
+Sau đây lần lượt xem xét từng implementation.
 
 [[token-based-remember-me-services]]
 === TokenBasedRememberMeServices
-This implementation supports the simpler approach described in <<remember-me-hash-token>>.
-`TokenBasedRememberMeServices` generates a `RememberMeAuthenticationToken`, which is processed by `RememberMeAuthenticationProvider`.
-A `key` is shared between this authentication provider and the `TokenBasedRememberMeServices`.
-In addition, `TokenBasedRememberMeServices` requires a `UserDetailsService`, from which it can retrieve the username and password for signature comparison purposes and generate the `RememberMeAuthenticationToken` to contain the correct `GrantedAuthority` instances.
-`TokenBasedRememberMeServices` also implements Spring Security's `LogoutHandler` interface so that it can be used with `LogoutFilter` to have the cookie cleared automatically.
+Implementation này hỗ trợ cách tiếp cận đơn giản hơn được mô tả trong <<remember-me-hash-token>>.
+`TokenBasedRememberMeServices` tạo một `RememberMeAuthenticationToken`, token này được `RememberMeAuthenticationProvider` xử lý.
+Một `key` được dùng chung giữa authentication provider này và `TokenBasedRememberMeServices`.
+Ngoài ra, `TokenBasedRememberMeServices` yêu cầu một `UserDetailsService`, từ đó nó có thể lấy username và password để so sánh signature, đồng thời tạo `RememberMeAuthenticationToken` chứa các instance `GrantedAuthority` chính xác.
+`TokenBasedRememberMeServices` cũng triển khai interface `LogoutHandler` của Spring Security để có thể sử dụng cùng `LogoutFilter` và tự động xóa cookie.
 
-By default, this implementation uses the SHA-256 algorithm to encode the token signature.
-To verify the token signature, the algorithm retrieved from `algorithmName` is parsed and used.
-If no `algorithmName` is present, the default matching algorithm will be used, which is SHA-256.
-You can specify different algorithms for signature encoding and for signature matching, this allows users to safely upgrade to a different encoding algorithm while still able to verify old ones if there is no `algorithmName` present.
-To do that you can specify your customized `TokenBasedRememberMeServices` as a Bean and use it in the configuration.
+Theo mặc định, implementation này sử dụng algorithm SHA-256 để encode token signature.
+Để verify token signature, algorithm lấy từ `algorithmName` sẽ được phân tích và sử dụng.
+Nếu không có `algorithmName`, matching algorithm mặc định sẽ được sử dụng, đó là SHA-256.
+Bạn có thể chỉ định các algorithm khác nhau cho việc encode signature và matching signature; điều này cho phép người dùng an toàn nâng cấp lên algorithm encode khác mà vẫn có thể verify các token cũ khi không có `algorithmName`.
+Để làm vậy, bạn có thể chỉ định `TokenBasedRememberMeServices` đã tùy chỉnh của mình dưới dạng một Bean và sử dụng nó trong cấu hình.
 
 include-code::./CustomAlgorithmRememberMeServicesConfiguration[tag=snippet,indent=0]
 
-The following beans are required in an application context to enable remember-me services:
+Các bean sau đây là bắt buộc trong application context để bật remember-me services:
 
 include-code::./DefaultAlgorithmRememberMeServicesConfiguration[tag=snippet,indent=0]
 
-Remember to add your `RememberMeServices` implementation to your `UsernamePasswordAuthenticationFilter.setRememberMeServices()` property, include the `RememberMeAuthenticationProvider` in your `AuthenticationManager.setProviders()` list, and add `RememberMeAuthenticationFilter` into your `FilterChainProxy` (typically immediately after your `UsernamePasswordAuthenticationFilter`).
+Hãy nhớ thêm implementation `RememberMeServices` của bạn vào property `UsernamePasswordAuthenticationFilter.setRememberMeServices()`, đưa `RememberMeAuthenticationProvider` vào list `AuthenticationManager.setProviders()`, và thêm `RememberMeAuthenticationFilter` vào `FilterChainProxy` (thông thường ngay sau `UsernamePasswordAuthenticationFilter`).
 
 
 === PersistentTokenBasedRememberMeServices
-You can use this class in the same way as `TokenBasedRememberMeServices`, but it additionally needs to be configured with a `PersistentTokenRepository` to store the tokens.
+Bạn có thể sử dụng class này giống như `TokenBasedRememberMeServices`, nhưng ngoài ra cần cấu hình class này với một `PersistentTokenRepository` để lưu các token.
 
-* `InMemoryTokenRepositoryImpl` which is intended for testing only.
-* `JdbcTokenRepositoryImpl` which stores the tokens in a database.
+* `InMemoryTokenRepositoryImpl`, chỉ dành cho testing.
+* `JdbcTokenRepositoryImpl`, dùng để lưu các token trong database.
 
-See <<remember-me-persistent-token>> for the database schema.
+Xem <<remember-me-persistent-token>> để biết database schema.
