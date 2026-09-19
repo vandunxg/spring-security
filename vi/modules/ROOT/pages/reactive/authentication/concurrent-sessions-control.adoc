@@ -1,26 +1,26 @@
 [[reactive-concurrent-sessions-control]]
-= Concurrent Sessions Control
+= Kiểm soát session đồng thời
 
-Similar to xref:servlet/authentication/session-management.adoc#ns-concurrent-sessions[Servlet's Concurrent Sessions Control], Spring Security also provides support to limit the number of concurrent sessions a user can have in a Reactive application.
+Tương tự như xref:servlet/authentication/session-management.adoc#ns-concurrent-sessions[Kiểm soát session đồng thời của Servlet], Spring Security cũng hỗ trợ giới hạn số session đồng thời mà một người dùng có thể có trong một ứng dụng Reactive.
 
-When you set up Concurrent Sessions Control in Spring Security, it monitors authentications carried out through Form Login, xref:reactive/oauth2/login/index.adoc[OAuth 2.0 Login], and HTTP Basic authentication by hooking into the way those authentication mechanisms handle authentication success.
-More specifically, the session management DSL will add the javadoc:org.springframework.security.web.server.authentication.ConcurrentSessionControlServerAuthenticationSuccessHandler[] and the javadoc:org.springframework.security.web.server.authentication.RegisterSessionServerAuthenticationSuccessHandler[] to the list of `ServerAuthenticationSuccessHandler` used by the authentication filter.
+Khi thiết lập Kiểm soát session đồng thời trong Spring Security, tính năng này theo dõi các authentication được thực hiện thông qua Form Login, xref:reactive/oauth2/login/index.adoc[Đăng nhập OAuth 2.0] và HTTP Basic authentication bằng cách móc vào cách các cơ chế authentication đó xử lý việc authentication thành công.
+Cụ thể hơn, DSL quản lý session sẽ thêm javadoc:org.springframework.security.web.server.authentication.ConcurrentSessionControlServerAuthenticationSuccessHandler[] và javadoc:org.springframework.security.web.server.authentication.RegisterSessionServerAuthenticationSuccessHandler[] vào danh sách `ServerAuthenticationSuccessHandler` được authentication filter sử dụng.
 
-The following sections contains examples of how to configure Concurrent Sessions Control.
+Các phần sau chứa những ví dụ về cách cấu hình Kiểm soát session đồng thời.
 
-* <<reactive-concurrent-sessions-control-limit,I want to limit the number of concurrent sessions a user can have>>
-* <<concurrent-sessions-control-custom-strategy,I want to customize the strategy used when the maximum number of sessions is exceeded>>
-* <<reactive-concurrent-sessions-control-specify-session-registry,I want to know how to specify a `ReactiveSessionRegistry`>>
-* <<concurrent-sessions-control-sample,I want to see a sample application that uses Concurrent Sessions Control>>
-* <<disabling-for-authentication-filters,I want to know how to disable it for some authentication filter>>
+* <<reactive-concurrent-sessions-control-limit,Tôi muốn giới hạn số session đồng thời mà một người dùng có thể có>>
+* <<concurrent-sessions-control-custom-strategy,Tôi muốn tùy chỉnh strategy được sử dụng khi vượt quá số session tối đa>>
+* <<reactive-concurrent-sessions-control-specify-session-registry,Tôi muốn biết cách chỉ định một `ReactiveSessionRegistry`>>
+* <<concurrent-sessions-control-sample,Tôi muốn xem một ứng dụng mẫu sử dụng Kiểm soát session đồng thời>>
+* <<disabling-for-authentication-filters,Tôi muốn biết cách vô hiệu hóa tính năng này cho một authentication filter>>
 
 [[reactive-concurrent-sessions-control-limit]]
-== Limiting Concurrent Sessions
+== Giới hạn session đồng thời
 
-By default, Spring Security will allow any number of concurrent sessions for a user.
-To limit the number of concurrent sessions, you can use the `maximumSessions` DSL method:
+Theo mặc định, Spring Security cho phép một người dùng có số session đồng thời bất kỳ.
+Để giới hạn số session đồng thời, bạn có thể sử dụng DSL method `maximumSessions`:
 
-.Configuring one session for any user
+.Cấu hình một session cho mọi người dùng
 [tabs]
 ======
 Java::
@@ -67,10 +67,10 @@ open fun reactiveSessionRegistry(): ReactiveSessionRegistry {
 ----
 ======
 
-The above configuration allows one session for any user.
-Similarly, you can also allow unlimited sessions by using the `SessionLimit#UNLIMITED` constant:
+Cấu hình trên cho phép mỗi người dùng có một session.
+Tương tự, bạn cũng có thể cho phép số session không giới hạn bằng cách sử dụng constant `SessionLimit#UNLIMITED`:
 
-.Configuring unlimited sessions
+.Cấu hình session không giới hạn
 [tabs]
 ======
 Java::
@@ -116,9 +116,9 @@ open fun reactiveSessionRegistry(webSessionManager: WebSessionManager): Reactive
 ----
 ======
 
-Since the `maximumSessions` method accepts a `SessionLimit` interface, which in turn extends `Function<Authentication, Mono<Integer>>`, you can have a more complex logic to determine the maximum number of sessions based on the user's authentication:
+Vì method `maximumSessions` chấp nhận interface `SessionLimit`, mà interface này mở rộng `Function<Authentication, Mono<Integer>>`, bạn có thể sử dụng logic phức tạp hơn để xác định số session tối đa dựa trên authentication của người dùng:
 
-.Configuring maximumSessions based on `Authentication`
+.Cấu hình maximumSessions dựa trên `Authentication`
 [tabs]
 ======
 Java::
@@ -185,23 +185,23 @@ open fun reactiveSessionRegistry(): ReactiveSessionRegistry {
 ----
 ======
 
-When the maximum number of sessions is exceeded, by default, the least recently used session(s) will be expired.
-If you want to change that behavior, you can <<concurrent-sessions-control-custom-strategy,customize the strategy used when the maximum number of sessions is exceeded>>.
+Khi vượt quá số session tối đa, theo mặc định, các session ít được sử dụng gần đây nhất sẽ hết hạn.
+Nếu muốn thay đổi hành vi đó, bạn có thể <<concurrent-sessions-control-custom-strategy,tùy chỉnh strategy được sử dụng khi vượt quá số session tối đa>>.
 
 [IMPORTANT]
 ====
-The Concurrent Session Management is not aware if there is another session in some Identity Provider that you might use via xref:reactive/oauth2/login/index.adoc[OAuth 2 Login] for example.
-If you also need to invalidate the session against the Identity Provider you must <<concurrent-sessions-control-custom-strategy,include your own implementation of `ServerMaximumSessionsExceededHandler`>>.
+Concurrent Session Management không biết liệu có một session khác trong một Identity Provider nào đó mà bạn có thể sử dụng, chẳng hạn thông qua xref:reactive/oauth2/login/index.adoc[OAuth 2 Login].
+Nếu cũng cần invalidate session trên Identity Provider, bạn phải <<concurrent-sessions-control-custom-strategy,đưa vào implementation riêng của mình cho `ServerMaximumSessionsExceededHandler`>>.
 ====
 
 [[concurrent-sessions-control-custom-strategy]]
-== Handling Maximum Number of Sessions Exceeded
+== Xử lý khi vượt quá số session tối đa
 
-By default, when the maximum number of sessions is exceeded, the least recently used session(s) will be expired by using the javadoc:org.springframework.security.web.server.authentication.InvalidateLeastUsedServerMaximumSessionsExceededHandler[].
-Spring Security also provides another implementation that prevents the user from creating new sessions by using the javadoc:org.springframework.security.web.server.authentication.PreventLoginServerMaximumSessionsExceededHandler[].
-If you want to use your own strategy, you can provide a different implementation of javadoc:org.springframework.security.web.server.authentication.ServerMaximumSessionsExceededHandler[].
+Theo mặc định, khi vượt quá số session tối đa, các session ít được sử dụng gần đây nhất sẽ hết hạn bằng cách sử dụng javadoc:org.springframework.security.web.server.authentication.InvalidateLeastUsedServerMaximumSessionsExceededHandler[].
+Spring Security cũng cung cấp một implementation khác để ngăn người dùng tạo session mới bằng cách sử dụng javadoc:org.springframework.security.web.server.authentication.PreventLoginServerMaximumSessionsExceededHandler[].
+Nếu muốn sử dụng strategy riêng, bạn có thể cung cấp một implementation khác của javadoc:org.springframework.security.web.server.authentication.ServerMaximumSessionsExceededHandler[].
 
-.Configuring maximumSessionsExceededHandler
+.Cấu hình maximumSessionsExceededHandler
 [tabs]
 ======
 Java::
@@ -252,15 +252,15 @@ open fun reactiveSessionRegistry(): ReactiveSessionRegistry {
 ======
 
 [[reactive-concurrent-sessions-control-specify-session-registry]]
-== Specifying a `ReactiveSessionRegistry`
+== Chỉ định một `ReactiveSessionRegistry`
 
-In order to keep track of the user's sessions, Spring Security uses a javadoc:org.springframework.security.core.session.ReactiveSessionRegistry[], and, every time a user logs in, their session information is saved.
+Để theo dõi các session của người dùng, Spring Security sử dụng javadoc:org.springframework.security.core.session.ReactiveSessionRegistry[], và mỗi khi người dùng đăng nhập, thông tin session của họ sẽ được lưu lại.
 
-Spring Security ships with javadoc:org.springframework.security.core.session.InMemoryReactiveSessionRegistry[] implementation of `ReactiveSessionRegistry`.
+Spring Security cung cấp implementation javadoc:org.springframework.security.core.session.InMemoryReactiveSessionRegistry[] của `ReactiveSessionRegistry`.
 
-To specify a `ReactiveSessionRegistry` implementation you can either declare it as a bean:
+Để chỉ định một implementation của `ReactiveSessionRegistry`, bạn có thể khai báo nó dưới dạng bean:
 
-.ReactiveSessionRegistry as a Bean
+.ReactiveSessionRegistry dưới dạng Bean
 [tabs]
 ======
 Java::
@@ -308,9 +308,9 @@ open fun reactiveSessionRegistry(): ReactiveSessionRegistry {
 ----
 ======
 
-or you can use the `sessionRegistry` DSL method:
+hoặc bạn có thể sử dụng DSL method `sessionRegistry`:
 
-.ReactiveSessionRegistry using sessionRegistry DSL method
+.ReactiveSessionRegistry sử dụng DSL method sessionRegistry
 [tabs]
 ======
 Java::
@@ -351,13 +351,13 @@ open fun springSecurity(http: ServerHttpSecurity): SecurityWebFilterChain {
 ======
 
 [[reactive-concurrent-sessions-control-manually-invalidating-sessions]]
-== Invalidating Registered User's Sessions
+== Invalidate session của người dùng đã đăng ký
 
-At times, it is handy to be able to invalidate all or some of a user's sessions.
-For example, when a user changes their password, you may want to invalidate all of their sessions so that they are forced to log in again.
-To do that, you can use the `ReactiveSessionRegistry` bean to retrieve all the user's sessions, invalidate them, and them remove them from the `WebSessionStore`:
+Đôi khi, việc có thể invalidate tất cả hoặc một số session của người dùng sẽ rất hữu ích.
+Ví dụ, khi người dùng thay đổi password, bạn có thể muốn invalidate tất cả session của họ để buộc họ đăng nhập lại.
+Để thực hiện việc đó, bạn có thể sử dụng bean `ReactiveSessionRegistry` để lấy tất cả session của người dùng, invalidate chúng, rồi xóa chúng khỏi `WebSessionStore`:
 
-.Using ReactiveSessionRegistry to invalidate sessions manually
+.Sử dụng ReactiveSessionRegistry để invalidate session thủ công
 [tabs]
 ======
 Java::
@@ -380,12 +380,12 @@ public class SessionControl {
 ======
 
 [[disabling-for-authentication-filters]]
-== Disabling It for Some Authentication Filters
+== Vô hiệu hóa tính năng này cho một số authentication filter
 
-By default, Concurrent Sessions Control will be configured automatically for Form Login, OAuth 2.0 Login, and HTTP Basic authentication as long as they do not specify an `ServerAuthenticationSuccessHandler` themselves.
-For example, the following configuration will disable Concurrent Sessions Control for Form Login:
+Theo mặc định, Kiểm soát session đồng thời sẽ được tự động cấu hình cho Form Login, OAuth 2.0 Login và HTTP Basic authentication miễn là chúng không tự chỉ định một `ServerAuthenticationSuccessHandler`.
+Ví dụ, cấu hình sau sẽ vô hiệu hóa Kiểm soát session đồng thời cho Form Login:
 
-.Disabling Concurrent Sessions Control for Form Login
+.Vô hiệu hóa Kiểm soát session đồng thời cho Form Login
 [tabs]
 ======
 Java::
@@ -429,12 +429,12 @@ open fun springSecurity(http: ServerHttpSecurity): SecurityWebFilterChain {
 ----
 ======
 
-=== Adding Additional Success Handlers Without Disabling Concurrent Sessions Control
+=== Thêm success handler bổ sung mà không vô hiệu hóa Kiểm soát session đồng thời
 
-You can also include additional `ServerAuthenticationSuccessHandler` instances to the list of handlers used by the authentication filter without disabling Concurrent Sessions Control.
-To do that you can use the `authenticationSuccessHandler(Consumer<List<ServerAuthenticationSuccessHandler>>)` method:
+Bạn cũng có thể thêm các instance `ServerAuthenticationSuccessHandler` bổ sung vào danh sách handler được authentication filter sử dụng mà không vô hiệu hóa Kiểm soát session đồng thời.
+Để thực hiện việc đó, bạn có thể sử dụng method `authenticationSuccessHandler(Consumer<List<ServerAuthenticationSuccessHandler>>)`:
 
-.Adding additional handlers
+.Thêm handler bổ sung
 [tabs]
 ======
 Java::
@@ -459,6 +459,6 @@ SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
 ======
 
 [[concurrent-sessions-control-sample]]
-== Checking a Sample Application
+== Kiểm tra ứng dụng mẫu
 
-You can check the {gh-samples-url}/reactive/webflux/java/session-management/maximum-sessions[sample application here].
+Bạn có thể xem {gh-samples-url}/reactive/webflux/java/session-management/maximum-sessions[ứng dụng mẫu tại đây].
