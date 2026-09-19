@@ -1,28 +1,28 @@
-= OIDC Logout
+= Logout OIDC
 
-Once an end user is able to login to your application, it's important to consider how they will log out.
+Khi người dùng cuối có thể đăng nhập vào ứng dụng của bạn, điều quan trọng là phải cân nhắc cách họ sẽ logout.
 
-Generally speaking, there are three use cases for you to consider:
+Nói chung, có ba trường hợp sử dụng bạn cần cân nhắc:
 
-1. I want to perform only a local logout
-2. I want to log out both my application and the OIDC Provider, initiated by my application
-3. I want to log out both my application and the OIDC Provider, initiated by the OIDC Provider
+1. Tôi chỉ muốn thực hiện logout cục bộ
+2. Tôi muốn logout cả ứng dụng của mình và OIDC Provider, do ứng dụng của mình khởi tạo
+3. Tôi muốn logout cả ứng dụng của mình và OIDC Provider, do OIDC Provider khởi tạo
 
 [[configure-local-logout]]
-== Local Logout
+== Logout cục bộ
 
-To perform a local logout, no special OIDC configuration is needed.
-Spring Security automatically stands up a local logout endpoint, which you can xref:reactive/authentication/logout.adoc[configure through the `logout()` DSL].
+Để thực hiện logout cục bộ, không cần cấu hình OIDC đặc biệt.
+Spring Security tự động thiết lập một endpoint logout cục bộ mà bạn có thể xref:reactive/authentication/logout.adoc[cấu hình thông qua DSL `logout()`].
 
 [[configure-client-initiated-oidc-logout]]
 [[oauth2login-advanced-oidc-logout]]
-== OpenID Connect 1.0 Client-Initiated Logout
+== Logout do Client khởi tạo theo OpenID Connect 1.0
 
-OpenID Connect Session Management 1.0 allows the ability to log out the end user at the Provider by using the Client.
-One of the strategies available is https://openid.net/specs/openid-connect-rpinitiated-1_0.html[RP-Initiated Logout].
+OpenID Connect Session Management 1.0 cho phép logout người dùng cuối tại Provider bằng cách sử dụng Client.
+Một trong các chiến lược hiện có là https://openid.net/specs/openid-connect-rpinitiated-1_0.html[RP-Initiated Logout].
 
-If the OpenID Provider supports both Session Management and https://openid.net/specs/openid-connect-discovery-1_0.html[Discovery], the client can obtain the `end_session_endpoint` `URL` from the OpenID Provider's https://openid.net/specs/openid-connect-session-1_0.html#OPMetadata[Discovery Metadata].
-You can do so by configuring the `ClientRegistration` with the `issuer-uri`, as follows:
+Nếu OpenID Provider hỗ trợ cả Session Management và https://openid.net/specs/openid-connect-discovery-1_0.html[Discovery], client có thể lấy `URL` `end_session_endpoint` từ https://openid.net/specs/openid-connect-session-1_0.html#OPMetadata[Discovery Metadata] của OpenID Provider.
+Bạn có thể thực hiện điều này bằng cách cấu hình `ClientRegistration` với `issuer-uri` như sau:
 
 [source,yaml]
 ----
@@ -40,7 +40,7 @@ spring:
             issuer-uri: https://dev-1234.oktapreview.com
 ----
 
-Also, you should configure `OidcClientInitiatedServerLogoutSuccessHandler`, which implements RP-Initiated Logout, as follows:
+Ngoài ra, bạn nên cấu hình `OidcClientInitiatedServerLogoutSuccessHandler`, class triển khai RP-Initiated Logout, như sau:
 
 [tabs]
 ======
@@ -72,8 +72,8 @@ public class OAuth2LoginSecurityConfig {
 		OidcClientInitiatedServerLogoutSuccessHandler oidcLogoutSuccessHandler =
 				new OidcClientInitiatedServerLogoutSuccessHandler(this.clientRegistrationRepository);
 
-		// Sets the location that the End-User's User Agent will be redirected to
-		// after the logout has been performed at the Provider
+		// Thiết lập địa chỉ mà User Agent của End User sẽ được chuyển hướng đến
+		// sau khi logout đã được thực hiện tại Provider
 		oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
 
 		return oidcLogoutSuccessHandler;
@@ -119,23 +119,23 @@ class OAuth2LoginSecurityConfig {
 
 [NOTE]
 ====
-`OidcClientInitiatedServerLogoutSuccessHandler` supports the `+{baseUrl}+` placeholder.
-If used, the application's base URL, such as `https://app.example.org`, replaces it at request time.
+`OidcClientInitiatedServerLogoutSuccessHandler` hỗ trợ placeholder `+{baseUrl}+`.
+Nếu được sử dụng, base URL của ứng dụng, chẳng hạn `https://app.example.org`, sẽ thay thế placeholder này tại thời điểm request.
 ====
 
 [NOTE]
 ====
-By default, `OidcClientInitiatedServerLogoutSuccessHandler` redirects to the logout URL using a standard HTTP redirect with the `GET` method.
-To perform the logout using a `POST` request, set the redirect strategy to `FormPostServerRedirectStrategy`, for example with `OidcClientInitiatedServerLogoutSuccessHandler.setRedirectStrategy(new ServerFormPostRedirectStrategy())`.
+Theo mặc định, `OidcClientInitiatedServerLogoutSuccessHandler` chuyển hướng đến URL logout bằng HTTP redirect tiêu chuẩn với method `GET`.
+Để thực hiện logout bằng request `POST`, hãy đặt redirect strategy thành `FormPostServerRedirectStrategy`, chẳng hạn bằng `OidcClientInitiatedServerLogoutSuccessHandler.setRedirectStrategy(new ServerFormPostRedirectStrategy())`.
 ====
 
 [[configure-provider-initiated-oidc-logout]]
-== OpenID Connect 1.0 Back-Channel Logout
+== Logout Back-Channel theo OpenID Connect 1.0
 
-OpenID Connect Session Management 1.0 allows the ability to log out the end user at the Client by having the Provider make an API call to the Client.
-This is referred to as https://openid.net/specs/openid-connect-backchannel-1_0.html[OIDC Back-Channel Logout].
+OpenID Connect Session Management 1.0 cho phép logout người dùng cuối tại Client bằng cách để Provider thực hiện một API call đến Client.
+Điều này được gọi là https://openid.net/specs/openid-connect-backchannel-1_0.html[OIDC Back-Channel Logout].
 
-To enable this, you can stand up the Back-Channel Logout endpoint in the DSL like so:
+Để bật tính năng này, bạn có thể thiết lập endpoint Back-Channel Logout trong DSL như sau:
 
 [tabs]
 ======
@@ -187,39 +187,39 @@ open fun filterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
 ----
 ======
 
-And that's it!
+Vậy là xong!
 
-This will stand up the endpoint `+/logout/connect/back-channel/{registrationId}+` which the OIDC Provider can request to invalidate a given session of an end user in your application.
-
-[NOTE]
-`oidcLogout` requires that `oauth2Login` also be configured.
+Điều này sẽ thiết lập endpoint `+/logout/connect/back-channel/{registrationId}+` mà OIDC Provider có thể request để invalidate một session cụ thể của người dùng cuối trong ứng dụng của bạn.
 
 [NOTE]
-`oidcLogout` requires that the session cookie be called `JSESSIONID` in order to correctly log out each session through a backchannel.
-
-=== Back-Channel Logout Architecture
-
-Consider a `ClientRegistration` whose identifier is `registrationId`.
-
-The overall flow for a Back-Channel logout is like this:
-
-1. At login time, Spring Security correlates the ID Token, CSRF Token, and Provider Session ID (if any) to your application's session id in its `ReactiveOidcSessionRegistry` implementation.
-2. Then at logout time, your OIDC Provider makes an API call to `/logout/connect/back-channel/registrationId` including a Logout Token that indicates either the `sub` (the End User) or the `sid` (the Provider Session ID) to logout.
-3. Spring Security validates the token's signature and claims.
-4. If the token contains a `sid` claim, then only the Client's session that correlates to that provider session is terminated.
-5. Otherwise, if the token contains a `sub` claim, then all that Client's sessions for that End User are terminated.
+`oidcLogout` yêu cầu `oauth2Login` cũng phải được cấu hình.
 
 [NOTE]
-Remember that Spring Security's OIDC support is multi-tenant.
-This means that it will only terminate sessions whose Client matches the `aud` claim in the Logout Token.
+`oidcLogout` yêu cầu session cookie phải có tên `JSESSIONID` để logout chính xác từng session thông qua backchannel.
 
-=== Customizing the Session Logout Endpoint
+=== Kiến trúc Logout Back-Channel
 
-With `OidcBackChannelServerLogoutHandler` published, the session logout endpoint is `+{baseUrl}+/logout/connect/back-channel/+{registrationId}+`.
+Hãy xét một `ClientRegistration` có identifier là `registrationId`.
 
-If `OidcBackChannelServerLogoutHandler` is not wired, then the URL is `+{baseUrl}+/logout/connect/back-channel/+{registrationId}+`, which is not recommended since it requires passing a CSRF token, which can be challenging depending on the kind of repository your application uses.
+Luồng tổng thể của Back-Channel logout như sau:
 
-In the event that you need to customize the endpoint, you can provide the URL as follows:
+1. Tại thời điểm đăng nhập, Spring Security liên kết ID Token, CSRF Token và Provider Session ID (nếu có) với session id của ứng dụng trong implementation `ReactiveOidcSessionRegistry`.
+2. Sau đó, tại thời điểm logout, OIDC Provider của bạn thực hiện API call đến `/logout/connect/back-channel/registrationId`, kèm theo Logout Token cho biết `sub` (người dùng cuối) hoặc `sid` (Provider Session ID) cần logout.
+3. Spring Security kiểm tra chữ ký và các claim của token.
+4. Nếu token chứa claim `sid`, chỉ session của Client liên kết với provider session đó mới bị kết thúc.
+5. Nếu không, nếu token chứa claim `sub`, tất cả session của Client tương ứng với người dùng cuối đó sẽ bị kết thúc.
+
+[NOTE]
+Hãy nhớ rằng hỗ trợ OIDC của Spring Security là multi-tenant.
+Điều này có nghĩa là nó chỉ kết thúc các session có Client khớp với claim `aud` trong Logout Token.
+
+=== Tùy chỉnh Session Logout Endpoint
+
+Khi `OidcBackChannelServerLogoutHandler` được publish, session logout endpoint là `+{baseUrl}+/logout/connect/back-channel/+{registrationId}+`.
+
+Nếu `OidcBackChannelServerLogoutHandler` không được wire, URL sẽ là `+{baseUrl}+/logout/connect/back-channel/+{registrationId}+`. Cách này không được khuyến nghị vì yêu cầu truyền một CSRF token, điều có thể khó thực hiện tùy thuộc vào loại repository mà ứng dụng của bạn sử dụng.
+
+Nếu cần tùy chỉnh endpoint, bạn có thể cung cấp URL như sau:
 
 
 [tabs]
@@ -251,13 +251,13 @@ http {
 ----
 ======
 
-=== Customizing the Session Logout Cookie Name
+=== Tùy chỉnh tên Session Logout Cookie
 
-By default, the session logout endpoint uses the `JSESSIONID` cookie to correlate the session to the corresponding `OidcSessionInformation`.
+Theo mặc định, session logout endpoint sử dụng cookie `JSESSIONID` để liên kết session với `OidcSessionInformation` tương ứng.
 
-However, the default cookie name in Spring Session is `SESSION`.
+Tuy nhiên, tên cookie mặc định trong Spring Session là `SESSION`.
 
-You can configure Spring Session's cookie name in the DSL like so:
+Bạn có thể cấu hình tên cookie của Spring Session trong DSL như sau:
 
 [tabs]
 ======
@@ -287,13 +287,13 @@ open fun oidcLogoutHandler(val sessionRegistry: ReactiveOidcSessionRegistry): Oi
 ======
 
 [[oidc-backchannel-logout-session-registry]]
-=== Customizing the OIDC Provider Session Registry
+=== Tùy chỉnh OIDC Provider Session Registry
 
-By default, Spring Security stores in-memory all links between the OIDC Provider session and the Client session.
+Theo mặc định, Spring Security lưu trong memory tất cả liên kết giữa OIDC Provider session và Client session.
 
-There are a number of circumstances, like a clustered application, where it would be nice to store this instead in a separate location, like a database.
+Có một số trường hợp, chẳng hạn ứng dụng dạng cluster, trong đó sẽ thuận tiện hơn nếu lưu thông tin này ở một nơi riêng biệt, chẳng hạn database.
 
-You can achieve this by configuring a custom `ReactiveOidcSessionRegistry`, like so:
+Bạn có thể thực hiện điều này bằng cách cấu hình `ReactiveOidcSessionRegistry` tùy chỉnh như sau:
 
 [tabs]
 ======
