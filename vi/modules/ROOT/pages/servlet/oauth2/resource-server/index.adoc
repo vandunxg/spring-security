@@ -2,61 +2,61 @@
 = OAuth 2.0 Resource Server
 :figures: servlet/oauth2
 
-Spring Security supports protecting endpoints by using two forms of OAuth 2.0 https://tools.ietf.org/html/rfc6750.html[Bearer Tokens]:
+Spring Security hỗ trợ bảo vệ các endpoint bằng cách sử dụng hai dạng OAuth 2.0 https://tools.ietf.org/html/rfc6750.html[Bearer Tokens]:
 
 * https://tools.ietf.org/html/rfc7519[JWT]
 * Opaque Tokens
 
-This is handy in circumstances where an application has delegated its authority management to an https://tools.ietf.org/html/rfc6749[authorization server] (for example, Okta or Ping Identity).
-This authorization server can be consulted by resource servers to authorize requests.
+Điều này hữu ích trong các trường hợp ứng dụng đã ủy quyền việc quản lý authority của mình cho một https://tools.ietf.org/html/rfc6749[Authorization Server] (ví dụ: Okta hoặc Ping Identity).
+Các Resource Server có thể tham vấn Authorization Server này để authorization các request.
 
-This section details how Spring Security provides support for OAuth 2.0 https://tools.ietf.org/html/rfc6750.html[Bearer Tokens].
+Phần này trình bày chi tiết cách Spring Security cung cấp hỗ trợ cho OAuth 2.0 https://tools.ietf.org/html/rfc6750.html[Bearer Tokens].
 
 [NOTE]
 ====
-Working samples for both {gh-samples-url}/servlet/spring-boot/java/oauth2/resource-server/jwe[JWTs] and {gh-samples-url}/servlet/spring-boot/java/oauth2/resource-server/opaque[Opaque Tokens] are available in the {gh-samples-url}[Spring Security Samples repository].
+Các sample hoạt động cho cả {gh-samples-url}/servlet/spring-boot/java/oauth2/resource-server/jwe[JWTs] và {gh-samples-url}/servlet/spring-boot/java/oauth2/resource-server/opaque[Opaque Tokens] đều có trong {gh-samples-url}[repository Spring Security Samples].
 ====
 
-Now we can consider how Bearer Token Authentication works within Spring Security.
-First, we see that, as with xref:servlet/authentication/passwords/basic.adoc#servlet-authentication-basic[Basic Authentication], the https://tools.ietf.org/html/rfc7235#section-4.1[WWW-Authenticate] header is sent back to an unauthenticated client:
+Tiếp theo, chúng ta sẽ xem Authentication bằng Bearer Token hoạt động như thế nào trong Spring Security.
+Trước tiên, chúng ta thấy rằng, cũng như với xref:servlet/authentication/passwords/basic.adoc#servlet-authentication-basic[Basic Authentication], header https://tools.ietf.org/html/rfc7235#section-4.1[WWW-Authenticate] được gửi lại cho một client chưa được authentication:
 
-.Sending WWW-Authenticate Header
+.Gửi header WWW-Authenticate
 [.invert-dark]
 image::{figures}/bearerauthenticationentrypoint.png[]
 
-The figure above builds off our xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] diagram.
+Hình trên được xây dựng dựa trên sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] của chúng ta.
 
-image:{icondir}/number_1.png[] First, a user makes an unauthenticated request to the `/private` resource for which the user is not authorized.
+image:{icondir}/number_1.png[] Trước tiên, user gửi một request chưa được authentication đến resource `/private`, là resource mà user không được authorization.
 
-image:{icondir}/number_2.png[] Spring Security's xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] indicates that the unauthenticated request is _Denied_ by throwing an `AccessDeniedException`.
+image:{icondir}/number_2.png[] xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] của Spring Security cho biết request chưa được authentication bị _Từ chối_ bằng cách ném một `AccessDeniedException`.
 
-image:{icondir}/number_3.png[] Since the user is not authenticated, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] initiates _Start Authentication_.
-The configured xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] is an instance of javadoc:org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint[], which sends a `WWW-Authenticate` header.
-The `RequestCache` is typically a `NullRequestCache` that does not save the request, since the client is capable of replaying the requests it originally requested.
+image:{icondir}/number_3.png[] Vì user chưa được authentication, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] khởi động _Bắt đầu authentication_.
+xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] được cấu hình là một instance của javadoc:org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint[], gửi một header `WWW-Authenticate`.
+`RequestCache` thường là một `NullRequestCache` không lưu request vì client có khả năng replay các request mà nó đã gửi ban đầu.
 
-When a client receives the `WWW-Authenticate: Bearer` header, it knows it should retry with a bearer token.
-The following image shows the flow for the bearer token being processed:
+Khi client nhận được header `WWW-Authenticate: Bearer`, client biết rằng nó nên retry bằng Bearer Token.
+Hình ảnh sau đây cho thấy flow xử lý Bearer Token:
 
 [[oauth2resourceserver-authentication-bearertokenauthenticationfilter]]
-.Authenticating Bearer Token
+.Authentication Bearer Token
 [.invert-dark]
 image::{figures}/bearertokenauthenticationfilter.png[]
 
-The figure builds off our xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] diagram.
+Hình trên được xây dựng dựa trên sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] của chúng ta.
 
-image:{icondir}/number_1.png[] When the user submits their bearer token, the `BearerTokenAuthenticationFilter` creates a `BearerTokenAuthenticationToken` which is a type of xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] by extracting the token from the `HttpServletRequest`.
+image:{icondir}/number_1.png[] Khi user gửi Bearer Token, `BearerTokenAuthenticationFilter` tạo một `BearerTokenAuthenticationToken`, là một loại xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`], bằng cách trích xuất token từ `HttpServletRequest`.
 
-image:{icondir}/number_2.png[] Next, the `HttpServletRequest` is passed to the `AuthenticationManagerResolver`, which selects the `AuthenticationManager`. The `BearerTokenAuthenticationToken` is passed into the `AuthenticationManager` to be authenticated.
-The details of what `AuthenticationManager` looks like depends on whether you're configured for xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-minimalconfiguration[JWT] or xref:servlet/oauth2/resource-server/opaque-token.adoc#oauth2resourceserver-opaque-minimalconfiguration[opaque token].
+image:{icondir}/number_2.png[] Tiếp theo, `HttpServletRequest` được truyền vào `AuthenticationManagerResolver`, thành phần chọn `AuthenticationManager`. `BearerTokenAuthenticationToken` được truyền vào `AuthenticationManager` để được authentication.
+Chi tiết về cấu trúc của `AuthenticationManager` phụ thuộc vào việc bạn cấu hình xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-minimalconfiguration[JWT] hay xref:servlet/oauth2/resource-server/opaque-token.adoc#oauth2resourceserver-opaque-minimalconfiguration[opaque token].
 
-image:{icondir}/number_3.png[] If authentication fails, then __Failure__
+image:{icondir}/number_3.png[] Nếu authentication thất bại thì __Thất bại__
 
-* The xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder] is cleared out.
-* The `AuthenticationEntryPoint` is invoked to trigger the WWW-Authenticate header to be sent again.
+* xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder] được xóa.
+* `AuthenticationEntryPoint` được gọi để kích hoạt việc gửi lại header WWW-Authenticate.
 
-image:{icondir}/number_4.png[] If authentication is successful, then __Success__.
+image:{icondir}/number_4.png[] Nếu authentication thành công thì __Thành công__.
 
-* Any already-authenticated `Authentication` in the xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] is loaded and its
-authorities are added to the returned xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`].
-* The xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication] is set on the xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder].
-* The `BearerTokenAuthenticationFilter` invokes `FilterChain.doFilter(request,response)` to continue with the rest of the application logic.
+* Mọi `Authentication` đã được authentication trước đó trong xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] được load và các
+authority của nó được thêm vào xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] được trả về.
+* xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication] được set trên xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder].
+* `BearerTokenAuthenticationFilter` gọi `FilterChain.doFilter(request,response)` để tiếp tục phần logic còn lại của ứng dụng.
