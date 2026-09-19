@@ -8,7 +8,7 @@
 - English source: `docs/modules/`
 - Vietnamese source: `vi/modules/`
 - Cập nhật: 2026-09-19
-- Đã xác nhận dịch trọn vẹn: **20 trang**
+- Đã xác nhận dịch trọn vẹn: **40 trang**
 
 ## Quy ước trạng thái
 
@@ -39,10 +39,30 @@
 18. [x] `modules/ROOT/pages/features/exploits/headers.adoc`
 19. [x] `modules/ROOT/pages/features/exploits/http.adoc`
 20. [x] `modules/ROOT/pages/features/integrations/index.adoc`
+21. [x] `modules/ROOT/pages/features/integrations/rest/http-service-client.adoc`
+22. [x] `modules/ROOT/pages/features/integrations/cryptography.adoc`
+23. [x] `modules/ROOT/pages/features/integrations/data.adoc`
+24. [x] `modules/ROOT/pages/features/integrations/concurrency.adoc`
+25. [x] `modules/ROOT/pages/features/integrations/jackson.adoc`
+26. [x] `modules/ROOT/pages/features/integrations/localization.adoc`
+27. [x] `modules/ROOT/pages/servlet/index.adoc`
+28. [x] `modules/ROOT/pages/servlet/getting-started.adoc`
+29. [x] `modules/ROOT/pages/servlet/architecture.adoc`
+30. [x] `modules/ROOT/pages/servlet/authentication/index.adoc`
+31. [x] `modules/ROOT/pages/servlet/authentication/architecture.adoc`
+32. [x] `modules/ROOT/pages/servlet/authentication/passwords/index.adoc`
+33. [x] `modules/ROOT/pages/servlet/authentication/passwords/input.adoc`
+34. [x] `modules/ROOT/pages/servlet/authentication/passwords/form.adoc`
+35. [x] `modules/ROOT/pages/servlet/authentication/passwords/basic.adoc`
+36. [x] `modules/ROOT/pages/servlet/authentication/passwords/digest.adoc`
+37. [x] `modules/ROOT/pages/servlet/authentication/passwords/storage.adoc`
+38. [x] `modules/ROOT/pages/servlet/authentication/passwords/in-memory.adoc`
+39. [x] `modules/ROOT/pages/servlet/authentication/passwords/jdbc.adoc`
+40. [x] `modules/ROOT/pages/servlet/authentication/passwords/user-details.adoc`
 
 ## Trang tiếp theo
 
-1. [ ] `modules/ROOT/pages/features/integrations/rest/http-service-client.adoc`
+1. [ ] `modules/ROOT/pages/servlet/authentication/passwords/credentials-container.adoc`
 
 ## Kiểm tra chất lượng
 
