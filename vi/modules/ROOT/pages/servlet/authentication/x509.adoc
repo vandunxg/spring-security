@@ -1,50 +1,50 @@
 [[servlet-x509]]
-= X.509 Authentication
+= Authentication X.509
 
 [[x509-overview]]
-The most common use of X.509 certificate authentication is in verifying the identity of a server when using SSL, most commonly when using HTTPS from a browser.
-The browser automatically checks that the certificate presented by a server has been issued (digitally signed) by one of a list of trusted certificate authorities that it maintains.
+Trường hợp sử dụng phổ biến nhất của authentication bằng chứng chỉ X.509 là xác minh danh tính của máy chủ khi sử dụng SSL, thường là khi sử dụng HTTPS từ trình duyệt.
+Trình duyệt tự động kiểm tra rằng chứng chỉ do máy chủ cung cấp đã được cấp (ký số) bởi một trong các authority cấp chứng chỉ đáng tin cậy thuộc danh sách mà nó duy trì.
 
-You can also use SSL with "`mutual authentication`". The server then requests a valid certificate from the client as part of the SSL handshake.
-The server authenticates the client by checking that its certificate is signed by an acceptable authority.
-If a valid certificate has been provided, it can be obtained through the servlet API in an application.
-For example, if you use Tomcat, you should read the https://tomcat.apache.org/tomcat-10.1-doc/ssl-howto.html[Tomcat SSL instructions].
-You should get this working before trying it out with Spring Security.
+Bạn cũng có thể sử dụng SSL với "`mutual authentication`". Khi đó, máy chủ yêu cầu client cung cấp một chứng chỉ hợp lệ trong quá trình SSL handshake.
+Máy chủ thực hiện authentication cho client bằng cách kiểm tra rằng chứng chỉ của client được ký bởi một authority được chấp nhận.
+Nếu đã cung cấp chứng chỉ hợp lệ, ứng dụng có thể lấy chứng chỉ đó thông qua servlet API.
+Ví dụ, nếu sử dụng Tomcat, bạn nên đọc https://tomcat.apache.org/tomcat-10.1-doc/ssl-howto.html[hướng dẫn SSL của Tomcat].
+Bạn nên hoàn tất việc này trước khi thử sử dụng với Spring Security.
 
-The Spring Security X.509 module extracts the certificate by using a filter.
-It maps the certificate to an application user and loads that user's set of granted authorities for use with the standard Spring Security infrastructure, specifically including at least the `FACTOR_X509` authority when <<servlet-x509-config, using the `HttpSecurity` DSL>>.
+Mô-đun X.509 của Spring Security trích xuất chứng chỉ bằng một filter.
+Mô-đun này ánh xạ chứng chỉ với một người dùng của ứng dụng và tải tập các authority được cấp cho người dùng đó để sử dụng với hạ tầng Spring Security tiêu chuẩn, cụ thể bao gồm ít nhất authority `FACTOR_X509` khi <<servlet-x509-config, sử dụng DSL `HttpSecurity`>>.
 
 [[servlet-x509-config]]
-== Adding X.509 Authentication to Your Web Application
+== Thêm Authentication X.509 vào ứng dụng Web của bạn
 
-Similar to xref:reactive/authentication/x509.adoc[Reactive X.509 authentication], the servlet x509 authentication filter allows extracting an authentication token from a certificate provided by a client.
+Tương tự xref:reactive/authentication/x509.adoc[authentication X.509 trong Reactive], filter authentication x509 của Servlet cho phép trích xuất authentication token từ chứng chỉ do client cung cấp.
 
-The following example shows a reactive x509 security configuration:
+Ví dụ sau minh họa một cấu hình bảo mật x509 Reactive:
 
 include-code::./DefaultX509Configuration[tag=springSecurity,indent=0]
 
-In the preceding configuration, when neither `principalExtractor` nor `authenticationManager` is provided, defaults are used.
-The default principal extractor is `SubjectX500PrincipalExtractor`, which extracts the CN (common name) field from a certificate provided by a client.
-The default authentication manager is `ReactivePreAuthenticatedAuthenticationManager`, which performs user account validation, checking that a user account with a name extracted by `principalExtractor` exists and that it is not locked, disabled, or expired.
+Trong cấu hình trên, khi không cung cấp cả `principalExtractor` lẫn `authenticationManager`, các giá trị mặc định sẽ được sử dụng.
+principal extractor mặc định là `SubjectX500PrincipalExtractor`, trích xuất trường CN (tên chung) từ chứng chỉ do client cung cấp.
+authentication manager mặc định là `ReactivePreAuthenticatedAuthenticationManager`, thực hiện validation tài khoản người dùng, kiểm tra rằng một tài khoản người dùng có tên được trích xuất bởi `principalExtractor` tồn tại và không bị khóa, vô hiệu hóa hoặc hết hạn.
 
-The following example demonstrates how these defaults can be overridden:
+Ví dụ sau minh họa cách ghi đè các giá trị mặc định này:
 
 include-code::./CustomX509Configuration[tag=springSecurity,indent=0]
 
-In the previous example, a username is extracted from the `emailAddress` field of a client certificate instead of CN, and account lookup uses a custom `ReactiveAuthenticationManager` instance.
+Trong ví dụ trước, tên người dùng được trích xuất từ trường `emailAddress` của chứng chỉ client thay vì CN, và việc tra cứu tài khoản sử dụng một instance `ReactiveAuthenticationManager` tùy chỉnh.
 
-For an example of configuring Netty and `WebClient` or `curl` command-line tool to use mutual TLS and enable X.509 authentication, see https://github.com/spring-projects/spring-security-samples/tree/main/servlet/java-configuration/authentication/x509.
+Để xem ví dụ cấu hình Netty và `WebClient` hoặc tool dòng lệnh `curl` để sử dụng mutual TLS và bật authentication X.509, hãy xem https://github.com/spring-projects/spring-security-samples/tree/main/servlet/java-configuration/authentication/x509.
 
 
 [[x509-ssl-config]]
-== Setting up SSL in Tomcat
-There are some pre-generated certificates in the {gh-samples-url}/servlet/java-configuration/authentication/x509/server[Spring Security Samples repository].
-You can use these to enable SSL for testing if you do not want to generate your own.
-The `server.jks` file contains the server certificate, the private key, and the issuing authority certificate.
-There are also some client certificate files for the users from the sample applications.
-You can install these in your browser to enable SSL client authentication.
+== Thiết lập SSL trong Tomcat
+Có một số chứng chỉ được tạo sẵn trong {gh-samples-url}/servlet/java-configuration/authentication/x509/server[kho lưu trữ Spring Security Samples].
+Bạn có thể sử dụng các chứng chỉ này để bật SSL cho việc kiểm thử nếu không muốn tự tạo chứng chỉ.
+File `server.jks` chứa chứng chỉ của máy chủ, khóa riêng và chứng chỉ của authority cấp phát.
+Ngoài ra còn có một số file chứng chỉ client cho người dùng từ các ứng dụng mẫu.
+Bạn có thể cài đặt các file này vào trình duyệt để bật authentication SSL cho client.
 
-To run tomcat with SSL support, drop the `server.jks` file into the tomcat `conf` directory and add the following connector to the `server.xml` file:
+Để chạy Tomcat với hỗ trợ SSL, đặt file `server.jks` vào thư mục `conf` của Tomcat và thêm connector sau vào file `server.xml`:
 
 [source,xml]
 ----
@@ -57,6 +57,5 @@ To run tomcat with SSL support, drop the `server.jks` file into the tomcat `conf
 />
 ----
 
-`clientAuth` can also be set to `want` if you still want SSL connections to succeed even if the client does not provide a certificate.
-Clients that do not present a certificate cannot access any objects secured by Spring Security unless you use a non-X.509 authentication mechanism, such as form authentication.
-
+`clientAuth` cũng có thể được đặt thành `want` nếu bạn vẫn muốn các kết nối SSL thành công ngay cả khi client không cung cấp chứng chỉ.
+Các client không cung cấp chứng chỉ không thể truy cập bất kỳ đối tượng nào được Spring Security bảo vệ, trừ khi bạn sử dụng cơ chế authentication không phải X.509, chẳng hạn authentication bằng biểu mẫu.
