@@ -1,26 +1,26 @@
 [[servlet-hello]]
 = Hello Spring Security
 
-This section covers the minimum setup for how to use Spring Security with {spring-boot-reference-url}[Spring Boot] and then points you to next steps after that.
+Phần này trình bày thiết lập tối thiểu để sử dụng Spring Security với {spring-boot-reference-url}[Spring Boot], sau đó chỉ bạn đến các bước tiếp theo.
 
 [NOTE]
 ====
-The completed starter application can be found {gh-samples-url}/servlet/spring-boot/java/hello-security[in our samples repository].
-For your convenience, you can download a minimal Spring Boot + Spring Security application https://start.spring.io/starter.zip?type=maven-project&language=java&packaging=jar&jvmVersion=1.8&groupId=example&artifactId=hello-security&name=hello-security&description=Hello%20Security&packageName=example.hello-security&dependencies=web,security[prepared by Spring Initializr].
+Bạn có thể tìm application starter đã hoàn chỉnh tại {gh-samples-url}/servlet/spring-boot/java/hello-security[repository sample của chúng tôi].
+Để thuận tiện, bạn có thể tải xuống một application Spring Boot + Spring Security tối thiểu https://start.spring.io/starter.zip?type=maven-project&language=java&packaging=jar&jvmVersion=1.8&groupId=example&artifactId=hello-security&name=hello-security&description=Hello%20Security&packageName=example.hello-security&dependencies=web,security[được Spring Initializr chuẩn bị].
 ====
 
 [[servlet-hello-dependencies]]
-== Updating Dependencies
+== Cập nhật dependency
 
-You first need to add Spring Security to your application's classpath; two ways to do this are to xref:getting-spring-security.adoc#getting-maven-boot[use Maven] or xref:getting-spring-security.adoc#getting-gradle-boot[Gradle].
+Trước tiên, bạn cần thêm Spring Security vào classpath của application; có hai cách để thực hiện việc này là xref:getting-spring-security.adoc#getting-maven-boot[sử dụng Maven] hoặc xref:getting-spring-security.adoc#getting-gradle-boot[Gradle].
 
 [[servlet-hello-starting]]
-== Starting Hello Spring Security Boot
+== Khởi động Hello Spring Security Boot
 
-With Spring Security <<servlet-hello-dependencies,on the classpath>>, you can now {spring-boot-reference-url}reference/using/running-your-application.html[run the Spring Boot application].
-The following snippet shows some of the output that indicates that Spring Security is enabled in your application:
+Khi Spring Security đã <<servlet-hello-dependencies,trên classpath>>, giờ bạn có thể {spring-boot-reference-url}reference/using/running-your-application.html[chạy application Spring Boot].
+Đoạn mã sau đây hiển thị một phần output cho biết Spring Security đã được bật trong application của bạn:
 
-.Running Spring Boot Application
+.Chạy application Spring Boot
 [tabs]
 ======
 Maven::
@@ -63,10 +63,10 @@ Using generated security password: 8e557245-73e2-4286-969a-ff57fe326336
 ----
 ======
 
-Now that you have it running, you might try hitting an endpoint to see what happens.
-If you hit an endpoint without credentials like so:
+Bây giờ application đã chạy, bạn có thể thử gọi một endpoint để xem điều gì xảy ra.
+Nếu gọi một endpoint không có credential như sau:
 
-.Querying a Secured Boot Application
+.Truy vấn application Boot được bảo vệ
 [source,bash]
 ----
 $ curl -i http://localhost:8080/some/path
@@ -74,14 +74,14 @@ HTTP/1.1 401
 ...
 ----
 
-then Spring Security denies access with a `401 Unauthorized`.
+thì Spring Security từ chối quyền truy cập với `401 Unauthorized`.
 
 [TIP]
-If you provide the same URL in a browser, it will redirect to a default login page.
+Nếu cung cấp cùng URL đó trong trình duyệt, request sẽ được redirect đến trang login mặc định.
 
-And if you hit an endpoint with credentials (found in the console output) as follows:
+Nếu gọi một endpoint với credential (được tìm thấy trong console output) như sau:
 
-.Querying with Credentials
+.Truy vấn với credential
 [source,bash]
 ----
 $ curl -i -u user:8e557245-73e2-4286-969a-ff57fe326336 http://localhost:8080/some/path
@@ -89,38 +89,38 @@ HTTP/1.1 404
 ...
 ----
 
-then Spring Boot will service the request, returning a `404 Not Found` in this case since `/some/path` doesn't exist.
+thì Spring Boot sẽ xử lý request và trả về `404 Not Found` trong trường hợp này vì `/some/path` không tồn tại.
 
-From here, you can:
+Từ đây, bạn có thể:
 
-* Better understand <<servlet-hello-auto-configuration,what Spring Boot enables in Spring Security by default>>
-* Read about <<security-use-cases,common use cases>> that Spring Security helps with
-* Start configuring xref:servlet/authentication/index.adoc[authentication]
+* Hiểu rõ hơn <<servlet-hello-auto-configuration,những gì Spring Boot bật theo mặc định trong Spring Security>>
+* Đọc về các <<security-use-cases,use case phổ biến>> mà Spring Security hỗ trợ
+* Bắt đầu cấu hình xref:servlet/authentication/index.adoc[authentication]
 
 [[servlet-hello-auto-configuration]]
-== Runtime Expectations
+== Kỳ vọng trong runtime
 
-The default arrangement of Spring Boot and Spring Security affords the following behaviors at runtime:
+Cấu hình mặc định của Spring Boot và Spring Security cung cấp các hành vi sau trong runtime:
 
-* Requires an authenticated user xref:servlet/authorization/authorize-http-requests.adoc[for any endpoint] (including Boot's `/error` endpoint)
-* xref:servlet/authentication/passwords/user-details-service.adoc[Registers a default user] with a generated password at startup (the password is logged to the console; in the preceding example, the password is `8e557245-73e2-4286-969a-ff57fe326336`)
-* Protects xref:servlet/authentication/passwords/password-encoder.adoc[password storage with BCrypt] as well as others
-* Provides form-based xref:servlet/authentication/passwords/form.adoc[login] and xref:servlet/authentication/logout.adoc[logout] flows
-* Authenticates xref:servlet/authentication/passwords/form.adoc[form-based login] as well as xref:servlet/authentication/passwords/basic.adoc[HTTP Basic]
-* Provides content negotiation; for web requests, redirects to the login page; for service requests, returns a `401 Unauthorized`
-* xref:servlet/exploits/csrf.adoc[Mitigates CSRF] attacks
-* xref:servlet/authentication/session-management.adoc#ns-session-fixation[Mitigates Session Fixation] attacks
-* Writes xref:servlet/exploits/headers.adoc#servlet-headers-hsts[Strict-Transport-Security] to https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security[ensure HTTPS]
-* Writes xref:servlet/exploits/headers.adoc#servlet-headers-content-type-options[X-Content-Type-Options] to mitigate https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options[sniffing attacks]
-* Writes xref:servlet/exploits/headers.adoc#servlet-headers-cache-control[Cache Control headers] that protect authenticated resources
-* Writes xref:servlet/exploits/headers.adoc#servlet-headers-frame-options[X-Frame-Options] to mitigate https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options[Clickjacking]
-* Integrates with xref:servlet/integrations/servlet-api.adoc[``HttpServletRequest``'s authentication methods]
-* Publishes xref:servlet/authentication/events.adoc[authentication success and failure events]
+* Yêu cầu người dùng đã authentication xref:servlet/authorization/authorize-http-requests.adoc[cho mọi endpoint] (bao gồm endpoint `/error` của Boot)
+* xref:servlet/authentication/passwords/user-details-service.adoc[Đăng ký một user mặc định] với password được tạo khi startup (password được ghi vào console; trong ví dụ trước, password là `8e557245-73e2-4286-969a-ff57fe326336`)
+* Bảo vệ xref:servlet/authentication/passwords/password-encoder.adoc[việc lưu trữ password bằng BCrypt] cũng như các cơ chế khác
+* Cung cấp flow xref:servlet/authentication/passwords/form.adoc[login] dựa trên form và flow xref:servlet/authentication/logout.adoc[logout]
+* Thực hiện authentication cho xref:servlet/authentication/passwords/form.adoc[login dựa trên form] cũng như xref:servlet/authentication/passwords/basic.adoc[HTTP Basic]
+* Cung cấp content negotiation; đối với web request, redirect đến trang login; đối với service request, trả về `401 Unauthorized`
+* xref:servlet/exploits/csrf.adoc[Giảm thiểu CSRF] các cuộc tấn công
+* xref:servlet/authentication/session-management.adoc#ns-session-fixation[Giảm thiểu Session Fixation] các cuộc tấn công
+* Ghi xref:servlet/exploits/headers.adoc#servlet-headers-hsts[Strict-Transport-Security] để https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security[đảm bảo HTTPS]
+* Ghi xref:servlet/exploits/headers.adoc#servlet-headers-content-type-options[X-Content-Type-Options] để giảm thiểu https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options[các cuộc tấn công sniffing]
+* Ghi xref:servlet/exploits/headers.adoc#servlet-headers-cache-control[các header Cache Control] để bảo vệ các resource đã authentication
+* Ghi xref:servlet/exploits/headers.adoc#servlet-headers-frame-options[X-Frame-Options] để giảm thiểu https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options[Clickjacking]
+* Tích hợp với xref:servlet/integrations/servlet-api.adoc[các method authentication của ``HttpServletRequest``]
+* Công bố xref:servlet/authentication/events.adoc[các event authentication thành công và thất bại]
 
-It can be helpful to understand how Spring Boot is coordinating with Spring Security to achieve this.
-Taking a look at {spring-boot-api-url}org/springframework/boot/security/autoconfigure/SecurityAutoConfiguration.html[Boot's security auto configuration], it does the following (simplified for illustration):
+Việc hiểu cách Spring Boot phối hợp với Spring Security để đạt được điều này có thể hữu ích.
+Xem {spring-boot-api-url}org/springframework/boot/security/autoconfigure/SecurityAutoConfiguration.html[auto-configuration bảo mật của Boot], ta thấy nó thực hiện các việc sau (được đơn giản hóa để minh họa):
 
-.Spring Boot Security Auto Configuration
+.Auto-configuration bảo mật của Spring Boot
 [source,java]
 ----
 @EnableWebSecurity <1>
@@ -141,33 +141,33 @@ public class DefaultSecurityConfig {
     }
 }
 ----
-1. Adds the `@EnableWebSecurity` annotation. (Among other things, this publishes xref:servlet/architecture.adoc#servlet-securityfilterchain[Spring Security's default `Filter` chain] as a `@Bean`)
-2. Publishes a xref:servlet/authentication/passwords/user-details-service.adoc[`UserDetailsService`] `@Bean` with a username of `user` and a randomly generated password that is logged to the console
-3. Publishes an xref:servlet/authentication/events.adoc[`AuthenticationEventPublisher`] `@Bean` for publishing authentication events
+1. Thêm annotation `@EnableWebSecurity`. (Trong số các việc khác, annotation này công bố xref:servlet/architecture.adoc#servlet-securityfilterchain[chuỗi `Filter` mặc định của Spring Security] dưới dạng một `@Bean`)
+2. Công bố một `@Bean` xref:servlet/authentication/passwords/user-details-service.adoc[`UserDetailsService`] với username là `user` và password được tạo ngẫu nhiên, password này được ghi vào console
+3. Công bố một `@Bean` xref:servlet/authentication/events.adoc[`AuthenticationEventPublisher`] để công bố các event authentication
 
 [NOTE]
-Spring Boot adds any `Filter` published as a `@Bean` to the application's filter chain.
-This means that using `@EnableWebSecurity` in conjunction with Spring Boot automatically registers Spring Security's filter chain for every request.
+Spring Boot thêm mọi `Filter` được công bố dưới dạng `@Bean` vào filter chain của application.
+Điều này có nghĩa là việc sử dụng `@EnableWebSecurity` kết hợp với Spring Boot sẽ tự động đăng ký filter chain của Spring Security cho mọi request.
 
 [[security-use-cases]]
-== Security Use Cases
+== Use case bảo mật
 
-There are a number of places that you may want to go from here.
-To figure out what's next for you and your application, consider these common use cases that Spring Security is built to address:
+Có một số hướng mà bạn có thể tiếp tục từ đây.
+Để xác định bước tiếp theo cho bạn và application của bạn, hãy cân nhắc các use case phổ biến mà Spring Security được xây dựng để giải quyết:
 
-* I am building a REST API, and I need to xref:servlet/oauth2/resource-server/jwt.adoc[authenticate a JWT] or xref:servlet/oauth2/resource-server/opaque-token.adoc[other bearer token]
-* I am building a Web Application, API Gateway, or BFF and
-** I need to xref:servlet/oauth2/login/core.adoc[login using OAuth 2.0 or OIDC]
-** I need to xref:servlet/saml2/login/index.adoc[login using SAML 2.0]
-** I need to xref:servlet/authentication/cas.adoc[login using CAS]
-* I need to manage
-** Users in xref:servlet/authentication/passwords/ldap.adoc[LDAP] or xref:servlet/authentication/passwords/ldap.adoc#_active_directory[Active Directory], with xref:servlet/integrations/data.adoc[Spring Data], or with xref:servlet/authentication/passwords/jdbc.adoc[JDBC]
-** xref:servlet/authentication/passwords/storage.adoc[Passwords]
+* Tôi đang xây dựng REST API và cần xref:servlet/oauth2/resource-server/jwt.adoc[authenticate JWT] hoặc xref:servlet/oauth2/resource-server/opaque-token.adoc[bearer token khác]
+* Tôi đang xây dựng Web Application, API Gateway hoặc BFF và
+** cần xref:servlet/oauth2/login/core.adoc[login bằng OAuth 2.0 hoặc OIDC]
+** cần xref:servlet/saml2/login/index.adoc[login bằng SAML 2.0]
+** cần xref:servlet/authentication/cas.adoc[login bằng CAS]
+* Tôi cần quản lý
+** user trong xref:servlet/authentication/passwords/ldap.adoc[LDAP] hoặc xref:servlet/authentication/passwords/ldap.adoc#_active_directory[Active Directory], với xref:servlet/integrations/data.adoc[Spring Data] hoặc với xref:servlet/authentication/passwords/jdbc.adoc[JDBC]
+** xref:servlet/authentication/passwords/storage.adoc[password]
 
-In case none of those match what you are looking for, consider thinking about your application in the following order:
+Nếu không trường hợp nào trong số đó phù hợp với nhu cầu của bạn, hãy cân nhắc application của bạn theo thứ tự sau:
 
-1. *Protocol*: First, consider the protocol your application will use to communicate.
-For servlet-based applications, Spring Security supports HTTP as well as xref:servlet/integrations/websocket.adoc[Websockets].
-2. *Authentication*: Next, consider how users will xref:servlet/authentication/index.adoc[authenticate] and if that authentication will be stateful or stateless
-3. *Authorization*: Then, consider how you will determine xref:servlet/authorization/index.adoc[what a user is authorized to do]
-4. *Defense*: Finally, xref:servlet/exploits/csrf.adoc#csrf-considerations[integrate with Spring Security's default protections] and consider xref:servlet/exploits/headers.adoc[which additional protections you need]
+1. *Protocol*: Trước tiên, hãy cân nhắc protocol mà application của bạn sẽ sử dụng để giao tiếp.
+Đối với application dựa trên servlet, Spring Security hỗ trợ HTTP cũng như xref:servlet/integrations/websocket.adoc[Websockets].
+2. *Authentication*: Tiếp theo, hãy cân nhắc cách người dùng sẽ xref:servlet/authentication/index.adoc[authenticate] và authentication đó sẽ là stateful hay stateless
+3. *Authorization*: Sau đó, hãy cân nhắc cách bạn xác định xref:servlet/authorization/index.adoc[những gì người dùng được authorization thực hiện]
+4. *Phòng vệ*: Cuối cùng, hãy xref:servlet/exploits/csrf.adoc#csrf-considerations[tích hợp với các cơ chế bảo vệ mặc định của Spring Security] và cân nhắc xref:servlet/exploits/headers.adoc[các cơ chế bảo vệ bổ sung bạn cần]
