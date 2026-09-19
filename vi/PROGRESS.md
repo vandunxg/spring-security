@@ -8,7 +8,7 @@
 - English source: `docs/modules/`
 - Vietnamese source: `vi/modules/`
 - Cập nhật: 2026-09-19
-- Đã xác nhận dịch trọn vẹn: **40 trang**
+- Đã xác nhận dịch trọn vẹn: **188 trang**
 
 ## Quy ước trạng thái
 
@@ -182,10 +182,35 @@
 161. [x] `modules/ROOT/pages/reactive/oauth2/client/authorized-clients.adoc`
 162. [x] `modules/ROOT/pages/reactive/oauth2/resource-server/index.adoc`
 163. [x] `modules/ROOT/pages/reactive/oauth2/resource-server/jwt.adoc`
+164. [x] `modules/ROOT/pages/migration/servlet/index.adoc`
+165. [x] `modules/ROOT/pages/modules.adoc`
+166. [x] `modules/ROOT/pages/samples.adoc`
+167. [x] `modules/ROOT/pages/reactive/oauth2/resource-server/opaque-token.adoc`
+168. [x] `modules/ROOT/pages/reactive/oauth2/resource-server/multitenancy.adoc`
+169. [x] `modules/ROOT/pages/reactive/oauth2/resource-server/bearer-tokens.adoc`
+170. [x] `modules/ROOT/pages/reactive/exploits/index.adoc`
+171. [x] `modules/ROOT/pages/reactive/exploits/csrf.adoc`
+172. [x] `modules/ROOT/pages/reactive/exploits/headers.adoc`
+173. [x] `modules/ROOT/pages/reactive/exploits/http.adoc`
+174. [x] `modules/ROOT/pages/reactive/exploits/firewall.adoc`
+175. [x] `modules/ROOT/pages/reactive/integrations/cors.adoc`
+176. [x] `modules/ROOT/pages/reactive/integrations/rsocket.adoc`
+177. [x] `modules/ROOT/pages/reactive/integrations/observability.adoc`
+178. [x] `modules/ROOT/pages/reactive/test/index.adoc`
+179. [x] `modules/ROOT/pages/reactive/test/method.adoc`
+180. [x] `modules/ROOT/pages/reactive/test/web/index.adoc`
+181. [x] `modules/ROOT/pages/reactive/test/web/setup.adoc`
+182. [x] `modules/ROOT/pages/reactive/test/web/authentication.adoc`
+183. [x] `modules/ROOT/pages/reactive/test/web/csrf.adoc`
+184. [x] `modules/ROOT/pages/reactive/test/web/oauth2.adoc`
+185. [x] `modules/ROOT/pages/reactive/test/web/x509.adoc`
+186. [x] `modules/ROOT/pages/reactive/configuration/webflux.adoc`
+187. [x] `modules/ROOT/pages/native-image/index.adoc`
+188. [x] `modules/ROOT/pages/native-image/method-security.adoc`
 
 ## Trang tiếp theo
 
-1. [ ] `modules/ROOT/pages/reactive/oauth2/resource-server/opaque-token.adoc`
+- Không còn trang chưa dịch trong `docs/modules/ROOT/nav.adoc`.
 
 ## Kiểm tra chất lượng
 
