@@ -1,5 +1,5 @@
 [[servlet-authentication-unpwd-input]]
-= Reading the Username & Password
+= Đọc tên người dùng và mật khẩu
 :page-section-summary-toc: 1
 
-Spring Security provides the following built-in mechanisms for reading a username and password from `HttpServletRequest`:
+Spring Security cung cấp các cơ chế tích hợp sẵn sau đây để đọc tên người dùng và mật khẩu từ `HttpServletRequest`:
