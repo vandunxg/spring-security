@@ -1,10 +1,10 @@
 [[servlet-events]]
-= Authentication Events
+= Các sự kiện authentication
 
-For each authentication that succeeds or fails, a `AuthenticationSuccessEvent` or `AuthenticationFailureEvent`, respectively, is fired.
+Với mỗi authentication thành công hoặc thất bại, tương ứng một `AuthenticationSuccessEvent` hoặc `AuthenticationFailureEvent` được phát ra.
 
-To listen for these events, you must first publish an `AuthenticationEventPublisher`.
-Spring Security's `DefaultAuthenticationEventPublisher` works fine for this purpose:
+Để lắng nghe các sự kiện này, trước tiên bạn phải publish một `AuthenticationEventPublisher`.
+`DefaultAuthenticationEventPublisher` của Spring Security hoạt động phù hợp cho mục đích này:
 
 [tabs]
 ======
@@ -31,7 +31,7 @@ fun authenticationEventPublisher
 ----
 ======
 
-Then you can use Spring's `@EventListener` support:
+Sau đó, bạn có thể sử dụng cơ chế hỗ trợ `@EventListener` của Spring:
 
 [tabs]
 ======
@@ -72,14 +72,14 @@ class AuthenticationEvents {
 ----
 ======
 
-While similar to `AuthenticationSuccessHandler` and `AuthenticationFailureHandler`, these are nice in that they can be used independently from the servlet API.
+Mặc dù tương tự `AuthenticationSuccessHandler` và `AuthenticationFailureHandler`, các sự kiện này có ưu điểm là có thể được sử dụng độc lập với Servlet API.
 
-== Adding Exception Mappings
+== Thêm ánh xạ ngoại lệ
 
-By default, `DefaultAuthenticationEventPublisher` publishes an `AuthenticationFailureEvent` for the following events:
+Theo mặc định, `DefaultAuthenticationEventPublisher` publish một `AuthenticationFailureEvent` cho các sự kiện sau:
 
 |============
-| Exception | Event
+| Ngoại lệ | Sự kiện
 | `BadCredentialsException` | `AuthenticationFailureBadCredentialsEvent`
 | `UsernameNotFoundException` | `AuthenticationFailureBadCredentialsEvent`
 | `AccountExpiredException` | `AuthenticationFailureExpiredEvent`
@@ -91,9 +91,9 @@ By default, `DefaultAuthenticationEventPublisher` publishes an `AuthenticationFa
 | `InvalidBearerTokenException` | `AuthenticationFailureBadCredentialsEvent`
 |============
 
-The publisher does an exact `Exception` match, which means that sub-classes of these exceptions do not also produce events.
+Publisher thực hiện so khớp `Exception` chính xác, nghĩa là các lớp con của những ngoại lệ này cũng không tạo ra sự kiện.
 
-To that end, you may want to supply additional mappings to the publisher through the `setAdditionalExceptionMappings` method:
+Vì vậy, bạn có thể cung cấp thêm các ánh xạ cho publisher thông qua method `setAdditionalExceptionMappings`:
 
 [tabs]
 ======
@@ -130,9 +130,9 @@ fun authenticationEventPublisher
 ----
 ======
 
-== Default Event
+== Sự kiện mặc định
 
-You can also supply a catch-all event to fire in the case of any `AuthenticationException`:
+Bạn cũng có thể cung cấp một sự kiện bắt tất cả để phát ra trong trường hợp có bất kỳ `AuthenticationException` nào:
 
 [tabs]
 ======
