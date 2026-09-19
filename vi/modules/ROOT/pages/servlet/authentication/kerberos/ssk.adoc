@@ -1,21 +1,21 @@
 [[springsecuritykerberos]]
-= Spring and Spring Security Kerberos
+= Spring và Spring Security Kerberos
 :figures: servlet/authentication/kerberos
 
-This part of the reference documentation explains the core functionality
-that Spring Security Kerberos provides to any Spring based application.
+Phần này của tài liệu tham khảo giải thích chức năng cốt lõi
+mà Spring Security Kerberos cung cấp cho mọi ứng dụng dựa trên Spring.
 
-<<ssk-authprovider>> describes the authentication provider support.
+<<ssk-authprovider>> mô tả hỗ trợ authentication provider.
 
-<<ssk-spnego>> describes the spnego negotiate support.
+<<ssk-spnego>> mô tả hỗ trợ negotiate Spnego.
 
-<<ssk-resttemplate>> describes the RestTemplate support.
+<<ssk-resttemplate>> mô tả hỗ trợ RestTemplate.
 
 
 [[ssk-authprovider]]
 == Authentication Provider
 
-Provider configuration using JavaConfig.
+Cấu hình authentication provider bằng JavaConfig.
 
 [source,java,indent=0]
 ----
@@ -25,7 +25,7 @@ include::example$kerberos/AuthProviderConfig.java[tags=snippetA]
 [[ssk-spnego]]
 == Spnego Negotiate
 
-Spnego configuration using JavaConfig.
+Cấu hình Spnego bằng JavaConfig.
 
 [source,java,indent=0]
 ----
@@ -33,45 +33,45 @@ include::example$kerberos/SpnegoConfig.java[tags=snippetA]
 ----
 
 [[ssk-resttemplate]]
-== Using KerberosRestTemplate
+== Sử dụng KerberosRestTemplate
 
-If there is a need to access Kerberos protected web resources
-programmatically we have `KerberosRestTemplate` which extends
-`RestTemplate` and does necessary login actions prior to delegating to
-actual RestTemplate methods. You basically have few options to
-configure this template.
+Nếu cần truy cập theo cách lập trình vào các tài nguyên web được Kerberos bảo vệ,
+chúng ta có `KerberosRestTemplate`, class này mở rộng
+`RestTemplate` và thực hiện các hành động đăng nhập cần thiết trước khi ủy quyền
+cho các method thực tế của `RestTemplate`. Về cơ bản, bạn có một số tùy chọn để
+cấu hình template này.
 
-- Leave keyTabLocation and userPrincipal empty if you want to
-  use cached ticket.
-- Use keyTabLocation and userPrincipal if you want to use
-  keytab file.
-- Use loginOptions if you want to customise Krb5LoginModule options.
-- Use a customised httpClient.
+- Để trống keyTabLocation và userPrincipal nếu bạn muốn
+  sử dụng ticket đã được cache.
+- Sử dụng keyTabLocation và userPrincipal nếu bạn muốn dùng
+  file keytab.
+- Sử dụng loginOptions nếu bạn muốn tùy chỉnh các tùy chọn của Krb5LoginModule.
+- Sử dụng httpClient đã được tùy chỉnh.
 
-With ticket cache.
+Với ticket cache.
 [source,java,indent=0]
 ----
 include::example$kerberos/KerberosRestTemplateConfig.java[tags=snippetA]
 ----
 
-With keytab file.
+Với file keytab.
 [source,java,indent=0]
 ----
 include::example$kerberos/KerberosRestTemplateConfig.java[tags=snippetB]
 ----
 
 [[ssk-kerberosldap]]
-== Authentication with LDAP Services
+== Authentication với dịch vụ LDAP
 
-With most of your samples we're using `DummyUserDetailsService`
-because there is not necessarily need to query a real user details
-once kerberos authentication is successful and we can use kerberos
-principal info to create that dummy user. However there is a way to
-access kerberized LDAP services in a say way and query user details
-from there.
+Trong hầu hết các sample, chúng tôi sử dụng `DummyUserDetailsService`
+vì không nhất thiết phải truy vấn thông tin của một user thực sau khi
+authentication bằng Kerberos thành công, và chúng ta có thể sử dụng thông tin
+principal của Kerberos để tạo user giả đó. Tuy nhiên, vẫn có cách an toàn để
+truy cập các dịch vụ LDAP được Kerberos bảo vệ và truy vấn thông tin user
+từ đó.
 
-`KerberosLdapContextSource` can be used to bind into LDAP via kerberos
-which is at least proven to work well with Windows AD services.
+`KerberosLdapContextSource` có thể được sử dụng để bind vào LDAP thông qua Kerberos,
+và đã được chứng minh là hoạt động tốt với các dịch vụ Windows AD.
 
 [source,java,indent=0]
 ----
@@ -80,6 +80,6 @@ include::example$kerberos/KerberosLdapContextSourceConfig.java[tags=snippetA]
 
 [TIP]
 ====
-Sample xref:servlet/authentication/kerberos/samples.adoc#samples-sec-server-win-auth[Security Server Windows Auth Sample]
-is currently configured to query user details from AD if authentication happen via kerberos.
+Mẫu xref:servlet/authentication/kerberos/samples.adoc#samples-sec-server-win-auth[Mẫu Security Server Windows Auth]
+hiện được cấu hình để truy vấn thông tin user từ AD nếu authentication xảy ra qua Kerberos.
 ====
