@@ -1,15 +1,14 @@
 [[new]]
-= What's New in Spring Security 7.2
+= Có gì mới trong Spring Security 7.2
 
 == Authentication
 
-* https://github.com/spring-projects/spring-security/issues/17655[gh-17655] - Make One-Time Token xref:servlet/authentication/onetimetoken.adoc#validating-account-status[account status checks opt-in]
+* https://github.com/spring-projects/spring-security/issues/17655[gh-17655] - Đặt việc xref:servlet/authentication/onetimetoken.adoc#validating-account-status[kiểm tra trạng thái tài khoản] của One-Time Token thành tùy chọn
 
 == Web
 
-* Since Spring Framework's `HttpMethod#valueOf` now normalizes casing, `StrictServerWebExchangeFirewall` no longer detects a non-canonical-case HTTP method (for example, `get` instead of `GET`) as a distinct value; such requests are processed as the canonical method instead of being rejected. Applications with a customized `ServerExchangeRejectedHandler` should be aware it is no longer invoked for this case.
+* Vì `HttpMethod#valueOf` của Spring Framework hiện chuẩn hóa cách viết hoa/thường, `StrictServerWebExchangeFirewall` không còn phát hiện một phương thức HTTP có cách viết hoa/thường không chuẩn (ví dụ `get` thay vì `GET`) là một giá trị riêng biệt; các request như vậy được xử lý theo phương thức chuẩn thay vì bị từ chối. Các ứng dụng đã tùy chỉnh `ServerExchangeRejectedHandler` cần lưu ý rằng handler này không còn được gọi trong trường hợp này.
 
 == OAuth 2.0
 
-* https://github.com/spring-projects/spring-security/pull/18895[gh-18895] - Add `authenticationSuccessHandler` to the Reactive Resource Server DSL
-
+* https://github.com/spring-projects/spring-security/pull/18895[gh-18895] - Thêm `authenticationSuccessHandler` vào DSL của Reactive Resource Server
