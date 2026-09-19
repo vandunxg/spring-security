@@ -1,37 +1,37 @@
 [[servlet-authentication-architecture]]
-= Servlet Authentication Architecture
+= Kiến trúc Authentication trong Servlet
 :figures: servlet/authentication/architecture
 
-This discussion expands on xref:servlet/architecture.adoc#servlet-architecture[Servlet Security: The Big Picture] to describe the main architectural components that Spring Security uses in Servlet authentication.
-If you need concrete flows that explain how these pieces fit together, look at the xref:servlet/authentication/index.adoc#servlet-authentication-mechanisms[Authentication Mechanism] specific sections.
+Phần thảo luận này mở rộng xref:servlet/architecture.adoc#servlet-architecture[Bảo mật Servlet: Bức tranh tổng thể] để mô tả các thành phần kiến trúc chính mà Spring Security sử dụng cho authentication trong Servlet.
+Nếu cần các luồng cụ thể giải thích cách những thành phần này kết hợp với nhau, hãy xem các phần dành riêng cho xref:servlet/authentication/index.adoc#servlet-authentication-mechanisms[cơ chế Authentication].
 
-* <<servlet-authentication-securitycontextholder>> - The `SecurityContextHolder` is where Spring Security stores the details of who is xref:features/authentication/index.adoc#authentication[authenticated].
-* <<servlet-authentication-securitycontext>> - is obtained from the `SecurityContextHolder` and contains the `Authentication` of the currently authenticated user.
-* <<servlet-authentication-authentication>> - Can be the input to `AuthenticationManager` to provide the credentials a user has provided to authenticate or the current user from the `SecurityContext`.
-* <<servlet-authentication-granted-authority>> - An authority that is granted to the principal on the `Authentication` (i.e. roles, scopes, etc.)
-* <<servlet-authentication-authenticationmanager>> -  the API that defines how Spring Security's Filters perform  xref:features/authentication/index.adoc#authentication[authentication].
-* <<servlet-authentication-providermanager>> -  the most common implementation of `AuthenticationManager`.
-* <<servlet-authentication-authenticationprovider>> - used by `ProviderManager` to perform a specific type of authentication.
-* <<servlet-authentication-authenticationentrypoint>> - used for requesting credentials from a client (i.e. redirecting to a log in page, sending a `WWW-Authenticate` response, etc.)
-* <<servlet-authentication-abstractprocessingfilter>> - a base `Filter` used for authentication.
-This also gives a good idea of the high level flow of authentication and how pieces work together.
+* <<servlet-authentication-securitycontextholder>> - `SecurityContextHolder` là nơi Spring Security lưu trữ thông tin về người xref:features/authentication/index.adoc#authentication[đã authentication].
+* <<servlet-authentication-securitycontext>> - được lấy từ `SecurityContextHolder` và chứa `Authentication` của người dùng hiện đang được authentication.
+* <<servlet-authentication-authentication>> - có thể là đầu vào cho `AuthenticationManager` để cung cấp credential mà người dùng đã gửi nhằm authentication, hoặc người dùng hiện tại từ `SecurityContext`.
+* <<servlet-authentication-granted-authority>> - một authority được cấp cho principal trong `Authentication` (tức là role, scope, v.v.).
+* <<servlet-authentication-authenticationmanager>> - API xác định cách các Filter của Spring Security thực hiện xref:features/authentication/index.adoc#authentication[authentication].
+* <<servlet-authentication-providermanager>> - implementation phổ biến nhất của `AuthenticationManager`.
+* <<servlet-authentication-authenticationprovider>> - được `ProviderManager` sử dụng để thực hiện một loại authentication cụ thể.
+* <<servlet-authentication-authenticationentrypoint>> - được sử dụng để yêu cầu credential từ client (tức là chuyển hướng đến trang đăng nhập, gửi phản hồi `WWW-Authenticate`, v.v.).
+* <<servlet-authentication-abstractprocessingfilter>> - một `Filter` cơ sở được sử dụng cho authentication.
+Phần này cũng giúp hình dung rõ về luồng authentication cấp cao và cách các thành phần phối hợp với nhau.
 
 [[servlet-authentication-securitycontextholder]]
 == SecurityContextHolder
 
-At the heart of Spring Security's authentication model is the `SecurityContextHolder`.
-It contains the <<servlet-authentication-securitycontext>>.
+Trung tâm của mô hình authentication trong Spring Security là `SecurityContextHolder`.
+Nó chứa <<servlet-authentication-securitycontext>>.
 
 [.invert-dark]
 image::{figures}/securitycontextholder.png[]
 
-The `SecurityContextHolder` is where Spring Security stores the details of who is xref:features/authentication/index.adoc#authentication[authenticated].
-Spring Security does not care how the `SecurityContextHolder` is populated.
-If it contains a value, it is used as the currently authenticated user.
+`SecurityContextHolder` là nơi Spring Security lưu trữ thông tin về người xref:features/authentication/index.adoc#authentication[đã authentication].
+Spring Security không quan tâm `SecurityContextHolder` được điền dữ liệu bằng cách nào.
+Nếu nó chứa một giá trị, giá trị đó được sử dụng làm người dùng hiện đang được authentication.
 
-The simplest way to indicate a user is authenticated is to set the `SecurityContextHolder` directly:
+Cách đơn giản nhất để cho biết một người dùng đã authentication là thiết lập trực tiếp `SecurityContextHolder`:
 
-.Setting `SecurityContextHolder`
+.Thiết lập `SecurityContextHolder`
 
 [tabs]
 ======
@@ -59,19 +59,19 @@ SecurityContextHolder.setContext(context) // <3>
 ----
 ======
 
-<1> We start by creating an empty `SecurityContext`.
-You should create a new `SecurityContext` instance instead of using `SecurityContextHolder.getContext().setAuthentication(authentication)` to avoid race conditions across multiple threads.
-<2> Next, we create a new <<servlet-authentication-authentication,`Authentication`>> object.
-Spring Security does not care what type of `Authentication` implementation is set on the `SecurityContext`.
-Here, we use `TestingAuthenticationToken`, because it is very simple.
-A more common production scenario is `UsernamePasswordAuthenticationToken(userDetails, password, authorities)`.
-<3> Finally, we set the `SecurityContext` on the `SecurityContextHolder`.
-Spring Security uses this information for xref:servlet/authorization/index.adoc#servlet-authorization[authorization].
+<1> Trước tiên, chúng ta tạo một `SecurityContext` rỗng.
+Bạn nên tạo một instance `SecurityContext` mới thay vì sử dụng `SecurityContextHolder.getContext().setAuthentication(authentication)` để tránh race condition giữa nhiều thread.
+<2> Tiếp theo, chúng ta tạo một object <<servlet-authentication-authentication,`Authentication`>> mới.
+Spring Security không quan tâm loại implementation `Authentication` nào được thiết lập trên `SecurityContext`.
+Ở đây, chúng ta sử dụng `TestingAuthenticationToken` vì nó rất đơn giản.
+Một kịch bản production phổ biến hơn là `UsernamePasswordAuthenticationToken(userDetails, password, authorities)`.
+<3> Cuối cùng, chúng ta thiết lập `SecurityContext` trên `SecurityContextHolder`.
+Spring Security sử dụng thông tin này cho xref:servlet/authorization/index.adoc#servlet-authorization[authorization].
 
 
-To obtain information about the authenticated principal, access the `SecurityContextHolder`.
+Để lấy thông tin về principal đã authentication, hãy truy cập `SecurityContextHolder`.
 
-.Access Currently Authenticated User
+.Truy cập người dùng hiện đang được authentication
 [tabs]
 ======
 Java::
@@ -97,148 +97,148 @@ val authorities = authentication.authorities
 ----
 ======
 
-In Spring MVC, you can resolve the current principal with
+Trong Spring MVC, bạn có thể xác định principal hiện tại bằng
 xref:servlet/integrations/mvc.adoc#mvc-authentication-principal[`@AuthenticationPrincipal`]
-and the full `SecurityContext` with
+và toàn bộ `SecurityContext` bằng
 xref:servlet/integrations/mvc.adoc#mvc-current-security-context[`@CurrentSecurityContext`].
-For Servlet API access, use `HttpServletRequest#getRemoteUser`.
+Để truy cập Servlet API, hãy sử dụng `HttpServletRequest#getRemoteUser`.
 
-By default, `SecurityContextHolder` uses a `ThreadLocal` to store these details, which means that the `SecurityContext` is always available to methods in the same thread, even if the `SecurityContext` is not explicitly passed around as an argument to those methods.
-Using a `ThreadLocal` in this way is quite safe if you take care to clear the thread after the present principal's request is processed.
-Spring Security's xref:servlet/architecture.adoc#servlet-filterchainproxy[FilterChainProxy] ensures that the `SecurityContext` is always cleared.
+Theo mặc định, `SecurityContextHolder` sử dụng một `ThreadLocal` để lưu trữ thông tin này. Điều đó có nghĩa là `SecurityContext` luôn khả dụng cho các phương thức trong cùng thread, ngay cả khi `SecurityContext` không được truyền tường minh dưới dạng đối số cho các phương thức đó.
+Sử dụng `ThreadLocal` theo cách này khá an toàn nếu bạn đảm bảo xóa thread sau khi request của principal hiện tại được xử lý.
+xref:servlet/architecture.adoc#servlet-filterchainproxy[FilterChainProxy] của Spring Security đảm bảo `SecurityContext` luôn được xóa.
 
-Some applications are not entirely suitable for using a `ThreadLocal`, because of the specific way they work with threads.
-For example, a Swing client might want all threads in a Java Virtual Machine to use the same security context.
-You can configure `SecurityContextHolder` with a strategy on startup to specify how you would like the context to be stored.
-For a standalone application, you would use the `SecurityContextHolder.MODE_GLOBAL` strategy.
-Other applications might want to have threads spawned by the secure thread also assume the same security identity.
-You can achieve this by using `SecurityContextHolder.MODE_INHERITABLETHREADLOCAL`.
-You can change the mode from the default `SecurityContextHolder.MODE_THREADLOCAL` in two ways.
-The first is to set a system property.
-The second is to call a static method on `SecurityContextHolder`.
-Most applications need not change from the default.
-However, if you do, take a look at the JavaDoc for `SecurityContextHolder` to learn more.
+Một số ứng dụng không hoàn toàn phù hợp để sử dụng `ThreadLocal` do cách cụ thể mà chúng làm việc với thread.
+Ví dụ, một client Swing có thể muốn mọi thread trong một Java Virtual Machine sử dụng cùng một context bảo mật.
+Bạn có thể cấu hình `SecurityContextHolder` bằng một strategy khi khởi động để chỉ định cách bạn muốn lưu trữ context.
+Đối với ứng dụng standalone, bạn sẽ sử dụng strategy `SecurityContextHolder.MODE_GLOBAL`.
+Các ứng dụng khác có thể muốn các thread được tạo từ thread bảo mật cũng sử dụng cùng identity bảo mật.
+Bạn có thể đạt được điều này bằng cách sử dụng `SecurityContextHolder.MODE_INHERITABLETHREADLOCAL`.
+Bạn có thể thay đổi mode mặc định `SecurityContextHolder.MODE_THREADLOCAL` theo hai cách.
+Cách thứ nhất là thiết lập một system property.
+Cách thứ hai là gọi một static method trên `SecurityContextHolder`.
+Hầu hết ứng dụng không cần thay đổi giá trị mặc định.
+Tuy nhiên, nếu thay đổi, hãy xem JavaDoc của `SecurityContextHolder` để biết thêm thông tin.
 
 [[servlet-authentication-securitycontext]]
 == SecurityContext
 
-The javadoc:org.springframework.security.core.context.SecurityContext[] is obtained from the <<servlet-authentication-securitycontextholder>>.
-The `SecurityContext` contains an <<servlet-authentication-authentication>> object.
+javadoc:org.springframework.security.core.context.SecurityContext[] được lấy từ <<servlet-authentication-securitycontextholder>>.
+`SecurityContext` chứa một object <<servlet-authentication-authentication>>.
 
 [[servlet-authentication-authentication]]
 == Authentication
 
-The javadoc:org.springframework.security.core.Authentication[] interface serves two main purposes within Spring Security:
+javadoc:org.springframework.security.core.Authentication[] interface có hai mục đích chính trong Spring Security:
 
-* An input to <<servlet-authentication-authenticationmanager,`AuthenticationManager`>> to provide the credentials a user has provided to authenticate.
-When used in this scenario, `isAuthenticated()` returns `false`.
-* Represent the currently authenticated user.
-You can obtain the current `Authentication` from the <<servlet-authentication-securitycontext>>.
+* Là đầu vào cho <<servlet-authentication-authenticationmanager,`AuthenticationManager`>> để cung cấp credential mà người dùng đã gửi nhằm authentication.
+Khi được sử dụng trong kịch bản này, `isAuthenticated()` trả về `false`.
+* Đại diện cho người dùng hiện đang được authentication.
+Bạn có thể lấy `Authentication` hiện tại từ <<servlet-authentication-securitycontext>>.
 
-The `Authentication` contains:
+`Authentication` chứa:
 
-* `principal`: Identifies the user.
-When authenticating with a username/password this is often an instance of xref:servlet/authentication/passwords/user-details.adoc#servlet-authentication-userdetails[`UserDetails`].
-* `credentials`: Often a password.
-In many cases, this is cleared after the user is authenticated, to ensure that it is not leaked.
-* `authorities`: The <<servlet-authentication-granted-authority,`GrantedAuthority`>> instances are high-level permissions the user is granted.
-Two examples are roles and scopes.
+* `principal`: Xác định người dùng.
+Khi authentication bằng username/password, đây thường là một instance của xref:servlet/authentication/passwords/user-details.adoc#servlet-authentication-userdetails[`UserDetails`].
+* `credentials`: Thường là password.
+Trong nhiều trường hợp, thông tin này được xóa sau khi người dùng được authentication để đảm bảo không bị rò rỉ.
+* `authorities`: Các instance <<servlet-authentication-granted-authority,`GrantedAuthority`>> là những permission cấp cao được cấp cho người dùng.
+Hai ví dụ là role và scope.
 
-It is also equipped with a `AdditionalRequiredFactorsBuilder` that allows you to mutate an existing `Authentication` instance and potentially merge it with another.
-This is useful in scenarios like taking the authorities from one authentication step, like form login, and applying them to another, like one-time-token login, like so:
+Nó cũng được trang bị một `AdditionalRequiredFactorsBuilder`, cho phép bạn thay đổi một instance `Authentication` hiện có và có khả năng hợp nhất nó với một instance khác.
+Điều này hữu ích trong các kịch bản như lấy authority từ một bước authentication, chẳng hạn form login, rồi áp dụng chúng cho một bước khác, chẳng hạn one-time-token login, như sau:
 
 include-code::./CopyAuthoritiesTests[tag=springSecurity,indent=0]
 
 [[servlet-authentication-granted-authority]]
 == GrantedAuthority
-javadoc:org.springframework.security.core.GrantedAuthority[] instances are high-level permissions that the user is granted.
-Two examples are roles and scopes.
+javadoc:org.springframework.security.core.GrantedAuthority[] là những permission cấp cao được cấp cho người dùng.
+Hai ví dụ là role và scope.
 
-You can obtain `GrantedAuthority` instances from the <<servlet-authentication-authentication,`Authentication.getAuthorities()`>> method.
-This method provides a `Collection` of `GrantedAuthority` objects.
-A `GrantedAuthority` is, not surprisingly, an authority that is granted to the principal.
-Such authorities are usually "`roles`", such as `ROLE_ADMINISTRATOR` or `ROLE_HR_SUPERVISOR`.
-These roles are later configured for web authorization, method authorization, and domain object authorization.
-Other parts of Spring Security interpret these authorities and expect them to be present.
-When using username/password based authentication `GrantedAuthority` instances are usually loaded by the xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[`UserDetailsService`].
+Bạn có thể lấy các instance `GrantedAuthority` từ method <<servlet-authentication-authentication,`Authentication.getAuthorities()`>>.
+Method này cung cấp một `Collection` gồm các object `GrantedAuthority`.
+Một `GrantedAuthority`, đúng như tên gọi, là một authority được cấp cho principal.
+Các authority như vậy thường là "`roles`", chẳng hạn `ROLE_ADMINISTRATOR` hoặc `ROLE_HR_SUPERVISOR`.
+Các role này sau đó được cấu hình cho web authorization, method authorization và domain object authorization.
+Các phần khác của Spring Security diễn giải những authority này và mong đợi chúng tồn tại.
+Khi sử dụng authentication dựa trên username/password, các instance `GrantedAuthority` thường được tải bởi xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[`UserDetailsService`].
 
-Usually, the `GrantedAuthority` objects are application-wide permissions.
-They are not specific to a given domain object.
-Thus, you would not likely have a `GrantedAuthority` to represent a permission to `Employee` object number 54, because if there are thousands of such authorities you would quickly run out of memory (or, at the very least, cause the application to take a long time to authenticate a user).
-Of course, Spring Security is expressly designed to handle this common requirement, but you should instead use the project's domain object security capabilities for this purpose.
+Thông thường, các object `GrantedAuthority` là những permission trên toàn application.
+Chúng không dành riêng cho một domain object cụ thể.
+Do đó, bạn thường sẽ không có một `GrantedAuthority` đại diện cho permission đối với object `Employee` số 54, vì nếu có hàng nghìn authority như vậy, bạn sẽ nhanh chóng hết bộ nhớ (hoặc ít nhất khiến ứng dụng mất nhiều thời gian để authentication cho một người dùng).
+Dĩ nhiên, Spring Security được thiết kế rõ ràng để xử lý yêu cầu phổ biến này, nhưng thay vào đó bạn nên sử dụng các khả năng bảo mật domain object của project cho mục đích này.
 
 [[servlet-authentication-authenticationmanager]]
 == AuthenticationManager
 
-javadoc:org.springframework.security.authentication.AuthenticationManager[] is the API that defines how Spring Security's Filters perform  xref:features/authentication/index.adoc#authentication[authentication].
-The <<servlet-authentication-authentication,`Authentication`>> that is returned is then set on the <<servlet-authentication-securitycontextholder>> by the controller (that is, by xref:servlet/architecture.adoc#servlet-security-filters[Spring Security's `Filters` instances]) that invoked the `AuthenticationManager`.
-If you are not integrating with Spring Security's `Filters` instances, you can set the `SecurityContextHolder` directly and are not required to use an `AuthenticationManager`.
+javadoc:org.springframework.security.authentication.AuthenticationManager[] là API xác định cách các Filter của Spring Security thực hiện xref:features/authentication/index.adoc#authentication[authentication].
+<<servlet-authentication-authentication,`Authentication`>> được trả về sau đó được controller (tức các xref:servlet/architecture.adoc#servlet-security-filters[instance `Filters` của Spring Security]) đã gọi `AuthenticationManager` thiết lập trên <<servlet-authentication-securitycontextholder>>.
+Nếu không tích hợp với các instance `Filters` của Spring Security, bạn có thể thiết lập trực tiếp `SecurityContextHolder` và không bắt buộc phải sử dụng `AuthenticationManager`.
 
-While the implementation of `AuthenticationManager` could be anything, the most common implementation is <<servlet-authentication-providermanager,`ProviderManager`>>.
+Mặc dù implementation của `AuthenticationManager` có thể là bất kỳ thứ gì, implementation phổ biến nhất là <<servlet-authentication-providermanager,`ProviderManager`>>.
 // FIXME: add configuration
 
 [[servlet-authentication-providermanager]]
 == ProviderManager
 
-javadoc:org.springframework.security.authentication.ProviderManager[] is the most commonly used implementation of <<servlet-authentication-authenticationmanager,`AuthenticationManager`>>.
-`ProviderManager` delegates to a `List` of <<servlet-authentication-authenticationprovider,`AuthenticationProvider`>> instances.
-Each `AuthenticationProvider` has an opportunity to indicate that authentication should be successful, fail, or indicate it cannot make a decision and allow a downstream `AuthenticationProvider` to decide.
-If none of the configured `AuthenticationProvider` instances can authenticate, authentication fails with a `ProviderNotFoundException`, which is a special `AuthenticationException` that indicates that the `ProviderManager` was not configured to support the type of `Authentication` that was passed into it.
+javadoc:org.springframework.security.authentication.ProviderManager[] là implementation được sử dụng phổ biến nhất của <<servlet-authentication-authenticationmanager,`AuthenticationManager`>>.
+`ProviderManager` ủy quyền cho một `List` gồm các instance <<servlet-authentication-authenticationprovider,`AuthenticationProvider`>>.
+Mỗi `AuthenticationProvider` có cơ hội cho biết authentication thành công, thất bại, hoặc không thể đưa ra quyết định và cho phép `AuthenticationProvider` ở downstream quyết định.
+Nếu không có instance `AuthenticationProvider` nào được cấu hình có thể thực hiện authentication, authentication thất bại với `ProviderNotFoundException`. Đây là một `AuthenticationException` đặc biệt cho biết `ProviderManager` chưa được cấu hình để hỗ trợ loại `Authentication` được truyền vào.
 
 [.invert-dark]
 image::{figures}/providermanager.png[]
 
-In practice each `AuthenticationProvider` knows how to perform a specific type of authentication.
-For example, one `AuthenticationProvider` might be able to validate a username/password, while another might be able to authenticate a SAML assertion.
-This lets each `AuthenticationProvider` do a very specific type of authentication while supporting multiple types of authentication and expose only a single `AuthenticationManager` bean.
+Trên thực tế, mỗi `AuthenticationProvider` biết cách thực hiện một loại authentication cụ thể.
+Ví dụ, một `AuthenticationProvider` có thể xác thực username/password, trong khi một `AuthenticationProvider` khác có thể authentication một SAML assertion.
+Điều này cho phép mỗi `AuthenticationProvider` thực hiện một loại authentication rất cụ thể, đồng thời hỗ trợ nhiều loại authentication và chỉ cung cấp một bean `AuthenticationManager` duy nhất.
 
-`ProviderManager` also allows configuring an optional parent `AuthenticationManager`, which is consulted in the event that no `AuthenticationProvider` can perform authentication.
-The parent can be any type of `AuthenticationManager`, but it is often an instance of `ProviderManager`.
+`ProviderManager` cũng cho phép cấu hình một `AuthenticationManager` parent tùy chọn, được tham vấn khi không có `AuthenticationProvider` nào có thể thực hiện authentication.
+Parent có thể là bất kỳ loại `AuthenticationManager` nào, nhưng thường là một instance của `ProviderManager`.
 
 [.invert-dark]
 image::{figures}/providermanager-parent.png[]
 
-In fact, multiple `ProviderManager` instances might share the same parent `AuthenticationManager`.
-This is somewhat common in scenarios where there are multiple xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] instances that have some authentication in common (the shared parent `AuthenticationManager`), but also different authentication mechanisms (the different `ProviderManager` instances).
+Trên thực tế, nhiều instance `ProviderManager` có thể dùng chung một `AuthenticationManager` parent.
+Điều này khá phổ biến trong các kịch bản có nhiều instance xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] dùng chung một phần authentication (parent `AuthenticationManager` được chia sẻ), nhưng cũng có các cơ chế authentication khác nhau (các instance `ProviderManager` khác nhau).
 
 [.invert-dark]
 image::{figures}/providermanagers-parent.png[]
 
 [[servlet-authentication-providermanager-erasing-credentials]]
-By default, `ProviderManager` tries to clear any sensitive credentials information from the `Authentication` object that is returned by a successful authentication request.
-This prevents information, such as passwords, being retained longer than necessary in the `HttpSession`.
+Theo mặc định, `ProviderManager` cố gắng xóa mọi thông tin credential nhạy cảm khỏi object `Authentication` được trả về bởi một request authentication thành công.
+Điều này ngăn thông tin, chẳng hạn password, được lưu giữ lâu hơn mức cần thiết trong `HttpSession`.
 
 [NOTE]
 ====
-The `CredentialsContainer` interface plays a critical role in the authentication process.
-It allows for the erasure of credential information once it is no longer needed, thereby enhancing security by ensuring sensitive data is not retained longer than necessary.
+interface `CredentialsContainer` đóng vai trò quan trọng trong quy trình authentication.
+Nó cho phép xóa thông tin credential khi thông tin đó không còn cần thiết, qua đó tăng cường bảo mật bằng cách đảm bảo dữ liệu nhạy cảm không được lưu giữ lâu hơn mức cần thiết.
 ====
 
-This may cause issues when you use a cache of user objects, for example, to improve performance in a stateless application.
-If the `Authentication` contains a reference to an object in the cache (such as a `UserDetails` instance) and this has its credentials removed, it is no longer possible to authenticate against the cached value.
-You need to take this into account if you use a cache.
-An obvious solution is to first make a copy of the object, either in the cache implementation or in the `AuthenticationProvider` that creates the returned `Authentication` object.
-Alternatively, you can disable the `eraseCredentialsAfterAuthentication` property on `ProviderManager`.
-See the Javadoc for the javadoc:org.springframework.security.authentication.ProviderManager[] class.
+Điều này có thể gây ra vấn đề khi bạn sử dụng cache chứa các object người dùng, chẳng hạn để cải thiện hiệu năng trong một stateless application.
+Nếu `Authentication` chứa một reference đến một object trong cache (chẳng hạn một instance `UserDetails`) và credential của object này bị xóa, thì không thể authentication dựa trên giá trị đã cache nữa.
+Bạn cần tính đến điều này nếu sử dụng cache.
+Một giải pháp rõ ràng là trước tiên tạo một bản sao của object, trong implementation của cache hoặc trong `AuthenticationProvider` tạo object `Authentication` được trả về.
+Ngoài ra, bạn có thể vô hiệu hóa property `eraseCredentialsAfterAuthentication` trên `ProviderManager`.
+Xem Javadoc của javadoc:org.springframework.security.authentication.ProviderManager[] class.
 
 [[servlet-authentication-authenticationprovider]]
 == AuthenticationProvider
 
-You can inject multiple javadoc:org.springframework.security.authentication.AuthenticationProvider[] instances into <<servlet-authentication-providermanager,`ProviderManager`>>.
-Each `AuthenticationProvider` performs a specific type of authentication.
-For example, xref:servlet/authentication/passwords/dao-authentication-provider.adoc#servlet-authentication-daoauthenticationprovider[`DaoAuthenticationProvider`] supports username/password-based authentication, while `JwtAuthenticationProvider` supports authenticating a JWT token.
+Bạn có thể inject nhiều instance javadoc:org.springframework.security.authentication.AuthenticationProvider[] vào <<servlet-authentication-providermanager,`ProviderManager`>>.
+Mỗi `AuthenticationProvider` thực hiện một loại authentication cụ thể.
+Ví dụ, xref:servlet/authentication/passwords/dao-authentication-provider.adoc#servlet-authentication-daoauthenticationprovider[`DaoAuthenticationProvider`] hỗ trợ authentication dựa trên username/password, trong khi `JwtAuthenticationProvider` hỗ trợ authentication một JWT token.
 
 [[servlet-authentication-authenticationentrypoint]]
-== Request Credentials with `AuthenticationEntryPoint`
+== Yêu cầu credential bằng `AuthenticationEntryPoint`
 
-javadoc:org.springframework.security.web.AuthenticationEntryPoint[] is used to send an HTTP response that requests credentials from a client.
+javadoc:org.springframework.security.web.AuthenticationEntryPoint[] được sử dụng để gửi một HTTP response yêu cầu credential từ client.
 
-Sometimes, a client proactively includes credentials (such as a username and password) to request a resource.
-In these cases, Spring Security does not need to provide an HTTP response that requests credentials from the client, since they are already included.
+Đôi khi, client chủ động gửi kèm credential (chẳng hạn username và password) để yêu cầu một resource.
+Trong những trường hợp này, Spring Security không cần cung cấp HTTP response yêu cầu credential từ client vì chúng đã được gửi kèm.
 
-In other cases, a client makes an unauthenticated request to a resource that they are not authorized to access.
-In this case, an implementation of `AuthenticationEntryPoint` is used to request credentials from the client.
-The `AuthenticationEntryPoint` implementation might perform a xref:servlet/authentication/passwords/form.adoc#servlet-authentication-form[redirect to a log in page], respond with an xref:servlet/authentication/passwords/basic.adoc#servlet-authentication-basic[WWW-Authenticate] header, or take other action.
+Trong những trường hợp khác, client gửi một request chưa authentication đến một resource mà client không được phép truy cập.
+Trong trường hợp này, một implementation của `AuthenticationEntryPoint` được sử dụng để yêu cầu credential từ client.
+Implementation `AuthenticationEntryPoint` có thể thực hiện xref:servlet/authentication/passwords/form.adoc#servlet-authentication-form[chuyển hướng đến trang đăng nhập], phản hồi bằng header xref:servlet/authentication/passwords/basic.adoc#servlet-authentication-basic[WWW-Authenticate], hoặc thực hiện hành động khác.
 
 // FIXME: authenticationsuccesshandler
 // FIXME: authenticationfailurehandler
@@ -246,45 +246,45 @@ The `AuthenticationEntryPoint` implementation might perform a xref:servlet/authe
 [[servlet-authentication-abstractprocessingfilter]]
 == AbstractAuthenticationProcessingFilter
 
-javadoc:org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter[] is used as a base `Filter` for authenticating a user's credentials.
-Before the credentials can be authenticated, Spring Security typically requests the credentials by using <<servlet-authentication-authenticationentrypoint,`AuthenticationEntryPoint`>>.
+javadoc:org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter[] được sử dụng làm `Filter` cơ sở để authentication credential của người dùng.
+Trước khi credential có thể được authentication, Spring Security thường yêu cầu credential bằng cách sử dụng <<servlet-authentication-authenticationentrypoint,`AuthenticationEntryPoint`>>.
 
-Next, the `AbstractAuthenticationProcessingFilter` can authenticate any authentication requests that are submitted to it.
+Tiếp theo, `AbstractAuthenticationProcessingFilter` có thể authentication mọi request authentication được gửi đến nó.
 
 [.invert-dark]
 image::{figures}/abstractauthenticationprocessingfilter.png[]
 
-image:{icondir}/number_1.png[] When the user submits their credentials, the `AbstractAuthenticationProcessingFilter` creates an <<servlet-authentication-authentication,`Authentication`>> from the `HttpServletRequest` to be authenticated.
-The type of `Authentication` created depends on the subclass of `AbstractAuthenticationProcessingFilter`.
-For example, xref:servlet/authentication/passwords/form.adoc#servlet-authentication-usernamepasswordauthenticationfilter[`UsernamePasswordAuthenticationFilter`] creates a `UsernamePasswordAuthenticationToken` from a __username__ and __password__ that are submitted in the `HttpServletRequest`.
+image:{icondir}/number_1.png[] Khi người dùng gửi credential, `AbstractAuthenticationProcessingFilter` tạo một <<servlet-authentication-authentication,`Authentication`>> từ `HttpServletRequest` để authentication.
+Loại `Authentication` được tạo phụ thuộc vào subclass của `AbstractAuthenticationProcessingFilter`.
+Ví dụ, xref:servlet/authentication/passwords/form.adoc#servlet-authentication-usernamepasswordauthenticationfilter[`UsernamePasswordAuthenticationFilter`] tạo một `UsernamePasswordAuthenticationToken` từ __username__ và __password__ được gửi trong `HttpServletRequest`.
 
-image:{icondir}/number_2.png[] Next, the <<servlet-authentication-authentication,`Authentication`>> is passed into the <<servlet-authentication-authenticationmanager,`AuthenticationManager`>> to be authenticated.
+image:{icondir}/number_2.png[] Tiếp theo, <<servlet-authentication-authentication,`Authentication`>> được truyền vào <<servlet-authentication-authenticationmanager,`AuthenticationManager`>> để authentication.
 
-image:{icondir}/number_3.png[] If authentication fails, then __Failure__.
+image:{icondir}/number_3.png[] Nếu authentication thất bại thì __Thất bại__.
 
-* The <<servlet-authentication-securitycontextholder>> is cleared out.
-* `RememberMeServices.loginFail` is invoked.
-If remember me is not configured, this is a no-op.
-See the javadoc:org.springframework.security.web.authentication.rememberme.package-summary[rememberme] package.
-* `AuthenticationFailureHandler` is invoked.
-See the javadoc:org.springframework.security.web.authentication.AuthenticationFailureHandler[] interface.
+* <<servlet-authentication-securitycontextholder>> được xóa.
+* `RememberMeServices.loginFail` được gọi.
+Nếu remember-me chưa được cấu hình thì đây là no-op.
+Xem javadoc:org.springframework.security.web.authentication.rememberme.package-summary[rememberme] package.
+* `AuthenticationFailureHandler` được gọi.
+Xem javadoc:org.springframework.security.web.authentication.AuthenticationFailureHandler[] interface.
 
-image:{icondir}/number_4.png[] If authentication is successful, then __Success__.
+image:{icondir}/number_4.png[] Nếu authentication thành công thì __Thành công__.
 
-* `SessionAuthenticationStrategy` is notified of a new login.
-See the javadoc:org.springframework.security.web.authentication.session.SessionAuthenticationStrategy[] interface.
-* Any already-authenticated `Authentication` in the <<servlet-authentication-securitycontextholder>> is loaded and its
-authorities are added to the returned <<servlet-authentication-authentication>>.
-* The <<servlet-authentication-authentication>> is set on the <<servlet-authentication-securitycontextholder>>.
-Later, if you need to save the `SecurityContext` so that it can be automatically set on future requests, `SecurityContextRepository#saveContext` must be explicitly invoked.
-See the javadoc:org.springframework.security.web.context.SecurityContextHolderFilter[] class.
+* `SessionAuthenticationStrategy` được thông báo về một lần đăng nhập mới.
+Xem javadoc:org.springframework.security.web.authentication.session.SessionAuthenticationStrategy[] interface.
+* Mọi `Authentication` đã authentication trước đó trong <<servlet-authentication-securitycontextholder>> được tải và
+  các authority của nó được thêm vào <<servlet-authentication-authentication>> được trả về.
+* <<servlet-authentication-authentication>> được thiết lập trên <<servlet-authentication-securitycontextholder>>.
+Sau đó, nếu cần lưu `SecurityContext` để nó có thể tự động được thiết lập trên các request về sau, phải gọi tường minh `SecurityContextRepository#saveContext`.
+Xem javadoc:org.springframework.security.web.context.SecurityContextHolderFilter[] class.
 
-* `RememberMeServices.loginSuccess` is invoked.
-If remember me is not configured, this is a no-op.
-See the javadoc:org.springframework.security.web.authentication.rememberme.package-summary[rememberme] package.
-* `ApplicationEventPublisher` publishes an `InteractiveAuthenticationSuccessEvent`.
-* `AuthenticationSuccessHandler` is invoked.
-See the javadoc:org.springframework.security.web.authentication.AuthenticationSuccessHandler[] interface.
+* `RememberMeServices.loginSuccess` được gọi.
+Nếu remember-me chưa được cấu hình thì đây là no-op.
+Xem javadoc:org.springframework.security.web.authentication.rememberme.package-summary[rememberme] package.
+* `ApplicationEventPublisher` phát hành một `InteractiveAuthenticationSuccessEvent`.
+* `AuthenticationSuccessHandler` được gọi.
+Xem javadoc:org.springframework.security.web.authentication.AuthenticationSuccessHandler[] interface.
 
 
 // daoauthenticationprovider (goes in username/password)
