@@ -1,23 +1,23 @@
 [[servlet-saml2login-authenticate-responses]]
-= Authenticating ``<saml2:Response>``s
+= Xác thực các ``<saml2:Response>``
 
-To verify SAML 2.0 Responses, Spring Security uses xref:servlet/saml2/login/overview.adoc#servlet-saml2login-authentication-saml2authenticationtokenconverter[`Saml2AuthenticationTokenConverter`] to populate the `Authentication` request and xref:servlet/saml2/login/overview.adoc#servlet-saml2login-architecture[`OpenSaml5AuthenticationProvider`] to authenticate it.
+Để xác minh các Response SAML 2.0, Spring Security sử dụng xref:servlet/saml2/login/overview.adoc#servlet-saml2login-authentication-saml2authenticationtokenconverter[`Saml2AuthenticationTokenConverter`] để tạo request `Authentication` và xref:servlet/saml2/login/overview.adoc#servlet-saml2login-architecture[`OpenSaml5AuthenticationProvider`] để xác thực request đó.
 
-You can configure this in a number of ways including:
+Bạn có thể cấu hình việc này theo một số cách, bao gồm:
 
-1. Changing the way the `RelyingPartyRegistration` is Looked Up
-2. Setting a clock skew to timestamp validation
-3. Mapping the response to a list of `GrantedAuthority` instances
-4. Customizing the strategy for validating assertions
-5. Customizing the strategy for decrypting response and assertion elements
+1. Thay đổi cách tra cứu `RelyingPartyRegistration`
+2. Thiết lập độ lệch đồng hồ khi xác thực timestamp
+3. Ánh xạ response thành một danh sách các instance `GrantedAuthority`
+4. Tùy chỉnh chiến lược xác thực assertion
+5. Tùy chỉnh chiến lược giải mã các phần tử response và assertion
 
-To configure these, you'll use the `saml2Login#authenticationManager` method in the DSL.
+Để cấu hình các nội dung này, bạn sẽ sử dụng method `saml2Login#authenticationManager` trong DSL.
 
 [[saml2-response-processing-endpoint]]
-== Changing the SAML Response Processing Endpoint
+== Thay đổi Endpoint xử lý SAML Response
 
-The default endpoint is `+/login/saml2/sso/{registrationId}+`.
-You can change this in the DSL and in the associated metadata like so:
+Endpoint mặc định là `+/login/saml2/sso/{registrationId}+`.
+Bạn có thể thay đổi endpoint này trong DSL và metadata liên quan như sau:
 
 [tabs]
 ======
@@ -55,7 +55,7 @@ fun securityFilters(val http: HttpSecurity): SecurityFilterChain {
 ----
 ======
 
-and:
+và:
 
 [tabs]
 ======
@@ -75,13 +75,13 @@ relyingPartyRegistrationBuilder.assertionConsumerServiceLocation("/saml/SSO")
 ======
 
 [[relyingpartyregistrationresolver-apply]]
-== Changing `RelyingPartyRegistration` lookup
+== Thay đổi việc tra cứu `RelyingPartyRegistration`
 
-By default, this converter will match against any associated `<saml2:AuthnRequest>` or any `registrationId` it finds in the URL.
-Or, if it cannot find one in either of those cases, then it attempts to look it up by the `<saml2:Response#Issuer>` element.
+Theo mặc định, converter này sẽ đối chiếu với bất kỳ `<saml2:AuthnRequest>` liên quan nào hoặc bất kỳ `registrationId` nào mà nó tìm thấy trong URL.
+Hoặc nếu không tìm thấy trong cả hai trường hợp đó, nó sẽ thử tra cứu bằng phần tử `<saml2:Response#Issuer>`.
 
-There are a number of circumstances where you might need something more sophisticated, like if you are supporting `ARTIFACT` binding.
-In those cases, you can customize lookup through a custom `AuthenticationConverter`, which you can customize like so:
+Có một số trường hợp bạn có thể cần cách xử lý tinh vi hơn, chẳng hạn khi hỗ trợ binding `ARTIFACT`.
+Trong những trường hợp đó, bạn có thể tùy chỉnh việc tra cứu thông qua một `AuthenticationConverter` tùy chỉnh như sau:
 
 [tabs]
 ======
@@ -120,10 +120,10 @@ fun securityFilters(val http: HttpSecurity, val converter: AuthenticationConvert
 ======
 
 [[servlet-saml2login-opensamlauthenticationprovider-clockskew]]
-== Setting a Clock Skew
+== Thiết lập độ lệch đồng hồ
 
-It's not uncommon for the asserting and relying parties to have system clocks that aren't perfectly synchronized.
-For that reason, you can configure `OpenSaml5AuthenticationProvider.AssertionValidator` as follows:
+Không hiếm trường hợp asserting party và Relying Party có đồng hồ hệ thống không được đồng bộ hoàn toàn.
+Vì lý do đó, bạn có thể cấu hình `OpenSaml5AuthenticationProvider.AssertionValidator` như sau:
 
 [tabs]
 ======
@@ -181,11 +181,11 @@ class SecurityConfig {
 ----
 ======
 
-== Converting an `Assertion` into an `Authentication`
+== Chuyển đổi một `Assertion` thành một `Authentication`
 
-`OpenSamlXAuthenticationProvider#setResponseAuthenticationConverter` provides a way for you to change how it converts your assertion into an `Authentication` instance.
+`OpenSamlXAuthenticationProvider#setResponseAuthenticationConverter` cung cấp cách để bạn thay đổi cách nó chuyển đổi assertion thành một instance `Authentication`.
 
-You can set a custom converter in the following way:
+Bạn có thể thiết lập một converter tùy chỉnh như sau:
 
 [tabs]
 ======
@@ -244,13 +244,13 @@ open class SecurityConfig {
 ----
 ======
 
-The ensuing examples all build off of this common construct to show you different ways this converter comes in handy.
+Các ví dụ tiếp theo đều dựa trên cấu trúc chung này để minh họa những cách khác nhau mà converter này có thể hữu ích.
 
 [[servlet-saml2login-opensamlauthenticationprovider-userdetailsservice]]
-== Coordinating with a `UserDetailsService`
+== Phối hợp với một `UserDetailsService`
 
-Or, perhaps you would like to include user details from a legacy `UserDetailsService`.
-In that case, the response authentication converter can come in handy, as can be seen below:
+Hoặc có thể bạn muốn đưa thông tin user từ một `UserDetailsService` cũ vào.
+Trong trường hợp đó, response authentication converter có thể hữu ích như minh họa dưới đây:
 
 [tabs]
 ======
@@ -305,23 +305,23 @@ open class MyUserDetailsResponseAuthenticationConverter(private val userDetailsS
 }
 ----
 ======
-<1> First, call the default converter, which extracts attributes and authorities from the response
-<2> Second, call the xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[`UserDetailsService`] using the relevant information
-<3> Third, return an authentication that includes the user details
+<1> Thứ nhất, gọi converter mặc định, converter này trích xuất attributes và authorities từ response
+<2> Thứ hai, gọi xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[`UserDetailsService`] bằng thông tin liên quan
+<3> Thứ ba, trả về một authentication có chứa thông tin user
 
 [TIP]
 ====
-If your `UserDetailsService` returns a value that also implements `AuthenticatedPrincipal`, then you don't need a custom authentication implementation.
+Nếu `UserDetailsService` của bạn trả về một giá trị cũng implements `AuthenticatedPrincipal`, bạn không cần một authentication implementation tùy chỉnh.
 ====
 
 [NOTE]
-It's not required to call ``OpenSaml5AuthenticationProvider``'s default authentication converter.
-It returns a `Saml2AuthenticatedPrincipal` containing the attributes it extracted from ``AttributeStatement``s as well as the single `ROLE_USER` authority.
+Không bắt buộc phải gọi authentication converter mặc định của ``OpenSaml5AuthenticationProvider``.
+Converter này trả về một `Saml2AuthenticatedPrincipal` chứa các attributes đã trích xuất từ các ``AttributeStatement`` cùng với authority `ROLE_USER` duy nhất.
 
-=== Configuring the Principal Name
+=== Cấu hình Principal Name
 
-Sometimes, the principal name is not in the `<saml2:NameID>` element.
-In that case, you can configure the `ResponseAuthenticationConverter` with a custom strategy like so:
+Đôi khi principal name không nằm trong phần tử `<saml2:NameID>`.
+Trong trường hợp đó, bạn có thể cấu hình `ResponseAuthenticationConverter` bằng một strategy tùy chỉnh như sau:
 
 [tabs]
 ======
@@ -354,10 +354,10 @@ fun authenticationConverter(): ResponseAuthenticationConverter {
 ----
 ======
 
-=== Configuring a Principal's Granted Authorities
+=== Cấu hình Granted Authorities của Principal
 
-Spring Security automatically grants `ROLE_USER` when using `OpenSamlXAuhenticationProvider`.
-With `OpenSaml5AuthenticationProvider`, you can configure a different set of granted authorities like so:
+Spring Security tự động cấp `ROLE_USER` khi sử dụng `OpenSamlXAuhenticationProvider`.
+Với `OpenSaml5AuthenticationProvider`, bạn có thể cấu hình một tập granted authorities khác như sau:
 
 [tabs]
 ======
@@ -391,12 +391,12 @@ fun authenticationConverter(): ResponseAuthenticationConverter {
 ======
 
 [[servlet-saml2login-opensamlauthenticationprovider-additionalvalidation]]
-== Performing Additional Response Validation
+== Thực hiện xác thực Response bổ sung
 
-`OpenSaml5AuthenticationProvider` validates the `Issuer` and `Destination` values right after decrypting the `Response`.
-You can customize the validation by extending the default validator concatenating with your own response validator, or you can replace it entirely with yours.
+`OpenSaml5AuthenticationProvider` xác thực các giá trị `Issuer` và `Destination` ngay sau khi giải mã `Response`.
+Bạn có thể tùy chỉnh việc xác thực bằng cách mở rộng validator mặc định và nối thêm response validator của mình, hoặc thay thế hoàn toàn bằng validator riêng.
 
-For example, you can throw a custom exception with any additional information available in the `Response` object, like so:
+Ví dụ, bạn có thể ném một exception tùy chỉnh cùng mọi thông tin bổ sung có trong object `Response` như sau:
 [source,java]
 ----
 OpenSaml5AuthenticationProvider provider = new OpenSaml5AuthenticationProvider();
@@ -404,8 +404,8 @@ ResponseValidator responseValidator = ResponseValidator.withDefaults(myCustomVal
 provider.setResponseValidator(responseValidator);
 ----
 
-You can also customize which validation steps Spring Security should do.
-For example, if you want to skip `Response#InResponseTo` validation, you can call ``ResponseValidator``'s constructor, excluding `InResponseToValidator` from the list:
+Bạn cũng có thể tùy chỉnh các bước xác thực mà Spring Security sẽ thực hiện.
+Ví dụ, nếu muốn bỏ qua việc xác thực `Response#InResponseTo`, bạn có thể gọi constructor của ``ResponseValidator``, loại `InResponseToValidator` khỏi danh sách:
 
 [source,java]
 ----
@@ -416,20 +416,20 @@ provider.setResponseValidator(responseValidator);
 
 [TIP]
 ====
-OpenSAML performs `Asssertion#InResponseTo` validation in its `BearerSubjectConfirmationValidator` class, which is configurable using <<_performing_additional_assertion_validation, setAssertionValidator>>.
+OpenSAML thực hiện xác thực `Asssertion#InResponseTo` trong class `BearerSubjectConfirmationValidator`, có thể cấu hình bằng <<_performing_additional_assertion_validation, setAssertionValidator>>.
 ====
 
-== Performing Additional Assertion Validation
-`OpenSaml5AuthenticationProvider` performs minimal validation on SAML 2.0 Assertions.
-After verifying the signature, it will:
+== Thực hiện xác thực Assertion bổ sung
+`OpenSaml5AuthenticationProvider` thực hiện việc xác thực tối thiểu đối với các Assertion SAML 2.0.
+Sau khi xác minh signature, nó sẽ:
 
-1. Validate `<AudienceRestriction>` and `<DelegationRestriction>` conditions
-2. Validate ``<SubjectConfirmation>``s, expect for any IP address information
+1. Xác thực các condition `<AudienceRestriction>` và `<DelegationRestriction>`
+2. Xác thực các ``<SubjectConfirmation>``, ngoại trừ mọi thông tin địa chỉ IP
 
-To perform additional validation, you can configure your own assertion validator that delegates to ``OpenSaml5AuthenticationProvider``'s default and then performs its own.
+Để thực hiện xác thực bổ sung, bạn có thể cấu hình assertion validator riêng, ủy quyền cho validator mặc định của ``OpenSaml5AuthenticationProvider`` rồi thực hiện phần xác thực của mình.
 
 [[servlet-saml2login-opensamlauthenticationprovider-onetimeuse]]
-For example, you can use OpenSAML's `OneTimeUseConditionValidator` to also validate a `<OneTimeUse>` condition, like so:
+Ví dụ, bạn có thể sử dụng `OneTimeUseConditionValidator` của OpenSAML để xác thực thêm condition `<OneTimeUse>` như sau:
 
 [tabs]
 ======
@@ -456,7 +456,7 @@ provider.setAssertionValidator(assertionValidator)
 ----
 ======
 
-You can use this same builder to remove validators that you don't want to use like so:
+Bạn có thể sử dụng cùng builder này để loại bỏ các validator không muốn dùng như sau:
 
 [tabs]
 ======
@@ -484,16 +484,16 @@ provider.setAssertionValidator(assertionValidator)
 ======
 
 [[servlet-saml2login-opensamlauthenticationprovider-decryption]]
-== Customizing Decryption
+== Tùy chỉnh việc giải mã
 
-Spring Security decrypts `<saml2:EncryptedAssertion>`, `<saml2:EncryptedAttribute>`, and `<saml2:EncryptedID>` elements automatically by using the decryption xref:servlet/saml2/login/overview.adoc#servlet-saml2login-rpr-credentials[`Saml2X509Credential` instances] registered in the xref:servlet/saml2/login/overview.adoc#servlet-saml2login-relyingpartyregistration[`RelyingPartyRegistration`].
+Spring Security tự động giải mã các phần tử `<saml2:EncryptedAssertion>`, `<saml2:EncryptedAttribute>` và `<saml2:EncryptedID>` bằng xref:servlet/saml2/login/overview.adoc#servlet-saml2login-rpr-credentials[các instance `Saml2X509Credential`] dùng cho việc giải mã, đã đăng ký trong xref:servlet/saml2/login/overview.adoc#servlet-saml2login-relyingpartyregistration[`RelyingPartyRegistration`].
 
-`OpenSaml5AuthenticationProvider` exposes xref:servlet/saml2/login/overview.adoc#servlet-saml2login-architecture[two decryption strategies].
-The response decrypter is for decrypting encrypted elements of the `<saml2:Response>`, like `<saml2:EncryptedAssertion>`.
-The assertion decrypter is for decrypting encrypted elements of the `<saml2:Assertion>`, like `<saml2:EncryptedAttribute>` and `<saml2:EncryptedID>`.
+`OpenSaml5AuthenticationProvider` cung cấp xref:servlet/saml2/login/overview.adoc#servlet-saml2login-architecture[hai chiến lược giải mã].
+Response decrypter dùng để giải mã các phần tử được mã hóa của `<saml2:Response>`, chẳng hạn `<saml2:EncryptedAssertion>`.
+Assertion decrypter dùng để giải mã các phần tử được mã hóa của `<saml2:Assertion>`, chẳng hạn `<saml2:EncryptedAttribute>` và `<saml2:EncryptedID>`.
 
-You can replace ``OpenSaml5AuthenticationProvider``'s default decryption strategy with your own.
-For example, if you have a separate service that decrypts the assertions in a `<saml2:Response>`, you can use it instead like so:
+Bạn có thể thay thế chiến lược giải mã mặc định của ``OpenSaml5AuthenticationProvider`` bằng chiến lược của mình.
+Ví dụ, nếu có một service riêng giải mã các assertion trong một `<saml2:Response>`, bạn có thể sử dụng service đó thay thế như sau:
 
 [tabs]
 ======
@@ -516,7 +516,7 @@ provider.setResponseElementsDecrypter { responseToken -> decryptionService.decry
 ----
 ======
 
-If you are also decrypting individual elements in a `<saml2:Assertion>`, you can customize the assertion decrypter, too:
+Nếu cũng đang giải mã các phần tử riêng lẻ trong một `<saml2:Assertion>`, bạn cũng có thể tùy chỉnh assertion decrypter:
 
 [tabs]
 ======
@@ -535,16 +535,16 @@ provider.setAssertionElementsDecrypter { assertionToken -> decryptionService.dec
 ----
 ======
 
-NOTE: There are two separate decrypters since assertions can be signed separately from responses.
-Trying to decrypt a signed assertion's elements before signature verification may invalidate the signature.
-If your asserting party signs the response only, then it's safe to decrypt all elements using only the response decrypter.
+LƯU Ý: Có hai decrypter riêng biệt vì assertion có thể được ký riêng với response.
+Cố gắng giải mã các phần tử của assertion đã ký trước khi xác minh signature có thể làm signature mất hiệu lực.
+Nếu asserting party của bạn chỉ ký response, thì có thể giải mã an toàn mọi phần tử chỉ bằng response decrypter.
 
 [[servlet-saml2login-authenticationmanager-custom]]
-== Using a Custom Authentication Manager
+== Sử dụng Authentication Manager tùy chỉnh
 
 [[servlet-saml2login-opensamlauthenticationprovider-authenticationmanager]]
-Of course, the `authenticationManager` DSL method can be also used to perform a completely custom SAML 2.0 authentication.
-This authentication manager should expect a `Saml2AuthenticationToken` object containing the SAML 2.0 Response XML data.
+Tất nhiên, method DSL `authenticationManager` cũng có thể được sử dụng để thực hiện authentication SAML 2.0 hoàn toàn tùy chỉnh.
+Authentication manager này cần nhận một object `Saml2AuthenticationToken` chứa dữ liệu XML Response SAML 2.0.
 
 [tabs]
 ======
@@ -597,12 +597,12 @@ open class SecurityConfig {
 ======
 
 [[servlet-saml2login-authenticatedprincipal]]
-== Using `Saml2AuthenticatedPrincipal`
+== Sử dụng `Saml2AuthenticatedPrincipal`
 
-With the relying party correctly configured for a given asserting party, it's ready to accept assertions.
-Once the relying party validates an assertion, the result is a `Saml2Authentication` with a `Saml2AuthenticatedPrincipal`.
+Khi Relying Party được cấu hình chính xác cho một asserting party cụ thể, nó đã sẵn sàng chấp nhận các assertion.
+Sau khi Relying Party xác thực một assertion, kết quả là một `Saml2Authentication` với một `Saml2AuthenticatedPrincipal`.
 
-This means that you can access the principal in your controller like so:
+Điều này có nghĩa là bạn có thể truy cập principal trong controller như sau:
 
 [tabs]
 ======
@@ -638,5 +638,5 @@ class MainController {
 ======
 
 [TIP]
-Because the SAML 2.0 specification allows for each attribute to have multiple values, you can either call `getAttribute` to get the list of attributes or `getFirstAttribute` to get the first in the list.
-`getFirstAttribute` is quite handy when you know that there is only one value.
+Vì đặc tả SAML 2.0 cho phép mỗi attribute có nhiều giá trị, bạn có thể gọi `getAttribute` để lấy danh sách attributes hoặc `getFirstAttribute` để lấy giá trị đầu tiên trong danh sách.
+`getFirstAttribute` khá tiện dụng khi bạn biết chỉ có một giá trị.
