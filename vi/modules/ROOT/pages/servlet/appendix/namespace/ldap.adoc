@@ -1,82 +1,82 @@
 [[nsa-ldap]]
-= LDAP Namespace Options
-LDAP is covered in some details in xref:servlet/authentication/passwords/ldap.adoc#servlet-authentication-ldap[its own chapter].
-We will expand on that here with some explanation of how the namespace options map to Spring beans.
-The LDAP implementation uses Spring LDAP extensively, so some familiarity with that project's API may be useful.
+= Các tùy chọn Namespace LDAP
+LDAP được trình bày khá chi tiết trong xref:servlet/authentication/passwords/ldap.adoc#servlet-authentication-ldap[chương riêng về LDAP].
+Ở đây, chúng ta sẽ mở rộng nội dung đó bằng một số giải thích về cách các tùy chọn namespace ánh xạ tới các Spring bean.
+Việc triển khai LDAP sử dụng rộng rãi Spring LDAP, vì vậy việc quen thuộc phần nào với API của dự án đó có thể hữu ích.
 
 
 [[nsa-ldap-server]]
-== Defining the LDAP Server using the
-`<ldap-server>` Element
-This element sets up a Spring LDAP `ContextSource` for use by the other LDAP beans, defining the location of the LDAP server and other information (such as a username and password, if it doesn't allow anonymous access) for connecting to it.
-It can also be used to create an embedded server for testing.
-Details of the syntax for both options are covered in the xref:servlet/authentication/passwords/ldap.adoc#servlet-authentication-ldap[LDAP chapter].
-The actual `ContextSource` implementation is `DefaultSpringSecurityContextSource` which extends Spring LDAP's `LdapContextSource` class.
-The `manager-dn` and `manager-password` attributes map to the latter's `userDn` and `password` properties respectively.
+== Xác định LDAP Server bằng
+`<ldap-server>` Phần tử
+Phần tử này thiết lập một Spring LDAP `ContextSource` để các LDAP bean khác sử dụng, xác định vị trí của LDAP server và thông tin khác (chẳng hạn như tên người dùng và mật khẩu, nếu server không cho phép truy cập ẩn danh) để kết nối tới server đó.
+Nó cũng có thể được dùng để tạo một server nhúng cho việc kiểm thử.
+Chi tiết cú pháp của cả hai tùy chọn được trình bày trong xref:servlet/authentication/passwords/ldap.adoc#servlet-authentication-ldap[chương LDAP].
+Triển khai `ContextSource` thực tế là `DefaultSpringSecurityContextSource`, mở rộng class `LdapContextSource` của Spring LDAP.
+Các attribute `manager-dn` và `manager-password` lần lượt ánh xạ tới các property `userDn` và `password` của class sau.
 
-If you only have one server defined in your application context, the other LDAP namespace-defined beans will use it automatically.
-Otherwise, you can give the element an "id" attribute and refer to it from other namespace beans using the `server-ref` attribute.
-This is actually the bean `id` of the `ContextSource` instance, if you want to use it in other traditional Spring beans.
+Nếu application context của bạn chỉ định nghĩa một server, các bean namespace LDAP khác sẽ tự động sử dụng server đó.
+Nếu không, bạn có thể cung cấp attribute "id" cho phần tử và tham chiếu tới nó từ các namespace bean khác bằng attribute `server-ref`.
+Đây thực chất là bean `id` của instance `ContextSource`, nếu bạn muốn sử dụng nó trong các Spring bean truyền thống khác.
 
 
 [[nsa-ldap-server-attributes]]
-=== <ldap-server> Attributes
+=== Các attribute của <ldap-server>
 
 [[nsa-ldap-server-mode]]
 * **mode**
-Explicitly specifies which embedded ldap server should use. The only supported value is `unboundid`. By default, it will depends if the library is available in the classpath.
+Chỉ định rõ embedded LDAP server nào sẽ được sử dụng. Giá trị duy nhất được hỗ trợ là `unboundid`. Theo mặc định, giá trị này phụ thuộc vào việc thư viện có sẵn trong classpath hay không.
 
 [[nsa-ldap-server-id]]
 * **id**
-A bean identifier, used for referring to the bean elsewhere in the context.
+Một định danh bean, được dùng để tham chiếu đến bean ở nơi khác trong context.
 
 
 [[nsa-ldap-server-ldif]]
 * **ldif**
-Explicitly specifies an ldif file resource to load into an embedded LDAP server.
-The ldif should be a Spring resource pattern (i.e. classpath:init.ldif).
-The default is classpath*:*.ldif
+Chỉ định rõ resource file ldif cần load vào embedded LDAP server.
+ldif phải là một Spring resource pattern (tức là classpath:init.ldif).
+Mặc định là classpath*:*.ldif
 
 
 [[nsa-ldap-server-manager-dn]]
 * **manager-dn**
-Username (DN) of the "manager" user identity which will be used to authenticate to a (non-embedded) LDAP server.
-If omitted, anonymous access will be used.
+Tên người dùng (DN) của danh tính người dùng "manager", được dùng để authentication tới một LDAP server (không nhúng).
+Nếu bỏ qua, truy cập ẩn danh sẽ được sử dụng.
 
 
 [[nsa-ldap-server-manager-password]]
 * **manager-password**
-The password for the manager DN.
-This is required if the manager-dn is specified.
+Mật khẩu cho manager DN.
+Đây là giá trị bắt buộc nếu `manager-dn` được chỉ định.
 
 
 [[nsa-ldap-server-port]]
 * **port**
-Specifies an IP port number.
-Used to configure an embedded LDAP server, for example.
-The default value is 33389.
+Chỉ định số cổng IP.
+Ví dụ, được dùng để cấu hình embedded LDAP server.
+Giá trị mặc định là 33389.
 
 
 [[nsa-ldap-server-root]]
 * **root**
-Optional root suffix for the embedded LDAP server.
-Default is "dc=springframework,dc=org"
+Hậu tố root tùy chọn cho embedded LDAP server.
+Mặc định là "dc=springframework,dc=org"
 
 
 [[nsa-ldap-server-url]]
 * **url**
-Specifies the ldap server URL when not using the embedded LDAP server.
+Chỉ định URL của LDAP server khi không sử dụng embedded LDAP server.
 
 
 [[nsa-ldap-authentication-provider]]
 == <ldap-authentication-provider>
-This element is shorthand for the creation of an `LdapAuthenticationProvider` instance.
-By default this will be configured with a `BindAuthenticator` instance and a `DefaultAuthoritiesPopulator`.
-As with all namespace authentication providers, it must be included as a child of the `authentication-provider` element.
+Phần tử này là cách viết rút gọn để tạo một instance `LdapAuthenticationProvider`.
+Theo mặc định, phần tử này được cấu hình với một instance `BindAuthenticator` và một `DefaultAuthoritiesPopulator`.
+Giống như mọi namespace authentication provider, nó phải được bao gồm dưới dạng phần tử con của phần tử `authentication-provider`.
 
 
 [[nsa-ldap-authentication-provider-parents]]
-=== Parent Elements of <ldap-authentication-provider>
+=== Các phần tử cha của <ldap-authentication-provider>
 
 
 * xref:servlet/appendix/namespace/authentication-manager.adoc#nsa-authentication-manager[authentication-manager]
@@ -84,92 +84,92 @@ As with all namespace authentication providers, it must be included as a child o
 
 
 [[nsa-ldap-authentication-provider-attributes]]
-=== <ldap-authentication-provider> Attributes
+=== Các attribute của <ldap-authentication-provider>
 
 
 [[nsa-ldap-authentication-provider-group-role-attribute]]
 * **group-role-attribute**
-The LDAP attribute name which contains the role name which will be used within Spring Security.
-Maps to the ``DefaultLdapAuthoritiesPopulator``'s `groupRoleAttribute` property.
-Defaults to "cn".
+Tên LDAP attribute chứa tên role sẽ được dùng trong Spring Security.
+Ánh xạ tới property `groupRoleAttribute` của ``DefaultLdapAuthoritiesPopulator``.
+Mặc định là "cn".
 
 
 [[nsa-ldap-authentication-provider-group-search-base]]
 * **group-search-base**
-Search base for group membership searches.
-Maps to the ``DefaultLdapAuthoritiesPopulator``'s `groupSearchBase` constructor argument.
-Defaults to "" (searching from the root).
+Cơ sở tìm kiếm tư cách thành viên của group.
+Ánh xạ tới constructor argument `groupSearchBase` của ``DefaultLdapAuthoritiesPopulator``.
+Mặc định là "" (tìm kiếm từ root).
 
 
 [[nsa-ldap-authentication-provider-group-search-filter]]
 * **group-search-filter**
-Group search filter.
-Maps to the ``DefaultLdapAuthoritiesPopulator``'s `groupSearchFilter` property.
-Defaults to `+(uniqueMember={0})+`.
-The substituted parameter is the DN of the user.
+Bộ lọc tìm kiếm group.
+Ánh xạ tới property `groupSearchFilter` của ``DefaultLdapAuthoritiesPopulator``.
+Mặc định là `+(uniqueMember={0})+`.
+Tham số được thay thế là DN của user.
 
 
 [[nsa-ldap-authentication-provider-role-prefix]]
 * **role-prefix**
-A non-empty string prefix that will be added to role strings loaded from persistent.
-Maps to the ``DefaultLdapAuthoritiesPopulator``'s `rolePrefix` property.
-Defaults to "ROLE_".
-Use the value "none" for no prefix in cases where the default is non-empty.
+Một chuỗi prefix không rỗng sẽ được thêm vào các chuỗi role được load từ lưu trữ bền vững.
+Ánh xạ tới property `rolePrefix` của ``DefaultLdapAuthoritiesPopulator``.
+Mặc định là "ROLE_".
+Sử dụng giá trị "none" để không có prefix trong trường hợp giá trị mặc định không rỗng.
 
 
 [[nsa-ldap-authentication-provider-server-ref]]
 * **server-ref**
-The optional server to use.
-If omitted, and a default LDAP server is registered (using <ldap-server> with no Id), that server will be used.
+Server tùy chọn cần sử dụng.
+Nếu bỏ qua và một LDAP server mặc định được đăng ký (bằng `<ldap-server>` không có Id), server đó sẽ được sử dụng.
 
 
 [[nsa-ldap-authentication-provider-user-context-mapper-ref]]
 * **user-context-mapper-ref**
-Allows explicit customization of the loaded user object by specifying a UserDetailsContextMapper bean which will be called with the context information from the user's directory entry
+Cho phép tùy chỉnh rõ ràng user object được load bằng cách chỉ định một UserDetailsContextMapper bean, bean này sẽ được gọi với thông tin context từ directory entry của user.
 
 
 [[nsa-ldap-authentication-provider-user-details-class]]
 * **user-details-class**
-Allows the objectClass of the user entry to be specified.
-If set, the framework will attempt to load standard attributes for the defined class into the returned UserDetails object
+Cho phép chỉ định objectClass của user entry.
+Nếu được đặt, framework sẽ cố load các attribute chuẩn cho class đã định nghĩa vào UserDetails object được trả về.
 
 
 [[nsa-ldap-authentication-provider-user-dn-pattern]]
 * **user-dn-pattern**
-If your users are at a fixed location in the directory (i.e. you can work out the DN directly from the username without doing a directory search), you can use this attribute to map directly to the DN.
-It maps directly to the `userDnPatterns` property of `AbstractLdapAuthenticator`.
-The value is a specific pattern used to build the user's DN, for example `+uid={0},ou=people+`.
-The key `+{0}+` must be present and will be substituted with the username.
+Nếu user của bạn ở một vị trí cố định trong directory (tức là bạn có thể xác định trực tiếp DN từ username mà không cần thực hiện directory search), bạn có thể dùng attribute này để ánh xạ trực tiếp tới DN.
+Nó ánh xạ trực tiếp tới property `userDnPatterns` của `AbstractLdapAuthenticator`.
+Giá trị là một pattern cụ thể dùng để xây dựng DN của user, ví dụ `+uid={0},ou=people+`.
+Key `+{0}+` phải hiện diện và sẽ được thay thế bằng username.
 
 
 [[nsa-ldap-authentication-provider-user-search-base]]
 * **user-search-base**
-Search base for user searches.
-Defaults to "".
-Only used with a 'user-search-filter'.
+Cơ sở tìm kiếm user.
+Mặc định là "".
+Chỉ được dùng với một 'user-search-filter'.
 
 +
 
-If you need to perform a search to locate the user in the directory, then you can set these attributes to control the search.
-The `BindAuthenticator` will be configured with a `FilterBasedLdapUserSearch` and the attribute values map directly to the first two arguments of that bean's constructor.
-If these attributes aren't set and no `user-dn-pattern` has been supplied as an alternative, then the default search values of `+user-search-filter="(uid={0})"+` and `user-search-base=""` will be used.
+Nếu cần thực hiện tìm kiếm để định vị user trong directory, bạn có thể đặt các attribute này để kiểm soát việc tìm kiếm.
+`BindAuthenticator` sẽ được cấu hình với một `FilterBasedLdapUserSearch` và các giá trị attribute ánh xạ trực tiếp tới hai argument đầu tiên của constructor của bean đó.
+Nếu không đặt các attribute này và không cung cấp `user-dn-pattern` làm phương án thay thế, các giá trị tìm kiếm mặc định là `+user-search-filter="(uid={0})"+` và `user-search-base=""` sẽ được sử dụng.
 
 
 [[nsa-ldap-authentication-provider-user-search-filter]]
 * **user-search-filter**
-The LDAP filter used to search for users (optional).
-For example `+(uid={0})+`.
-The substituted parameter is the user's login name.
+LDAP filter được dùng để tìm kiếm user (tùy chọn).
+Ví dụ `+(uid={0})+`.
+Tham số được thay thế là login name của user.
 
 +
 
-If you need to perform a search to locate the user in the directory, then you can set these attributes to control the search.
-The `BindAuthenticator` will be configured with a `FilterBasedLdapUserSearch` and the attribute values map directly to the first two arguments of that bean's constructor.
-If these attributes aren't set and no `user-dn-pattern` has been supplied as an alternative, then the default search values of `+user-search-filter="(uid={0})"+` and `user-search-base=""` will be used.
+Nếu cần thực hiện tìm kiếm để định vị user trong directory, bạn có thể đặt các attribute này để kiểm soát việc tìm kiếm.
+`BindAuthenticator` sẽ được cấu hình với một `FilterBasedLdapUserSearch` và các giá trị attribute ánh xạ trực tiếp tới hai argument đầu tiên của constructor của bean đó.
+Nếu không đặt các attribute này và không cung cấp `user-dn-pattern` làm phương án thay thế, các giá trị tìm kiếm mặc định là `+user-search-filter="(uid={0})"+` và `user-search-base=""` sẽ được sử dụng.
 
 
 [[nsa-ldap-authentication-provider-children]]
-=== Child Elements of <ldap-authentication-provider>
+=== Các phần tử con của <ldap-authentication-provider>
 
 
 * <<nsa-password-compare,password-compare>>
@@ -178,11 +178,11 @@ If these attributes aren't set and no `user-dn-pattern` has been supplied as an 
 
 [[nsa-password-compare]]
 == <password-compare>
-This is used as child element to `<ldap-provider>` and switches the authentication strategy from `BindAuthenticator` to `PasswordComparisonAuthenticator`.
+Phần tử này được dùng như phần tử con của `<ldap-provider>` và chuyển chiến lược authentication từ `BindAuthenticator` sang `PasswordComparisonAuthenticator`.
 
 
 [[nsa-password-compare-parents]]
-=== Parent Elements of <password-compare>
+=== Các phần tử cha của <password-compare>
 
 
 * <<nsa-ldap-authentication-provider,ldap-authentication-provider>>
@@ -190,23 +190,23 @@ This is used as child element to `<ldap-provider>` and switches the authenticati
 
 
 [[nsa-password-compare-attributes]]
-=== <password-compare> Attributes
+=== Các attribute của <password-compare>
 
 
 [[nsa-password-compare-hash]]
 * **hash**
-Defines the hashing algorithm used on user passwords.
-We recommend strongly against using MD4, as it is a very weak hashing algorithm.
+Xác định hashing algorithm được dùng trên password của user.
+Chúng tôi đặc biệt khuyến cáo không dùng MD4 vì đây là một hashing algorithm rất yếu.
 
 
 [[nsa-password-compare-password-attribute]]
 * **password-attribute**
-The attribute in the directory which contains the user password.
-Defaults to "userPassword".
+Attribute trong directory chứa password của user.
+Mặc định là "userPassword".
 
 
 [[nsa-password-compare-children]]
-=== Child Elements of <password-compare>
+=== Các phần tử con của <password-compare>
 
 
 * xref:servlet/appendix/namespace/authentication-manager.adoc#nsa-password-encoder[password-encoder]
@@ -215,77 +215,77 @@ Defaults to "userPassword".
 
 [[nsa-ldap-user-service]]
 == <ldap-user-service>
-This element configures an LDAP `UserDetailsService`.
-The class used is `LdapUserDetailsService` which is a combination of a `FilterBasedLdapUserSearch` and a `DefaultLdapAuthoritiesPopulator`.
-The attributes it supports have the same usage as in `<ldap-provider>`.
+Phần tử này cấu hình một LDAP `UserDetailsService`.
+Class được dùng là `LdapUserDetailsService`, kết hợp giữa một `FilterBasedLdapUserSearch` và một `DefaultLdapAuthoritiesPopulator`.
+Các attribute mà nó hỗ trợ có cách sử dụng giống như trong `<ldap-provider>`.
 
 
 [[nsa-ldap-user-service-attributes]]
-=== <ldap-user-service> Attributes
+=== Các attribute của <ldap-user-service>
 
 
 [[nsa-ldap-user-service-cache-ref]]
 * **cache-ref**
-Defines a reference to a cache for use with a UserDetailsService.
+Xác định một tham chiếu tới cache để sử dụng với UserDetailsService.
 
 
 [[nsa-ldap-user-service-group-role-attribute]]
 * **group-role-attribute**
-The LDAP attribute name which contains the role name which will be used within Spring Security.
-Defaults to "cn".
+Tên LDAP attribute chứa tên role sẽ được dùng trong Spring Security.
+Mặc định là "cn".
 
 
 [[nsa-ldap-user-service-group-search-base]]
 * **group-search-base**
-Search base for group membership searches.
-Defaults to "" (searching from the root).
+Cơ sở tìm kiếm tư cách thành viên của group.
+Mặc định là "" (tìm kiếm từ root).
 
 
 [[nsa-ldap-user-service-group-search-filter]]
 * **group-search-filter**
-Group search filter.
-Defaults to `+(uniqueMember={0})+`.
-The substituted parameter is the DN of the user.
+Bộ lọc tìm kiếm group.
+Mặc định là `+(uniqueMember={0})+`.
+Tham số được thay thế là DN của user.
 
 
 [[nsa-ldap-user-service-id]]
 * **id**
-A bean identifier, used for referring to the bean elsewhere in the context.
+Một định danh bean, được dùng để tham chiếu đến bean ở nơi khác trong context.
 
 
 [[nsa-ldap-user-service-role-prefix]]
 * **role-prefix**
-A non-empty string prefix that will be added to role strings loaded from persistent storage (e.g.
+Một chuỗi prefix không rỗng sẽ được thêm vào các chuỗi role được load từ lưu trữ bền vững (ví dụ
 "ROLE_").
-Use the value "none" for no prefix in cases where the default is non-empty.
+Sử dụng giá trị "none" để không có prefix trong trường hợp giá trị mặc định không rỗng.
 
 
 [[nsa-ldap-user-service-server-ref]]
 * **server-ref**
-The optional server to use.
-If omitted, and a default LDAP server is registered (using <ldap-server> with no Id), that server will be used.
+Server tùy chọn cần sử dụng.
+Nếu bỏ qua và một LDAP server mặc định được đăng ký (bằng `<ldap-server>` không có Id), server đó sẽ được sử dụng.
 
 
 [[nsa-ldap-user-service-user-context-mapper-ref]]
 * **user-context-mapper-ref**
-Allows explicit customization of the loaded user object by specifying a UserDetailsContextMapper bean which will be called with the context information from the user's directory entry
+Cho phép tùy chỉnh rõ ràng user object được load bằng cách chỉ định một UserDetailsContextMapper bean, bean này sẽ được gọi với thông tin context từ directory entry của user.
 
 
 [[nsa-ldap-user-service-user-details-class]]
 * **user-details-class**
-Allows the objectClass of the user entry to be specified.
-If set, the framework will attempt to load standard attributes for the defined class into the returned UserDetails object
+Cho phép chỉ định objectClass của user entry.
+Nếu được đặt, framework sẽ cố load các attribute chuẩn cho class đã định nghĩa vào UserDetails object được trả về.
 
 
 [[nsa-ldap-user-service-user-search-base]]
 * **user-search-base**
-Search base for user searches.
-Defaults to "".
-Only used with a 'user-search-filter'.
+Cơ sở tìm kiếm user.
+Mặc định là "".
+Chỉ được dùng với một 'user-search-filter'.
 
 
 [[nsa-ldap-user-service-user-search-filter]]
 * **user-search-filter**
-The LDAP filter used to search for users (optional).
-For example `+(uid={0})+`.
-The substituted parameter is the user's login name.
+LDAP filter được dùng để tìm kiếm user (tùy chọn).
+Ví dụ `+(uid={0})+`.
+Tham số được thay thế là login name của user.
