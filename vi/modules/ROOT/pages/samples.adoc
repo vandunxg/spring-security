@@ -1,10 +1,10 @@
 [[samples]]
-= Samples
+= Mẫu
 
-Spring Security includes many {gh-samples-url}[samples] applications.
+Spring Security bao gồm nhiều ứng dụng {gh-samples-url}[mẫu].
 
 [NOTE]
 ====
-These samples are being migrated to a separate project, however, you can still find
-the not migrated samples in an older branch of the {gh-old-samples-url}[Spring Security repository].
+Các ứng dụng mẫu này đang được chuyển sang một dự án riêng; tuy nhiên, bạn vẫn có thể tìm thấy
+các ứng dụng mẫu chưa được chuyển trong một nhánh cũ hơn của {gh-old-samples-url}[kho lưu trữ Spring Security].
 ====
