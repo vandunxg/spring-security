@@ -68,7 +68,7 @@ fun users(): UserDetailsService {
 Các ví dụ trước lưu password ở định dạng an toàn nhưng trải nghiệm làm quen ban đầu còn nhiều điểm chưa thuận tiện.
 
 Trong ví dụ sau, chúng ta sử dụng xref:features/authentication/password-storage.adoc#authentication-password-storage-dep-getting-started[User.withDefaultPasswordEncoder] để đảm bảo password được lưu trong bộ nhớ được bảo vệ.
-Tuy nhiên, cách này không ngăn được việc lấy password bằng cách decompile source code.
+Tuy nhiên, cách này không ngăn được việc lấy password bằng cách dịch ngược mã nguồn.
 Vì lý do này, `User.withDefaultPasswordEncoder` chỉ nên được sử dụng để "`làm quen ban đầu`" và không dành cho production.
 
 .InMemoryUserDetailsManager với User.withDefaultPasswordEncoder
