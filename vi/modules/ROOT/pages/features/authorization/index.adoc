@@ -2,7 +2,7 @@
 = Authorization
 
 Spring Security cung cấp hỗ trợ toàn diện cho https://en.wikipedia.org/wiki/Authorization[authorization].
-Authorization là việc xác định ai được phép truy cập một resource cụ thể.
+Authorization là việc xác định ai được phép truy cập một tài nguyên cụ thể.
 Spring Security cung cấp https://en.wikipedia.org/wiki/Defense_in_depth_(computing)[phòng thủ theo chiều sâu] bằng cách cho phép authorization dựa trên request và authorization dựa trên method.
 
 [[authorization-request]]
