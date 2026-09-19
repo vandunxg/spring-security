@@ -2,28 +2,28 @@
 = OAuth 2.0 Client
 :page-section-summary-toc: 1
 
-The OAuth 2.0 Client features provide support for the Client role as defined in the https://tools.ietf.org/html/rfc6749#section-1.1[OAuth 2.0 Authorization Framework].
+Các tính năng OAuth 2.0 Client cung cấp hỗ trợ cho vai trò Client được định nghĩa trong https://tools.ietf.org/html/rfc6749#section-1.1[OAuth 2.0 Authorization Framework].
 
-At a high-level, the core features available are:
+Ở mức tổng quan, các tính năng cốt lõi hiện có gồm:
 
-.Authorization Grant support
+.Hỗ trợ Authorization Grant
 * xref:reactive/oauth2/client/authorization-grants.adoc#oauth2-client-authorization-code[Authorization Code]
 * xref:reactive/oauth2/client/authorization-grants.adoc#oauth2-client-refresh-token[Refresh Token]
 * xref:reactive/oauth2/client/authorization-grants.adoc#oauth2-client-client-credentials[Client Credentials]
 * xref:reactive/oauth2/client/authorization-grants.adoc#oauth2-client-jwt-bearer[JWT Bearer]
 * xref:reactive/oauth2/client/authorization-grants.adoc#oauth2-client-token-exchange[Token Exchange]
 
-.Client Authentication support
+.Hỗ trợ Client Authentication
 * xref:reactive/oauth2/client/client-authentication.adoc#oauth2-client-authentication-jwt-bearer[JWT Bearer]
 
-.HTTP Client support
-* xref:reactive/oauth2/client/authorized-clients.adoc#oauth2-client-web-client[`WebClient` integration for Reactive Environments] (for requesting protected resources)
+.Hỗ trợ HTTP Client
+* xref:reactive/oauth2/client/authorized-clients.adoc#oauth2-client-web-client[Tích hợp `WebClient` cho môi trường Reactive] (để yêu cầu các tài nguyên được bảo vệ)
 
-The `ServerHttpSecurity.oauth2Client()` DSL provides a number of configuration options for customizing the core components used by OAuth 2.0 Client.
+DSL `ServerHttpSecurity.oauth2Client()` cung cấp một số tùy chọn cấu hình để tùy chỉnh các thành phần cốt lõi được OAuth 2.0 Client sử dụng.
 
-The following code shows the complete configuration options provided by the `ServerHttpSecurity.oauth2Client()` DSL:
+Đoạn mã sau đây cho thấy đầy đủ các tùy chọn cấu hình do DSL `ServerHttpSecurity.oauth2Client()` cung cấp:
 
-.OAuth2 Client Configuration Options
+.Các tùy chọn cấu hình OAuth2 Client
 [tabs]
 ======
 Java::
@@ -78,9 +78,9 @@ class OAuth2ClientSecurityConfig {
 ----
 ======
 
-The `ReactiveOAuth2AuthorizedClientManager` is responsible for managing the authorization (or re-authorization) of an OAuth 2.0 Client, in collaboration with one or more `ReactiveOAuth2AuthorizedClientProvider`(s).
+`ReactiveOAuth2AuthorizedClientManager` chịu trách nhiệm quản lý authorization (hoặc re-authorization) của một OAuth 2.0 Client, phối hợp với một hoặc nhiều `ReactiveOAuth2AuthorizedClientProvider`.
 
-The following code shows an example of how to register a `ReactiveOAuth2AuthorizedClientManager` `@Bean` and associate it with a `ReactiveOAuth2AuthorizedClientProvider` composite that provides support for the `authorization_code`, `refresh_token` and `client_credentials` authorization grant types:
+Đoạn mã sau đây minh họa cách đăng ký một `ReactiveOAuth2AuthorizedClientManager` `@Bean` và liên kết nó với một composite `ReactiveOAuth2AuthorizedClientProvider` hỗ trợ các loại authorization grant `authorization_code`, `refresh_token` và `client_credentials`:
 
 [tabs]
 ======
