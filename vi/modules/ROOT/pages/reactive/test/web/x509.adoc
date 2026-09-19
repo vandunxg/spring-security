@@ -1,4 +1,4 @@
 = X509
 
-Spring Framework provides first class support for testing X509 with `WebTestClient`.
-For details refer to javadoc:{spring-framework-api-url}org.springframework.test.web.reactive.server.UserWebTestClientConfigurer[].
+Spring Framework cung cấp hỗ trợ hạng nhất cho việc kiểm thử X509 bằng `WebTestClient`.
+Để biết chi tiết, hãy tham khảo javadoc:{spring-framework-api-url}org.springframework.test.web.reactive.server.UserWebTestClientConfigurer[].
