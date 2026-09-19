@@ -1,16 +1,16 @@
 [[authorization]]
 = Authorization
 
-Spring Security provides comprehensive support for https://en.wikipedia.org/wiki/Authorization[authorization].
-Authorization is determining who is allowed to access a particular resource.
-Spring Security provides https://en.wikipedia.org/wiki/Defense_in_depth_(computing)[defense in depth] by allowing for request based authorization and method based authorization.
+Spring Security cung cấp hỗ trợ toàn diện cho https://en.wikipedia.org/wiki/Authorization[authorization].
+Authorization là việc xác định ai được phép truy cập một resource cụ thể.
+Spring Security cung cấp https://en.wikipedia.org/wiki/Defense_in_depth_(computing)[phòng thủ theo chiều sâu] bằng cách cho phép authorization dựa trên request và authorization dựa trên method.
 
 [[authorization-request]]
-== Request Based Authorization
+== Authorization dựa trên request
 
-Spring Security provides authorization based upon the request for both xref:servlet/authorization/authorize-http-requests.adoc[Servlet] and xref:reactive/authorization/authorize-http-requests.adoc[WebFlux] environments.
+Spring Security cung cấp authorization dựa trên request cho cả môi trường xref:servlet/authorization/authorize-http-requests.adoc[Servlet] và xref:reactive/authorization/authorize-http-requests.adoc[WebFlux].
 
 [[authorization-method]]
-== Method Based Authorization
+== Authorization dựa trên method
 
-Spring Security provides authorization based on the method invocation for both xref:servlet/authorization/method-security.adoc[Servlet] and xref:reactive/authorization/method.adoc[WebFlux] environments.
+Spring Security cung cấp authorization dựa trên việc gọi method cho cả môi trường xref:servlet/authorization/method-security.adoc[Servlet] và xref:reactive/authorization/method.adoc[WebFlux].
