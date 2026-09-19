@@ -1,8 +1,8 @@
 = SecurityMockMvcResultMatchers
 
-At times it is desirable to make various security related assertions about a request.
-To accommodate this need, Spring Security Test support implements Spring MVC Test's `ResultMatcher` interface.
-In order to use Spring Security's `ResultMatcher` implementations ensure the following static import is used:
+Đôi khi, cần thực hiện nhiều phép khẳng định liên quan đến bảo mật đối với một request.
+Để đáp ứng nhu cầu này, tính năng hỗ trợ Spring Security Test triển khai interface `ResultMatcher` của Spring MVC Test.
+Để sử dụng các triển khai `ResultMatcher` của Spring Security, hãy đảm bảo sử dụng static import sau:
 
 [tabs]
 ======
@@ -22,11 +22,11 @@ import org.springframework.security.test.web.servlet.response.SecurityMockMvcRes
 ----
 ======
 
-== Unauthenticated Assertion
+== Khẳng định chưa authentication
 
-At times it may be valuable to assert that there is no authenticated user associated with the result of a `MockMvc` invocation.
-For example, you might want to test submitting an invalid username and password and verify that no user is authenticated.
-You can easily do this with Spring Security's testing support using something like the following:
+Đôi khi, việc khẳng định rằng không có người dùng đã được authentication nào gắn với kết quả của một lần gọi `MockMvc` là hữu ích.
+Ví dụ, bạn có thể muốn kiểm thử việc gửi username và password không hợp lệ rồi xác minh rằng không có người dùng nào được authentication.
+Bạn có thể dễ dàng thực hiện điều này với tính năng hỗ trợ kiểm thử của Spring Security bằng cách như sau:
 
 [tabs]
 ======
@@ -49,11 +49,11 @@ mvc
 ----
 ======
 
-== Authenticated Assertion
+== Khẳng định đã authentication
 
-It is often times that we must assert that an authenticated user exists.
-For example, we may want to verify that we authenticated successfully.
-We could verify that a form based login was successful with the following snippet of code:
+Thông thường, chúng ta cần khẳng định rằng có một người dùng đã được authentication.
+Ví dụ, chúng ta có thể muốn xác minh rằng việc authentication đã thành công.
+Chúng ta có thể xác minh rằng Form Login thành công bằng đoạn code sau:
 
 [tabs]
 ======
@@ -76,7 +76,7 @@ mvc
 ----
 ======
 
-If we wanted to assert the roles of the user, we could refine our previous code as shown below:
+Nếu muốn khẳng định các role của người dùng, chúng ta có thể tinh chỉnh code trước đó như sau:
 
 [tabs]
 ======
@@ -99,7 +99,7 @@ mvc
 ----
 ======
 
-Alternatively, we could verify the username:
+Ngoài ra, chúng ta có thể xác minh username:
 
 [tabs]
 ======
@@ -122,7 +122,7 @@ mvc
 ----
 ======
 
-We can also combine the assertions:
+Chúng ta cũng có thể kết hợp các phép khẳng định:
 
 [tabs]
 ======
@@ -145,7 +145,7 @@ mvc
 ----
 ======
 
-We can also make arbitrary assertions on the authentication
+Chúng ta cũng có thể thực hiện các phép khẳng định tùy ý trên authentication
 
 [tabs]
 ======
