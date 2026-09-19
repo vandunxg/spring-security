@@ -1,23 +1,23 @@
 [[passkeys]]
 = Passkeys
 
-Spring Security provides support for https://www.passkeys.com[passkeys].
-Passkeys are a more secure method of authenticating than passwords and are built using https://www.w3.org/TR/webauthn-3/[WebAuthn].
+Spring Security hỗ trợ https://www.passkeys.com[passkey].
+Passkey là phương thức authentication bảo mật hơn mật khẩu và được xây dựng bằng https://www.w3.org/TR/webauthn-3/[WebAuthn].
 
-In order to use a passkey to authenticate, a user must first xref:servlet/authentication/passkeys.adoc#passkeys-register[Register a New Credential].
-After the credential is registered, it can be used to authenticate by xref:servlet/authentication/passkeys.adoc#passkeys-verify[verifying an authentication assertion].
+Để sử dụng passkey cho authentication, trước hết người dùng phải xref:servlet/authentication/passkeys.adoc#passkeys-register[đăng ký credential mới].
+Sau khi credential được đăng ký, có thể dùng credential để authentication bằng cách xref:servlet/authentication/passkeys.adoc#passkeys-verify[xác minh authentication assertion].
 
 [[passkeys-dependencies]]
-== Required Dependencies
+== Các dependency bắt buộc
 
-To get started, add the `spring-security-webauthn` dependency to your project.
+Để bắt đầu, thêm dependency `spring-security-webauthn` vào dự án.
 
 [NOTE]
 ====
-This assumes that you are managing Spring Security's versions with Spring Boot or Spring Security's BOM as described in xref:getting-spring-security.adoc[].
+Điều này giả định rằng bạn đang quản lý version của Spring Security bằng Spring Boot hoặc BOM của Spring Security như mô tả trong xref:getting-spring-security.adoc[].
 ====
 
-.Passkeys Dependencies
+.Các dependency của passkey
 [tabs]
 ======
 Maven::
@@ -41,10 +41,10 @@ dependencies {
 ======
 
 [[passkeys-configuration]]
-== Configuration
+== Cấu hình
 
-The following configuration enables passkey authentication.
-It provides a way to xref:./passkeys.adoc#passkeys-register[] at `/webauthn/register` and a default log in page that allows xref:./passkeys.adoc#passkeys-verify[authenticating with passkeys].
+Cấu hình sau bật authentication bằng passkey.
+Cấu hình này cung cấp cách xref:./passkeys.adoc#passkeys-register[] tại `/webauthn/register` và một trang đăng nhập mặc định cho phép xref:./passkeys.adoc#passkeys-verify[authentication bằng passkey].
 
 [tabs]
 ======
@@ -61,7 +61,7 @@ SecurityFilterChain filterChain(HttpSecurity http) {
 		.webAuthn((webAuthn) -> webAuthn
 			.rpId("example.com")
 			.allowedOrigins("https://example.com")
-			// optional properties
+			// các property tùy chọn
 			.creationOptionsRepository(new CustomPublicKeyCredentialCreationOptionsRepository())
 			.messageConverter(new CustomHttpMessageConverter())
 		);
@@ -91,7 +91,7 @@ open fun filterChain(http: HttpSecurity): SecurityFilterChain {
 		webAuthn {
 			rpId = "example.com"
 			allowedOrigins = setOf("https://example.com")
-			// optional properties
+			// các property tùy chọn
 			creationOptionsRepository = CustomPublicKeyCredentialCreationOptionsRepository()
 			messageConverter = CustomHttpMessageConverter()
 		}
@@ -112,11 +112,11 @@ open fun userDetailsService(): UserDetailsService {
 
 
 [[passkeys-configuration-persistence]]
-=== JDBC & Custom Persistence
+=== Persistence bằng JDBC và tùy chỉnh
 
-WebAuthn performs persistence with javadoc:org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository[] and javadoc:org.springframework.security.web.webauthn.management.UserCredentialRepository[].
-The default is to use in memory persistence, but JDBC persistence is support with javadoc:org.springframework.security.web.webauthn.management.JdbcPublicKeyCredentialUserEntityRepository[] and javadoc:org.springframework.security.web.webauthn.management.JdbcUserCredentialRepository[].
-To configure JDBC based persistence, expose the repositories as a Bean:
+WebAuthn thực hiện persistence bằng javadoc:org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository[] và javadoc:org.springframework.security.web.webauthn.management.UserCredentialRepository[].
+Mặc định là persistence trong bộ nhớ, nhưng persistence bằng JDBC được hỗ trợ với javadoc:org.springframework.security.web.webauthn.management.JdbcPublicKeyCredentialUserEntityRepository[] và javadoc:org.springframework.security.web.webauthn.management.JdbcUserCredentialRepository[].
+Để cấu hình persistence dựa trên JDBC, cung cấp các repository dưới dạng Bean:
 
 [tabs]
 ======
@@ -151,14 +151,14 @@ fun jdbcUserCredentialRepository(jdbc: JdbcOperations): JdbcUserCredentialReposi
 ----
 ======
 
-If JDBC does not meet your needs, you can create your own implementations of the interfaces and use them by exposing them as a Bean similar to the example above.
+Nếu JDBC không đáp ứng nhu cầu, bạn có thể tự tạo implementation của các interface và sử dụng chúng bằng cách cung cấp chúng dưới dạng Bean tương tự ví dụ trên.
 
 [[passkeys-configuration-pkccor]]
-=== Custom PublicKeyCredentialCreationOptionsRepository
+=== PublicKeyCredentialCreationOptionsRepository tùy chỉnh
 
-The `PublicKeyCredentialCreationOptionsRepository` is used to persist the `PublicKeyCredentialCreationOptions` between requests.
-The default is to persist it the `HttpSession`, but at times users may need to customize this behavior.
-This can be done by setting the optional property `creationOptionsRepository` demonstrated in xref:./passkeys.adoc#passkeys-configuration[Configuration] or by exposing a `PublicKeyCredentialCreationOptionsRepository` Bean:
+`PublicKeyCredentialCreationOptionsRepository` được dùng để lưu `PublicKeyCredentialCreationOptions` giữa các request.
+Mặc định là lưu trong `HttpSession`, nhưng đôi khi người dùng cần tùy chỉnh hành vi này.
+Có thể thực hiện việc này bằng cách đặt property tùy chọn `creationOptionsRepository` như minh họa trong xref:./passkeys.adoc#passkeys-configuration[Cấu hình] hoặc cung cấp một Bean `PublicKeyCredentialCreationOptionsRepository`:
 
 [tabs]
 ======
@@ -184,37 +184,37 @@ open fun creationOptionsRepository(): CustomPublicKeyCredentialCreationOptionsRe
 ======
 
 [[passkeys-register]]
-== Register a New Credential
+== Đăng ký credential mới
 
-In order to use a passkey, a user must first https://www.w3.org/TR/webauthn-3/#sctn-registering-a-new-credential[Register a New Credential].
+Để sử dụng passkey, trước hết người dùng phải https://www.w3.org/TR/webauthn-3/#sctn-registering-a-new-credential[đăng ký credential mới].
 
-Registering a new credential is composed of two steps:
+Việc đăng ký credential mới gồm hai bước:
 
-1. Requesting the Registration Options
-2. Registering the Credential
+1. Yêu cầu các tùy chọn đăng ký
+2. Đăng ký credential
 
 [[passkeys-register-options]]
-=== Request the Registration Options
+=== Yêu cầu các tùy chọn đăng ký
 
-The first step in registration of a new credential is to request the registration options.
-In Spring Security, a request for the registration options is typically done using JavaScript and looks like:
+Bước đầu tiên khi đăng ký credential mới là yêu cầu các tùy chọn đăng ký.
+Trong Spring Security, request các tùy chọn đăng ký thường được thực hiện bằng JavaScript và có dạng:
 
 [NOTE]
 ====
-Spring Security provides a default registration page that can be used as a reference on how to register credentials.
+Spring Security cung cấp một trang đăng ký mặc định có thể dùng làm tài liệu tham khảo về cách đăng ký credential.
 ====
 
-.Request for Registration Options
+.Yêu cầu các tùy chọn đăng ký
 [source,http]
 ----
 POST /webauthn/register/options
 X-CSRF-TOKEN: 4bfd1575-3ad1-4d21-96c7-4ef2d9f86721
 ----
 
-The request above will obtain the registration options for the currently authenticated user.
-Since the challenge is persisted (state is changed) to be compared at the time of registration, the request must be a POST and include a CSRF token.
+Yêu cầu trên sẽ lấy các tùy chọn đăng ký cho người dùng hiện đã authentication.
+Vì challenge được persist (state bị thay đổi) để so sánh tại thời điểm đăng ký, request phải là POST và phải bao gồm CSRF token.
 
-.Response for Registration Options
+.Phản hồi cho các tùy chọn đăng ký
 [source,json]
 ----
 {
@@ -256,15 +256,15 @@ Since the challenge is persisted (state is changed) to be compared at the time o
 ----
 
 [[passkeys-register-create]]
-=== Registering the Credential
+=== Đăng ký credential
 
-After the registration options are obtained, they are used to create the credentials that are registered.
-To register a new credential, the application should pass the options to https://w3c.github.io/webappsec-credential-management/#dom-credentialscontainer-create[`navigator.credentials.create`] after base64url decoding the binary values such as `user.id`, `challenge`, and `excludeCredentials[].id`.
+Sau khi lấy được các tùy chọn đăng ký, chúng được dùng để tạo các credential sẽ được đăng ký.
+Để đăng ký credential mới, ứng dụng nên truyền các tùy chọn vào https://w3c.github.io/webappsec-credential-management/#dom-credentialscontainer-create[`navigator.credentials.create`] sau khi giải mã base64url các giá trị nhị phân như `user.id`, `challenge` và `excludeCredentials[].id`.
 
-The returned value can then be sent to the server as a JSON request.
-An example registration request can be found below:
+Sau đó có thể gửi giá trị trả về đến máy chủ dưới dạng một JSON request.
+Ví dụ về request đăng ký được trình bày bên dưới:
 
-.Example Registration Request
+.Ví dụ request đăng ký
 [source,http]
 ----
 POST /webauthn/register
@@ -291,10 +291,10 @@ X-CSRF-TOKEN: 4bfd1575-3ad1-4d21-96c7-4ef2d9f86721
   }
 }
 ----
-<1> The result of calling `navigator.credentials.create` with binary values base64url encoded.
-<2> A label that the user selects to have associated with this credential to help the user distinguish the credential.
+<1> Kết quả gọi `navigator.credentials.create` với các giá trị nhị phân được mã hóa base64url.
+<2> Nhãn do người dùng chọn để gắn với credential này, giúp người dùng phân biệt credential.
 
-.Example Successful Registration Response
+.Ví dụ phản hồi đăng ký thành công
 [source,http]
 ----
 HTTP/1.1 200 OK
@@ -305,39 +305,39 @@ HTTP/1.1 200 OK
 ----
 
 [[passkeys-verify]]
-== Verifying an Authentication Assertion
+== Xác minh authentication assertion
 
-After xref:./passkeys.adoc#passkeys-register[] the passkey can be https://www.w3.org/TR/webauthn-3/#sctn-verifying-assertion[verified] (authenticated).
+Sau khi xref:./passkeys.adoc#passkeys-register[], có thể https://www.w3.org/TR/webauthn-3/#sctn-verifying-assertion[xác minh] (authentication) passkey.
 
-Verifying a credential is composed of two steps:
+Việc xác minh credential gồm hai bước:
 
-1. Requesting the Verification Options
-2. Verifying the Credential
+1. Yêu cầu các tùy chọn xác minh
+2. Xác minh credential
 
 [[passkeys-verify-options]]
-=== Request the Verification Options
+=== Yêu cầu các tùy chọn xác minh
 
-The first step in verification of a credential is to request the verification options.
-In Spring Security, a request for the verification options is typically done using JavaScript and looks like:
+Bước đầu tiên khi xác minh credential là yêu cầu các tùy chọn xác minh.
+Trong Spring Security, request các tùy chọn xác minh thường được thực hiện bằng JavaScript và có dạng:
 
 [NOTE]
 ====
-Spring Security provides a default log in page that can be used as a reference on how to verify credentials.
+Spring Security cung cấp một trang đăng nhập mặc định có thể dùng làm tài liệu tham khảo về cách xác minh credential.
 ====
 
-.Request for Verification Options
+.Yêu cầu các tùy chọn xác minh
 [source,http]
 ----
 POST /webauthn/authenticate/options
 X-CSRF-TOKEN: 4bfd1575-3ad1-4d21-96c7-4ef2d9f86721
 ----
 
-The request above will obtain the verification options.
-Since the challenge is persisted (state is changed) to be compared at the time of authentication, the request must be a POST and include a CSRF token.
+Yêu cầu trên sẽ lấy các tùy chọn xác minh.
+Vì challenge được persist (state bị thay đổi) để so sánh tại thời điểm authentication, request phải là POST và phải bao gồm CSRF token.
 
-The response will contain the options for obtaining a credential with binary values such as `challenge` base64url encoded.
+Phản hồi sẽ chứa các tùy chọn để lấy credential, trong đó các giá trị nhị phân như `challenge` được mã hóa base64url.
 
-.Example Response for Verification Options
+.Ví dụ phản hồi cho các tùy chọn xác minh
 [source,json]
 ----
 {
@@ -351,16 +351,16 @@ The response will contain the options for obtaining a credential with binary val
 ----
 
 [[passkeys-verify-get]]
-=== Verifying the Credential
+=== Xác minh credential
 
-After the verification options are obtained, they are used to get a credential.
-To get a credential, the application should pass the options to https://w3c.github.io/webappsec-credential-management/#dom-credentialscontainer-create[`navigator.credentials.get`] after base64url decoding the binary values such as `challenge`.
+Sau khi lấy được các tùy chọn xác minh, chúng được dùng để lấy credential.
+Để lấy credential, ứng dụng nên truyền các tùy chọn vào https://w3c.github.io/webappsec-credential-management/#dom-credentialscontainer-create[`navigator.credentials.get`] sau khi giải mã base64url các giá trị nhị phân như `challenge`.
 
-The returned value of `navigator.credentials.get` can then be sent to the server as a JSON request.
-Binary values such as `rawId` and `response.*` must be base64url encoded.
-An example authentication request can be found below:
+Sau đó có thể gửi giá trị trả về của `navigator.credentials.get` đến máy chủ dưới dạng một JSON request.
+Các giá trị nhị phân như `rawId` và `response.*` phải được mã hóa base64url.
+Ví dụ về request authentication được trình bày bên dưới:
 
-.Example Authentication Request
+.Ví dụ request authentication
 [source,http]
 ----
 POST /login/webauthn
@@ -380,7 +380,7 @@ X-CSRF-TOKEN: 4bfd1575-3ad1-4d21-96c7-4ef2d9f86721
 }
 ----
 
-.Example Successful Authentication Response
+.Ví dụ phản hồi authentication thành công
 [source,http]
 ----
 HTTP/1.1 200 OK
@@ -390,10 +390,10 @@ HTTP/1.1 200 OK
   "authenticated": true // <2>
 }
 ----
-<1> The URL to redirect to
-<2> Indicates that the user is authenticated
+<1> URL để redirect đến
+<2> Cho biết người dùng đã authentication
 
-.Example Authentication Failure Response
+.Ví dụ phản hồi authentication thất bại
 [source,http]
 ----
 HTTP/1.1 401 OK
