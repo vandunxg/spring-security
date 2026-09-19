@@ -2,5 +2,5 @@
 = SAML2
 :page-section-summary-toc: 1
 
-Spring Security provides comprehensive SAML 2 support.
-This section discusses how to integrate SAML 2 into your servlet based application.
+Spring Security cung cấp hỗ trợ toàn diện cho SAML 2.
+Phần này trình bày cách tích hợp SAML 2 vào ứng dụng dựa trên servlet của bạn.
