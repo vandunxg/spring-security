@@ -120,7 +120,7 @@ Giả sử không có instance `SecurityFilterChain` nào khác khớp, `Securit
 Lưu ý rằng `SecurityFilterChain~0~` chỉ được cấu hình với ba instance `Filter` bảo mật.
 Tuy nhiên, `SecurityFilterChain~n~` được cấu hình với bốn instance `Filter` bảo mật.
 Cần lưu ý rằng mỗi `SecurityFilterChain` có thể là duy nhất và có thể được cấu hình độc lập.
-Trên thực tế, một `SecurityFilterChain` có thể có không instance `Filter` bảo mật nào nếu ứng dụng muốn Spring Security bỏ qua một số request nhất định.
+Trên thực tế, một `SecurityFilterChain` có thể không có instance `Filter` bảo mật nào nếu ứng dụng muốn Spring Security bỏ qua một số request nhất định.
 // FIXME: add link to configuring multiple `SecurityFilterChain` instances
 
 [[servlet-security-filters]]
