@@ -1,15 +1,15 @@
 [[servlet-authentication-unpwd]]
-= Username/Password Authentication
+= Authentication bằng tên người dùng/mật khẩu
 :page-section-summary-toc: 1
 :figures: images/servlet/authentication/unpwd
 :icondir: images/icons
 
-One of the most common ways to authenticate a user is by validating a username and password.
-Spring Security provides comprehensive support for authenticating with a username and password.
+Một trong những cách phổ biến nhất để thực hiện authentication cho người dùng là xác thực tên người dùng và mật khẩu.
+Spring Security cung cấp hỗ trợ toàn diện cho việc authentication bằng tên người dùng và mật khẩu.
 
-You can configure username and password authentication using the following:
+Bạn có thể cấu hình authentication bằng tên người dùng và mật khẩu như sau:
 
-.Simple Username/Password Example
+.Ví dụ đơn giản về Authentication bằng tên người dùng/mật khẩu
 [tabs]
 =====
 Java::
@@ -102,30 +102,30 @@ class SecurityConfig {
 =====
 
 [WARNING]
-`User#withDefaultPasswordEncoder` is considered unsafe for production and is only intended for sample applications. See javadoc:org.springframework.security.core.userdetails.User#withDefaultPasswordEncoder()[User#withDefaultPasswordEncoder] for more details.
+`User#withDefaultPasswordEncoder` được xem là không an toàn cho production và chỉ dành cho các ứng dụng mẫu. Xem javadoc:org.springframework.security.core.userdetails.User#withDefaultPasswordEncoder()[User#withDefaultPasswordEncoder] để biết thêm chi tiết.
 
-The preceding configuration automatically registers an xref:servlet/authentication/passwords/in-memory.adoc[in-memory `UserDetailsService`] with the `SecurityFilterChain`, registers the xref:servlet/authentication/passwords/dao-authentication-provider.adoc[`DaoAuthenticationProvider`] with the default xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationmanager[`AuthenticationManager`], and enables xref:servlet/authentication/passwords/form.adoc[Form Login] and xref:servlet/authentication/passwords/basic.adoc[HTTP Basic] authentication.
+Cấu hình trên tự động đăng ký một xref:servlet/authentication/passwords/in-memory.adoc[`UserDetailsService` trong bộ nhớ] với `SecurityFilterChain`, đăng ký xref:servlet/authentication/passwords/dao-authentication-provider.adoc[`DaoAuthenticationProvider`] với xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationmanager[`AuthenticationManager`] mặc định, đồng thời bật authentication bằng xref:servlet/authentication/passwords/form.adoc[Form Login] và xref:servlet/authentication/passwords/basic.adoc[HTTP Basic].
 
-To learn more about username/password authentication, consider the following use cases:
+Để tìm hiểu thêm về authentication bằng tên người dùng/mật khẩu, hãy xem các trường hợp sử dụng sau:
 
-* I want to xref:servlet/authentication/passwords/form.adoc[learn how Form Login works]
-* I want to xref:servlet/authentication/passwords/basic.adoc[learn how HTTP Basic authentication works]
-* I want to xref:servlet/authentication/passwords/dao-authentication-provider.adoc[learn how `DaoAuthenticationProvider` works]
-* I want to xref:servlet/authentication/passwords/in-memory.adoc[manage users in memory]
-* I want to xref:servlet/authentication/passwords/jdbc.adoc[manage users in a database]
-* I want to xref:servlet/authentication/passwords/ldap.adoc#servlet-authentication-ldap-authentication[manage users in LDAP]
-* I want to <<publish-authentication-manager-bean,publish an `AuthenticationManager` bean>> for custom authentication
-* I want to <<customize-global-authentication-manager,customize the global `AuthenticationManager`>>
+* Tôi muốn xref:servlet/authentication/passwords/form.adoc[tìm hiểu cách Form Login hoạt động]
+* Tôi muốn xref:servlet/authentication/passwords/basic.adoc[tìm hiểu cách authentication bằng HTTP Basic hoạt động]
+* Tôi muốn xref:servlet/authentication/passwords/dao-authentication-provider.adoc[tìm hiểu cách `DaoAuthenticationProvider` hoạt động]
+* Tôi muốn xref:servlet/authentication/passwords/in-memory.adoc[quản lý người dùng trong bộ nhớ]
+* Tôi muốn xref:servlet/authentication/passwords/jdbc.adoc[quản lý người dùng trong database]
+* Tôi muốn xref:servlet/authentication/passwords/ldap.adoc#servlet-authentication-ldap-authentication[quản lý người dùng trong LDAP]
+* Tôi muốn <<publish-authentication-manager-bean,công bố một bean `AuthenticationManager`>> cho authentication tùy chỉnh
+* Tôi muốn <<customize-global-authentication-manager,tùy chỉnh `AuthenticationManager` toàn cục>>
 
 [[publish-authentication-manager-bean]]
-== Publish an `AuthenticationManager` bean
+== Công bố một bean `AuthenticationManager`
 
-A fairly common requirement is publishing an `AuthenticationManager` bean to allow for custom authentication, such as in a `@Service` or Spring MVC `@Controller`.
-For example, you may want to authenticate users via a REST API instead of using xref:servlet/authentication/passwords/form.adoc[Form Login].
+Một yêu cầu khá phổ biến là công bố một bean `AuthenticationManager` để cho phép authentication tùy chỉnh, chẳng hạn trong một `@Service` hoặc `@Controller` của Spring MVC.
+Ví dụ, bạn có thể muốn thực hiện authentication cho người dùng qua REST API thay vì sử dụng xref:servlet/authentication/passwords/form.adoc[Form Login].
 
-You can publish such an `AuthenticationManager` for custom authentication scenarios using the following configuration:
+Bạn có thể công bố `AuthenticationManager` như vậy cho các tình huống authentication tùy chỉnh bằng cấu hình sau:
 
-.Publish `AuthenticationManager` bean for Custom Authentication
+.Công bố bean `AuthenticationManager` cho Authentication tùy chỉnh
 [tabs]
 =====
 Java::
@@ -257,10 +257,10 @@ class SecurityConfig {
 ----
 =====
 
-With the preceding configuration in place, you can create a `@RestController` that uses the `AuthenticationManager` as follows:
+Khi đã có cấu hình trên, bạn có thể tạo một `@RestController` sử dụng `AuthenticationManager` như sau:
 
 
-.Create a `@RestController` for Authentication
+.Tạo một `@RestController` cho Authentication
 [tabs]
 =====
 Java::
@@ -316,21 +316,21 @@ class LoginController(val authenticationManager: AuthenticationManager) {
 
 [NOTE]
 ====
-In this example, it is your responsibility to save the authenticated user in the `SecurityContextRepository` if needed.
-For example, if using the `HttpSession` to persist the `SecurityContext` between requests, you can use xref:servlet/authentication/persistence.adoc#httpsecuritycontextrepository[`HttpSessionSecurityContextRepository`].
+Trong ví dụ này, bạn chịu trách nhiệm lưu người dùng đã authentication vào `SecurityContextRepository` nếu cần.
+Ví dụ, nếu sử dụng `HttpSession` để duy trì `SecurityContext` giữa các request, bạn có thể dùng xref:servlet/authentication/persistence.adoc#httpsecuritycontextrepository[`HttpSessionSecurityContextRepository`].
 ====
 
 [[customize-global-authentication-manager]]
-== Customize the `AuthenticationManager`
+== Tùy chỉnh `AuthenticationManager`
 
-Normally, Spring Security builds an `AuthenticationManager` internally composed of a `DaoAuthenticationProvider` for username/password authentication.
-In certain cases, it may still be desired to customize the instance of `AuthenticationManager` used by Spring Security.
-For example, you may need to simply disable xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager-erasing-credentials[credential erasure] for cached users.
+Thông thường, Spring Security xây dựng một `AuthenticationManager` ở bên trong, bao gồm một `DaoAuthenticationProvider` cho authentication bằng tên người dùng/mật khẩu.
+Trong một số trường hợp, bạn vẫn có thể cần tùy chỉnh instance `AuthenticationManager` được Spring Security sử dụng.
+Ví dụ, bạn có thể chỉ cần vô hiệu hóa xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager-erasing-credentials[việc xóa credential] đối với người dùng được cache.
 
-To do this, you can take advantage of the fact that the `AuthenticationManagerBuilder` used to build Spring Security's global `AuthenticationManager` is published as a bean.
-You can configure the builder as follows:
+Để làm điều này, bạn có thể tận dụng việc `AuthenticationManagerBuilder` được dùng để xây dựng `AuthenticationManager` toàn cục của Spring Security được công bố dưới dạng bean.
+Bạn có thể cấu hình builder như sau:
 
-.Configure global `AuthenticationManagerBuilder`
+.Cấu hình `AuthenticationManagerBuilder` toàn cục
 [tabs]
 =====
 Java::
@@ -392,9 +392,9 @@ class SecurityConfig {
 ----
 =====
 
-Alternatively, you may configure a local `AuthenticationManager` to override the global one.
+Ngoài ra, bạn có thể cấu hình một `AuthenticationManager` cục bộ để ghi đè `AuthenticationManager` toàn cục.
 
-.Configure local `AuthenticationManager` for Spring Security
+.Cấu hình `AuthenticationManager` cục bộ cho Spring Security
 [tabs]
 =====
 Java::
@@ -527,4 +527,3 @@ class SecurityConfig {
 }
 ----
 =====
-
