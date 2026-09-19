@@ -12,7 +12,7 @@ Nếu cần các luồng cụ thể giải thích cách những thành phần n�
 * <<servlet-authentication-authenticationmanager>> - API xác định cách các Filter của Spring Security thực hiện xref:features/authentication/index.adoc#authentication[authentication].
 * <<servlet-authentication-providermanager>> - implementation phổ biến nhất của `AuthenticationManager`.
 * <<servlet-authentication-authenticationprovider>> - được `ProviderManager` sử dụng để thực hiện một loại authentication cụ thể.
-* <<servlet-authentication-authenticationentrypoint>> - được sử dụng để yêu cầu credential từ client (tức là chuyển hướng đến trang đăng nhập, gửi phản hồi `WWW-Authenticate`, v.v.).
+* <<servlet-authentication-authenticationentrypoint>> - được sử dụng để yêu cầu credential từ client (tức là redirect đến trang đăng nhập, gửi phản hồi `WWW-Authenticate`, v.v.).
 * <<servlet-authentication-abstractprocessingfilter>> - một `Filter` cơ sở được sử dụng cho authentication.
 Phần này cũng giúp hình dung rõ về luồng authentication cấp cao và cách các thành phần phối hợp với nhau.
 
@@ -103,7 +103,7 @@ và toàn bộ `SecurityContext` bằng
 xref:servlet/integrations/mvc.adoc#mvc-current-security-context[`@CurrentSecurityContext`].
 Để truy cập Servlet API, hãy sử dụng `HttpServletRequest#getRemoteUser`.
 
-Theo mặc định, `SecurityContextHolder` sử dụng một `ThreadLocal` để lưu trữ thông tin này. Điều đó có nghĩa là `SecurityContext` luôn khả dụng cho các phương thức trong cùng thread, ngay cả khi `SecurityContext` không được truyền tường minh dưới dạng đối số cho các phương thức đó.
+Theo mặc định, `SecurityContextHolder` sử dụng một `ThreadLocal` để lưu trữ thông tin này. Điều đó có nghĩa là `SecurityContext` luôn khả dụng cho các method trong cùng thread, ngay cả khi `SecurityContext` không được truyền tường minh dưới dạng đối số cho các method đó.
 Sử dụng `ThreadLocal` theo cách này khá an toàn nếu bạn đảm bảo xóa thread sau khi request của principal hiện tại được xử lý.
 xref:servlet/architecture.adoc#servlet-filterchainproxy[FilterChainProxy] của Spring Security đảm bảo `SecurityContext` luôn được xóa.
 
@@ -238,7 +238,7 @@ Trong những trường hợp này, Spring Security không cần cung cấp HTTP
 
 Trong những trường hợp khác, client gửi một request chưa authentication đến một resource mà client không được phép truy cập.
 Trong trường hợp này, một implementation của `AuthenticationEntryPoint` được sử dụng để yêu cầu credential từ client.
-Implementation `AuthenticationEntryPoint` có thể thực hiện xref:servlet/authentication/passwords/form.adoc#servlet-authentication-form[chuyển hướng đến trang đăng nhập], phản hồi bằng header xref:servlet/authentication/passwords/basic.adoc#servlet-authentication-basic[WWW-Authenticate], hoặc thực hiện hành động khác.
+Implementation `AuthenticationEntryPoint` có thể thực hiện xref:servlet/authentication/passwords/form.adoc#servlet-authentication-form[redirect đến trang đăng nhập], phản hồi bằng header xref:servlet/authentication/passwords/basic.adoc#servlet-authentication-basic[WWW-Authenticate], hoặc thực hiện hành động khác.
 
 // FIXME: authenticationsuccesshandler
 // FIXME: authenticationfailurehandler
