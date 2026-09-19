@@ -1,22 +1,22 @@
 
 [[kotlin-config]]
-= Kotlin Configuration
+= Cấu hình Kotlin
 
-Spring Security Kotlin configuration has been available since Spring Security 5.3.
-It lets users configure Spring Security by using a native Kotlin DSL.
+Cấu hình Kotlin của Spring Security có từ Spring Security 5.3.
+Cấu hình này cho phép người dùng cấu hình Spring Security bằng Kotlin DSL gốc.
 
 [NOTE]
 ====
-Spring Security provides https://github.com/spring-projects/spring-security-samples/tree/main/servlet/spring-boot/kotlin/hello-security[a sample application] to demonstrate the use of Spring Security Kotlin Configuration.
+Spring Security cung cấp https://github.com/spring-projects/spring-security-samples/tree/main/servlet/spring-boot/kotlin/hello-security[một ứng dụng mẫu] để minh họa việc sử dụng Cấu hình Kotlin của Spring Security.
 ====
 
 [[kotlin-config-httpsecurity]]
 == HttpSecurity
 
-How does Spring Security know that we want to require all users to be authenticated?
-How does Spring Security know we want to support form-based authentication?
-There is a configuration class (called `SecurityFilterChain`) that is being invoked behind the scenes.
-It is configured with the following default implementation:
+Làm thế nào Spring Security biết rằng chúng ta muốn yêu cầu mọi người dùng phải có authentication?
+Làm thế nào Spring Security biết rằng chúng ta muốn hỗ trợ authentication dựa trên form?
+Có một class cấu hình (có tên là `SecurityFilterChain`) được gọi ngầm phía sau.
+Class này được cấu hình bằng implementation mặc định sau:
 
 [source,kotlin]
 ----
@@ -36,15 +36,15 @@ open fun filterChain(http: HttpSecurity): SecurityFilterChain {
 ----
 
 [NOTE]
-Make sure to import the `org.springframework.security.config.annotation.web.invoke` function to enable the Kotlin DSL in your class, as the IDE will not always auto-import the method, causing compilation issues.
+Hãy nhớ import function `org.springframework.security.config.annotation.web.invoke` để bật Kotlin DSL trong class của bạn, vì IDE không phải lúc nào cũng tự động import method này, dẫn đến lỗi biên dịch.
 
-The default configuration (shown in the preceding example):
+Configuration mặc định (được trình bày trong ví dụ trước):
 
-* Ensures that any request to our application requires the user to be authenticated
-* Lets users authenticate with form-based login
-* Lets users authenticate with HTTP Basic authentication
+* Đảm bảo mọi request đến ứng dụng đều yêu cầu người dùng có authentication
+* Cho phép người dùng thực hiện authentication bằng form-based login
+* Cho phép người dùng thực hiện authentication bằng HTTP Basic authentication
 
-Note that this configuration parallels the XML namespace configuration:
+Lưu ý rằng configuration này tương đương với configuration XML namespace:
 
 [source,xml]
 ----
@@ -55,14 +55,14 @@ Note that this configuration parallels the XML namespace configuration:
 </http>
 ----
 
-=== Multiple HttpSecurity Instances
+=== Nhiều instance HttpSecurity
 
-To effectively manage security in an application where certain areas need different protection, we can employ multiple filter chains alongside the `securityMatcher` DSL method.
-This approach allows us to define distinct security configurations tailored to specific parts of the application, enhancing overall application security and control.
+Để quản lý security hiệu quả trong một ứng dụng mà một số khu vực cần các mức bảo vệ khác nhau, chúng ta có thể sử dụng nhiều filter chain cùng với method DSL `securityMatcher`.
+Cách tiếp cận này cho phép chúng ta định nghĩa các security configuration riêng biệt, phù hợp với từng phần cụ thể của ứng dụng, từ đó tăng cường security và khả năng kiểm soát tổng thể của ứng dụng.
 
-We can configure multiple `HttpSecurity` instances just as we can have multiple `<http>` blocks in XML.
-The key is to register multiple `SecurityFilterChain` ``@Bean``s.
-The following example has a different configuration for URLs that begin with `/api/`:
+Chúng ta có thể cấu hình nhiều instance `HttpSecurity`, giống như có thể có nhiều block `<http>` trong XML.
+Điểm mấu chốt là đăng ký nhiều `SecurityFilterChain` ``@Bean``.
+Ví dụ sau có configuration khác cho các URL bắt đầu bằng `/api/`:
 
 [[multiple-httpsecurity-instances-kotlin]]
 [source,kotlin]
@@ -106,40 +106,40 @@ class MultiHttpSecurityConfig {
     }
 }
 ----
-<1> Configure Authentication as usual.
-<2> Create an instance of `SecurityFilterChain` that contains `@Order` to specify which `SecurityFilterChain` should be considered first.
-<3> The `http.securityMatcher()` states that this `HttpSecurity` is applicable only to URLs that begin with `/api/`.
-<4> Create another instance of `SecurityFilterChain`.
-If the URL does not begin with `/api/`, this configuration is used.
-This configuration is considered after `apiFilterChain`, since it has an `@Order` value after `1` (no `@Order` defaults to last).
+<1> Cấu hình Authentication như bình thường.
+<2> Tạo một instance `SecurityFilterChain` có `@Order` để chỉ định `SecurityFilterChain` nào được xem xét trước.
+<3> `http.securityMatcher()` cho biết `HttpSecurity` này chỉ áp dụng cho các URL bắt đầu bằng `/api/`.
+<4> Tạo một instance `SecurityFilterChain` khác.
+Nếu URL không bắt đầu bằng `/api/`, configuration này sẽ được sử dụng.
+Configuration này được xem xét sau `apiFilterChain` vì có giá trị `@Order` sau `1` (không có `@Order` thì mặc định là cuối cùng).
 
-=== Choosing `securityMatcher` or `requestMatchers`
+=== Chọn `securityMatcher` hay `requestMatchers`
 
-A common question is:
+Một câu hỏi thường gặp là:
 
-> What is the difference between the `http.securityMatcher()` method and `requestMatchers()` used for request authorization (i.e. inside of `http.authorizeHttpRequests()`)?
+> Điểm khác nhau giữa method `http.securityMatcher()` và `requestMatchers()` được sử dụng cho request authorization (tức là bên trong `http.authorizeHttpRequests()`) là gì?
 
-To answer this question, it helps to understand that each `HttpSecurity` instance used to build a `SecurityFilterChain` contains a `RequestMatcher` to match incoming requests.
-If a request does not match a `SecurityFilterChain` with higher priority (e.g. `@Order(1)`), the request can be tried against a filter chain with lower priority (e.g. no `@Order`).
-
-[NOTE]
-====
-The matching logic for multiple filter chains is performed by the xref:servlet/architecture.adoc#servlet-filterchainproxy[`FilterChainProxy`].
-====
-
-The default `RequestMatcher` matches *any request* to ensure Spring Security protects *all requests by default*.
+Để trả lời câu hỏi này, cần hiểu rằng mỗi instance `HttpSecurity` được sử dụng để build một `SecurityFilterChain` đều chứa một `RequestMatcher` để match các request đến.
+Nếu request không match `SecurityFilterChain` có độ ưu tiên cao hơn (ví dụ `@Order(1)`), request có thể được thử với filter chain có độ ưu tiên thấp hơn (ví dụ không có `@Order`).
 
 [NOTE]
 ====
-Specifying a `securityMatcher` overrides this default.
+Logic match nhiều filter chain được thực hiện bởi xref:servlet/architecture.adoc#servlet-filterchainproxy[`FilterChainProxy`].
+====
+
+`RequestMatcher` mặc định match *mọi request* để đảm bảo Spring Security *mặc định bảo vệ mọi request*.
+
+[NOTE]
+====
+Việc chỉ định `securityMatcher` sẽ ghi đè mặc định này.
 ====
 
 [WARNING]
 ====
-If no filter chain matches a particular request, the request is *not protected* by Spring Security.
+Nếu không có filter chain nào match một request cụ thể, request đó sẽ *không được Spring Security bảo vệ*.
 ====
 
-The following example demonstrates a single filter chain that only protects requests that begin with `/secured/`:
+Ví dụ sau minh họa một filter chain duy nhất chỉ bảo vệ các request bắt đầu bằng `/secured/`:
 
 [[choosing-security-matcher-request-matchers-kotlin]]
 [source,kotlin]
@@ -170,37 +170,37 @@ class PartialSecurityConfig {
 	}
 }
 ----
-<1> Requests that begin with `/secured/` will be protected but any other requests are not protected.
-<2> Requests to `/secured/user` require the `ROLE_USER` authority.
-<3> Requests to `/secured/admin` require the `ROLE_ADMIN` authority.
-<4> Any other requests (such as `/secured/other`) simply require an authenticated user.
+<1> Các request bắt đầu bằng `/secured/` sẽ được bảo vệ, còn các request khác thì không.
+<2> Request đến `/secured/user` yêu cầu authority `ROLE_USER`.
+<3> Request đến `/secured/admin` yêu cầu authority `ROLE_ADMIN`.
+<4> Mọi request khác (chẳng hạn `/secured/other`) chỉ yêu cầu người dùng có authentication.
 
 [TIP]
 ====
-It is _recommended_ to provide a `SecurityFilterChain` that does not specify any `securityMatcher` to ensure the entire application is protected, as demonstrated in the <<multiple-httpsecurity-instances-kotlin,earlier example>>.
+_Khuyến nghị_ cung cấp một `SecurityFilterChain` không chỉ định `securityMatcher` để đảm bảo toàn bộ ứng dụng được bảo vệ, như đã minh họa trong <<multiple-httpsecurity-instances-kotlin,ví dụ trước>>.
 ====
 
-Notice that the `requestMatchers` method only applies to individual authorization rules.
-Each request listed there must also match the overall `securityMatcher` for this particular `HttpSecurity` instance used to create the `SecurityFilterChain`.
-Using `anyRequest()` in this example matches all other requests within this particular `SecurityFilterChain` (which must begin with `/secured/`).
+Lưu ý rằng method `requestMatchers` chỉ áp dụng cho từng authorization rule riêng lẻ.
+Mỗi request được liệt kê ở đó cũng phải match `securityMatcher` tổng thể của instance `HttpSecurity` cụ thể được sử dụng để tạo `SecurityFilterChain`.
+Trong ví dụ này, việc sử dụng `anyRequest()` sẽ match mọi request khác trong `SecurityFilterChain` cụ thể này (vốn phải bắt đầu bằng `/secured/`).
 
 [NOTE]
 ====
-See xref:servlet/authorization/authorize-http-requests.adoc[Authorize HttpServletRequests] for more information on `requestMatchers`.
+Xem xref:servlet/authorization/authorize-http-requests.adoc[Authorize HttpServletRequests] để biết thêm thông tin về `requestMatchers`.
 ====
 
-=== `SecurityFilterChain` Endpoints
+=== Endpoint của `SecurityFilterChain`
 
-Several filters in the `SecurityFilterChain` directly provide endpoints, such as the `UsernamePasswordAuthenticationFilter` which is set up by `http.formLogin()` and provides the `POST /login` endpoint.
-In the <<choosing-security-matcher-request-matchers-kotlin,above example>>, the `/login` endpoint is not matched by `http.securityMatcher("/secured/**")` and therefore that application would not have any `GET /login` or `POST /login` endpoint.
-Such requests would return `404 Not Found`.
-This is often surprising to users.
+Một số filter trong `SecurityFilterChain` trực tiếp cung cấp endpoint, chẳng hạn `UsernamePasswordAuthenticationFilter` được thiết lập bởi `http.formLogin()` và cung cấp endpoint `POST /login`.
+Trong <<choosing-security-matcher-request-matchers-kotlin,ví dụ trên>>, endpoint `/login` không được `http.securityMatcher("/secured/**")` match, do đó ứng dụng đó sẽ không có endpoint `GET /login` hoặc `POST /login`.
+Các request như vậy sẽ trả về `404 Not Found`.
+Điều này thường khiến người dùng bất ngờ.
 
-Specifying `http.securityMatcher()` affects what requests are matched by that `SecurityFilterChain`.
-However, it does not automatically affect endpoints provided by the filter chain.
-In such cases, you may need to customize the URL of any endpoints you would like the filter chain to provide.
+Việc chỉ định `http.securityMatcher()` ảnh hưởng đến các request được `SecurityFilterChain` đó match.
+Tuy nhiên, việc này không tự động ảnh hưởng đến các endpoint do filter chain cung cấp.
+Trong những trường hợp đó, bạn có thể cần tùy chỉnh URL của các endpoint mà bạn muốn filter chain cung cấp.
 
-The following example demonstrates a configuration that secures requests that begin with `/secured/` and denies all other requests, while also customizing endpoints provided by the `SecurityFilterChain`:
+Ví dụ sau minh họa một configuration bảo vệ các request bắt đầu bằng `/secured/` và từ chối mọi request khác, đồng thời tùy chỉnh các endpoint do `SecurityFilterChain` cung cấp:
 
 [[security-filter-chain-endpoints-kotlin]]
 [source,kotlin]
@@ -248,22 +248,22 @@ class SecuredSecurityConfig {
     }
 }
 ----
-<1> Requests that begin with `/secured/` will be protected by this filter chain.
-<2> Requests that begin with `/secured/` require an authenticated user.
-<3> Customize form login to prefix URLs with `/secured/`.
-<4> Customize logout to prefix URLs with `/secured/`.
-<5> All other requests will be denied.
+<1> Các request bắt đầu bằng `/secured/` sẽ được filter chain này bảo vệ.
+<2> Các request bắt đầu bằng `/secured/` yêu cầu người dùng có authentication.
+<3> Tùy chỉnh form login để thêm tiền tố `/secured/` vào URL.
+<4> Tùy chỉnh logout để thêm tiền tố `/secured/` vào URL.
+<5> Mọi request khác sẽ bị từ chối.
 
 [NOTE]
 ====
-This example customizes the login and logout pages, which disables Spring Security's generated pages.
-You must xref:servlet/authentication/passwords/form.adoc#servlet-authentication-form-custom[provide your own] custom endpoints for `GET /secured/login` and `GET /secured/logout`.
-Note that Spring Security still provides `POST /secured/login` and `POST /secured/logout` endpoints for you.
+Ví dụ này tùy chỉnh các page login và logout, việc này vô hiệu hóa các page được Spring Security tạo.
+Bạn phải xref:servlet/authentication/passwords/form.adoc#servlet-authentication-form-custom[tự cung cấp] các endpoint tùy chỉnh cho `GET /secured/login` và `GET /secured/logout`.
+Lưu ý rằng Spring Security vẫn cung cấp endpoint `POST /secured/login` và `POST /secured/logout` cho bạn.
 ====
 
-=== Real World Example
+=== Ví dụ thực tế
 
-The following example demonstrates a slightly more real-world configuration putting all of these elements together:
+Ví dụ sau minh họa một configuration thực tế hơn một chút, kết hợp tất cả các thành phần này:
 
 [[real-world-example-kotlin]]
 [source,kotlin]
@@ -333,89 +333,89 @@ class BankingSecurityConfig {
     }
 }
 ----
-<1> Begin by configuring authentication settings.
-<2> Define a `SecurityFilterChain` instance with `@Order(1)`, which means that this filter chain will have the highest priority.
-    This filter chain applies only to requests that begin with `/accounts/approvals/`, `/loans/approvals/` or `/credit-cards/approvals/`.
-	Requests to this filter chain require the `ROLE_ADMIN` authority and allow HTTP Basic Authentication.
-<3> Next, create another `SecurityFilterChain` instance with `@Order(2)` which will be considered second.
-    This filter chain applies only to requests that begin with `/accounts/`, `/loans/`, `/credit-cards/`, or `/balances/`.
-	Notice that because this filter chain is second, any requests that include `/approvals/` will match the previous filter chain and will *not* be matched by this filter chain.
-	Requests to this filter chain require the `ROLE_USER` authority.
-	This filter chain does not define any authentication because the next (default) filter chain contains that configuration.
-<4> Lastly, create an additional `SecurityFilterChain` instance without an `@Order` annotation.
-	This configuration will handle requests not covered by the other filter chains and will be processed last (no `@Order` defaults to last).
-	Requests that match `/`, `/user-login`, `/user-logout`, `/notices`, `/contact` and `/register` allow access without authentication.
-	Any other requests require the user to be authenticated to access any URL not explicitly allowed or protected by other filter chains.
+<1> Bắt đầu bằng việc cấu hình các thiết lập authentication.
+<2> Định nghĩa một instance `SecurityFilterChain` với `@Order(1)`, nghĩa là filter chain này có độ ưu tiên cao nhất.
+    Filter chain này chỉ áp dụng cho các request bắt đầu bằng `/accounts/approvals/`, `/loans/approvals/` hoặc `/credit-cards/approvals/`.
+	Các request đến filter chain này yêu cầu authority `ROLE_ADMIN` và cho phép HTTP Basic Authentication.
+<3> Tiếp theo, tạo một instance `SecurityFilterChain` khác với `@Order(2)`, sẽ được xem xét thứ hai.
+    Filter chain này chỉ áp dụng cho các request bắt đầu bằng `/accounts/`, `/loans/`, `/credit-cards/` hoặc `/balances/`.
+	Lưu ý rằng vì filter chain này được xem xét thứ hai, mọi request chứa `/approvals/` sẽ match filter chain trước đó và *không* được filter chain này match.
+	Các request đến filter chain này yêu cầu authority `ROLE_USER`.
+	Filter chain này không định nghĩa authentication nào vì filter chain tiếp theo (mặc định) chứa configuration đó.
+<4> Cuối cùng, tạo thêm một instance `SecurityFilterChain` không có annotation `@Order`.
+	Configuration này sẽ xử lý các request không được các filter chain khác bao phủ và được xử lý cuối cùng (không có `@Order` thì mặc định là cuối cùng).
+	Các request match `/`, `/user-login`, `/user-logout`, `/notices`, `/contact` và `/register` được phép truy cập mà không cần authentication.
+	Mọi request khác yêu cầu người dùng có authentication để truy cập bất kỳ URL nào không được cho phép rõ ràng hoặc được các filter chain khác bảo vệ.
 
 
 [[modular-httpsecuritydsl-configuration]]
-== Modular HttpSecurityDsl Configuration
+== Configuration HttpSecurityDsl dạng module
 
-Many users prefer that their Spring Security configuration lives in a centralized place and will choose to configure it in a single `SecurityFilterChain` instance.
-However, there are times that users may want to modularize the configuration.
-This can be done using:
+Nhiều người dùng muốn Spring Security configuration của họ nằm ở một nơi tập trung và sẽ chọn cấu hình trong một instance `SecurityFilterChain` duy nhất.
+Tuy nhiên, đôi khi người dùng muốn chia configuration thành các module.
+Có thể thực hiện việc này bằng:
 
-* xref:#httpsecuritydsl-bean[HttpSecurityDsl.() -> Unit Beans]
-* xref:#top-level-dsl-bean[Top Level Security Dsl Beans]
+* xref:#httpsecuritydsl-bean[Bean HttpSecurityDsl.() -> Unit]
+* xref:#top-level-dsl-bean[Bean Security Dsl cấp cao nhất]
 
-NOTE: Since the Spring Security Kotlin Dsl (`HttpSecurityDsl`) uses `HttpSecurity`, all of the Java xref:./kotlin.adoc#modular-bean-configuration[Modular Bean Customization] is applied before xref:#modular-httpsecuritydsl-configuration[Modular HttpSecurity Configuration].
+NOTE: Vì Spring Security Kotlin Dsl (`HttpSecurityDsl`) sử dụng `HttpSecurity`, toàn bộ xref:./kotlin.adoc#modular-bean-configuration[Tùy chỉnh Bean dạng module] của Java được áp dụng trước xref:#modular-httpsecuritydsl-configuration[Configuration HttpSecurity dạng module].
 
 [[httpsecuritydsl-bean]]
-=== HttpSecurityDsl.() -> Unit Beans
+=== Bean HttpSecurityDsl.() -> Unit
 
-If you would like to modularize your security configuration you can place logic in a `HttpSecurityDsl.() -> Unit` Bean.
-For example, the following configuration will ensure all `HttpSecurityDsl` instances are configured to:
+Nếu muốn chia security configuration thành các module, bạn có thể đặt logic trong một Bean `HttpSecurityDsl.() -> Unit`.
+Ví dụ, configuration sau sẽ đảm bảo mọi instance `HttpSecurityDsl` được cấu hình để:
 
 include-code::./HttpSecurityDslBeanConfiguration[tag=httpSecurityDslBean,indent=0]
 
-<1> Set the xref:servlet/exploits/headers.adoc#servlet-headers-csp[Content Security Policy] to `object-src 'none'`
-<2> xref:servlet/exploits/http.adoc#servlet-http-redirect[Redirect any request to https]
+<1> Đặt xref:servlet/exploits/headers.adoc#servlet-headers-csp[Content Security Policy] thành `object-src 'none'`
+<2> xref:servlet/exploits/http.adoc#servlet-http-redirect[Chuyển hướng mọi request sang https]
 
 
 [[top-level-dsl-bean]]
-=== Top Level Security Dsl Beans
+=== Bean Security Dsl cấp cao nhất
 
-If you prefer to have further modularization of your security configuration, Spring Security will automatically apply any top level Security Dsl Beans.
+Nếu muốn security configuration được chia thành nhiều module hơn nữa, Spring Security sẽ tự động áp dụng mọi Bean Security Dsl cấp cao nhất.
 
-A top level Security Dsl can be summarized as any class Dsl class that matches `public HttpSecurityDsl.*(<Dsl>)`.
-This translates to any Security Dsl that is a single argument to a public method on `HttpSecurityDsl`.
+Có thể tóm tắt Security Dsl cấp cao nhất là bất kỳ class Dsl nào match `public HttpSecurityDsl.*(<Dsl>)`.
+Điều này có nghĩa là bất kỳ Security Dsl nào là một argument duy nhất của một public method trên `HttpSecurityDsl`.
 
-A few examples can help to clarify.
-If `ContentTypeOptionsDsl.() -> Unit` is published as a Bean, it will not be be automatically applied because it is an argument to `HeadersDsl#contentTypeOptions(ContentTypeOptionsDsl.() -> Unit)` and is not an argument to a method defined on `HttpSecurityDsl`.
-However, if `HeadersDsl.() -> Unit` is published as a Bean, it will be automatically applied because it is an argument to `HttpSecurityDsl.headers(HeadersDsl.() -> Unit)`.
+Một vài ví dụ có thể giúp làm rõ điều này.
+Nếu `ContentTypeOptionsDsl.() -> Unit` được publish dưới dạng Bean, nó sẽ không được tự động áp dụng vì là argument của `HeadersDsl#contentTypeOptions(ContentTypeOptionsDsl.() -> Unit)` và không phải là argument của method được định nghĩa trên `HttpSecurityDsl`.
+Tuy nhiên, nếu `HeadersDsl.() -> Unit` được publish dưới dạng Bean, nó sẽ được tự động áp dụng vì là argument của `HttpSecurityDsl.headers(HeadersDsl.() -> Unit)`.
 
-For example, the following configuration ensure all `HttpSecurityDsl` instances are configured to:
+Ví dụ, configuration sau đảm bảo mọi instance `HttpSecurityDsl` được cấu hình để:
 
 include-code::./TopLevelDslBeanConfiguration[tag=headersSecurity,indent=0]
 
-<1> Set the xref:servlet/exploits/headers.adoc#servlet-headers-csp[Content Security Policy] to `object-src 'none'`
+<1> Đặt xref:servlet/exploits/headers.adoc#servlet-headers-csp[Content Security Policy] thành `object-src 'none'`
 
 [[dsl-bean-ordering]]
-=== Dsl Bean Ordering
+=== Thứ tự Bean Dsl
 
-First, all xref:servlet/configuration/java.adoc#modular-httpsecurity-configuration[Modular HttpSecurity Configuration] is applied since the Kotlin Dsl uses an `HttpSecurity` Bean.
+Đầu tiên, toàn bộ xref:servlet/configuration/java.adoc#modular-httpsecurity-configuration[Configuration HttpSecurity dạng module] được áp dụng vì Kotlin Dsl sử dụng một Bean `HttpSecurity`.
 
-Second, each xref:#httpsecuritydsl-bean[HttpSecurityDsl.() -> Unit Beans] is applied using {spring-framework-api-url}org/springframework/beans/factory/ObjectProvider.html#orderedStream()[ObjectProvider#orderedStream()].
-This means that if there are multiple `HttpSecurity.() -> Unit` Beans, the {spring-framework-api-url}org/springframework/core/annotation/Order.html[@Order] annotation can be added to the Bean definitions to control the ordering.
+Thứ hai, mỗi xref:#httpsecuritydsl-bean[Bean HttpSecurityDsl.() -> Unit] được áp dụng bằng {spring-framework-api-url}org/springframework/beans/factory/ObjectProvider.html#orderedStream()[ObjectProvider#orderedStream()].
+Điều này có nghĩa là nếu có nhiều Bean `HttpSecurity.() -> Unit`, có thể thêm annotation {spring-framework-api-url}org/springframework/core/annotation/Order.html[@Order] vào các định nghĩa Bean để kiểm soát thứ tự.
 
-Next, every xref:#top-level-dsl-bean[Top Level Security Dsl Beans] type is looked up and each is is applied using `ObjectProvider#orderedStream()`.
-If there is are different types of top level security Beans (e.g. `HeadersDsl.() -> Unit` and `HttpsRedirectDsl.() -> Unit`), then the order that each Dsl type is invoked is undefined.
-However, the order that each instance of of the same top level security Bean type is defined by `ObjectProvider#orderedStream()` and can be controlled using `@Order` on the Bean the definitions.
+Tiếp theo, mỗi type xref:#top-level-dsl-bean[Bean Security Dsl cấp cao nhất] được tra cứu và áp dụng bằng `ObjectProvider#orderedStream()`.
+Nếu có các type Bean security cấp cao nhất khác nhau (ví dụ `HeadersDsl.() -> Unit` và `HttpsRedirectDsl.() -> Unit`), thứ tự gọi từng type Dsl là không xác định.
+Tuy nhiên, thứ tự của từng instance thuộc cùng một type Bean security cấp cao nhất được xác định bởi `ObjectProvider#orderedStream()` và có thể được kiểm soát bằng `@Order` trên các định nghĩa Bean.
 
-Finally, the `HttpSecurityDsl` Bean is injected as a Bean.
-All `*Dsl.() -> Unit` Beans are applied before the `HttpSecurityDsl` Bean is created.
-This allows overriding the customizations provided by the `*Dsl.() -> Unit` Beans.
+Cuối cùng, Bean `HttpSecurityDsl` được inject dưới dạng một Bean.
+Mọi Bean `*Dsl.() -> Unit` được áp dụng trước khi Bean `HttpSecurityDsl` được tạo.
+Điều này cho phép ghi đè các tùy chỉnh do các Bean `*Dsl.() -> Unit` cung cấp.
 
-You can find an example below that illustrates the ordering:
+Ví dụ minh họa thứ tự được trình bày dưới đây:
 
 include-code::./DslBeanOrderingConfiguration[tag=sample,indent=0]
 
-<1> All xref:servlet/configuration/java.adoc#modular-httpsecurity-configuration[Modular HttpSecurity Configuration] is applied since the Kotlin Dsl uses an `HttpSecurity` Bean.
-<2> All `HttpSecurity.() -> Unit` instances are applied.
-The `adminAuthorization` Bean has the highest `@Order` so it is applied first.
-If there are no `@Order` annotations on the `HttpSecurity.() -> Unit` Beans or the `@Order` annotations had the same value, then the order that the `HttpSecurity.() -> Unit` instances are applied is undefined.
-<3> The `userAuthorization` is applied next due to being an instance of `HttpSecurity.() -> Unit`
-<4> The order that the `*Dsl.() -> Unit` types are undefined.
-In this example, the order of `contentSecurityPolicy`, `contentTypeOptions`, and `httpsRedirect` are undefined.
-If `@Order(Ordered.HIGHEST_PRECEDENCE)` was added to `contentTypeOptions`, then we would know that `contentTypeOptions` is before `contentSecurityPolicy` (they are the same type), but we do not know if `httpsRedirect` is before or after the `HeadersDsl.() -> Unit` Beans.
-<5> After all of the `*Dsl.() -> Unit` Beans are applied, the `HttpSecurityDsl` is passed in as a Bean.
+<1> Toàn bộ xref:servlet/configuration/java.adoc#modular-httpsecurity-configuration[Configuration HttpSecurity dạng module] được áp dụng vì Kotlin Dsl sử dụng một Bean `HttpSecurity`.
+<2> Mọi instance `HttpSecurity.() -> Unit` được áp dụng.
+Bean `adminAuthorization` có `@Order` cao nhất nên được áp dụng trước.
+Nếu các Bean `HttpSecurity.() -> Unit` không có annotation `@Order`, hoặc các annotation `@Order` có cùng giá trị, thứ tự áp dụng các instance `HttpSecurity.() -> Unit` là không xác định.
+<3> `userAuthorization` được áp dụng tiếp theo vì là một instance của `HttpSecurity.() -> Unit`.
+<4> Thứ tự của các type `*Dsl.() -> Unit` là không xác định.
+Trong ví dụ này, thứ tự của `contentSecurityPolicy`, `contentTypeOptions` và `httpsRedirect` là không xác định.
+Nếu thêm `@Order(Ordered.HIGHEST_PRECEDENCE)` vào `contentTypeOptions`, chúng ta sẽ biết `contentTypeOptions` đứng trước `contentSecurityPolicy` (chúng cùng một type), nhưng không biết `httpsRedirect` đứng trước hay sau các Bean `HeadersDsl.() -> Unit`.
+<5> Sau khi áp dụng mọi Bean `*Dsl.() -> Unit`, `HttpSecurityDsl` được truyền vào dưới dạng một Bean.
