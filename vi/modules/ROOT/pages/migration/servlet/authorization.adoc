@@ -1,11 +1,11 @@
-= Authorization Changes
+= Các thay đổi về authorization
 
-== If Using Access API, Add `spring-security-access`
+== Nếu sử dụng Access API, thêm `spring-security-access`
 
-Spring Security 7 moves `AccessDecisionManager`, `AccessDecisionVoter`, and the related Access API to a legacy module, `spring-security-access`.
-The Access API is deprecated in favor of the Authorization API as of Spring Security 5.
+Spring Security 7 chuyển `AccessDecisionManager`, `AccessDecisionVoter` và Access API liên quan sang một module legacy, `spring-security-access`.
+Access API đã bị deprecated để ưu tiên Authorization API kể từ Spring Security 5.
 
-You can add the dependency like other Spring Security dependencies like so:
+Bạn có thể thêm dependency giống như các dependency Spring Security khác như sau:
 
 [tabs]
 ======
@@ -26,4 +26,3 @@ Gradle::
 implementation('org.springframework.security:spring-security-access')
 ----
 ======
-
