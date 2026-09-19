@@ -89,10 +89,40 @@
 68. [x] `modules/ROOT/pages/servlet/authorization/authorize-http-requests.adoc`
 69. [x] `modules/ROOT/pages/servlet/authorization/method-security.adoc`
 70. [x] `modules/ROOT/pages/servlet/authorization/acls.adoc`
+71. [x] `modules/ROOT/pages/servlet/authorization/events.adoc`
+72. [x] `modules/ROOT/pages/servlet/oauth2/index.adoc`
+73. [x] `modules/ROOT/pages/servlet/oauth2/login/index.adoc`
+74. [x] `modules/ROOT/pages/servlet/oauth2/login/core.adoc`
+75. [x] `modules/ROOT/pages/servlet/oauth2/login/advanced.adoc`
+76. [x] `modules/ROOT/pages/servlet/oauth2/login/logout.adoc`
+77. [x] `modules/ROOT/pages/servlet/oauth2/client/index.adoc`
+78. [x] `modules/ROOT/pages/servlet/oauth2/client/core.adoc`
+79. [x] `modules/ROOT/pages/servlet/oauth2/client/authorization-grants.adoc`
+80. [x] `modules/ROOT/pages/servlet/oauth2/client/client-authentication.adoc`
+81. [x] `modules/ROOT/pages/servlet/oauth2/client/authorized-clients.adoc`
+82. [x] `modules/ROOT/pages/servlet/oauth2/resource-server/index.adoc`
+83. [x] `modules/ROOT/pages/servlet/oauth2/resource-server/jwt.adoc`
+84. [x] `modules/ROOT/pages/servlet/oauth2/resource-server/opaque-token.adoc`
+85. [x] `modules/ROOT/pages/servlet/oauth2/resource-server/multitenancy.adoc`
+86. [x] `modules/ROOT/pages/servlet/oauth2/resource-server/bearer-tokens.adoc`
+87. [x] `modules/ROOT/pages/servlet/oauth2/resource-server/dpop-tokens.adoc`
+88. [x] `modules/ROOT/pages/servlet/oauth2/resource-server/protected-resource-metadata.adoc`
+89. [x] `modules/ROOT/pages/servlet/oauth2/authorization-server/index.adoc`
+90. [x] `modules/ROOT/pages/servlet/oauth2/authorization-server/getting-started.adoc`
+91. [x] `modules/ROOT/pages/servlet/oauth2/authorization-server/configuration-model.adoc`
+92. [x] `modules/ROOT/pages/servlet/oauth2/authorization-server/core-model-components.adoc`
+93. [x] `modules/ROOT/pages/servlet/oauth2/authorization-server/protocol-endpoints.adoc`
+94. [x] `modules/ROOT/pages/servlet/saml2/index.adoc`
+95. [x] `modules/ROOT/pages/servlet/saml2/login/index.adoc`
+96. [x] `modules/ROOT/pages/servlet/saml2/login/overview.adoc`
+97. [x] `modules/ROOT/pages/servlet/saml2/login/authentication-requests.adoc`
+98. [x] `modules/ROOT/pages/servlet/saml2/login/authentication.adoc`
+99. [x] `modules/ROOT/pages/servlet/saml2/logout.adoc`
+100. [x] `modules/ROOT/pages/servlet/saml2/metadata.adoc`
 
 ## Trang tiếp theo
 
-1. [ ] `modules/ROOT/pages/servlet/authorization/events.adoc`
+1. [ ] `modules/ROOT/pages/servlet/saml2/saml-extension-migration.adoc`
 
 ## Kiểm tra chất lượng
 
