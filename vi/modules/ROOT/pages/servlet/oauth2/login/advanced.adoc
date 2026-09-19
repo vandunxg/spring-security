@@ -1,14 +1,14 @@
 [[oauth2login-advanced]]
-= Advanced Configuration
+= Cấu hình nâng cao
 
-`HttpSecurity.oauth2Login()` provides a number of configuration options for customizing OAuth 2.0 Login.
-The main configuration options are grouped into their protocol endpoint counterparts.
+`HttpSecurity.oauth2Login()` cung cấp một số tùy chọn cấu hình để tùy chỉnh OAuth 2.0 Login.
+Các tùy chọn cấu hình chính được nhóm theo các endpoint tương ứng trong protocol.
 
-For example, `oauth2Login().authorizationEndpoint()` allows configuring the _Authorization Endpoint_, whereas `oauth2Login().tokenEndpoint()` allows configuring the _Token Endpoint_.
+Ví dụ, `oauth2Login().authorizationEndpoint()` cho phép cấu hình _Authorization Endpoint_, trong khi `oauth2Login().tokenEndpoint()` cho phép cấu hình _Token Endpoint_.
 
-The following code shows an example:
+Đoạn code sau đây minh họa một ví dụ:
 
-.Advanced OAuth2 Login Configuration
+.Cấu hình OAuth2 Login nâng cao
 [tabs]
 ======
 Java::
@@ -73,28 +73,28 @@ class OAuth2LoginSecurityConfig {
 ----
 ======
 
-The main goal of the `oauth2Login()` DSL was to closely align with the naming, as defined in the specifications.
+Mục tiêu chính của DSL `oauth2Login()` là bám sát cách đặt tên được định nghĩa trong các specification.
 
-The OAuth 2.0 Authorization Framework defines the https://tools.ietf.org/html/rfc6749#section-3[Protocol Endpoints] as follows:
+OAuth 2.0 Authorization Framework định nghĩa các https://tools.ietf.org/html/rfc6749#section-3[Protocol Endpoints] như sau:
 
-The authorization process uses two authorization server endpoints (HTTP resources):
+Quy trình authorization sử dụng hai endpoint của Authorization Server (các tài nguyên HTTP):
 
-* Authorization Endpoint: Used by the client to obtain authorization from the resource owner through user-agent redirection.
-* Token Endpoint: Used by the client to exchange an authorization grant for an access token, typically with client authentication.
+* Authorization Endpoint: Được client sử dụng để lấy authorization từ resource owner thông qua chuyển hướng user-agent.
+* Token Endpoint: Được client sử dụng để đổi authorization grant lấy access token, thường kèm theo client authentication.
 
-The authorization process also uses one client endpoint:
+Quy trình authorization cũng sử dụng một client endpoint:
 
-* Redirection Endpoint: Used by the authorization server to return responses that contain authorization credentials to the client through the resource owner user-agent.
+* Redirection Endpoint: Được Authorization Server sử dụng để trả về các response chứa authorization credential cho client thông qua user-agent của resource owner.
 
-The OpenID Connect Core 1.0 specification defines the https://openid.net/specs/openid-connect-core-1_0.html#UserInfo[UserInfo Endpoint] as follows:
+OpenID Connect Core 1.0 specification định nghĩa https://openid.net/specs/openid-connect-core-1_0.html#UserInfo[UserInfo Endpoint] như sau:
 
-The UserInfo Endpoint is an OAuth 2.0 Protected Resource that returns claims about the authenticated end-user.
-To obtain the requested claims about the end-user, the client makes a request to the UserInfo Endpoint by using an access token obtained through OpenID Connect Authentication.
-These claims are normally represented by a JSON object that contains a collection of name-value pairs for the claims.
+UserInfo Endpoint là một OAuth 2.0 Protected Resource trả về các claim về end-user đã authentication.
+Để lấy các claim được yêu cầu về end-user, client gửi request đến UserInfo Endpoint bằng access token nhận được thông qua OpenID Connect Authentication.
+Các claim này thường được biểu diễn bằng một JSON object chứa tập hợp các cặp name-value của claim.
 
-The following code shows the complete configuration options available for the `oauth2Login()` DSL:
+Đoạn code sau đây cho thấy đầy đủ các tùy chọn cấu hình có trong DSL `oauth2Login()`:
 
-.OAuth2 Login Configuration Options
+.Các tùy chọn cấu hình OAuth2 Login
 [tabs]
 ======
 Java::
@@ -175,11 +175,11 @@ class OAuth2LoginSecurityConfig {
 ----
 ======
 
-In addition to the `oauth2Login()` DSL, XML configuration is also supported.
+Ngoài DSL `oauth2Login()`, cấu hình XML cũng được hỗ trợ.
 
-The following code shows the complete configuration options available in the xref:servlet/appendix/namespace/http.adoc#nsa-oauth2-login[ security namespace]:
+Đoạn code sau đây cho thấy đầy đủ các tùy chọn cấu hình có trong xref:servlet/appendix/namespace/http.adoc#nsa-oauth2-login[ namespace bảo mật]:
 
-.OAuth2 Login XML Configuration Options
+.Các tùy chọn cấu hình XML của OAuth2 Login
 [source,xml]
 ----
 <http>
@@ -200,7 +200,7 @@ The following code shows the complete configuration options available in the xre
 </http>
 ----
 
-The following sections go into more detail on each of the configuration options available:
+Các section sau đây trình bày chi tiết hơn về từng tùy chọn cấu hình hiện có:
 
 * <<oauth2login-advanced-login-page>>
 * <<oauth2login-advanced-redirection-endpoint>>
@@ -210,33 +210,33 @@ The following sections go into more detail on each of the configuration options 
 
 
 [[oauth2login-advanced-login-page]]
-== OAuth 2.0 Login Page
+== Trang OAuth 2.0 Login
 
-By default, the OAuth 2.0 Login Page is auto-generated by the `DefaultLoginPageGeneratingFilter`.
-The default login page shows each configured OAuth Client with its `ClientRegistration.clientName` as a link, which is capable of initiating the Authorization Request (or OAuth 2.0 Login).
+Theo mặc định, Trang OAuth 2.0 Login được tự động tạo bởi `DefaultLoginPageGeneratingFilter`.
+Trang login mặc định hiển thị mỗi OAuth Client đã cấu hình cùng `ClientRegistration.clientName` dưới dạng một link, có thể khởi tạo Authorization Request (hoặc OAuth 2.0 Login).
 
 [NOTE]
 ====
-For `DefaultLoginPageGeneratingFilter` to show links for configured OAuth Clients, the registered `ClientRegistrationRepository` needs to also implement `Iterable<ClientRegistration>`.
-See `InMemoryClientRegistrationRepository` for reference.
+Để `DefaultLoginPageGeneratingFilter` hiển thị link cho các OAuth Client đã cấu hình, `ClientRegistrationRepository` đã đăng ký cũng cần implement `Iterable<ClientRegistration>`.
+Xem `InMemoryClientRegistrationRepository` để tham khảo.
 ====
 
-The link's destination for each OAuth Client defaults to the following:
+Đích đến của link cho mỗi OAuth Client mặc định là:
 
 `+OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/{registrationId}"+`
 
-The following line shows an example:
+Dòng sau đây minh họa một ví dụ:
 
 [source,html]
 ----
 <a href="/oauth2/authorization/google">Google</a>
 ----
 
-To override the default login page, configure `oauth2Login().loginPage()` and (optionally) `oauth2Login().authorizationEndpoint().baseUri()`.
+Để ghi đè trang login mặc định, hãy cấu hình `oauth2Login().loginPage()` và (tùy chọn) `oauth2Login().authorizationEndpoint().baseUri()`.
 
-The following listing shows an example:
+Danh sách sau đây minh họa một ví dụ:
 
-.OAuth2 Login Page Configuration
+.Cấu hình trang OAuth2 Login
 [tabs]
 ======
 Java::
@@ -300,15 +300,15 @@ Xml::
 
 [IMPORTANT]
 ====
-You need to provide a `@Controller` with a `@RequestMapping("/login/oauth2")` that is capable of rendering the custom login page.
+Bạn cần cung cấp một `@Controller` với `@RequestMapping("/login/oauth2")` có khả năng render trang login tùy chỉnh.
 ====
 
 [TIP]
 =====
-As noted earlier, configuring `oauth2Login().authorizationEndpoint().baseUri()` is optional.
-However, if you choose to customize it, ensure the link to each OAuth Client matches the `authorizationEndpoint().baseUri()`.
+Như đã nêu trước đó, việc cấu hình `oauth2Login().authorizationEndpoint().baseUri()` là tùy chọn.
+Tuy nhiên, nếu chọn tùy chỉnh, hãy bảo đảm link đến mỗi OAuth Client khớp với `authorizationEndpoint().baseUri()`.
 
-The following line shows an example:
+Dòng sau đây minh họa một ví dụ:
 [source,html]
 ----
 <a href="/login/oauth2/authorization/google">Google</a>
@@ -319,19 +319,19 @@ The following line shows an example:
 [[oauth2login-advanced-redirection-endpoint]]
 == Redirection Endpoint
 
-The Redirection Endpoint is used by the Authorization Server for returning the Authorization Response (which contains the authorization credentials) to the client through the Resource Owner user-agent.
+Redirection Endpoint được Authorization Server sử dụng để trả Authorization Response (chứa authorization credential) cho client thông qua user-agent của Resource Owner.
 
 [TIP]
 ====
-OAuth 2.0 Login leverages the Authorization Code Grant.
-Therefore, the authorization credential is the authorization code.
+OAuth 2.0 Login sử dụng Authorization Code Grant.
+Do đó, authorization credential là authorization code.
 ====
 
-The default Authorization Response `baseUri` (redirection endpoint) is `*/login/oauth2/code/**`, which is defined in `OAuth2LoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI`.
+`baseUri` Authorization Response mặc định (redirection endpoint) là `*/login/oauth2/code/**`, được định nghĩa trong `OAuth2LoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI`.
 
-If you would like to customize the Authorization Response `baseUri`, configure it as follows:
+Nếu muốn tùy chỉnh `baseUri` của Authorization Response, hãy cấu hình như sau:
 
-.Redirection Endpoint Configuration
+.Cấu hình Redirection Endpoint
 [tabs]
 ======
 Java::
@@ -392,9 +392,9 @@ Xml::
 
 [IMPORTANT]
 =====
-You also need to ensure the `ClientRegistration.redirectUri` matches the custom Authorization Response `baseUri`.
+Bạn cũng cần bảo đảm `ClientRegistration.redirectUri` khớp với `baseUri` Authorization Response tùy chỉnh.
 
-The following listing shows an example:
+Danh sách sau đây minh họa một ví dụ:
 
 [tabs]
 ======
@@ -426,7 +426,7 @@ return CommonOAuth2Provider.GOOGLE.getBuilder("google")
 [[oauth2login-advanced-userinfo-endpoint]]
 == UserInfo Endpoint
 
-The UserInfo Endpoint includes a number of configuration options, as described in the following sub-sections:
+UserInfo Endpoint bao gồm một số tùy chọn cấu hình, được mô tả trong các subsection sau:
 
 * <<oauth2login-advanced-map-authorities>>
 * <<oauth2login-advanced-oauth2-user-service>>
@@ -434,28 +434,28 @@ The UserInfo Endpoint includes a number of configuration options, as described i
 
 
 [[oauth2login-advanced-map-authorities]]
-=== Mapping User Authorities
+=== Ánh xạ authority của user
 
-After the user successfully authenticates with the OAuth 2.0 Provider, the `OAuth2User.getAuthorities()` (or `OidcUser.getAuthorities()`) contains a list of granted authorities populated from `OAuth2UserRequest.getAccessToken().getScopes()` and prefixed with `SCOPE_`.
-These granted authorities can be mapped to a new set of `GrantedAuthority` instances, which are supplied to `OAuth2AuthenticationToken` when completing the authentication.
+Sau khi user authentication thành công với OAuth 2.0 Provider, `OAuth2User.getAuthorities()` (hoặc `OidcUser.getAuthorities()`) chứa danh sách authority đã cấp, được lấy từ `OAuth2UserRequest.getAccessToken().getScopes()` và thêm tiền tố `SCOPE_`.
+Các authority đã cấp này có thể được ánh xạ thành một tập hợp instance `GrantedAuthority` mới, rồi cung cấp cho `OAuth2AuthenticationToken` khi hoàn tất authentication.
 
 [TIP]
-`OAuth2AuthenticationToken.getAuthorities()` is used for authorizing requests, such as in `hasRole('USER')` or `hasRole('ADMIN')`.
+`OAuth2AuthenticationToken.getAuthorities()` được sử dụng để authorization cho các request, chẳng hạn trong `hasRole('USER')` hoặc `hasRole('ADMIN')`.
 
-There are a couple of options to choose from when mapping user authorities:
+Có một số tùy chọn để lựa chọn khi ánh xạ authority của user:
 
 * <<oauth2login-advanced-map-authorities-grantedauthoritiesmapper>>
 * <<oauth2login-advanced-map-authorities-oauth2userservice>>
 
 
 [[oauth2login-advanced-map-authorities-grantedauthoritiesmapper]]
-==== Using a GrantedAuthoritiesMapper
+==== Sử dụng GrantedAuthoritiesMapper
 
-The `GrantedAuthoritiesMapper` is given a list of granted authorities which contains a special authority of type `OAuth2UserAuthority` and the authority string `OAUTH2_USER` (or `OidcUserAuthority` and the authority string `OIDC_USER`).
+`GrantedAuthoritiesMapper` nhận một danh sách authority đã cấp, trong đó có authority đặc biệt thuộc kiểu `OAuth2UserAuthority` và authority string `OAUTH2_USER` (hoặc `OidcUserAuthority` và authority string `OIDC_USER`).
 
-Provide an implementation of `GrantedAuthoritiesMapper` and configure it, as follows:
+Cung cấp một implementation của `GrantedAuthoritiesMapper` và cấu hình như sau:
 
-.Granted Authorities Mapper Configuration
+.Cấu hình Granted Authorities Mapper
 [tabs]
 ======
 Java::
@@ -489,16 +489,16 @@ public class OAuth2LoginSecurityConfig {
 					OidcIdToken idToken = oidcUserAuthority.getIdToken();
 					OidcUserInfo userInfo = oidcUserAuthority.getUserInfo();
 
-					// Map the claims found in idToken and/or userInfo
-					// to one or more GrantedAuthority's and add it to mappedAuthorities
+					// Ánh xạ các claim tìm thấy trong idToken và/hoặc userInfo
+					// thành một hoặc nhiều GrantedAuthority rồi thêm vào mappedAuthorities
 
 				} else if (OAuth2UserAuthority.class.isInstance(authority)) {
 					OAuth2UserAuthority oauth2UserAuthority = (OAuth2UserAuthority)authority;
 
 					Map<String, Object> userAttributes = oauth2UserAuthority.getAttributes();
 
-					// Map the attributes found in userAttributes
-					// to one or more GrantedAuthority's and add it to mappedAuthorities
+					// Ánh xạ các attribute tìm thấy trong userAttributes
+					// thành một hoặc nhiều GrantedAuthority rồi thêm vào mappedAuthorities
 
 				}
 			});
@@ -536,12 +536,12 @@ class OAuth2LoginSecurityConfig {
             if (authority is OidcUserAuthority) {
                 val idToken = authority.idToken
                 val userInfo = authority.userInfo
-                // Map the claims found in idToken and/or userInfo
-                // to one or more GrantedAuthority's and add it to mappedAuthorities
+                // Ánh xạ các claim tìm thấy trong idToken và/hoặc userInfo
+                // thành một hoặc nhiều GrantedAuthority rồi thêm vào mappedAuthorities
             } else if (authority is OAuth2UserAuthority) {
                 val userAttributes = authority.attributes
-                // Map the attributes found in userAttributes
-                // to one or more GrantedAuthority's and add it to mappedAuthorities
+                // Ánh xạ các attribute tìm thấy trong userAttributes
+                // thành một hoặc nhiều GrantedAuthority rồi thêm vào mappedAuthorities
             }
         }
 
@@ -562,9 +562,9 @@ Xml::
 ----
 ======
 
-Alternatively, you can register a `GrantedAuthoritiesMapper` `@Bean` to have it automatically applied to the configuration, as follows:
+Ngoài ra, bạn có thể đăng ký một `GrantedAuthoritiesMapper` `@Bean` để tự động áp dụng vào cấu hình, như sau:
 
-.Granted Authorities Mapper Bean Configuration
+.Cấu hình bean Granted Authorities Mapper
 [tabs]
 ======
 Java::
@@ -615,19 +615,19 @@ class OAuth2LoginSecurityConfig {
 
 [TIP]
 ====
-Once authentication completes, it also contains the `FACTOR_AUTHORIZATION_CODE` granted authority.
+Sau khi authentication hoàn tất, nó cũng chứa authority đã cấp `FACTOR_AUTHORIZATION_CODE`.
 ====
 
 [[oauth2login-advanced-map-authorities-oauth2userservice]]
-==== Delegation-based Strategy with OAuth2UserService
+==== Chiến lược dựa trên delegation với OAuth2UserService
 
-This strategy is advanced compared to using a `GrantedAuthoritiesMapper`. However, it is also more flexible, as it gives you access to the `OAuth2UserRequest` and `OAuth2User` (when using an OAuth 2.0 UserService) or `OidcUserRequest` and `OidcUser` (when using an OpenID Connect 1.0 UserService).
+Chiến lược này nâng cao hơn so với việc sử dụng `GrantedAuthoritiesMapper`. Tuy nhiên, nó cũng linh hoạt hơn vì cho phép bạn truy cập `OAuth2UserRequest` và `OAuth2User` (khi sử dụng OAuth 2.0 UserService) hoặc `OidcUserRequest` và `OidcUser` (khi sử dụng OpenID Connect 1.0 UserService).
 
-The `OAuth2UserRequest` (and `OidcUserRequest`) provides you access to the associated `OAuth2AccessToken`, which is very useful in cases where the _delegator_ needs to fetch authority information from a protected resource before it can map the custom authorities for the user.
+`OAuth2UserRequest` (và `OidcUserRequest`) cung cấp quyền truy cập vào `OAuth2AccessToken` tương ứng. Điều này rất hữu ích khi _delegator_ cần lấy thông tin authority từ một protected resource trước khi có thể ánh xạ các authority tùy chỉnh cho user.
 
-The following example shows how to implement and configure a delegation-based strategy using an OpenID Connect 1.0 UserService:
+Ví dụ sau đây cho thấy cách implement và cấu hình một chiến lược dựa trên delegation bằng OpenID Connect 1.0 UserService:
 
-.OAuth2UserService Configuration
+.Cấu hình OAuth2UserService
 [tabs]
 ======
 Java::
@@ -654,17 +654,17 @@ public class OAuth2LoginSecurityConfig {
 		final OidcUserService delegate = new OidcUserService();
 
 		return (userRequest) -> {
-			// Delegate to the default implementation for loading a user
+			// Ủy quyền cho implementation mặc định để tải user
 			OidcUser oidcUser = delegate.loadUser(userRequest);
 
 			OAuth2AccessToken accessToken = userRequest.getAccessToken();
 			Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
 
 			// TODO
-			// 1) Fetch the authority information from the protected resource using accessToken
-			// 2) Map the authority information to one or more GrantedAuthority's and add it to mappedAuthorities
+			// 1) Lấy thông tin authority từ protected resource bằng accessToken
+			// 2) Ánh xạ thông tin authority thành một hoặc nhiều GrantedAuthority rồi thêm vào mappedAuthorities
 
-			// 3) Create a copy of oidcUser but use the mappedAuthorities instead
+			// 3) Tạo một bản sao của oidcUser nhưng sử dụng mappedAuthorities thay thế
 			ProviderDetails providerDetails = userRequest.getClientRegistration().getProviderDetails();
 			String userNameAttributeName = providerDetails.getUserInfoEndpoint().getUserNameAttributeName();
 			if (StringUtils.hasText(userNameAttributeName)) {
@@ -704,16 +704,16 @@ class OAuth2LoginSecurityConfig  {
         val delegate = OidcUserService()
 
         return OAuth2UserService { userRequest ->
-            // Delegate to the default implementation for loading a user
+            // Ủy quyền cho implementation mặc định để tải user
             val oidcUser = delegate.loadUser(userRequest)
 
             val accessToken = userRequest.accessToken
             val mappedAuthorities = HashSet<GrantedAuthority>()
 
             // TODO
-            // 1) Fetch the authority information from the protected resource using accessToken
-            // 2) Map the authority information to one or more GrantedAuthority's and add it to mappedAuthorities
-            // 3) Create a copy of oidcUser but use the mappedAuthorities instead
+            // 1) Lấy thông tin authority từ protected resource bằng accessToken
+            // 2) Ánh xạ thông tin authority thành một hoặc nhiều GrantedAuthority rồi thêm vào mappedAuthorities
+            // 3) Tạo một bản sao của oidcUser nhưng sử dụng mappedAuthorities thay thế
             val providerDetails = userRequest.getClientRegistration().getProviderDetails()
             val userNameAttributeName = providerDetails.getUserInfoEndpoint().getUserNameAttributeName()
             if (StringUtils.hasText(userNameAttributeName)) {
@@ -742,20 +742,20 @@ Xml::
 [[oauth2login-advanced-oauth2-user-service]]
 === OAuth 2.0 UserService
 
-`DefaultOAuth2UserService` is an implementation of an `OAuth2UserService` that supports standard OAuth 2.0 Provider's.
+`DefaultOAuth2UserService` là một implementation của `OAuth2UserService` hỗ trợ các OAuth 2.0 Provider tiêu chuẩn.
 
 [NOTE]
 ====
-`OAuth2UserService` obtains the user attributes of the end-user (the resource owner) from the UserInfo Endpoint (by using the access token granted to the client during the authorization flow) and returns an `AuthenticatedPrincipal` in the form of an `OAuth2User`.
+`OAuth2UserService` lấy các thuộc tính user của end-user (resource owner) từ UserInfo Endpoint (bằng access token được cấp cho client trong authorization flow) và trả về một `AuthenticatedPrincipal` dưới dạng `OAuth2User`.
 ====
 
-`DefaultOAuth2UserService` uses a `RestOperations` instance when requesting the user attributes at the UserInfo Endpoint.
+`DefaultOAuth2UserService` sử dụng một instance `RestOperations` khi request các thuộc tính user tại UserInfo Endpoint.
 
-If you need to customize the pre-processing of the UserInfo Request, you can provide `DefaultOAuth2UserService.setRequestEntityConverter()` with a custom `Converter<OAuth2UserRequest, RequestEntity<?>>`.
-The default implementation `OAuth2UserRequestEntityConverter` builds a `RequestEntity` representation of a UserInfo Request that sets the `OAuth2AccessToken` in the `Authorization` header by default.
+Nếu cần tùy chỉnh việc xử lý trước UserInfo Request, bạn có thể cung cấp một `Converter<OAuth2UserRequest, RequestEntity<?>>` tùy chỉnh cho `DefaultOAuth2UserService.setRequestEntityConverter()`.
+Implementation mặc định `OAuth2UserRequestEntityConverter` tạo một biểu diễn `RequestEntity` của UserInfo Request, mặc định đặt `OAuth2AccessToken` trong header `Authorization`.
 
-On the other end, if you need to customize the post-handling of the UserInfo Response, you need to provide `DefaultOAuth2UserService.setRestOperations()` with a custom configured `RestOperations`.
-The default `RestOperations` is configured as follows:
+Mặt khác, nếu cần tùy chỉnh việc xử lý sau UserInfo Response, bạn cần cung cấp một `RestOperations` được cấu hình tùy chỉnh cho `DefaultOAuth2UserService.setRestOperations()`.
+`RestOperations` mặc định được cấu hình như sau:
 
 [source,java]
 ----
@@ -763,10 +763,10 @@ RestTemplate restTemplate = new RestTemplate();
 restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
 ----
 
-`OAuth2ErrorResponseErrorHandler` is a `ResponseErrorHandler` that can handle an OAuth 2.0 Error (400 Bad Request).
-It uses an `OAuth2ErrorHttpMessageConverter` for converting the OAuth 2.0 Error parameters to an `OAuth2Error`.
+`OAuth2ErrorResponseErrorHandler` là một `ResponseErrorHandler` có thể xử lý OAuth 2.0 Error (400 Bad Request).
+Nó sử dụng `OAuth2ErrorHttpMessageConverter` để chuyển đổi các tham số OAuth 2.0 Error thành một `OAuth2Error`.
 
-Whether you customize `DefaultOAuth2UserService` or provide your own implementation of `OAuth2UserService`, you need to configure it as follows:
+Dù tùy chỉnh `DefaultOAuth2UserService` hay cung cấp implementation riêng của `OAuth2UserService`, bạn cần cấu hình như sau:
 
 [tabs]
 ======
@@ -828,13 +828,13 @@ class OAuth2LoginSecurityConfig {
 [[oauth2login-advanced-oidc-user-service]]
 === OpenID Connect 1.0 UserService
 
-`OidcUserService` is an implementation of an `OAuth2UserService` that supports OpenID Connect 1.0 Provider's.
+`OidcUserService` là một implementation của `OAuth2UserService` hỗ trợ các OpenID Connect 1.0 Provider.
 
-The `OidcUserService` leverages the `DefaultOAuth2UserService` when requesting the user attributes at the UserInfo Endpoint.
+`OidcUserService` sử dụng `DefaultOAuth2UserService` khi request các thuộc tính user tại UserInfo Endpoint.
 
-If you need to customize the pre-processing of the UserInfo Request or the post-handling of the UserInfo Response, you need to provide `OidcUserService.setOauth2UserService()` with a custom configured `DefaultOAuth2UserService`.
+Nếu cần tùy chỉnh việc xử lý trước UserInfo Request hoặc xử lý sau UserInfo Response, bạn cần cung cấp một `DefaultOAuth2UserService` được cấu hình tùy chỉnh cho `OidcUserService.setOauth2UserService()`.
 
-Whether you customize `OidcUserService` or provide your own implementation of `OAuth2UserService` for OpenID Connect 1.0 Provider's, you need to configure it as follows:
+Dù tùy chỉnh `OidcUserService` hay cung cấp implementation riêng của `OAuth2UserService` cho OpenID Connect 1.0 Provider, bạn cần cấu hình như sau:
 
 [tabs]
 ======
@@ -894,18 +894,18 @@ class OAuth2LoginSecurityConfig {
 
 
 [[oauth2login-advanced-idtoken-verify]]
-== ID Token Signature Verification
+== Xác minh chữ ký ID Token
 
-OpenID Connect 1.0 Authentication introduces the https://openid.net/specs/openid-connect-core-1_0.html#IDToken[ID Token], which is a security token that contains Claims about the Authentication of an End-User by an Authorization Server when used by a Client.
+OpenID Connect 1.0 Authentication giới thiệu https://openid.net/specs/openid-connect-core-1_0.html#IDToken[ID Token], một security token chứa các Claim về Authentication của End-User bởi Authorization Server khi được Client sử dụng.
 
-The ID Token is represented as a https://tools.ietf.org/html/rfc7519[JSON Web Token] (JWT) and MUST be signed by using https://tools.ietf.org/html/rfc7515[JSON Web Signature] (JWS).
+ID Token được biểu diễn dưới dạng https://tools.ietf.org/html/rfc7519[JSON Web Token] (JWT) và MUST được ký bằng https://tools.ietf.org/html/rfc7515[JSON Web Signature] (JWS).
 
-The `OidcIdTokenDecoderFactory` provides a `JwtDecoder` used for `OidcIdToken` signature verification. The default algorithm is `RS256` but may be different when assigned during client registration.
-For these cases, you can configure a resolver to return the expected JWS algorithm assigned for a specific client.
+`OidcIdTokenDecoderFactory` cung cấp một `JwtDecoder` được sử dụng để xác minh chữ ký `OidcIdToken`. Algorithm mặc định là `RS256` nhưng có thể khác nếu được gán trong quá trình đăng ký client.
+Trong các trường hợp này, bạn có thể cấu hình một resolver để trả về JWS algorithm dự kiến được gán cho một client cụ thể.
 
-The JWS algorithm resolver is a `Function` that accepts a `ClientRegistration` and returns the expected `JwsAlgorithm` for the client, such as `SignatureAlgorithm.RS256` or `MacAlgorithm.HS256`
+JWS algorithm resolver là một `Function` nhận `ClientRegistration` và trả về `JwsAlgorithm` dự kiến cho client, chẳng hạn `SignatureAlgorithm.RS256` hoặc `MacAlgorithm.HS256`.
 
-The following code shows how to configure the `OidcIdTokenDecoderFactory` `@Bean` to default to `MacAlgorithm.HS256` for all `ClientRegistration` instances:
+Đoạn code sau đây cho thấy cách cấu hình `@Bean` `OidcIdTokenDecoderFactory` để mặc định sử dụng `MacAlgorithm.HS256` cho mọi instance `ClientRegistration`:
 
 [tabs]
 ======
@@ -936,23 +936,23 @@ fun idTokenDecoderFactory(): JwtDecoderFactory<ClientRegistration?> {
 
 [NOTE]
 ====
-For MAC-based algorithms (such as `HS256`, `HS384`, or `HS512`), the `client-secret` that corresponds to the `client-id` is used as the symmetric key for signature verification.
+Đối với các algorithm dựa trên MAC (chẳng hạn `HS256`, `HS384` hoặc `HS512`), `client-secret` tương ứng với `client-id` được sử dụng làm symmetric key để xác minh chữ ký.
 ====
 
 [TIP]
 ====
-If more than one `ClientRegistration` is configured for OpenID Connect 1.0 Authentication, the JWS algorithm resolver may evaluate the provided `ClientRegistration` to determine which algorithm to return.
+Nếu có nhiều hơn một `ClientRegistration` được cấu hình cho OpenID Connect 1.0 Authentication, JWS algorithm resolver có thể đánh giá `ClientRegistration` được cung cấp để xác định algorithm cần trả về.
 ====
 
 [[oauth2login-advanced-idtoken-decoder-factory]]
-== Providing a Custom JwtDecoderFactory
+== Cung cấp JwtDecoderFactory tùy chỉnh
 
-`OidcIdTokenDecoderFactory` is deliberately narrow: it exists to make it easy to support multiple `ClientRegistration` instances, each potentially needing a different `JwtDecoder`, and its configuration surface is limited to what most applications need for that purpose, such as the JWS algorithm resolver shown above.
+`OidcIdTokenDecoderFactory` được thiết kế có phạm vi hẹp một cách có chủ đích: nó tồn tại để giúp dễ dàng hỗ trợ nhiều instance `ClientRegistration`, mỗi instance có thể cần một `JwtDecoder` khác nhau, và bề mặt cấu hình của nó được giới hạn ở những gì hầu hết application cần cho mục đích đó, chẳng hạn JWS algorithm resolver được trình bày ở trên.
 
-If your application needs deeper control over how the ID Token's `JwtDecoder` is constructed -- for example, providing your own `RestOperations` -- you can instead provide your own `JwtDecoderFactory<ClientRegistration>` `@Bean`.
-Because OAuth2 Login does not use a resource server `JwtDecoder` bean for this purpose, this is the supported way to reach the same level of control that `NimbusJwtDecoder`'s builder already offers, without introducing additional configuration properties on `OidcIdTokenDecoderFactory` itself.
+Nếu application cần kiểm soát sâu hơn cách tạo `JwtDecoder` của ID Token -- ví dụ cung cấp `RestOperations` riêng -- bạn có thể thay vào đó cung cấp `JwtDecoderFactory<ClientRegistration>` `@Bean` riêng.
+Vì OAuth2 Login không sử dụng bean `JwtDecoder` của resource server cho mục đích này, đây là cách được hỗ trợ để đạt cùng mức độ kiểm soát mà builder của `NimbusJwtDecoder` đã cung cấp, mà không cần bổ sung các configuration property trên chính `OidcIdTokenDecoderFactory`.
 
-For a single `ClientRegistration`, this can be as simple as:
+Với một `ClientRegistration` duy nhất, việc này có thể đơn giản như sau:
 
 [tabs]
 ======
@@ -989,7 +989,7 @@ fun idTokenDecoderFactory(rest: RestOperations): JwtDecoderFactory<ClientRegistr
 ----
 ======
 
-If you have multiple `ClientRegistration` instances and want to avoid rebuilding a `JwtDecoder` on every request, cache the decoder per registration, for example by annotating the factory method with `@Cacheable` or by keying a `Map` on `ClientRegistration#getRegistrationId()`.
+Nếu có nhiều instance `ClientRegistration` và muốn tránh việc tạo lại `JwtDecoder` trong mỗi request, hãy cache decoder theo từng registration, chẳng hạn bằng cách gắn annotation `@Cacheable` cho factory method hoặc dùng `ClientRegistration#getRegistrationId()` làm key cho một `Map`.
 
 [[oauth2login-advanced-oidc-logout]]
-Then, you can proceed to configure xref:servlet/oauth2/login/logout.adoc[logout]
+Sau đó, bạn có thể tiến hành cấu hình xref:servlet/oauth2/login/logout.adoc[đăng xuất]
