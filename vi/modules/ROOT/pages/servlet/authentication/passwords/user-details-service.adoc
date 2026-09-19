@@ -1,18 +1,18 @@
 [[servlet-authentication-userdetailsservice]]
 = UserDetailsService
 
-javadoc:org.springframework.security.core.userdetails.UserDetailsService[] is used by xref:servlet/authentication/passwords/dao-authentication-provider.adoc#servlet-authentication-daoauthenticationprovider[`DaoAuthenticationProvider`] for retrieving a username, a password, and other attributes for authenticating with a username and password.
-Spring Security provides xref:servlet/authentication/passwords/in-memory.adoc#servlet-authentication-inmemory[in-memory], xref:servlet/authentication/passwords/jdbc.adoc#servlet-authentication-jdbc[JDBC], and xref:servlet/authentication/passwords/caching.adoc#servlet-authentication-caching-user-details[caching] implementations of `UserDetailsService`.
+javadoc:org.springframework.security.core.userdetails.UserDetailsService[] được xref:servlet/authentication/passwords/dao-authentication-provider.adoc#servlet-authentication-daoauthenticationprovider[`DaoAuthenticationProvider`] sử dụng để truy xuất tên người dùng, mật khẩu và các thuộc tính khác nhằm thực hiện authentication bằng tên người dùng và mật khẩu.
+Spring Security cung cấp các implementation của `UserDetailsService` cho xref:servlet/authentication/passwords/in-memory.adoc#servlet-authentication-inmemory[lưu trong bộ nhớ], xref:servlet/authentication/passwords/jdbc.adoc#servlet-authentication-jdbc[JDBC] và xref:servlet/authentication/passwords/caching.adoc#servlet-authentication-caching-user-details[bộ nhớ đệm].
 
-You can define custom authentication by exposing a custom `UserDetailsService` as a bean.
-For example, the following listing customizes authentication, assuming that `CustomUserDetailsService` implements `UserDetailsService`:
+Bạn có thể định nghĩa authentication tùy chỉnh bằng cách cung cấp một `UserDetailsService` tùy chỉnh dưới dạng bean.
+Ví dụ, listing sau tùy chỉnh authentication, với giả định rằng `CustomUserDetailsService` triển khai `UserDetailsService`:
 
 [NOTE]
 ====
-This is only used if the `AuthenticationManagerBuilder` has not been populated and no `AuthenticationProviderBean` is defined.
+Điều này chỉ được sử dụng nếu `AuthenticationManagerBuilder` chưa được điền và không có `AuthenticationProviderBean` nào được định nghĩa.
 ====
 
-.Custom UserDetailsService Bean
+.Bean UserDetailsService tùy chỉnh
 [tabs]
 ======
 Java::
@@ -41,4 +41,4 @@ fun customUserDetailsService() = CustomUserDetailsService()
 ----
 ======
 
-// FIXME: Add CustomUserDetails example with links to @AuthenticationPrincipal
+// FIXME: Thêm ví dụ CustomUserDetails với các liên kết tới @AuthenticationPrincipal
