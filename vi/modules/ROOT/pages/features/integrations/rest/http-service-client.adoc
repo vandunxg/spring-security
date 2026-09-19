@@ -5,7 +5,7 @@ Hỗ trợ OAuth của Spring Security có thể tích hợp với `RestClient` 
 
 [[configuration]]
 == Cấu hình
-Sau cấu hình riêng cho xref:features/integrations/rest/http-service-client.adoc#configuration-restclient[RestClient] hoặc xref:features/integrations/rest/http-service-client.adoc#configuration-webclient[WebClient], việc sử dụng xref:features/integrations/rest/http-service-client.adoc[] chỉ yêu cầu thêm xref:features/integrations/rest/http-service-client.adoc#client-registration-id[`@ClientRegistrationId`] vào các method yêu cầu OAuth hoặc HTTP interface khai báo chúng.
+Sau cấu hình riêng cho xref:features/integrations/rest/http-service-client.adoc#configuration-restclient[RestClient] hoặc xref:features/integrations/rest/http-service-client.adoc#configuration-webclient[WebClient], việc sử dụng xref:features/integrations/rest/http-service-client.adoc[] chỉ yêu cầu thêm xref:features/integrations/rest/http-service-client.adoc#client-registration-id[`@ClientRegistrationId`] vào các method yêu cầu OAuth hoặc vào HTTP interface khai báo các method đó.
 
 Vì sự hiện diện của xref:features/integrations/rest/http-service-client.adoc#client-registration-id[`@ClientRegistrationId`] xác định việc OAuth token có được phân giải hay không và được phân giải như thế nào, bạn có thể an toàn thêm hỗ trợ OAuth của Spring Security vào bất kỳ cấu hình nào.
 
