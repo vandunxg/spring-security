@@ -1,9 +1,9 @@
 [[testing-oauth2]]
-= Testing OAuth 2.0
+= Kiểm thử OAuth 2.0
 
-When it comes to OAuth 2.0, the same principles covered earlier still apply: Ultimately, it depends on what your method under test is expecting to be in the `SecurityContextHolder`.
+Đối với OAuth 2.0, các nguyên tắc đã trình bày trước đó vẫn được áp dụng: về cơ bản, điều này phụ thuộc vào những gì method đang được kiểm thử mong đợi có trong `SecurityContextHolder`.
 
-For example, for a controller that looks like this:
+Ví dụ, với một controller có dạng như sau:
 
 [tabs]
 ======
@@ -28,9 +28,9 @@ fun foo(user: Principal): String {
 ----
 ======
 
-There's nothing OAuth2-specific about it, so you will likely be able to simply xref:servlet/test/method.adoc#test-method-withmockuser[use `@WithMockUser`] and be fine.
+Không có gì riêng cho OAuth2 trong trường hợp này, vì vậy bạn có thể chỉ cần xref:servlet/test/method.adoc#test-method-withmockuser[sử dụng `@WithMockUser`] là đủ.
 
-But, in cases where your controllers are bound to some aspect of Spring Security's OAuth 2.0 support, like the following:
+Tuy nhiên, trong trường hợp controller của bạn gắn với một khía cạnh nào đó trong hỗ trợ OAuth 2.0 của Spring Security, như ví dụ sau:
 
 [tabs]
 ======
@@ -55,15 +55,15 @@ fun foo(@AuthenticationPrincipal user: OidcUser): String {
 ----
 ======
 
-then Spring Security's test support can come in handy.
+thì hỗ trợ kiểm thử của Spring Security có thể rất hữu ích.
 
 [[testing-oidc-login]]
-== Testing OIDC Login
+== Kiểm thử Đăng nhập OIDC
 
-Testing the method above with Spring MVC Test would require simulating some kind of grant flow with an authorization server.
-Certainly this would be a daunting task, which is why Spring Security ships with support for removing this boilerplate.
+Kiểm thử method ở trên bằng Spring MVC Test sẽ yêu cầu mô phỏng một loại luồng cấp quyền nào đó với Authorization Server.
+Đây chắc chắn là một công việc khó khăn, vì vậy Spring Security cung cấp hỗ trợ để loại bỏ phần boilerplate này.
 
-For example, we can tell Spring Security to include a default `OidcUser` using the `oidcLogin` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`], like so:
+Ví dụ, chúng ta có thể yêu cầu Spring Security đưa vào một `OidcUser` mặc định bằng `oidcLogin` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`], như sau:
 
 [tabs]
 ======
@@ -85,9 +85,9 @@ mvc.get("/endpoint") {
 ----
 ======
 
-What this will do is configure the associated `MockHttpServletRequest` with an `OidcUser` that includes a simple `OidcIdToken`, `OidcUserInfo`, and `Collection` of granted authorities.
+Thao tác này sẽ cấu hình `MockHttpServletRequest` liên kết với một `OidcUser` bao gồm một `OidcIdToken`, `OidcUserInfo` đơn giản và một `Collection` các authority được cấp.
 
-Specifically, it will include an `OidcIdToken` with a `sub` claim set to `user`:
+Cụ thể, nó sẽ bao gồm một `OidcIdToken` có claim `sub` được đặt thành `user`:
 
 [tabs]
 ======
@@ -106,7 +106,7 @@ assertThat(user.idToken.getClaim<String>("sub")).isEqualTo("user")
 ----
 ======
 
-an `OidcUserInfo` with no claims set:
+Một `OidcUserInfo` không có claim nào được thiết lập:
 
 [tabs]
 ======
@@ -125,7 +125,7 @@ assertThat(user.userInfo.claims).isEmpty()
 ----
 ======
 
-and a `Collection` of authorities with just one authority, `SCOPE_read`:
+và một `Collection` authority chỉ có một authority là `SCOPE_read`:
 
 [tabs]
 ======
@@ -146,17 +146,17 @@ assertThat(user.authorities).containsExactly(SimpleGrantedAuthority("SCOPE_read"
 ----
 ======
 
-Spring Security does the necessary work to make sure that the `OidcUser` instance is available for xref:servlet/integrations/mvc.adoc#mvc-authentication-principal[the `@AuthenticationPrincipal` annotation].
+Spring Security thực hiện các công việc cần thiết để bảo đảm instance `OidcUser` có sẵn cho xref:servlet/integrations/mvc.adoc#mvc-authentication-principal[annotation `@AuthenticationPrincipal`].
 
-Further, it also links that `OidcUser` to a simple instance of `OAuth2AuthorizedClient` that it deposits into an mock `OAuth2AuthorizedClientRepository`.
-This can be handy if your tests <<testing-oauth2-client,use the `@RegisteredOAuth2AuthorizedClient` annotation>>..
+Ngoài ra, nó còn liên kết `OidcUser` đó với một instance đơn giản của `OAuth2AuthorizedClient`, rồi đưa instance này vào một `OAuth2AuthorizedClientRepository` mock.
+Điều này có thể hữu ích nếu các bài kiểm thử của bạn <<testing-oauth2-client,sử dụng annotation `@RegisteredOAuth2AuthorizedClient`>>..
 
 [[testing-oidc-login-authorities]]
-== Configuring Authorities
+== Cấu hình Authority
 
-In many circumstances, your method is protected by filter or method security and needs your `Authentication` to have certain granted authorities to allow the request.
+Trong nhiều trường hợp, method của bạn được bảo vệ bởi filter hoặc method security và cần `Authentication` có một số authority được cấp nhất định để cho phép request.
 
-In this case, you can supply what granted authorities you need using the `authorities()` method:
+Trong trường hợp này, bạn có thể cung cấp các authority được cấp cần thiết bằng method `authorities()`:
 
 [tabs]
 ======
@@ -185,12 +185,12 @@ mvc.get("/endpoint") {
 ======
 
 [[testing-oidc-login-claims]]
-== Configuring Claims
+== Cấu hình Claim
 
-And while granted authorities are quite common across all of Spring Security, we also have claims in the case of OAuth 2.0.
+Mặc dù authority được cấp khá phổ biến trong toàn bộ Spring Security, OAuth 2.0 còn có các claim.
 
-Let's say, for example, that you've got a `user_id` claim that indicates the user's id in your system.
-You might access it like so in a controller:
+Ví dụ, giả sử bạn có claim `user_id` biểu thị ID của user trong hệ thống.
+Bạn có thể truy cập claim này trong controller như sau:
 
 [tabs]
 ======
@@ -217,7 +217,7 @@ fun foo(@AuthenticationPrincipal oidcUser: OidcUser): String {
 ----
 ======
 
-In that case, you'd want to specify that claim with the `idToken()` method:
+Trong trường hợp đó, bạn sẽ muốn chỉ định claim này bằng method `idToken()`:
 
 [tabs]
 ======
@@ -247,23 +247,23 @@ mvc.get("/endpoint") {
 ----
 ======
 
-since `OidcUser` collects its claims from `OidcIdToken`.
+vì `OidcUser` lấy các claim của nó từ `OidcIdToken`.
 
 [[testing-oidc-login-user]]
-== Additional Configurations
+== Cấu hình bổ sung
 
-There are additional methods, too, for further configuring the authentication; it simply depends on what data your controller expects:
+Ngoài ra còn có các method để cấu hình authentication chi tiết hơn; điều này chỉ phụ thuộc vào dữ liệu mà controller của bạn mong đợi:
 
-* `userInfo(OidcUserInfo.Builder)` - For configuring the `OidcUserInfo` instance
-* `clientRegistration(ClientRegistration)` - For configuring the associated `OAuth2AuthorizedClient` with a given `ClientRegistration`
-* `oidcUser(OidcUser)` - For configuring the complete `OidcUser` instance
+* `userInfo(OidcUserInfo.Builder)` - Dùng để cấu hình instance `OidcUserInfo`
+* `clientRegistration(ClientRegistration)` - Dùng để cấu hình `OAuth2AuthorizedClient` liên kết với một `ClientRegistration` cho trước
+* `oidcUser(OidcUser)` - Dùng để cấu hình toàn bộ instance `OidcUser`
 
-That last one is handy if you:
-1. Have your own implementation of `OidcUser`, or
-2. Need to change the name attribute
+Method cuối cùng hữu ích nếu bạn:
+1. Có implementation riêng của `OidcUser`, hoặc
+2. Cần thay đổi thuộc tính name
 
-For example, let's say that your authorization server sends the principal name in the `user_name` claim instead of the `sub` claim.
-In that case, you can configure an `OidcUser` by hand:
+Ví dụ, giả sử Authorization Server gửi tên principal trong claim `user_name` thay vì claim `sub`.
+Trong trường hợp đó, bạn có thể cấu hình thủ công một `OidcUser`:
 
 [tabs]
 ======
@@ -299,12 +299,12 @@ mvc.get("/endpoint") {
 ======
 
 [[testing-oauth2-login]]
-== Testing OAuth 2.0 Login
+== Kiểm thử Đăng nhập OAuth 2.0
 
-As with <<testing-oidc-login,testing OIDC login>>, testing OAuth 2.0 Login presents a similar challenge of mocking a grant flow.
-And because of that, Spring Security also has test support for non-OIDC use cases.
+Tương tự như <<testing-oidc-login,kiểm thử Đăng nhập OIDC>>, kiểm thử Đăng nhập OAuth 2.0 cũng đặt ra thách thức tương tự trong việc mock một luồng cấp quyền.
+Vì vậy, Spring Security cũng có hỗ trợ kiểm thử cho các trường hợp sử dụng không phải OIDC.
 
-Let's say that we've got a controller that gets the logged-in user as an `OAuth2User`:
+Giả sử chúng ta có một controller lấy user đã đăng nhập dưới dạng `OAuth2User`:
 
 [tabs]
 ======
@@ -329,7 +329,7 @@ fun foo(@AuthenticationPrincipal oauth2User: OAuth2User): String? {
 ----
 ======
 
-In that case, we can tell Spring Security to include a default `OAuth2User` using the `oauth2Login` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`], like so:
+Trong trường hợp đó, chúng ta có thể yêu cầu Spring Security đưa vào một `OAuth2User` mặc định bằng `oauth2Login` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`], như sau:
 
 [tabs]
 ======
@@ -351,9 +351,9 @@ mvc.get("/endpoint") {
 ----
 ======
 
-What this will do is configure the associated `MockHttpServletRequest` with an `OAuth2User` that includes a simple `Map` of attributes and `Collection` of granted authorities.
+Thao tác này sẽ cấu hình `MockHttpServletRequest` liên kết với một `OAuth2User` bao gồm một `Map` thuộc tính đơn giản và một `Collection` các authority được cấp.
 
-Specifically, it will include a `Map` with a key/value pair of `sub`/`user`:
+Cụ thể, nó sẽ bao gồm một `Map` có cặp key/value là `sub`/`user`:
 
 [tabs]
 ======
@@ -372,7 +372,7 @@ assertThat(user.getAttribute<String>("sub")).isEqualTo("user")
 ----
 ======
 
-and a `Collection` of authorities with just one authority, `SCOPE_read`:
+và một `Collection` authority chỉ có một authority là `SCOPE_read`:
 
 [tabs]
 ======
@@ -393,17 +393,17 @@ assertThat(user.authorities).containsExactly(SimpleGrantedAuthority("SCOPE_read"
 ----
 ======
 
-Spring Security does the necessary work to make sure that the `OAuth2User` instance is available for xref:servlet/integrations/mvc.adoc#mvc-authentication-principal[the `@AuthenticationPrincipal` annotation].
+Spring Security thực hiện các công việc cần thiết để bảo đảm instance `OAuth2User` có sẵn cho xref:servlet/integrations/mvc.adoc#mvc-authentication-principal[annotation `@AuthenticationPrincipal`].
 
-Further, it also links that `OAuth2User` to a simple instance of `OAuth2AuthorizedClient` that it deposits in a mock `OAuth2AuthorizedClientRepository`.
-This can be handy if your tests <<testing-oauth2-client,use the `@RegisteredOAuth2AuthorizedClient` annotation>>.
+Ngoài ra, nó còn liên kết `OAuth2User` đó với một instance đơn giản của `OAuth2AuthorizedClient`, rồi đưa instance này vào một `OAuth2AuthorizedClientRepository` mock.
+Điều này có thể hữu ích nếu các bài kiểm thử của bạn <<testing-oauth2-client,sử dụng annotation `@RegisteredOAuth2AuthorizedClient`>>.
 
 [[testing-oauth2-login-authorities]]
-== Configuring Authorities
+== Cấu hình Authority
 
-In many circumstances, your method is protected by filter or method security and needs your `Authentication` to have certain granted authorities to allow the request.
+Trong nhiều trường hợp, method của bạn được bảo vệ bởi filter hoặc method security và cần `Authentication` có một số authority được cấp nhất định để cho phép request.
 
-In this case, you can supply what granted authorities you need using the `authorities()` method:
+Trong trường hợp này, bạn có thể cung cấp các authority được cấp cần thiết bằng method `authorities()`:
 
 [tabs]
 ======
@@ -432,12 +432,12 @@ mvc.get("/endpoint") {
 ======
 
 [[testing-oauth2-login-claims]]
-== Configuring Claims
+== Cấu hình Claim
 
-And while granted authorities are quite common across all of Spring Security, we also have claims in the case of OAuth 2.0.
+Mặc dù authority được cấp khá phổ biến trong toàn bộ Spring Security, OAuth 2.0 còn có các claim.
 
-Let's say, for example, that you've got a `user_id` attribute that indicates the user's id in your system.
-You might access it like so in a controller:
+Ví dụ, giả sử bạn có attribute `user_id` biểu thị ID của user trong hệ thống.
+Bạn có thể truy cập attribute này trong controller như sau:
 
 [tabs]
 ======
@@ -464,7 +464,7 @@ fun foo(@AuthenticationPrincipal oauth2User: OAuth2User): String {
 ----
 ======
 
-In that case, you'd want to specify that attribute with the `attributes()` method:
+Trong trường hợp đó, bạn sẽ muốn chỉ định attribute này bằng method `attributes()`:
 
 [tabs]
 ======
@@ -493,19 +493,19 @@ mvc.get("/endpoint") {
 ======
 
 [[testing-oauth2-login-user]]
-== Additional Configurations
+== Cấu hình bổ sung
 
-There are additional methods, too, for further configuring the authentication; it simply depends on what data your controller expects:
+Ngoài ra còn có các method để cấu hình authentication chi tiết hơn; điều này chỉ phụ thuộc vào dữ liệu mà controller của bạn mong đợi:
 
-* `clientRegistration(ClientRegistration)` - For configuring the associated `OAuth2AuthorizedClient` with a given `ClientRegistration`
-* `oauth2User(OAuth2User)` - For configuring the complete `OAuth2User` instance
+* `clientRegistration(ClientRegistration)` - Dùng để cấu hình `OAuth2AuthorizedClient` liên kết với một `ClientRegistration` cho trước
+* `oauth2User(OAuth2User)` - Dùng để cấu hình toàn bộ instance `OAuth2User`
 
-That last one is handy if you:
-1. Have your own implementation of `OAuth2User`, or
-2. Need to change the name attribute
+Method cuối cùng hữu ích nếu bạn:
+1. Có implementation riêng của `OAuth2User`, hoặc
+2. Cần thay đổi thuộc tính name
 
-For example, let's say that your authorization server sends the principal name in the `user_name` claim instead of the `sub` claim.
-In that case, you can configure an `OAuth2User` by hand:
+Ví dụ, giả sử Authorization Server gửi tên principal trong claim `user_name` thay vì claim `sub`.
+Trong trường hợp đó, bạn có thể cấu hình thủ công một `OAuth2User`:
 
 [tabs]
 ======
@@ -541,10 +541,10 @@ mvc.get("/endpoint") {
 ======
 
 [[testing-oauth2-client]]
-== Testing OAuth 2.0 Clients
+== Kiểm thử Client OAuth 2.0
 
-Independent of how your user authenticates, you may have other tokens and client registrations that are in play for the request you are testing.
-For example, your controller may be relying on the client credentials grant to get a token that isn't associated with the user at all:
+Bất kể user của bạn thực hiện authentication như thế nào, request đang được kiểm thử có thể sử dụng các token và client registration khác.
+Ví dụ, controller của bạn có thể dựa vào grant client credentials để lấy một token hoàn toàn không liên kết với user:
 
 [tabs]
 ======
@@ -577,8 +577,8 @@ fun foo(@RegisteredOAuth2AuthorizedClient("my-app") authorizedClient: OAuth2Auth
 ----
 ======
 
-Simulating this handshake with the authorization server could be cumbersome.
-Instead, you can use the `oauth2Client` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`] to add a `OAuth2AuthorizedClient` into a mock `OAuth2AuthorizedClientRepository`:
+Mô phỏng quá trình bắt tay này với Authorization Server có thể khá phức tạp.
+Thay vào đó, bạn có thể sử dụng `oauth2Client` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`] để thêm một `OAuth2AuthorizedClient` vào `OAuth2AuthorizedClientRepository` mock:
 
 [tabs]
 ======
@@ -602,9 +602,9 @@ mvc.get("/endpoint") {
 ----
 ======
 
-What this will do is create an `OAuth2AuthorizedClient` that has a simple `ClientRegistration`, `OAuth2AccessToken`, and resource owner name.
+Thao tác này sẽ tạo một `OAuth2AuthorizedClient` có `ClientRegistration`, `OAuth2AccessToken` đơn giản và tên resource owner.
 
-Specifically, it will include a `ClientRegistration` with a client id of "test-client" and client secret of "test-secret":
+Cụ thể, nó sẽ bao gồm một `ClientRegistration` có client id là "test-client" và client secret là "test-secret":
 
 [tabs]
 ======
@@ -625,7 +625,7 @@ assertThat(authorizedClient.clientRegistration.clientSecret).isEqualTo("test-sec
 ----
 ======
 
-a resource owner name of "user":
+tên resource owner là "user":
 
 [tabs]
 ======
@@ -644,7 +644,7 @@ assertThat(authorizedClient.principalName).isEqualTo("user")
 ----
 ======
 
-and an `OAuth2AccessToken` with just one scope, `read`:
+và một `OAuth2AccessToken` chỉ có một scope là `read`:
 
 [tabs]
 ======
@@ -665,13 +665,13 @@ assertThat(authorizedClient.accessToken.scopes).containsExactly("read")
 ----
 ======
 
-The client can then be retrieved as normal using `@RegisteredOAuth2AuthorizedClient` in a controller method.
+Sau đó, client có thể được lấy như bình thường bằng `@RegisteredOAuth2AuthorizedClient` trong method của controller.
 
 [[testing-oauth2-client-scopes]]
-== Configuring Scopes
+== Cấu hình Scope
 
-In many circumstances, the OAuth 2.0 access token comes with a set of scopes.
-If your controller inspects these, say like so:
+Trong nhiều trường hợp, access token OAuth 2.0 đi kèm một tập scope.
+Nếu controller của bạn kiểm tra các scope này, chẳng hạn như sau:
 
 [tabs]
 ======
@@ -712,7 +712,7 @@ fun foo(@RegisteredOAuth2AuthorizedClient("my-app") authorizedClient: OAuth2Auth
 ----
 ======
 
-then you can configure the scope using the `accessToken()` method:
+thì bạn có thể cấu hình scope bằng method `accessToken()`:
 
 [tabs]
 ======
@@ -741,19 +741,19 @@ mvc.get("/endpoint") {
 ======
 
 [[testing-oauth2-client-registration]]
-== Additional Configurations
+== Cấu hình bổ sung
 
-There are additional methods, too, for further configuring the authentication; it simply depends on what data your controller expects:
+Ngoài ra còn có các method để cấu hình authentication chi tiết hơn; điều này chỉ phụ thuộc vào dữ liệu mà controller của bạn mong đợi:
 
-* `principalName(String)` - For configuring the resource owner name
-* `clientRegistration(Consumer<ClientRegistration.Builder>)` - For configuring the associated `ClientRegistration`
-* `clientRegistration(ClientRegistration)` - For configuring the complete `ClientRegistration`
+* `principalName(String)` - Dùng để cấu hình tên resource owner
+* `clientRegistration(Consumer<ClientRegistration.Builder>)` - Dùng để cấu hình `ClientRegistration` liên kết
+* `clientRegistration(ClientRegistration)` - Dùng để cấu hình toàn bộ `ClientRegistration`
 
-That last one is handy if you want to use a real `ClientRegistration`
+Method cuối cùng hữu ích nếu bạn muốn sử dụng một `ClientRegistration` thực tế.
 
-For example, let's say that you are wanting to use one of your app's `ClientRegistration` definitions, as specified in your `application.yml`.
+Ví dụ, giả sử bạn muốn sử dụng một định nghĩa `ClientRegistration` của ứng dụng, như được chỉ định trong `application.yml`.
 
-In that case, your test can autowire the `ClientRegistrationRepository` and look up the one your test needs:
+Trong trường hợp đó, bài kiểm thử của bạn có thể autowire `ClientRegistrationRepository` và tra cứu registration mà bài kiểm thử cần:
 
 [tabs]
 ======
@@ -790,20 +790,20 @@ mvc.get("/endpoint") {
 ======
 
 [[testing-jwt]]
-== Testing JWT Authentication
+== Kiểm thử Authentication JWT
 
-In order to make an authorized request on a resource server, you need a bearer token.
+Để thực hiện một request được authorization trên Resource Server, bạn cần một bearer token.
 
-If your resource server is configured for JWTs, then this would mean that the bearer token needs to be signed and then encoded according to the JWT specification.
-All of this can be quite daunting, especially when this isn't the focus of your test.
+Nếu Resource Server của bạn được cấu hình cho JWT, điều đó có nghĩa là bearer token phải được ký rồi mã hóa theo đặc tả JWT.
+Tất cả việc này có thể khá khó khăn, đặc biệt khi đó không phải trọng tâm của bài kiểm thử.
 
-Fortunately, there are a number of simple ways that you can overcome this difficulty and allow your tests to focus on authorization and not on representing bearer tokens.
-We'll look at two of them now:
+May mắn là có một số cách đơn giản để vượt qua khó khăn này, cho phép các bài kiểm thử của bạn tập trung vào authorization thay vì biểu diễn bearer token.
+Sau đây chúng ta sẽ xem xét hai cách:
 
 == `jwt() RequestPostProcessor`
 
-The first way is via the `jwt` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`].
-The simplest of these would look something like this:
+Cách đầu tiên là thông qua `jwt` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`].
+Cách đơn giản nhất có dạng như sau:
 
 [tabs]
 ======
@@ -825,9 +825,9 @@ mvc.get("/endpoint") {
 ----
 ======
 
-What this will do is create a mock `Jwt`, passing it correctly through any authentication APIs so that it's available for your authorization mechanisms to verify.
+Thao tác này sẽ tạo một `Jwt` mock và đưa nó đi đúng qua mọi API authentication, để các cơ chế authorization của bạn có thể xác minh nó.
 
-By default, the `JWT` that it creates has the following characteristics:
+Theo mặc định, `JWT` được tạo có các đặc điểm sau:
 
 [source,json]
 ----
@@ -840,7 +840,7 @@ By default, the `JWT` that it creates has the following characteristics:
 }
 ----
 
-And the resulting `Jwt`, were it tested, would pass in the following way:
+Và nếu kiểm thử `Jwt` kết quả, nó sẽ cho kết quả như sau:
 
 [tabs]
 ======
@@ -863,9 +863,9 @@ assertThat(jwt.subject).isEqualTo("sub")
 ----
 ======
 
-These values can, of course be configured.
+Các giá trị này tất nhiên có thể được cấu hình.
 
-Any headers or claims can be configured with their corresponding methods:
+Bạn có thể cấu hình mọi header hoặc claim bằng method tương ứng:
 
 [tabs]
 ======
@@ -913,8 +913,8 @@ mvc.get("/endpoint") {
 ----
 ======
 
-The `scope` and `scp` claims are processed the same way here as they are in a normal bearer token request.
-However, this can be overridden simply by providing the list of `GrantedAuthority` instances that you need for your test:
+Các claim `scope` và `scp` được xử lý ở đây giống như trong một bearer token request thông thường.
+Tuy nhiên, bạn có thể dễ dàng ghi đè hành vi này bằng cách cung cấp danh sách instance `GrantedAuthority` mà bài kiểm thử cần:
 
 [tabs]
 ======
@@ -939,7 +939,7 @@ mvc.get("/endpoint") {
 ----
 ======
 
-Or, if you have a custom `Jwt` to `Collection<GrantedAuthority>` converter, you can also use that to derive the authorities:
+Hoặc nếu bạn có converter tùy chỉnh từ `Jwt` sang `Collection<GrantedAuthority>`, bạn cũng có thể sử dụng converter đó để suy ra các authority:
 
 [tabs]
 ======
@@ -964,7 +964,7 @@ mvc.get("/endpoint") {
 ----
 ======
 
-You can also specify a complete `Jwt`, for which javadoc:org.springframework.security.oauth2.jwt.Jwt$Builder[] comes quite handy:
+Bạn cũng có thể chỉ định một `Jwt` đầy đủ; javadoc:org.springframework.security.oauth2.jwt.Jwt$Builder[] rất hữu ích cho việc này:
 
 [tabs]
 ======
@@ -1003,8 +1003,8 @@ mvc.get("/endpoint") {
 
 == `authentication()` `RequestPostProcessor`
 
-The second way is by using the `authentication()` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`].
-Essentially, you can instantiate your own `JwtAuthenticationToken` and provide it in your test, like so:
+Cách thứ hai là sử dụng `authentication()` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`].
+Về cơ bản, bạn có thể tự khởi tạo `JwtAuthenticationToken` và cung cấp nó trong bài kiểm thử như sau:
 
 [tabs]
 ======
@@ -1043,15 +1043,15 @@ mvc.get("/endpoint") {
 ----
 ======
 
-Note that as an alternative to these, you can also mock the `JwtDecoder` bean itself with a `@MockBean` annotation.
+Lưu ý rằng, thay cho các cách trên, bạn cũng có thể mock chính bean `JwtDecoder` bằng annotation `@MockBean`.
 
 [[testing-opaque-token]]
-== Testing Opaque Token Authentication
+== Kiểm thử Authentication opaque token
 
-Similar to <<testing-jwt,JWTs>>, opaque tokens require an authorization server in order to verify their validity, which can make testing more difficult.
-To help with that, Spring Security has test support for opaque tokens.
+Tương tự <<testing-jwt,JWT>>, opaque token yêu cầu Authorization Server để xác minh tính hợp lệ, điều này có thể khiến việc kiểm thử khó khăn hơn.
+Để hỗ trợ việc đó, Spring Security có hỗ trợ kiểm thử opaque token.
 
-Let's say that we've got a controller that retrieves the authentication as a `BearerTokenAuthentication`:
+Giả sử chúng ta có một controller lấy authentication dưới dạng `BearerTokenAuthentication`:
 
 [tabs]
 ======
@@ -1076,7 +1076,7 @@ fun foo(authentication: BearerTokenAuthentication): String {
 ----
 ======
 
-In that case, we can tell Spring Security to include a default `BearerTokenAuthentication` using the `opaqueToken` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`] method, like so:
+Trong trường hợp đó, chúng ta có thể yêu cầu Spring Security đưa vào một `BearerTokenAuthentication` mặc định bằng method `opaqueToken` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`], như sau:
 
 [tabs]
 ======
@@ -1098,9 +1098,9 @@ mvc.get("/endpoint") {
 ----
 ======
 
-What this will do is configure the associated `MockHttpServletRequest` with a `BearerTokenAuthentication` that includes a simple `OAuth2AuthenticatedPrincipal`, `Map` of attributes, and `Collection` of granted authorities.
+Thao tác này sẽ cấu hình `MockHttpServletRequest` liên kết với một `BearerTokenAuthentication` bao gồm một `OAuth2AuthenticatedPrincipal` đơn giản, `Map` thuộc tính và `Collection` các authority được cấp.
 
-Specifically, it will include a `Map` with a key/value pair of `sub`/`user`:
+Cụ thể, nó sẽ bao gồm một `Map` có cặp key/value là `sub`/`user`:
 
 [tabs]
 ======
@@ -1119,7 +1119,7 @@ assertThat(token.tokenAttributes["sub"] as String).isEqualTo("user")
 ----
 ======
 
-and a `Collection` of authorities with just one authority, `SCOPE_read`:
+và một `Collection` authority chỉ có một authority là `SCOPE_read`:
 
 [tabs]
 ======
@@ -1140,14 +1140,14 @@ assertThat(token.authorities).containsExactly(SimpleGrantedAuthority("SCOPE_read
 ----
 ======
 
-Spring Security does the necessary work to make sure that the `BearerTokenAuthentication` instance is available for your controller methods.
+Spring Security thực hiện các công việc cần thiết để bảo đảm instance `BearerTokenAuthentication` có sẵn cho các method của controller.
 
 [[testing-opaque-token-authorities]]
-== Configuring Authorities
+== Cấu hình Authority
 
-In many circumstances, your method is protected by filter or method security and needs your `Authentication` to have certain granted authorities to allow the request.
+Trong nhiều trường hợp, method của bạn được bảo vệ bởi filter hoặc method security và cần `Authentication` có một số authority được cấp nhất định để cho phép request.
 
-In this case, you can supply what granted authorities you need using the `authorities()` method:
+Trong trường hợp này, bạn có thể cung cấp các authority được cấp cần thiết bằng method `authorities()`:
 
 [tabs]
 ======
@@ -1176,12 +1176,12 @@ mvc.get("/endpoint") {
 ======
 
 [[testing-opaque-token-attributes]]
-== Configuring Claims
+== Cấu hình Claim
 
-And while granted authorities are quite common across all of Spring Security, we also have attributes in the case of OAuth 2.0.
+Mặc dù authority được cấp khá phổ biến trong toàn bộ Spring Security, OAuth 2.0 còn có các attribute.
 
-Let's say, for example, that you've got a `user_id` attribute that indicates the user's id in your system.
-You might access it like so in a controller:
+Ví dụ, giả sử bạn có attribute `user_id` biểu thị ID của user trong hệ thống.
+Bạn có thể truy cập attribute này trong controller như sau:
 
 [tabs]
 ======
@@ -1208,7 +1208,7 @@ fun foo(authentication: BearerTokenAuthentication): String {
 ----
 ======
 
-In that case, you'd want to specify that attribute with the `attributes()` method:
+Trong trường hợp đó, bạn sẽ muốn chỉ định attribute này bằng method `attributes()`:
 
 [tabs]
 ======
@@ -1237,18 +1237,18 @@ mvc.get("/endpoint") {
 ======
 
 [[testing-opaque-token-principal]]
-== Additional Configurations
+== Cấu hình bổ sung
 
-There are additional methods, too, for further configuring the authentication; it simply depends on what data your controller expects.
+Ngoài ra còn có các method để cấu hình authentication chi tiết hơn; điều này chỉ phụ thuộc vào dữ liệu mà controller của bạn mong đợi.
 
-One such is `principal(OAuth2AuthenticatedPrincipal)`, which you can use to configure the complete `OAuth2AuthenticatedPrincipal` instance that underlies the `BearerTokenAuthentication`
+Một method như vậy là `principal(OAuth2AuthenticatedPrincipal)`, bạn có thể dùng method này để cấu hình toàn bộ instance `OAuth2AuthenticatedPrincipal` làm nền tảng cho `BearerTokenAuthentication`.
 
-It's handy if you:
-1. Have your own implementation of `OAuth2AuthenticatedPrincipal`, or
-2. Want to specify a different principal name
+Method này hữu ích nếu bạn:
+1. Có implementation riêng của `OAuth2AuthenticatedPrincipal`, hoặc
+2. Muốn chỉ định tên principal khác
 
-For example, let's say that your authorization server sends the principal name in the `user_name` attribute instead of the `sub` attribute.
-In that case, you can configure an `OAuth2AuthenticatedPrincipal` by hand:
+Ví dụ, giả sử Authorization Server gửi tên principal trong attribute `user_name` thay vì attribute `sub`.
+Trong trường hợp đó, bạn có thể cấu hình thủ công một `OAuth2AuthenticatedPrincipal`:
 
 [tabs]
 ======
@@ -1285,4 +1285,4 @@ mvc.get("/endpoint") {
 ----
 ======
 
-Note that as an alternative to using `opaqueToken()` test support, you can also mock the `OpaqueTokenIntrospector` bean itself with a `@MockBean` annotation.
+Lưu ý rằng, thay cho việc sử dụng hỗ trợ kiểm thử `opaqueToken()`, bạn cũng có thể mock chính bean `OpaqueTokenIntrospector` bằng annotation `@MockBean`.
