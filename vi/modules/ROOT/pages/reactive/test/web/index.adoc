@@ -1,5 +1,5 @@
 [[test-webtestclient]]
-= Testing Web Security
+= Kiểm thử bảo mật Web
 :page-section-summary-toc: 1
 
-In this section, we'll talk about testing web application endpoints.
+Trong phần này, chúng ta sẽ trao đổi về việc kiểm thử các endpoint của ứng dụng web.
