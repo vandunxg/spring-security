@@ -1,13 +1,13 @@
 [[servlet-authentication-inmemory]]
-= In-Memory Authentication
+= Authentication trong bộ nhớ
 
-Spring Security's `InMemoryUserDetailsManager` implements xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[UserDetailsService] to provide support for username/password based authentication that is stored in memory.
-`InMemoryUserDetailsManager` provides management of `UserDetails` by implementing the `UserDetailsManager` interface.
-`UserDetails`-based authentication is used by Spring Security when it is configured to xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-input[accept a username and password] for authentication.
+`InMemoryUserDetailsManager` của Spring Security triển khai xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[UserDetailsService] để hỗ trợ authentication dựa trên username/password được lưu trong bộ nhớ.
+`InMemoryUserDetailsManager` cung cấp khả năng quản lý `UserDetails` bằng cách triển khai interface `UserDetailsManager`.
+Spring Security sử dụng authentication dựa trên `UserDetails` khi được cấu hình để xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-input[chấp nhận username và password] cho authentication.
 
-In the following sample, we use xref:features/authentication/password-storage.adoc#authentication-password-storage-boot-cli[Spring Boot CLI] to encode a password value of `password` and get the encoded password of `+{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW+`:
+Trong ví dụ sau, chúng ta sử dụng xref:features/authentication/password-storage.adoc#authentication-password-storage-boot-cli[Spring Boot CLI] để encode giá trị password là `password` và nhận được password đã encode là `+{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW+`:
 
-.InMemoryUserDetailsManager Java Configuration
+.Cấu hình Java cho InMemoryUserDetailsManager
 [tabs]
 ======
 Java::
@@ -65,13 +65,13 @@ fun users(): UserDetailsService {
 ----
 ======
 
-The preceding samples store the passwords in a secure format but leave a lot to be desired in terms of a getting started experience.
+Các ví dụ trước lưu password ở định dạng an toàn nhưng trải nghiệm làm quen ban đầu còn nhiều điểm chưa thuận tiện.
 
-In the following sample, we use xref:features/authentication/password-storage.adoc#authentication-password-storage-dep-getting-started[User.withDefaultPasswordEncoder] to ensure that the password stored in memory is protected.
-However, it does not protect against obtaining the password by decompiling the source code.
-For this reason, `User.withDefaultPasswordEncoder` should only be used for "`getting started`" and is not intended for production.
+Trong ví dụ sau, chúng ta sử dụng xref:features/authentication/password-storage.adoc#authentication-password-storage-dep-getting-started[User.withDefaultPasswordEncoder] để đảm bảo password được lưu trong bộ nhớ được bảo vệ.
+Tuy nhiên, cách này không ngăn được việc lấy password bằng cách decompile source code.
+Vì lý do này, `User.withDefaultPasswordEncoder` chỉ nên được sử dụng để "`làm quen ban đầu`" và không dành cho production.
 
-.InMemoryUserDetailsManager with User.withDefaultPasswordEncoder
+.InMemoryUserDetailsManager với User.withDefaultPasswordEncoder
 [tabs]
 ======
 Java::
@@ -119,10 +119,10 @@ fun users(): UserDetailsService {
 ----
 ======
 
-There is no simple way to use `User.withDefaultPasswordEncoder` with XML-based configuration.
-For demos or just getting started, you can choose to prefix the password with `+{noop}+` to indicate xref:features/authentication/password-storage.adoc#authentication-password-storage-dpe-format[no encoding should be used]:
+Không có cách đơn giản nào để sử dụng `User.withDefaultPasswordEncoder` với cấu hình dựa trên XML.
+Đối với demo hoặc chỉ để bắt đầu sử dụng, bạn có thể thêm tiền tố `+{noop}+` vào password để chỉ ra rằng xref:features/authentication/password-storage.adoc#authentication-password-storage-dpe-format[không được sử dụng encoding]:
 
-.<user-service> `+{noop}+` XML Configuration
+.<user-service> `+{noop}+` Cấu hình XML
 [source,xml,attrs="-attributes"]
 ----
 <user-service>
