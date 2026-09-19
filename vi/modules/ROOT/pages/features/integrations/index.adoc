@@ -2,6 +2,6 @@
 = Tích hợp
 :page-section-summary-toc: 1
 
-Spring Security cung cấp khả năng tích hợp với nhiều framework và API.
-Trong phần này, chúng ta thảo luận về các tích hợp chung không dành riêng cho môi trường Servlet hoặc Reactive.
-Để xem các tích hợp cụ thể, hãy tham khảo các phần Tích hợp xref:servlet/integrations/index.adoc[Servlet] và Tích hợp xref:reactive/integrations/cors.adoc[Reactive].
+Spring Security cung cấp khả năng tích hợp với nhiều nền tảng và giao diện lập trình ứng dụng.
+Trong phần này, chúng ta thảo luận về các tích hợp tổng quát không dành riêng cho môi trường Servlet hoặc Reactive.
+Để xem các tích hợp cụ thể, hãy tham khảo xref:servlet/integrations/index.adoc[các tích hợp Servlet] và xref:reactive/integrations/cors.adoc[các tích hợp Reactive].
