@@ -1,10 +1,10 @@
 [[oauth2resourceserver-protected-resource-metadata]]
-= OAuth 2.0 Protected Resource Metadata
+= Metadata của Protected Resource OAuth 2.0
 
-`OAuth2ResourceServerConfigurer.ProtectedResourceMetadataConfigurer` provides the ability to customize the https://www.rfc-editor.org/rfc/rfc9728.html#section-3[OAuth 2.0 Protected Resource Metadata endpoint].
-It defines an extension point that lets you customize the https://www.rfc-editor.org/rfc/rfc9728.html#section-3.2[OAuth 2.0 Protected Resource Metadata response].
+`OAuth2ResourceServerConfigurer.ProtectedResourceMetadataConfigurer` cung cấp khả năng tùy chỉnh https://www.rfc-editor.org/rfc/rfc9728.html#section-3[endpoint OAuth 2.0 Protected Resource Metadata].
+Nó định nghĩa một extension point cho phép bạn tùy chỉnh https://www.rfc-editor.org/rfc/rfc9728.html#section-3.2[response OAuth 2.0 Protected Resource Metadata].
 
-`OAuth2ResourceServerConfigurer.ProtectedResourceMetadataConfigurer` provides the following configuration option:
+`OAuth2ResourceServerConfigurer.ProtectedResourceMetadataConfigurer` cung cấp tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -22,7 +22,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 	return http.build();
 }
 ----
-<1> `protectedResourceMetadataCustomizer()`: The `Consumer` providing access to the `OAuth2ProtectedResourceMetadata.Builder` allowing the ability to customize the claims of the Resource Server's configuration.
+<1> `protectedResourceMetadataCustomizer()`: `Consumer` cung cấp quyền truy cập vào `OAuth2ProtectedResourceMetadata.Builder`, cho phép tùy chỉnh các claim trong cấu hình của Resource Server.
 
-`OAuth2ResourceServerConfigurer.ProtectedResourceMetadataConfigurer` configures the `OAuth2ProtectedResourceMetadataFilter` and registers it with the Resource Server `SecurityFilterChain` `@Bean`.
-`OAuth2ProtectedResourceMetadataFilter` is the `Filter` that returns the https://www.rfc-editor.org/rfc/rfc9728.html#section-3.2[OAuth2ProtectedResourceMetadata response].
+`OAuth2ResourceServerConfigurer.ProtectedResourceMetadataConfigurer` cấu hình `OAuth2ProtectedResourceMetadataFilter` và đăng ký filter này với `SecurityFilterChain` `@Bean` của Resource Server.
+`OAuth2ProtectedResourceMetadataFilter` là `Filter` trả về https://www.rfc-editor.org/rfc/rfc9728.html#section-3.2[response OAuth2ProtectedResourceMetadata].
