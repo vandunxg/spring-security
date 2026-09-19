@@ -1,106 +1,106 @@
 [[servlet-cas]]
-= CAS Authentication
+= Xác thực CAS
 
 [[cas-overview]]
-== Overview
-JA-SIG produces an enterprise-wide single sign on system known as CAS.
-Unlike other initiatives, JA-SIG's Central Authentication Service is open source, widely used, simple to understand, platform independent, and supports proxy capabilities.
-Spring Security fully supports CAS, and provides an easy migration path from single-application deployments of Spring Security through to multiple-application deployments secured by an enterprise-wide CAS server.
+== Tổng quan
+JA-SIG phát triển một hệ thống đăng nhập một lần trên toàn doanh nghiệp có tên là CAS.
+Không giống các sáng kiến khác, Central Authentication Service của JA-SIG là mã nguồn mở, được sử dụng rộng rãi, dễ hiểu, độc lập nền tảng và hỗ trợ khả năng proxy.
+Spring Security hỗ trợ đầy đủ CAS và cung cấp một lộ trình di chuyển dễ dàng từ các triển khai Spring Security cho một ứng dụng đến các triển khai cho nhiều ứng dụng được bảo vệ bởi một CAS server trên toàn doanh nghiệp.
 
-You can learn more about CAS at https://www.apereo.org.
-You will also need to visit this site to download the CAS Server files.
+Bạn có thể tìm hiểu thêm về CAS tại https://www.apereo.org.
+Bạn cũng cần truy cập trang này để tải các file CAS Server.
 
 [[cas-how-it-works]]
-== How CAS Works
-Whilst the CAS web site contains documents that detail the architecture of CAS, we present the general overview again here within the context of Spring Security.
-Spring Security 3.x supports CAS 3.
-At the time of writing, the CAS server was at version 3.4.
+== CAS hoạt động như thế nào
+Mặc dù website CAS có các tài liệu mô tả chi tiết kiến trúc của CAS, ở đây chúng tôi vẫn trình bày lại tổng quan trong bối cảnh của Spring Security.
+Spring Security 3.x hỗ trợ CAS 3.
+Tại thời điểm viết tài liệu, CAS server ở version 3.4.
 
-Somewhere in your enterprise you will need to setup a CAS server.
-The CAS server is simply a standard WAR file, so there isn't anything difficult about setting up your server.
-Inside the WAR file you will customise the login and other single sign on pages displayed to users.
+Bạn cần thiết lập một CAS server ở đâu đó trong doanh nghiệp của mình.
+CAS server đơn giản chỉ là một WAR file tiêu chuẩn, vì vậy việc thiết lập server không có gì khó khăn.
+Bên trong WAR file, bạn sẽ tùy chỉnh trang đăng nhập và các trang đăng nhập một lần khác hiển thị cho người dùng.
 
-When deploying a CAS 3.4 server, you will also need to specify an `AuthenticationHandler` in the `deployerConfigContext.xml` included with CAS.
-The `AuthenticationHandler` has a simple method that returns a boolean as to whether a given set of Credentials is valid.
-Your `AuthenticationHandler` implementation will need to link into some type of backend authentication repository, such as an LDAP server or database.
-CAS itself includes numerous ``AuthenticationHandler``s out of the box to assist with this.
-When you download and deploy the server war file, it is set up to successfully authenticate users who enter a password matching their username, which is useful for testing.
+Khi triển khai CAS 3.4 server, bạn cũng cần chỉ định một `AuthenticationHandler` trong `deployerConfigContext.xml` đi kèm CAS.
+`AuthenticationHandler` có một method đơn giản trả về boolean cho biết một tập Credentials đã cho có hợp lệ hay không.
+Triển khai `AuthenticationHandler` của bạn cần liên kết với một loại kho authentication backend nào đó, chẳng hạn LDAP server hoặc database.
+Bản thân CAS tích hợp sẵn nhiều ``AuthenticationHandler`` để hỗ trợ việc này.
+Khi tải xuống và triển khai server war file, nó được thiết lập để xác thực thành công những người dùng nhập password trùng với username, điều hữu ích cho việc kiểm thử.
 
-Apart from the CAS server itself, the other key players are of course the secure web applications deployed throughout your enterprise.
-These web applications are known as "services".
-There are three types of services.
-Those that authenticate service tickets, those that can obtain proxy tickets, and those that authenticate proxy tickets.
-Authenticating a proxy ticket differs because the list of proxies must be validated and often times a proxy ticket can be reused.
+Ngoài bản thân CAS server, các thành phần chính khác tất nhiên là những web application an toàn được triển khai trên toàn doanh nghiệp.
+Các web application này được gọi là "service".
+Có ba loại service.
+Những service xác thực service ticket, những service có thể lấy proxy ticket và những service xác thực proxy ticket.
+Việc xác thực proxy ticket khác ở chỗ danh sách proxy phải được kiểm tra và proxy ticket thường có thể được sử dụng lại.
 
 
 [[cas-sequence]]
-=== Spring Security and CAS Interaction Sequence
-The basic interaction between a web browser, CAS server and a Spring Security-secured service is as follows:
+=== Trình tự tương tác giữa Spring Security và CAS
+Tương tác cơ bản giữa web browser, CAS server và một service được Spring Security bảo vệ như sau:
 
-* The web user is browsing the service's public pages.
-CAS or Spring Security is not involved.
-* The user eventually requests a page that is either secure or one of the beans it uses is secure.
-Spring Security's `ExceptionTranslationFilter` will detect the `AccessDeniedException` or `AuthenticationException`.
-* Because the user's `Authentication` object (or lack thereof) caused an `AuthenticationException`, the `ExceptionTranslationFilter` will call the configured `AuthenticationEntryPoint`.
-If using CAS, this will be the `CasAuthenticationEntryPoint` class.
-* The `CasAuthenticationEntryPoint` will redirect the user's browser to the CAS server.
-It will also indicate a `service` parameter, which is the callback URL for the Spring Security service (your application).
-For example, the URL to which the browser is redirected might be https://my.company.com/cas/login?service=https%3A%2F%2Fserver3.company.com%2Fwebapp%2Flogin/cas.
-* After the user's browser redirects to CAS, they will be prompted for their username and password.
-If the user presents a session cookie which indicates they've previously logged on, they will not be prompted to login again (there is an exception to this procedure, which we'll cover later).
-CAS will use the `PasswordHandler` (or `AuthenticationHandler` if using CAS 3.0) discussed above to decide whether the username and password is valid.
-* Upon successful login, CAS will redirect the user's browser back to the original service.
-It will also include a `ticket` parameter, which is an opaque string representing the "service ticket".
-Continuing our earlier example, the URL the browser is redirected to might be https://server3.company.com/webapp/login/cas?ticket=ST-0-ER94xMJmn6pha35CQRoZ.
-* Back in the service web application, the `CasAuthenticationFilter` is always listening for requests to `/login/cas` (this is configurable, but we'll use the defaults in this introduction).
-The processing filter will construct a `UsernamePasswordAuthenticationToken` representing the service ticket.
-The principal will be equal to `CasAuthenticationFilter.CAS_STATEFUL_IDENTIFIER`, whilst the credentials will be the service ticket opaque value.
-This authentication request will then be handed to the configured `AuthenticationManager`.
-* The `AuthenticationManager` implementation will be the `ProviderManager`, which is in turn configured with the `CasAuthenticationProvider`.
-The `CasAuthenticationProvider` only responds to ``UsernamePasswordAuthenticationToken``s containing the CAS-specific principal (such as `CasAuthenticationFilter.CAS_STATEFUL_IDENTIFIER`) and ``CasAuthenticationToken``s (discussed later).
-* `CasAuthenticationProvider` will validate the service ticket using a `TicketValidator` implementation.
-This will typically be a `Cas20ServiceTicketValidator` which is one of the classes included in the CAS client library.
-In the event the application needs to validate proxy tickets, the `Cas20ProxyTicketValidator` is used.
-The `TicketValidator` makes an HTTPS request to the CAS server in order to validate the service ticket.
-It may also include a proxy callback URL, which is included in this example: https://my.company.com/cas/proxyValidate?service=https%3A%2F%2Fserver3.company.com%2Fwebapp%2Flogin/cas&ticket=ST-0-ER94xMJmn6pha35CQRoZ&pgtUrl=https://server3.company.com/webapp/login/cas/proxyreceptor.
-* Back on the CAS server, the validation request will be received.
-If the presented service ticket matches the service URL the ticket was issued to, CAS will provide an affirmative response in XML indicating the username.
-If any proxy was involved in the authentication (discussed below), the list of proxies is also included in the XML response.
-* [OPTIONAL] If the request to the CAS validation service included the proxy callback URL (in the `pgtUrl` parameter), CAS will include a `pgtIou` string in the XML response.
-This `pgtIou` represents a proxy-granting ticket IOU.
-The CAS server will then create its own HTTPS connection back to the `pgtUrl`.
-This is to mutually authenticate the CAS server and the claimed service URL.
-The HTTPS connection will be used to send a proxy granting ticket to the original web application.
-For example, https://server3.company.com/webapp/login/cas/proxyreceptor?pgtIou=PGTIOU-0-R0zlgrl4pdAQwBvJWO3vnNpevwqStbSGcq3vKB2SqSFFRnjPHt&pgtId=PGT-1-si9YkkHLrtACBo64rmsi3v2nf7cpCResXg5MpESZFArbaZiOKH.
-* The `Cas20TicketValidator` will parse the XML received from the CAS server.
-It will return to the `CasAuthenticationProvider` a `TicketResponse`, which includes the username (mandatory), proxy list (if any were involved), and proxy-granting ticket IOU (if the proxy callback was requested).
-* Next `CasAuthenticationProvider` will call a configured `CasProxyDecider`.
-The `CasProxyDecider` indicates whether the proxy list in the `TicketResponse` is acceptable to the service.
-Several implementations are provided with Spring Security: `RejectProxyTickets`, `AcceptAnyCasProxy` and `NamedCasProxyDecider`.
-These names are largely self-explanatory, except `NamedCasProxyDecider` which allows a `List` of trusted proxies to be provided.
-* `CasAuthenticationProvider` will next request a `AuthenticationUserDetailsService` to load the `GrantedAuthority` objects that apply to the user contained in the `Assertion`.
-* If there were no problems, `CasAuthenticationProvider` constructs a `CasAuthenticationToken` including the details contained in the `TicketResponse` and a set of ``GrantedAuthority``s that contains at least `FACTOR_BEARER`.
-* Control then returns to `CasAuthenticationFilter`, which places the created `CasAuthenticationToken` in the security context.
-* The user's browser is redirected to the original page that caused the `AuthenticationException` (or a custom destination depending on the configuration).
+* Người dùng web đang duyệt các trang công khai của service.
+CAS hoặc Spring Security không tham gia.
+* Cuối cùng, người dùng yêu cầu một trang được bảo mật hoặc một trong các bean mà trang sử dụng được bảo mật.
+`ExceptionTranslationFilter` của Spring Security sẽ phát hiện `AccessDeniedException` hoặc `AuthenticationException`.
+* Vì đối tượng `Authentication` của người dùng (hoặc việc không có đối tượng này) gây ra `AuthenticationException`, `ExceptionTranslationFilter` sẽ gọi `AuthenticationEntryPoint` đã cấu hình.
+Nếu sử dụng CAS, đây sẽ là class `CasAuthenticationEntryPoint`.
+* `CasAuthenticationEntryPoint` sẽ redirect browser của người dùng đến CAS server.
+Nó cũng chỉ ra parameter `service`, là callback URL cho service Spring Security (ứng dụng của bạn).
+Ví dụ, URL mà browser được redirect đến có thể là https://my.company.com/cas/login?service=https%3A%2F%2Fserver3.company.com%2Fwebapp%2Flogin/cas.
+* Sau khi browser của người dùng redirect đến CAS, người dùng sẽ được yêu cầu nhập username và password.
+Nếu người dùng gửi một session cookie cho biết họ đã đăng nhập trước đó, họ sẽ không bị yêu cầu đăng nhập lại (có một ngoại lệ đối với quy trình này, sẽ được đề cập sau).
+CAS sẽ sử dụng `PasswordHandler` (hoặc `AuthenticationHandler` nếu sử dụng CAS 3.0) được đề cập ở trên để quyết định username và password có hợp lệ hay không.
+* Sau khi đăng nhập thành công, CAS sẽ redirect browser của người dùng trở lại service ban đầu.
+Nó cũng sẽ bao gồm parameter `ticket`, là một chuỗi opaque đại diện cho "service ticket".
+Tiếp tục ví dụ trước, URL mà browser được redirect đến có thể là https://server3.company.com/webapp/login/cas?ticket=ST-0-ER94xMJmn6pha35CQRoZ.
+* Quay lại web application của service, `CasAuthenticationFilter` luôn lắng nghe các request đến `/login/cas` (có thể cấu hình lại, nhưng trong phần giới thiệu này chúng ta sẽ dùng giá trị mặc định).
+Filter xử lý sẽ tạo một `UsernamePasswordAuthenticationToken` đại diện cho service ticket.
+principal sẽ bằng `CasAuthenticationFilter.CAS_STATEFUL_IDENTIFIER`, còn credential sẽ là giá trị opaque của service ticket.
+Sau đó request authentication này sẽ được chuyển đến `AuthenticationManager` đã cấu hình.
+* Triển khai `AuthenticationManager` sẽ là `ProviderManager`, vốn được cấu hình với `CasAuthenticationProvider`.
+`CasAuthenticationProvider` chỉ phản hồi với ``UsernamePasswordAuthenticationToken`` có principal riêng của CAS (chẳng hạn `CasAuthenticationFilter.CAS_STATEFUL_IDENTIFIER`) và ``CasAuthenticationToken`` (sẽ được đề cập sau).
+* `CasAuthenticationProvider` sẽ kiểm tra service ticket bằng triển khai `TicketValidator`.
+Thông thường đây sẽ là `Cas20ServiceTicketValidator`, một trong các class có trong CAS client library.
+Nếu ứng dụng cần kiểm tra proxy ticket, `Cas20ProxyTicketValidator` sẽ được sử dụng.
+`TicketValidator` tạo một HTTPS request đến CAS server để kiểm tra service ticket.
+Request này cũng có thể bao gồm proxy callback URL, như trong ví dụ này: https://my.company.com/cas/proxyValidate?service=https%3A%2F%2Fserver3.company.com%2Fwebapp%2Flogin/cas&ticket=ST-0-ER94xMJmn6pha35CQRoZ&pgtUrl=https://server3.company.com/webapp/login/cas/proxyreceptor.
+* Trên CAS server, request kiểm tra sẽ được tiếp nhận.
+Nếu service ticket được gửi khớp với service URL mà ticket được cấp cho, CAS sẽ cung cấp response xác nhận ở dạng XML, trong đó có username.
+Nếu có proxy tham gia authentication (được thảo luận bên dưới), danh sách proxy cũng được đưa vào XML response.
+* [TÙY CHỌN] Nếu request đến CAS validation service bao gồm proxy callback URL (trong parameter `pgtUrl`), CAS sẽ đưa một chuỗi `pgtIou` vào XML response.
+`pgtIou` này đại diện cho một proxy-granting ticket IOU.
+Sau đó CAS server sẽ tự tạo kết nối HTTPS trở lại `pgtUrl`.
+Việc này nhằm authentication lẫn nhau giữa CAS server và service URL được khai báo.
+Kết nối HTTPS sẽ được dùng để gửi proxy granting ticket đến web application ban đầu.
+Ví dụ, https://server3.company.com/webapp/login/cas/proxyreceptor?pgtIou=PGTIOU-0-R0zlgrl4pdAQwBvJWO3vnNpevwqStbSGcq3vKB2SqSFFRnjPHt&pgtId=PGT-1-si9YkkHLrtACBo64rmsi3v2nf7cpCResXg5MpESZFArbaZiOKH.
+* `Cas20TicketValidator` sẽ phân tích XML nhận được từ CAS server.
+Nó sẽ trả về cho `CasAuthenticationProvider` một `TicketResponse`, trong đó có username (bắt buộc), danh sách proxy (nếu có) và proxy-granting ticket IOU (nếu đã yêu cầu proxy callback).
+* Tiếp theo, `CasAuthenticationProvider` sẽ gọi `CasProxyDecider` đã cấu hình.
+`CasProxyDecider` cho biết danh sách proxy trong `TicketResponse` có được service chấp nhận hay không.
+Spring Security cung cấp một số triển khai: `RejectProxyTickets`, `AcceptAnyCasProxy` và `NamedCasProxyDecider`.
+Các tên này hầu như đã tự giải thích, ngoại trừ `NamedCasProxyDecider`, cho phép cung cấp một `List` gồm các proxy đáng tin cậy.
+* Tiếp theo, `CasAuthenticationProvider` sẽ yêu cầu một `AuthenticationUserDetailsService` tải các đối tượng `GrantedAuthority` áp dụng cho người dùng có trong `Assertion`.
+Nếu không có vấn đề gì, `CasAuthenticationProvider` sẽ tạo `CasAuthenticationToken`, bao gồm các chi tiết trong `TicketResponse` và một tập ``GrantedAuthority`` chứa ít nhất `FACTOR_BEARER`.
+* Sau đó quyền điều khiển trở về `CasAuthenticationFilter`, nơi đặt `CasAuthenticationToken` đã tạo vào security context.
+* Browser của người dùng được redirect đến trang ban đầu gây ra `AuthenticationException` (hoặc destination tùy chỉnh, phụ thuộc cấu hình).
 
-It's good that you're still here!
-Let's now look at how this is configured
+Thật tốt vì bạn vẫn đang theo dõi!
+Bây giờ hãy xem cách cấu hình phần này
 
 [[cas-client]]
-== Configuration of CAS Client
-The web application side of CAS is made easy due to Spring Security.
-It is assumed you already know the basics of using Spring Security, so these are not covered again below.
-We'll assume a namespace based configuration is being used and add in the CAS beans as required.
-Each section builds upon the previous section.
-A full CAS sample application can be found in the Spring Security xref:samples.adoc#samples[Samples].
+== Cấu hình CAS Client
+Phía web application của CAS được Spring Security làm cho đơn giản hơn.
+Giả định rằng bạn đã biết các kiến thức cơ bản về cách sử dụng Spring Security, nên những nội dung này sẽ không được nhắc lại bên dưới.
+Chúng ta sẽ giả định đang sử dụng cấu hình dựa trên namespace và thêm các CAS bean cần thiết.
+Mỗi phần được xây dựng dựa trên phần trước đó.
+Bạn có thể tìm thấy một CAS sample application đầy đủ trong Spring Security xref:samples.adoc#samples[Các sample].
 
 
 [[cas-st]]
-=== Service Ticket Authentication
-This section describes how to setup Spring Security to authenticate Service Tickets.
-Often times this is all a web application requires.
-You will need to add a `ServiceProperties` bean to your application context.
-This represents your CAS service:
+=== Xác thực Service Ticket
+Phần này mô tả cách thiết lập Spring Security để authentication Service Ticket.
+Thông thường đây là tất cả những gì một web application cần.
+Bạn cần thêm một `ServiceProperties` bean vào application context.
+Bean này đại diện cho CAS service của bạn:
 
 [source,xml]
 ----
@@ -112,12 +112,12 @@ This represents your CAS service:
 </bean>
 ----
 
-The `service` must equal a URL that will be monitored by the `CasAuthenticationFilter`.
-The `sendRenew` defaults to false, but should be set to true if your application is particularly sensitive.
-What this parameter does is tell the CAS login service that a single sign on login is unacceptable.
-Instead, the user will need to re-enter their username and password in order to gain access to the service.
+`service` phải bằng một URL sẽ được `CasAuthenticationFilter` giám sát.
+`sendRenew` mặc định là false, nhưng nên đặt thành true nếu ứng dụng của bạn đặc biệt nhạy cảm.
+Parameter này cho CAS login service biết rằng không chấp nhận đăng nhập một lần.
+Thay vào đó, người dùng sẽ phải nhập lại username và password để truy cập service.
 
-The following beans should be configured to commence the CAS authentication process (assuming you're using a namespace configuration):
+Các bean sau nên được cấu hình để bắt đầu quy trình authentication CAS (giả định bạn đang sử dụng cấu hình namespace):
 
 [source,xml]
 ----
@@ -138,15 +138,15 @@ The following beans should be configured to commence the CAS authentication proc
 </bean>
 ----
 
-For CAS to operate, the `ExceptionTranslationFilter` must have its `authenticationEntryPoint` property set to the `CasAuthenticationEntryPoint` bean.
-This can easily be done using xref:servlet/appendix/namespace/http.adoc#nsa-http-entry-point-ref[entry-point-ref] as is done in the example above.
-The `CasAuthenticationEntryPoint` must refer to the `ServiceProperties` bean (discussed above), which provides the URL to the enterprise's CAS login server.
-This is where the user's browser will be redirected.
+Để CAS hoạt động, property `authenticationEntryPoint` của `ExceptionTranslationFilter` phải được đặt thành `CasAuthenticationEntryPoint` bean.
+Có thể dễ dàng thực hiện việc này bằng xref:servlet/appendix/namespace/http.adoc#nsa-http-entry-point-ref[entry-point-ref] như trong ví dụ trên.
+`CasAuthenticationEntryPoint` phải tham chiếu đến `ServiceProperties` bean (đã thảo luận ở trên), bean này cung cấp URL đến CAS login server của doanh nghiệp.
+Đây là nơi browser của người dùng sẽ được redirect đến.
 
-The `CasAuthenticationFilter` has very similar properties to the `UsernamePasswordAuthenticationFilter` (used for form-based logins).
-You can use these properties to customize things like behavior for authentication success and failure.
+`CasAuthenticationFilter` có các property rất giống `UsernamePasswordAuthenticationFilter` (được dùng cho form-based login).
+Bạn có thể sử dụng các property này để tùy chỉnh những thứ như behavior khi authentication thành công và thất bại.
 
-Next you need to add a `CasAuthenticationProvider` and its collaborators:
+Tiếp theo, bạn cần thêm một `CasAuthenticationProvider` và các collaborator của nó:
 
 [source,xml,attrs="-attributes"]
 ----
@@ -181,22 +181,22 @@ Normally passwords should be hashed using BCrypt -->
 </security:user-service>
 ----
 
-The `CasAuthenticationProvider` uses a `UserDetailsService` instance to load the authorities for a user, once they have been authenticated by CAS.
-We've shown a simple in-memory setup here.
-Note that the `CasAuthenticationProvider` does not actually use the password for authentication, but it does use the authorities.
+`CasAuthenticationProvider` sử dụng một instance `UserDetailsService` để tải các authority cho người dùng sau khi người dùng đã được CAS authentication.
+Ở đây chúng tôi trình bày một thiết lập in-memory đơn giản.
+Lưu ý rằng `CasAuthenticationProvider` thực sự không sử dụng password cho authentication, nhưng có sử dụng authority.
 
-The beans are all reasonably self-explanatory if you refer back to the <<cas-how-it-works,How CAS Works>> section.
+Các bean đều tương đối dễ hiểu nếu bạn xem lại phần <<cas-how-it-works,CAS hoạt động như thế nào>>.
 
-This completes the most basic configuration for CAS.
-If you haven't made any mistakes, your web application should happily work within the framework of CAS single sign on.
-No other parts of Spring Security need to be concerned about the fact CAS handled authentication.
-In the following sections we will discuss some (optional) more advanced configurations.
+Như vậy là hoàn tất cấu hình cơ bản nhất cho CAS.
+Nếu bạn không mắc lỗi nào, web application của bạn sẽ hoạt động tốt trong framework đăng nhập một lần của CAS.
+Các phần khác của Spring Security không cần quan tâm đến việc CAS đã xử lý authentication.
+Trong các phần tiếp theo, chúng ta sẽ thảo luận một số cấu hình nâng cao hơn (tùy chọn).
 
 
 [[cas-singlelogout]]
-=== Single Logout
-The CAS protocol supports Single Logout and can be easily added to your Spring Security configuration.
-Below are updates to the Spring Security configuration that handle Single Logout
+=== Đăng xuất một lần
+CAS protocol hỗ trợ Single Logout và có thể dễ dàng thêm vào cấu hình Spring Security.
+Dưới đây là các cập nhật cho cấu hình Spring Security để xử lý Single Logout
 
 [source,xml]
 ----
@@ -222,24 +222,24 @@ Below are updates to the Spring Security configuration that handle Single Logout
 </bean>
 ----
 
-The `logout` element logs the user out of the local application, but does not end the session with the CAS server or any other applications that have been logged into.
-The `requestSingleLogoutFilter` filter will allow the URL of `/spring_security_cas_logout` to be requested to redirect the application to the configured CAS Server logout URL.
-Then the CAS Server will send a Single Logout request to all the services that were signed into.
-The `singleLogoutFilter` handles the Single Logout request by looking up the `HttpSession` in a static `Map` and then invalidating it.
+Phần tử `logout` logout người dùng khỏi ứng dụng local, nhưng không kết thúc session với CAS server hoặc bất kỳ ứng dụng nào khác mà người dùng đã đăng nhập.
+Filter `requestSingleLogoutFilter` cho phép request URL `/spring_security_cas_logout` để redirect ứng dụng đến CAS Server logout URL đã cấu hình.
+Sau đó CAS Server sẽ gửi request Single Logout đến tất cả service đã đăng nhập.
+`singleLogoutFilter` xử lý request Single Logout bằng cách tra cứu `HttpSession` trong một `Map` static rồi invalidate nó.
 
-It might be confusing why both the `logout` element and the `singleLogoutFilter` are needed.
-It is considered best practice to logout locally first since the `SingleSignOutFilter` just stores the `HttpSession` in a static `Map` in order to call invalidate on it.
-With the configuration above, the flow of logout would be:
+Có thể bạn sẽ thấy khó hiểu vì sao cần cả phần tử `logout` và `singleLogoutFilter`.
+Logout local trước được xem là best practice vì `SingleSignOutFilter` chỉ lưu `HttpSession` trong một `Map` static để gọi invalidate trên đó.
+Với cấu hình trên, flow logout sẽ là:
 
-* The user requests `/logout` which would log the user out of the local application and send the user to the logout success page.
-* The logout success page, `/cas-logout.jsp`, should instruct the user to click a link pointing to `/logout/cas` in order to logout out of all applications.
-* When the user clicks the link, the user is redirected to the CAS single logout URL (https://localhost:9443/cas/logout).
-* On the CAS Server side, the CAS single logout URL then submits single logout requests to all the CAS Services.
-On the CAS Service side, Apereo's `SingleSignOutFilter` processes the logout request by invalidating the original session.
+* Người dùng request `/logout`, thao tác này sẽ logout người dùng khỏi ứng dụng local và đưa người dùng đến trang logout success.
+* Trang logout success, `/cas-logout.jsp`, nên hướng dẫn người dùng nhấp vào một link trỏ đến `/logout/cas` để logout khỏi tất cả ứng dụng.
+* Khi người dùng nhấp vào link, người dùng được redirect đến CAS single logout URL (https://localhost:9443/cas/logout).
+* Ở phía CAS Server, CAS single logout URL sau đó gửi các request single logout đến tất cả CAS Service.
+Ở phía CAS Service, `SingleSignOutFilter` của Apereo xử lý request logout bằng cách invalidate session ban đầu.
 
 
 
-The next step is to add the following to your web.xml
+Bước tiếp theo là thêm nội dung sau vào web.xml của bạn
 
 [source,xml]
 ----
@@ -264,27 +264,27 @@ The next step is to add the following to your web.xml
 </listener>
 ----
 
-When using the SingleSignOutFilter you might encounter some encoding issues.
-Therefore it is recommended to add the `CharacterEncodingFilter` to ensure that the character encoding is correct when using the `SingleSignOutFilter`.
-Again, refer to Apereo CAS's documentation for details.
-The `SingleSignOutHttpSessionListener` ensures that when an `HttpSession` expires, the mapping used for single logout is removed.
+Khi sử dụng SingleSignOutFilter, bạn có thể gặp một số vấn đề về encoding.
+Do đó, nên thêm `CharacterEncodingFilter` để bảo đảm character encoding chính xác khi sử dụng `SingleSignOutFilter`.
+Một lần nữa, hãy tham khảo tài liệu của Apereo CAS để biết chi tiết.
+`SingleSignOutHttpSessionListener` bảo đảm rằng khi một `HttpSession` hết hạn, mapping được dùng cho single logout sẽ bị xóa.
 
 
 [[cas-pt-client]]
-=== Authenticating to a Stateless Service with CAS
-This section describes how to authenticate to a service using CAS.
-In other words, this section discusses how to setup a client that uses a service that authenticates with CAS.
-The next section describes how to setup a stateless service to Authenticate using CAS.
+=== Authentication đến Stateless Service bằng CAS
+Phần này mô tả cách authentication đến một service bằng CAS.
+Nói cách khác, phần này thảo luận cách thiết lập một client sử dụng service được authentication bằng CAS.
+Phần tiếp theo mô tả cách thiết lập một stateless service để xác thực bằng CAS.
 
 
 [[cas-pt-client-config]]
-==== Configuring CAS to Obtain Proxy Granting Tickets
-In order to authenticate to a stateless service, the application needs to obtain a proxy granting ticket (PGT).
-This section describes how to configure Spring Security to obtain a PGT building upon thencas-st[Service Ticket Authentication] configuration.
+==== Cấu hình CAS để lấy Proxy Granting Ticket
+Để authentication đến một stateless service, ứng dụng cần lấy proxy granting ticket (PGT).
+Phần này mô tả cách cấu hình Spring Security để lấy PGT, xây dựng trên cấu hình thencas-st[Xác thực Service Ticket].
 
-The first step is to include a `ProxyGrantingTicketStorage` in your Spring Security configuration.
-This is used to store PGT's that are obtained by the `CasAuthenticationFilter` so that they can be used to obtain proxy tickets.
-An example configuration is shown below
+Bước đầu tiên là đưa một `ProxyGrantingTicketStorage` vào cấu hình Spring Security.
+Nó được dùng để lưu các PGT mà `CasAuthenticationFilter` lấy được, để có thể dùng chúng lấy proxy ticket.
+Ví dụ cấu hình được trình bày bên dưới
 
 [source,xml]
 ----
@@ -296,11 +296,11 @@ ProxyGrantingTicketStorage.cleanup()
 <bean id="pgtStorage" class="org.apereo.cas.client.proxy.ProxyGrantingTicketStorageImpl"/>
 ----
 
-The next step is to update the `CasAuthenticationProvider` to be able to obtain proxy tickets.
-To do this replace the `Cas20ServiceTicketValidator` with a `Cas20ProxyTicketValidator`.
-The `proxyCallbackUrl` should be set to a URL that the application will receive PGT's at.
-Last, the configuration should also reference the `ProxyGrantingTicketStorage` so it can use a PGT to obtain proxy tickets.
-You can find an example of the configuration changes that should be made below.
+Bước tiếp theo là cập nhật `CasAuthenticationProvider` để có thể lấy proxy ticket.
+Để thực hiện việc này, thay `Cas20ServiceTicketValidator` bằng `Cas20ProxyTicketValidator`.
+`proxyCallbackUrl` nên được đặt thành URL nơi ứng dụng sẽ nhận PGT.
+Cuối cùng, cấu hình cũng phải tham chiếu `ProxyGrantingTicketStorage` để có thể sử dụng PGT lấy proxy ticket.
+Bạn có thể xem ví dụ về các thay đổi cấu hình cần thực hiện bên dưới.
 
 [source,xml]
 ----
@@ -318,9 +318,9 @@ You can find an example of the configuration changes that should be made below.
 </bean>
 ----
 
-The last step is to update the `CasAuthenticationFilter` to accept PGT and to store them in the `ProxyGrantingTicketStorage`.
-It is important the `proxyReceptorUrl` matches the `proxyCallbackUrl` of the `Cas20ProxyTicketValidator`.
-An example configuration is shown below.
+Bước cuối cùng là cập nhật `CasAuthenticationFilter` để chấp nhận PGT và lưu chúng vào `ProxyGrantingTicketStorage`.
+Điều quan trọng là `proxyReceptorUrl` phải khớp với `proxyCallbackUrl` của `Cas20ProxyTicketValidator`.
+Ví dụ cấu hình được trình bày bên dưới.
 
 [source,xml]
 ----
@@ -335,10 +335,10 @@ An example configuration is shown below.
 ----
 
 [[cas-pt-client-sample]]
-==== Calling a Stateless Service Using a Proxy Ticket
-Now that Spring Security obtains PGTs, you can use them to create proxy tickets which can be used to authenticate to a stateless service.
-The CAS xref:samples.adoc#samples[sample application] contains a working example in the `ProxyTicketSampleServlet`.
-Example code can be found below:
+==== Gọi Stateless Service bằng Proxy Ticket
+Bây giờ Spring Security đã lấy được PGT, bạn có thể dùng chúng để tạo proxy ticket, vốn có thể được dùng để authentication đến stateless service.
+CAS xref:samples.adoc#samples[ứng dụng mẫu] có một ví dụ hoạt động trong `ProxyTicketSampleServlet`.
+Code ví dụ được trình bày bên dưới:
 
 [tabs]
 ======
@@ -382,24 +382,24 @@ protected fun doGet(request: HttpServletRequest, response: HttpServletResponse?)
 ======
 
 [[cas-pt]]
-=== Proxy Ticket Authentication
-The `CasAuthenticationProvider` distinguishes between stateful and stateless clients.
-A stateful client is considered any that submits to the `filterProcessesUrl` of the `CasAuthenticationFilter`.
-A stateless client is any that presents an authentication request to `CasAuthenticationFilter` on a URL other than the `filterProcessesUrl`.
+=== Xác thực Proxy Ticket
+`CasAuthenticationProvider` phân biệt giữa stateful client và stateless client.
+Stateful client là bất kỳ client nào gửi request đến `filterProcessesUrl` của `CasAuthenticationFilter`.
+Stateless client là bất kỳ client nào gửi authentication request đến `CasAuthenticationFilter` trên URL khác với `filterProcessesUrl`.
 
-Because remoting protocols have no way of presenting themselves within the context of an `HttpSession`, it isn't possible to rely on the default practice of storing the security context in the session between requests.
-Furthermore, because the CAS server invalidates a ticket after it has been validated by the `TicketValidator`, presenting the same proxy ticket on subsequent requests will not work.
+Vì remoting protocol không có cách tự biểu diễn trong context của một `HttpSession`, không thể dựa vào cách làm mặc định là lưu security context trong session giữa các request.
+Hơn nữa, vì CAS server invalidate ticket sau khi ticket được `TicketValidator` kiểm tra, việc gửi cùng proxy ticket trong các request tiếp theo sẽ không hoạt động.
 
-One obvious option is to not use CAS at all for remoting protocol clients.
-However, this would eliminate many of the desirable features of CAS.
-As a middle-ground, the `CasAuthenticationProvider` uses a `StatelessTicketCache`.
-This is used solely for stateless clients which use a principal equal to `CasAuthenticationFilter.CAS_STATELESS_IDENTIFIER`.
-What happens is the `CasAuthenticationProvider` will store the resulting `CasAuthenticationToken` in the `StatelessTicketCache`, keyed on the proxy ticket.
-Accordingly, remoting protocol clients can present the same proxy ticket and the `CasAuthenticationProvider` will not need to contact the CAS server for validation (aside from the first request).
-Once authenticated, the proxy ticket could be used for URLs other than the original target service.
+Một lựa chọn rõ ràng là hoàn toàn không sử dụng CAS cho các client remoting protocol.
+Tuy nhiên, điều này sẽ loại bỏ nhiều tính năng đáng mong muốn của CAS.
+Ở mức trung gian, `CasAuthenticationProvider` sử dụng `StatelessTicketCache`.
+Thành phần này chỉ được dùng cho stateless client có principal bằng `CasAuthenticationFilter.CAS_STATELESS_IDENTIFIER`.
+Cụ thể, `CasAuthenticationProvider` sẽ lưu `CasAuthenticationToken` kết quả vào `StatelessTicketCache`, với proxy ticket làm key.
+Theo đó, client remoting protocol có thể gửi cùng proxy ticket và `CasAuthenticationProvider` sẽ không cần liên hệ CAS server để kiểm tra (ngoại trừ request đầu tiên).
+Sau khi được authentication, proxy ticket có thể được dùng cho các URL khác với target service ban đầu.
 
-This section builds upon the previous sections to accommodate proxy ticket authentication.
-The first step is to specify to authenticate all artifacts as shown below.
+Phần này xây dựng trên các phần trước để hỗ trợ authentication proxy ticket.
+Bước đầu tiên là chỉ định authentication tất cả artifact như bên dưới.
 
 [source,xml]
 ----
@@ -410,10 +410,10 @@ The first step is to specify to authenticate all artifacts as shown below.
 </bean>
 ----
 
-The next step is to specify `serviceProperties` and the `authenticationDetailsSource` for the `CasAuthenticationFilter`.
-The `serviceProperties` property instructs the `CasAuthenticationFilter` to attempt to authenticate all artifacts instead of only ones present on the `filterProcessesUrl`.
-The `ServiceAuthenticationDetailsSource` creates a `ServiceAuthenticationDetails` that ensures the current URL, based upon the `HttpServletRequest`, is used as the service URL when validating the ticket.
-The method for generating the service URL can be customized by injecting a custom `AuthenticationDetailsSource` that returns a custom `ServiceAuthenticationDetails`.
+Bước tiếp theo là chỉ định `serviceProperties` và `authenticationDetailsSource` cho `CasAuthenticationFilter`.
+Property `serviceProperties` hướng dẫn `CasAuthenticationFilter` thử authentication tất cả artifact thay vì chỉ những artifact có trên `filterProcessesUrl`.
+`ServiceAuthenticationDetailsSource` tạo một `ServiceAuthenticationDetails`, bảo đảm URL hiện tại, dựa trên `HttpServletRequest`, được dùng làm service URL khi kiểm tra ticket.
+Có thể tùy chỉnh cách tạo service URL bằng cách inject một `AuthenticationDetailsSource` tùy chỉnh trả về `ServiceAuthenticationDetails` tùy chỉnh.
 
 [source,xml]
 ----
@@ -430,10 +430,10 @@ The method for generating the service URL can be customized by injecting a custo
 </bean>
 ----
 
-You will also need to update the `CasAuthenticationProvider` to handle proxy tickets.
-To do this replace the `Cas20ServiceTicketValidator` with a `Cas20ProxyTicketValidator`.
-You will need to configure the `statelessTicketCache` and which proxies you want to accept.
-You can find an example of the updates required to accept all proxies below.
+Bạn cũng cần cập nhật `CasAuthenticationProvider` để xử lý proxy ticket.
+Để thực hiện việc này, thay `Cas20ServiceTicketValidator` bằng `Cas20ProxyTicketValidator`.
+Bạn cần cấu hình `statelessTicketCache` và các proxy muốn chấp nhận.
+Bạn có thể xem ví dụ về các cập nhật cần thiết để chấp nhận tất cả proxy bên dưới.
 
 [source,xml]
 ----
