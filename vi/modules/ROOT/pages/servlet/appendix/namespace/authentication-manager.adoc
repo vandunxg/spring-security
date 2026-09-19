@@ -1,44 +1,44 @@
 [[nsa-authentication]]
-= Authentication Services
-Before Spring Security 3.0, an `AuthenticationManager` was automatically registered internally.
-Now you must register one explicitly using the `<authentication-manager>` element.
-This creates an instance of Spring Security's `ProviderManager` class, which needs to be configured with a list of one or more `AuthenticationProvider` instances.
-These can either be created using syntax elements provided by the namespace, or they can be standard bean definitions, marked for addition to the list using the `authentication-provider` element.
+= Dịch vụ authentication
+Trước Spring Security 3.0, một `AuthenticationManager` được tự động đăng ký nội bộ.
+Hiện tại, bạn phải đăng ký tường minh một `AuthenticationManager` bằng phần tử `<authentication-manager>`.
+Phần tử này tạo một instance của class `ProviderManager` của Spring Security, class này cần được cấu hình bằng danh sách gồm một hoặc nhiều instance `AuthenticationProvider`.
+Các instance này có thể được tạo bằng các phần tử cú pháp do namespace cung cấp, hoặc có thể là các định nghĩa bean tiêu chuẩn, được đánh dấu để thêm vào danh sách bằng phần tử `authentication-provider`.
 
 
 [[nsa-authentication-manager]]
 == <authentication-manager>
-Every Spring Security application which uses the namespace must have include this element somewhere.
-It is responsible for registering the `AuthenticationManager` which provides authentication services to the application.
-All elements which create `AuthenticationProvider` instances should be children of this element.
+Mọi ứng dụng Spring Security sử dụng namespace đều phải bao gồm phần tử này ở đâu đó.
+Phần tử này chịu trách nhiệm đăng ký `AuthenticationManager` cung cấp các dịch vụ authentication cho ứng dụng.
+Mọi phần tử tạo instance `AuthenticationProvider` đều nên là phần tử con của phần tử này.
 
 
 [[nsa-authentication-manager-attributes]]
-=== <authentication-manager> Attributes
+=== <authentication-manager> Thuộc tính
 
 
 [[nsa-authentication-manager-alias]]
 * **alias**
-This attribute allows you to define an alias name for the internal instance for use in your own configuration.
+Thuộc tính này cho phép bạn định nghĩa một tên alias cho instance nội bộ để sử dụng trong cấu hình của riêng bạn.
 
 
 [[nsa-authentication-manager-erase-credentials]]
 * **erase-credentials**
-If set to true, the AuthenticationManager will attempt to clear any credentials data in the returned Authentication object, once the user has been authenticated.
-Literally it maps to the `eraseCredentialsAfterAuthentication` property of the xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager[`ProviderManager`].
+Nếu được đặt thành true, AuthenticationManager sẽ cố gắng xóa mọi dữ liệu credential trong object Authentication được trả về sau khi user đã được authenticated.
+Về bản chất, thuộc tính này ánh xạ tới property `eraseCredentialsAfterAuthentication` của xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager[`ProviderManager`].
 
 [[nsa-authentication-manager-observation-registry-ref]]
 * **observation-registry-ref**
-A reference to the `ObservationRegistry` used for the `FilterChain` and related components
+Một tham chiếu tới `ObservationRegistry` được sử dụng cho `FilterChain` và các component liên quan
 
 [[nsa-authentication-manager-id]]
 * **id**
-This attribute allows you to define an id for the internal instance for use in your own configuration.
-It is the same as the alias element, but provides a more consistent experience with elements that use the id attribute.
+Thuộc tính này cho phép bạn định nghĩa một id cho instance nội bộ để sử dụng trong cấu hình của riêng bạn.
+Nó tương đương với phần tử alias, nhưng mang lại trải nghiệm nhất quán hơn với các phần tử sử dụng thuộc tính id.
 
 
 [[nsa-authentication-manager-children]]
-=== Child Elements of <authentication-manager>
+=== Phần tử con của <authentication-manager>
 
 
 * <<nsa-authentication-provider,authentication-provider>>
@@ -48,14 +48,14 @@ It is the same as the alias element, but provides a more consistent experience w
 
 [[nsa-authentication-provider]]
 == <authentication-provider>
-Unless used with a `ref` attribute, this element is shorthand for configuring a `DaoAuthenticationProvider`.
-`DaoAuthenticationProvider` loads user information from a `UserDetailsService` and compares the username/password combination with the values supplied at login.
-The `UserDetailsService` instance can be defined either by using an available namespace element (`jdbc-user-service` or by using the `user-service-ref` attribute to point to a bean defined elsewhere in the application context).
+Trừ khi được sử dụng với thuộc tính `ref`, phần tử này là cách viết tắt để cấu hình một `DaoAuthenticationProvider`.
+`DaoAuthenticationProvider` tải thông tin user từ một `UserDetailsService` và so sánh tổ hợp username/password với các giá trị được cung cấp khi đăng nhập.
+Instance `UserDetailsService` có thể được định nghĩa bằng một phần tử namespace khả dụng (`jdbc-user-service`, hoặc bằng thuộc tính `user-service-ref` để trỏ tới một bean được định nghĩa ở nơi khác trong application context).
 
 
 
 [[nsa-authentication-provider-parents]]
-=== Parent Elements of <authentication-provider>
+=== Phần tử cha của <authentication-provider>
 
 
 * <<nsa-authentication-manager,authentication-manager>>
@@ -63,14 +63,14 @@ The `UserDetailsService` instance can be defined either by using an available na
 
 
 [[nsa-authentication-provider-attributes]]
-=== <authentication-provider> Attributes
+=== <authentication-provider> Thuộc tính
 
 
 [[nsa-authentication-provider-ref]]
 * **ref**
-Defines a reference to a Spring bean that implements `AuthenticationProvider`.
+Định nghĩa một tham chiếu tới bean Spring triển khai `AuthenticationProvider`.
 
-If you have written your own `AuthenticationProvider` implementation (or want to configure one of Spring Security's own implementations as a traditional bean for some reason, then you can use the following syntax to add it to the internal list of `ProviderManager`:
+Nếu bạn đã viết triển khai `AuthenticationProvider` của riêng mình (hoặc vì lý do nào đó muốn cấu hình một trong các triển khai của Spring Security dưới dạng bean truyền thống), bạn có thể sử dụng cú pháp sau để thêm triển khai đó vào danh sách nội bộ của `ProviderManager`:
 
 [source,xml]
 ----
@@ -87,11 +87,11 @@ If you have written your own `AuthenticationProvider` implementation (or want to
 
 [[nsa-authentication-provider-user-service-ref]]
 * **user-service-ref**
-A reference to a bean that implements UserDetailsService that may be created using the standard bean element or the custom user-service element.
+Một tham chiếu tới bean triển khai UserDetailsService, có thể được tạo bằng phần tử bean tiêu chuẩn hoặc phần tử user-service tùy chỉnh.
 
 
 [[nsa-authentication-provider-children]]
-=== Child Elements of <authentication-provider>
+=== Phần tử con của <authentication-provider>
 
 
 * <<nsa-jdbc-user-service,jdbc-user-service>>
@@ -103,18 +103,18 @@ A reference to a bean that implements UserDetailsService that may be created usi
 
 [[nsa-jdbc-user-service]]
 == <jdbc-user-service>
-Causes creation of a JDBC-based UserDetailsService.
+Tạo một UserDetailsService dựa trên JDBC.
 
 
 [[nsa-jdbc-user-service-attributes]]
-=== <jdbc-user-service> Attributes
+=== <jdbc-user-service> Thuộc tính
 
 
 [[nsa-jdbc-user-service-authorities-by-username-query]]
 * **authorities-by-username-query**
-An SQL statement to query for a user's granted authorities given a username.
+Một câu lệnh SQL để truy vấn các authority được cấp cho user dựa trên username.
 
-The default is
+Giá trị mặc định là
 
 [source]
 ----
@@ -126,18 +126,18 @@ select username, authority from authorities where username = ?
 
 [[nsa-jdbc-user-service-cache-ref]]
 * **cache-ref**
-Defines a reference to a cache for use with a UserDetailsService.
+Định nghĩa một tham chiếu tới cache để sử dụng với UserDetailsService.
 
 
 [[nsa-jdbc-user-service-data-source-ref]]
 * **data-source-ref**
-The bean ID of the DataSource which provides the required tables.
+ID của bean DataSource cung cấp các bảng cần thiết.
 
 
 [[nsa-jdbc-user-service-group-authorities-by-username-query]]
 * **group-authorities-by-username-query**
-An SQL statement to query user's group authorities given a username.
-The default is
+Một câu lệnh SQL để truy vấn các group authority của user dựa trên username.
+Giá trị mặc định là
 
 +
 
@@ -156,19 +156,19 @@ gm.username = ? and g.id = ga.group_id and g.id = gm.group_id
 
 [[nsa-jdbc-user-service-id]]
 * **id**
-A bean identifier, used for referring to the bean elsewhere in the context.
+Một bean identifier, được sử dụng để tham chiếu tới bean ở nơi khác trong context.
 
 
 [[nsa-jdbc-user-service-role-prefix]]
 * **role-prefix**
-A non-empty string prefix that will be added to role strings loaded from persistent storage (default is "ROLE_").
-Use the value "none" for no prefix in cases where the default is non-empty.
+Một tiền tố chuỗi không rỗng được thêm vào các chuỗi role được tải từ persistent storage (giá trị mặc định là "ROLE_").
+Sử dụng giá trị "none" để không có tiền tố trong trường hợp giá trị mặc định không rỗng.
 
 
 [[nsa-jdbc-user-service-users-by-username-query]]
 * **users-by-username-query**
-An SQL statement to query a username, password, and enabled status given a username.
-The default is
+Một câu lệnh SQL để truy vấn username, password và trạng thái enabled dựa trên username.
+Giá trị mặc định là
 
 +
 
@@ -182,12 +182,12 @@ select username, password, enabled from users where username = ?
 
 [[nsa-password-encoder]]
 == <password-encoder>
-Authentication providers can optionally be configured to use a password encoder as described in the xref:features/authentication/password-storage.adoc#authentication-password-storage[Password Storage].
-This will result in the bean being injected with the appropriate `PasswordEncoder` instance.
+Authentication provider có thể được cấu hình tùy chọn để sử dụng password encoder như mô tả trong xref:features/authentication/password-storage.adoc#authentication-password-storage[Lưu trữ mật khẩu].
+Điều này sẽ khiến bean được inject instance `PasswordEncoder` thích hợp.
 
 
 [[nsa-password-encoder-parents]]
-=== Parent Elements of <password-encoder>
+=== Phần tử cha của <password-encoder>
 
 
 * <<nsa-authentication-provider,authentication-provider>>
@@ -196,38 +196,38 @@ This will result in the bean being injected with the appropriate `PasswordEncode
 
 
 [[nsa-password-encoder-attributes]]
-=== <password-encoder> Attributes
+=== <password-encoder> Thuộc tính
 
 
 [[nsa-password-encoder-hash]]
 * **hash**
-Defines the hashing algorithm used on user passwords.
-We recommend strongly against using MD4, as it is a very weak hashing algorithm.
+Định nghĩa thuật toán hashing được sử dụng cho password của user.
+Chúng tôi đặc biệt khuyến nghị không sử dụng MD4 vì đây là một thuật toán hashing rất yếu.
 
 
 [[nsa-password-encoder-ref]]
 * **ref**
-Defines a reference to a Spring bean that implements `PasswordEncoder`.
+Định nghĩa một tham chiếu tới bean Spring triển khai `PasswordEncoder`.
 
 
 [[nsa-user-service]]
 == <user-service>
-Creates an in-memory UserDetailsService from a properties file or a list of "user" child elements.
-Usernames are converted to lower-case internally to allow for case-insensitive lookups, so this should not be used if case-sensitivity is required.
+Tạo một UserDetailsService in-memory từ một file properties hoặc một danh sách các phần tử con "user".
+Username được chuyển đổi nội bộ thành chữ thường để cho phép tra cứu không phân biệt chữ hoa chữ thường, vì vậy không nên sử dụng phần tử này nếu cần phân biệt chữ hoa chữ thường.
 
 
 [[nsa-user-service-attributes]]
-=== <user-service> Attributes
+=== <user-service> Thuộc tính
 
 
 [[nsa-user-service-id]]
 * **id**
-A bean identifier, used for referring to the bean elsewhere in the context.
+Một bean identifier, được sử dụng để tham chiếu tới bean ở nơi khác trong context.
 
 
 [[nsa-user-service-properties]]
 * **properties**
-The location of a Properties file where each line is in the format of
+Vị trí của một file Properties, trong đó mỗi dòng có định dạng
 
 +
 
@@ -240,7 +240,7 @@ username=password,grantedAuthority[,grantedAuthority][,enabled|disabled]
 
 
 [[nsa-user-service-children]]
-=== Child Elements of <user-service>
+=== Phần tử con của <user-service>
 
 
 * <<nsa-user,user>>
@@ -249,11 +249,11 @@ username=password,grantedAuthority[,grantedAuthority][,enabled|disabled]
 
 [[nsa-user]]
 == <user>
-Represents a user in the application.
+Đại diện cho một user trong application.
 
 
 [[nsa-user-parents]]
-=== Parent Elements of <user>
+=== Phần tử cha của <user>
 
 
 * <<nsa-user-service,user-service>>
@@ -261,35 +261,35 @@ Represents a user in the application.
 
 
 [[nsa-user-attributes]]
-=== <user> Attributes
+=== <user> Thuộc tính
 
 
 [[nsa-user-authorities]]
 * **authorities**
-One of more authorities granted to the user.
-Separate authorities with a comma (but no space).
-For example, "ROLE_USER,ROLE_ADMINISTRATOR"
+Một hoặc nhiều authority được cấp cho user.
+Phân tách các authority bằng dấu phẩy (không có khoảng trắng).
+Ví dụ: "ROLE_USER,ROLE_ADMINISTRATOR"
 
 
 [[nsa-user-disabled]]
 * **disabled**
-Can be set to "true" to mark an account as disabled and unusable.
+Có thể được đặt thành "true" để đánh dấu account là disabled và không thể sử dụng.
 
 
 [[nsa-user-locked]]
 * **locked**
-Can be set to "true" to mark an account as locked and unusable.
+Có thể được đặt thành "true" để đánh dấu account là locked và không thể sử dụng.
 
 
 [[nsa-user-name]]
 * **name**
-The username assigned to the user.
+Username được gán cho user.
 
 
 [[nsa-user-password]]
 * **password**
-The password assigned to the user.
-This may be hashed if the corresponding authentication provider supports hashing (remember to set the "hash" attribute of the "user-service" element).
-This attribute be omitted in the case where the data will not be used for authentication, but only for accessing authorities.
-If omitted, the namespace will generate a random value, preventing its accidental use for authentication.
-Cannot be empty.
+Password được gán cho user.
+Password này có thể được hashing nếu authentication provider tương ứng hỗ trợ hashing (hãy nhớ đặt thuộc tính "hash" của phần tử "user-service").
+Có thể bỏ qua thuộc tính này trong trường hợp dữ liệu sẽ không được sử dụng cho authentication mà chỉ để truy cập các authority.
+Nếu bị bỏ qua, namespace sẽ tạo một giá trị ngẫu nhiên, ngăn việc vô tình sử dụng giá trị đó cho authentication.
+Không được để trống.
