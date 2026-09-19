@@ -1,35 +1,35 @@
 [[oauth2AuthorizationServer-configuration-model]]
-= Configuration Model
+= Mô hình cấu hình
 
 [[oauth2AuthorizationServer-default-configuration]]
-== Default configuration
+== Cấu hình mặc định
 
-`OAuth2AuthorizationServerConfiguration` is a `@Configuration` that provides the minimal default configuration for an OAuth2 authorization server.
+`OAuth2AuthorizationServerConfiguration` là một `@Configuration` cung cấp cấu hình mặc định tối thiểu cho một Authorization Server OAuth2.
 
-`OAuth2AuthorizationServerConfiguration` uses xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-customizing-the-configuration[`OAuth2AuthorizationServerConfigurer`] to apply the default configuration and registers a `SecurityFilterChain` `@Bean` composed of all the infrastructure components supporting an OAuth2 authorization server.
+`OAuth2AuthorizationServerConfiguration` sử dụng xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-customizing-the-configuration[`OAuth2AuthorizationServerConfigurer`] để áp dụng cấu hình mặc định và đăng ký một `SecurityFilterChain` `@Bean` được tạo thành từ tất cả component hạ tầng hỗ trợ một Authorization Server OAuth2.
 
-The OAuth2 authorization server `SecurityFilterChain` `@Bean` is configured with the following default protocol endpoints:
+`SecurityFilterChain` `@Bean` của Authorization Server OAuth2 được cấu hình với các protocol endpoint mặc định sau:
 
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-endpoint[OAuth2 Authorization endpoint]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-endpoint[OAuth2 Token endpoint]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-introspection-endpoint[OAuth2 Token Introspection endpoint]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-revocation-endpoint[OAuth2 Token Revocation endpoint]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-server-metadata-endpoint[OAuth2 Authorization Server Metadata endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-endpoint[Authorization endpoint OAuth2]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-endpoint[Token endpoint OAuth2]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-introspection-endpoint[Token Introspection endpoint OAuth2]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-revocation-endpoint[Token Revocation endpoint OAuth2]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-server-metadata-endpoint[Authorization Server Metadata endpoint OAuth2]
 * xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-jwk-set-endpoint[JWK Set endpoint]
 
 [NOTE]
-The JWK Set endpoint is configured *only* if a `JWKSource<SecurityContext>` `@Bean` is registered.
+JWK Set endpoint chỉ được cấu hình *khi* một `JWKSource<SecurityContext>` `@Bean` được đăng ký.
 
 [NOTE]
 ====
-The following protocol endpoints are disabled by default:
+Các protocol endpoint sau bị vô hiệu hóa theo mặc định:
 
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-authorization-endpoint[OAuth2 Device Authorization Endpoint]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-verification-endpoint[OAuth2 Device Verification Endpoint]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-client-registration-endpoint[OAuth2 Client Registration endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-authorization-endpoint[Device Authorization Endpoint OAuth2]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-verification-endpoint[Device Verification Endpoint OAuth2]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-client-registration-endpoint[Client Registration endpoint OAuth2]
 ====
 
-The following example shows how to use `OAuth2AuthorizationServerConfiguration` to apply the minimal default configuration:
+Ví dụ sau cho thấy cách sử dụng `OAuth2AuthorizationServerConfiguration` để áp dụng cấu hình mặc định tối thiểu:
 
 [source,java]
 ----
@@ -54,9 +54,9 @@ public class AuthorizationServerConfig {
 ----
 
 [IMPORTANT]
-The https://datatracker.ietf.org/doc/html/rfc6749#section-4.1[authorization_code grant] requires the resource owner to be authenticated. Therefore, a user authentication mechanism *must* be configured in addition to the default OAuth2 security configuration.
+https://datatracker.ietf.org/doc/html/rfc6749#section-4.1[authorization_code grant] yêu cầu resource owner phải được authentication. Vì vậy, một cơ chế user authentication *phải* được cấu hình bổ sung bên cạnh cấu hình security OAuth2 mặc định.
 
-https://openid.net/specs/openid-connect-core-1_0.html[OpenID Connect 1.0] is disabled in the default configuration. The following example shows how to enable OpenID Connect 1.0 by initializing the `OidcConfigurer`:
+https://openid.net/specs/openid-connect-core-1_0.html[OpenID Connect 1.0] bị vô hiệu hóa trong cấu hình mặc định. Ví dụ sau cho thấy cách bật OpenID Connect 1.0 bằng cách khởi tạo `OidcConfigurer`:
 
 [source,java]
 ----
@@ -71,19 +71,19 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 }
 ----
 
-In addition to the default protocol endpoints, the OAuth2 authorization server `SecurityFilterChain` `@Bean` is configured with the following OpenID Connect 1.0 protocol endpoints:
+Ngoài các protocol endpoint mặc định, `SecurityFilterChain` `@Bean` của Authorization Server OAuth2 được cấu hình với các OpenID Connect 1.0 protocol endpoint sau:
 
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-provider-configuration-endpoint[OpenID Connect 1.0 Provider Configuration endpoint]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-logout-endpoint[OpenID Connect 1.0 Logout endpoint]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-user-info-endpoint[OpenID Connect 1.0 UserInfo endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-provider-configuration-endpoint[Provider Configuration endpoint OpenID Connect 1.0]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-logout-endpoint[Logout endpoint OpenID Connect 1.0]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-user-info-endpoint[UserInfo endpoint OpenID Connect 1.0]
 
 [NOTE]
-The xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-client-registration-endpoint[OpenID Connect 1.0 Client Registration endpoint] is disabled by default.
+xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-client-registration-endpoint[Client Registration endpoint OpenID Connect 1.0] bị vô hiệu hóa theo mặc định.
 
 [TIP]
-`OAuth2AuthorizationServerConfiguration.jwtDecoder(JWKSource<SecurityContext>)` is a convenience (`static`) utility method that can be used to register a `JwtDecoder` `@Bean`, which is *REQUIRED* for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-user-info-endpoint[OpenID Connect 1.0 UserInfo endpoint] and the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-client-registration-endpoint[OpenID Connect 1.0 Client Registration endpoint].
+`OAuth2AuthorizationServerConfiguration.jwtDecoder(JWKSource<SecurityContext>)` là một utility method tiện lợi (`static`) có thể dùng để đăng ký `JwtDecoder` `@Bean`, thành phần *BẮT BUỘC* đối với xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-user-info-endpoint[UserInfo endpoint OpenID Connect 1.0] và xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-client-registration-endpoint[Client Registration endpoint OpenID Connect 1.0].
 
-The following example shows how to register a `JwtDecoder` `@Bean`:
+Ví dụ sau cho thấy cách đăng ký `JwtDecoder` `@Bean`:
 
 [source,java]
 ----
@@ -93,16 +93,16 @@ public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
 }
 ----
 
-The main intent of `OAuth2AuthorizationServerConfiguration` is to provide a convenient method to apply the minimal default configuration for an OAuth2 authorization server. However, in most cases, customizing the configuration will be required.
+Mục đích chính của `OAuth2AuthorizationServerConfiguration` là cung cấp một method thuận tiện để áp dụng cấu hình mặc định tối thiểu cho một Authorization Server OAuth2. Tuy nhiên, trong hầu hết trường hợp, sẽ cần tùy chỉnh cấu hình.
 
 [[oauth2AuthorizationServer-customizing-the-configuration]]
-== Customizing the configuration
+== Tùy chỉnh cấu hình
 
-`OAuth2AuthorizationServerConfigurer` provides the ability to fully customize the security configuration for an OAuth2 authorization server.
-It lets you specify the core components to use - for example, xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client-repository[`RegisteredClientRepository`],  xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-authorization-service[`OAuth2AuthorizationService`], xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-generator[`OAuth2TokenGenerator`], and others.
-Furthermore, it lets you customize the request processing logic for the protocol endpoints – for example, xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-endpoint[authorization endpoint], xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-authorization-endpoint[device authorization endpoint], xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-verification-endpoint[device verification endpoint], xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-endpoint[token endpoint], xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-introspection-endpoint[token introspection endpoint], and others.
+`OAuth2AuthorizationServerConfigurer` cung cấp khả năng tùy chỉnh đầy đủ cấu hình security cho một Authorization Server OAuth2.
+Nó cho phép bạn chỉ định các component cốt lõi cần sử dụng, chẳng hạn như xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client-repository[`RegisteredClientRepository`], xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-authorization-service[`OAuth2AuthorizationService`], xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-generator[`OAuth2TokenGenerator`] và các component khác.
+Ngoài ra, nó cho phép bạn tùy chỉnh logic xử lý request cho các protocol endpoint, chẳng hạn như xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-endpoint[authorization endpoint], xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-authorization-endpoint[device authorization endpoint], xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-verification-endpoint[device verification endpoint], xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-endpoint[token endpoint], xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-introspection-endpoint[token introspection endpoint] và các endpoint khác.
 
-`OAuth2AuthorizationServerConfigurer` provides the following configuration options:
+`OAuth2AuthorizationServerConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -137,32 +137,32 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `registeredClientRepository()`: The xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client-repository[`RegisteredClientRepository`] (*REQUIRED*) for managing new and existing clients.
-<2> `authorizationService()`: The xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-authorization-service[`OAuth2AuthorizationService`] for managing new and existing authorizations.
-<3> `authorizationConsentService()`: The xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-authorization-consent-service[`OAuth2AuthorizationConsentService`] for managing new and existing authorization consents.
-<4> `authorizationServerSettings()`: The xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-configuring-authorization-server-settings[`AuthorizationServerSettings`] (*REQUIRED*) for customizing configuration settings for the OAuth2 authorization server.
-<5> `tokenGenerator()`: The xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-generator[`OAuth2TokenGenerator`] for generating tokens supported by the OAuth2 authorization server.
-<6> `clientAuthentication()`: The configurer for xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-configuring-client-authentication[OAuth2 Client Authentication].
-<7> `authorizationEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-endpoint[OAuth2 Authorization endpoint].
-<8> `pushedAuthorizationRequestEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-pushed-authorization-request-endpoint[OAuth2 Pushed Authorization Request endpoint].
-<9> `deviceAuthorizationEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-authorization-endpoint[OAuth2 Device Authorization endpoint].
-<10> `deviceVerificationEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-verification-endpoint[OAuth2 Device Verification endpoint].
-<11> `tokenEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-endpoint[OAuth2 Token endpoint].
-<12> `tokenIntrospectionEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-introspection-endpoint[OAuth2 Token Introspection endpoint].
-<13> `tokenRevocationEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-revocation-endpoint[OAuth2 Token Revocation endpoint].
-<14> `clientRegistrationEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-client-registration-endpoint[OAuth2 Client Registration endpoint].
-<15> `authorizationServerMetadataEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-server-metadata-endpoint[OAuth2 Authorization Server Metadata endpoint].
-<16> `providerConfigurationEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-provider-configuration-endpoint[OpenID Connect 1.0 Provider Configuration endpoint].
-<17> `logoutEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-logout-endpoint[OpenID Connect 1.0 Logout endpoint].
-<18> `userInfoEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-user-info-endpoint[OpenID Connect 1.0 UserInfo endpoint].
-<19> `clientRegistrationEndpoint()`: The configurer for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-client-registration-endpoint[OpenID Connect 1.0 Client Registration endpoint].
+<1> `registeredClientRepository()`: xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client-repository[`RegisteredClientRepository`] (*BẮT BUỘC*) để quản lý client mới và hiện có.
+<2> `authorizationService()`: xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-authorization-service[`OAuth2AuthorizationService`] để quản lý authorization mới và hiện có.
+<3> `authorizationConsentService()`: xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-authorization-consent-service[`OAuth2AuthorizationConsentService`] để quản lý consent authorization mới và hiện có.
+<4> `authorizationServerSettings()`: xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-configuring-authorization-server-settings[`AuthorizationServerSettings`] (*BẮT BUỘC*) để tùy chỉnh các thiết lập cấu hình cho Authorization Server OAuth2.
+<5> `tokenGenerator()`: xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-oauth2-token-generator[`OAuth2TokenGenerator`] để tạo các token được Authorization Server OAuth2 hỗ trợ.
+<6> `clientAuthentication()`: configurer cho xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-configuring-client-authentication[Client Authentication OAuth2].
+<7> `authorizationEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-endpoint[Authorization endpoint OAuth2].
+<8> `pushedAuthorizationRequestEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-pushed-authorization-request-endpoint[Pushed Authorization Request endpoint OAuth2].
+<9> `deviceAuthorizationEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-authorization-endpoint[Device Authorization endpoint OAuth2].
+<10> `deviceVerificationEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-verification-endpoint[Device Verification endpoint OAuth2].
+<11> `tokenEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-endpoint[Token endpoint OAuth2].
+<12> `tokenIntrospectionEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-introspection-endpoint[Token Introspection endpoint OAuth2].
+<13> `tokenRevocationEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-revocation-endpoint[Token Revocation endpoint OAuth2].
+<14> `clientRegistrationEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-client-registration-endpoint[Client Registration endpoint OAuth2].
+<15> `authorizationServerMetadataEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-server-metadata-endpoint[Authorization Server Metadata endpoint OAuth2].
+<16> `providerConfigurationEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-provider-configuration-endpoint[Provider Configuration endpoint OpenID Connect 1.0].
+<17> `logoutEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-logout-endpoint[Logout endpoint OpenID Connect 1.0].
+<18> `userInfoEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-user-info-endpoint[UserInfo endpoint OpenID Connect 1.0].
+<19> `clientRegistrationEndpoint()`: configurer cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-client-registration-endpoint[Client Registration endpoint OpenID Connect 1.0].
 
 [[oauth2AuthorizationServer-configuring-authorization-server-settings]]
-== Configuring Authorization Server Settings
+== Cấu hình Authorization Server Settings
 
-`AuthorizationServerSettings` contains the configuration settings for the OAuth2 authorization server.
-It specifies the `URI` for the protocol endpoints as well as the https://datatracker.ietf.org/doc/html/rfc8414#section-2[issuer identifier].
-The default `URI` for the protocol endpoints are as follows:
+`AuthorizationServerSettings` chứa các thiết lập cấu hình cho Authorization Server OAuth2.
+Nó chỉ định `URI` cho các protocol endpoint cũng như https://datatracker.ietf.org/doc/html/rfc8414#section-2[issuer identifier].
+`URI` mặc định cho các protocol endpoint như sau:
 
 [source,java]
 ----
@@ -192,12 +192,12 @@ public final class AuthorizationServerSettings extends AbstractSettings {
 ----
 
 [NOTE]
-`AuthorizationServerSettings` is a *REQUIRED* component.
+`AuthorizationServerSettings` là component *BẮT BUỘC*.
 
 [TIP]
-xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-default-configuration[`@Import(OAuth2AuthorizationServerConfiguration.class)`] automatically registers an `AuthorizationServerSettings` `@Bean`, if not already provided.
+xref:servlet/oauth2/authorization-server/configuration-model.adoc#oauth2AuthorizationServer-default-configuration[`@Import(OAuth2AuthorizationServerConfiguration.class)`] tự động đăng ký một `AuthorizationServerSettings` `@Bean` nếu chưa được cung cấp.
 
-The following example shows how to customize the configuration settings and register an `AuthorizationServerSettings` `@Bean`:
+Ví dụ sau cho thấy cách tùy chỉnh các thiết lập cấu hình và đăng ký một `AuthorizationServerSettings` `@Bean`:
 
 [source,java]
 ----
@@ -221,22 +221,22 @@ public AuthorizationServerSettings authorizationServerSettings() {
 }
 ----
 
-The `AuthorizationServerContext` is a context object that holds information of the Authorization Server runtime environment.
-It provides access to the `AuthorizationServerSettings` and the "`current`" issuer identifier.
+`AuthorizationServerContext` là một context object chứa thông tin về môi trường runtime của Authorization Server.
+Nó cung cấp quyền truy cập đến `AuthorizationServerSettings` và issuer identifier "`current`".
 
 [NOTE]
-If the issuer identifier is not configured in `AuthorizationServerSettings.builder().issuer(String)`, it is resolved from the current request.
+Nếu issuer identifier không được cấu hình trong `AuthorizationServerSettings.builder().issuer(String)`, nó sẽ được phân giải từ request hiện tại.
 
 [NOTE]
-The `AuthorizationServerContext` is accessible through the `AuthorizationServerContextHolder`, which associates it with the current request thread by using a `ThreadLocal`.
+Có thể truy cập `AuthorizationServerContext` thông qua `AuthorizationServerContextHolder`, thành phần liên kết nó với thread của request hiện tại bằng `ThreadLocal`.
 
 [[oauth2AuthorizationServer-configuring-client-authentication]]
-== Configuring Client Authentication
+== Cấu hình Client Authentication
 
-`OAuth2ClientAuthenticationConfigurer` provides the ability to customize https://datatracker.ietf.org/doc/html/rfc6749#section-2.3[OAuth2 client authentication].
-It defines extension points that let you customize the pre-processing, main processing, and post-processing logic for client authentication requests.
+`OAuth2ClientAuthenticationConfigurer` cung cấp khả năng tùy chỉnh https://datatracker.ietf.org/doc/html/rfc6749#section-2.3[client authentication OAuth2].
+Nó định nghĩa các extension point cho phép bạn tùy chỉnh logic tiền xử lý, xử lý chính và hậu xử lý cho các request client authentication.
 
-`OAuth2ClientAuthenticationConfigurer` provides the following configuration options:
+`OAuth2ClientAuthenticationConfigurer` cung cấp các tùy chọn cấu hình sau:
 
 [source,java]
 ----
@@ -259,39 +259,39 @@ public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity h
 	return http.build();
 }
 ----
-<1> `authenticationConverter()`: Adds an `AuthenticationConverter` (_pre-processor_) used when attempting to extract client credentials from `HttpServletRequest` to an instance of `OAuth2ClientAuthenticationToken`.
-<2> `authenticationConverters()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationConverter``'s allowing the ability to add, remove, or customize a specific `AuthenticationConverter`.
-<3> `authenticationProvider()`: Adds an `AuthenticationProvider` (_main processor_) used for authenticating the `OAuth2ClientAuthenticationToken`.
-<4> `authenticationProviders()`: Sets the `Consumer` providing access to the `List` of default and (optionally) added ``AuthenticationProvider``'s allowing the ability to add, remove, or customize a specific `AuthenticationProvider`.
-<5> `authenticationSuccessHandler()`: The `AuthenticationSuccessHandler` (_post-processor_) used for handling a successful client authentication and associating the `OAuth2ClientAuthenticationToken` to the `SecurityContext`.
-<6> `errorResponseHandler()`: The `AuthenticationFailureHandler` (_post-processor_) used for handling a failed client authentication and returning the https://datatracker.ietf.org/doc/html/rfc6749#section-5.2[`OAuth2Error` response].
+<1> `authenticationConverter()`: Thêm một `AuthenticationConverter` (_bộ tiền xử lý_) được sử dụng khi cố gắng trích xuất credential của client từ `HttpServletRequest` thành một instance của `OAuth2ClientAuthenticationToken`.
+<2> `authenticationConverters()`: Thiết lập `Consumer` cung cấp quyền truy cập đến `List` mặc định và các ``AuthenticationConverter`` được thêm vào (tùy chọn), cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationConverter` cụ thể.
+<3> `authenticationProvider()`: Thêm một `AuthenticationProvider` (_bộ xử lý chính_) được sử dụng để authentication `OAuth2ClientAuthenticationToken`.
+<4> `authenticationProviders()`: Thiết lập `Consumer` cung cấp quyền truy cập đến `List` mặc định và các ``AuthenticationProvider`` được thêm vào (tùy chọn), cho phép thêm, xóa hoặc tùy chỉnh một `AuthenticationProvider` cụ thể.
+<5> `authenticationSuccessHandler()`: `AuthenticationSuccessHandler` (_bộ hậu xử lý_) được sử dụng để xử lý client authentication thành công và liên kết `OAuth2ClientAuthenticationToken` với `SecurityContext`.
+<6> `errorResponseHandler()`: `AuthenticationFailureHandler` (_bộ hậu xử lý_) được sử dụng để xử lý client authentication thất bại và trả về https://datatracker.ietf.org/doc/html/rfc6749#section-5.2[response `OAuth2Error`].
 
-`OAuth2ClientAuthenticationConfigurer` configures the `OAuth2ClientAuthenticationFilter` and registers it with the OAuth2 authorization server `SecurityFilterChain` `@Bean`.
-`OAuth2ClientAuthenticationFilter` is the `Filter` that processes client authentication requests.
+`OAuth2ClientAuthenticationConfigurer` cấu hình `OAuth2ClientAuthenticationFilter` và đăng ký nó với `SecurityFilterChain` `@Bean` của Authorization Server OAuth2.
+`OAuth2ClientAuthenticationFilter` là `Filter` xử lý các request client authentication.
 
-By default, client authentication is required for the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-endpoint[OAuth2 Token endpoint], the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-introspection-endpoint[OAuth2 Token Introspection endpoint], and the xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-revocation-endpoint[OAuth2 Token Revocation endpoint].
-The supported client authentication methods are `client_secret_basic`, `client_secret_post`, `private_key_jwt`, `client_secret_jwt`, `tls_client_auth`, `self_signed_tls_client_auth`, and `none` (public clients).
+Theo mặc định, client authentication là bắt buộc đối với xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-endpoint[Token endpoint OAuth2], xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-introspection-endpoint[Token Introspection endpoint OAuth2] và xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-revocation-endpoint[Token Revocation endpoint OAuth2].
+Các method client authentication được hỗ trợ là `client_secret_basic`, `client_secret_post`, `private_key_jwt`, `client_secret_jwt`, `tls_client_auth`, `self_signed_tls_client_auth` và `none` (public client).
 
-`OAuth2ClientAuthenticationFilter` is configured with the following defaults:
+`OAuth2ClientAuthenticationFilter` được cấu hình với các giá trị mặc định sau:
 
-* `*AuthenticationConverter*` -- A `DelegatingAuthenticationConverter` composed of  `JwtClientAssertionAuthenticationConverter`, `X509ClientCertificateAuthenticationConverter`, `ClientSecretBasicAuthenticationConverter`, `ClientSecretPostAuthenticationConverter`, and `PublicClientAuthenticationConverter`.
-* `*AuthenticationManager*` -- An `AuthenticationManager` composed of `JwtClientAssertionAuthenticationProvider`, `X509ClientCertificateAuthenticationProvider`, `ClientSecretAuthenticationProvider`, and `PublicClientAuthenticationProvider`.
-* `*AuthenticationSuccessHandler*` -- An internal implementation that associates the "`authenticated`" `OAuth2ClientAuthenticationToken` (current `Authentication`) to the `SecurityContext`.
-* `*AuthenticationFailureHandler*` -- An internal implementation that uses the `OAuth2Error` associated with the `OAuth2AuthenticationException` to return the OAuth2 error response.
+* `*AuthenticationConverter*` -- Một `DelegatingAuthenticationConverter` được tạo thành từ `JwtClientAssertionAuthenticationConverter`, `X509ClientCertificateAuthenticationConverter`, `ClientSecretBasicAuthenticationConverter`, `ClientSecretPostAuthenticationConverter` và `PublicClientAuthenticationConverter`.
+* `*AuthenticationManager*` -- Một `AuthenticationManager` được tạo thành từ `JwtClientAssertionAuthenticationProvider`, `X509ClientCertificateAuthenticationProvider`, `ClientSecretAuthenticationProvider` và `PublicClientAuthenticationProvider`.
+* `*AuthenticationSuccessHandler*` -- Một implementation nội bộ liên kết `OAuth2ClientAuthenticationToken` ( `Authentication` hiện tại) "`authenticated`" với `SecurityContext`.
+* `*AuthenticationFailureHandler*` -- Một implementation nội bộ sử dụng `OAuth2Error` liên kết với `OAuth2AuthenticationException` để trả về OAuth2 error response.
 
 [[oauth2AuthorizationServer-customizing-jwt-client-assertion-validation]]
-=== Customizing Jwt Client Assertion Validation
+=== Tùy chỉnh Jwt Client Assertion Validation
 
-`JwtClientAssertionDecoderFactory.DEFAULT_JWT_VALIDATOR_FACTORY` is the default factory that provides an `OAuth2TokenValidator<Jwt>` for the specified `RegisteredClient` and is used for validating the `iss`, `sub`, `aud`, `exp` and `nbf` claims of the `Jwt` client assertion.
+`JwtClientAssertionDecoderFactory.DEFAULT_JWT_VALIDATOR_FACTORY` là factory mặc định cung cấp một `OAuth2TokenValidator<Jwt>` cho `RegisteredClient` được chỉ định và được sử dụng để validation các claim `iss`, `sub`, `aud`, `exp` và `nbf` của client assertion `Jwt`.
 
-`JwtClientAssertionDecoderFactory` provides the ability to override the default `Jwt` client assertion validation by supplying a custom factory of type `Function<RegisteredClient, OAuth2TokenValidator<Jwt>>` to `setJwtValidatorFactory()`.
+`JwtClientAssertionDecoderFactory` cung cấp khả năng ghi đè validation client assertion `Jwt` mặc định bằng cách cung cấp một factory tùy chỉnh có kiểu `Function<RegisteredClient, OAuth2TokenValidator<Jwt>>` cho `setJwtValidatorFactory()`.
 
 [NOTE]
-`JwtClientAssertionDecoderFactory` is the default `JwtDecoderFactory` used by `JwtClientAssertionAuthenticationProvider` that provides a `JwtDecoder` for the specified `RegisteredClient` and is used for authenticating a `Jwt` Bearer Token during OAuth2 client authentication.
+`JwtClientAssertionDecoderFactory` là `JwtDecoderFactory` mặc định được `JwtClientAssertionAuthenticationProvider` sử dụng, cung cấp một `JwtDecoder` cho `RegisteredClient` được chỉ định và được dùng để authentication một Bearer Token `Jwt` trong quá trình client authentication OAuth2.
 
-A common use case for customizing `JwtClientAssertionDecoderFactory` is to validate additional claims in the `Jwt` client assertion.
+Một trường hợp sử dụng phổ biến khi tùy chỉnh `JwtClientAssertionDecoderFactory` là validation các claim bổ sung trong client assertion `Jwt`.
 
-The following example shows how to configure `JwtClientAssertionAuthenticationProvider` with a customized `JwtClientAssertionDecoderFactory` that validates an additional claim in the `Jwt` client assertion:
+Ví dụ sau cho thấy cách cấu hình `JwtClientAssertionAuthenticationProvider` với một `JwtClientAssertionDecoderFactory` đã tùy chỉnh để validation một claim bổ sung trong client assertion `Jwt`:
 
 [source,java]
 ----
@@ -331,17 +331,17 @@ private Consumer<List<AuthenticationProvider>> configureJwtClientAssertionValida
 ----
 
 [[oauth2AuthorizationServer-customizing-mutual-tls-client-authentication]]
-=== Customizing Mutual-TLS Client Authentication
+=== Tùy chỉnh Mutual-TLS Client Authentication
 
-`X509ClientCertificateAuthenticationProvider` is used for authenticating the client `X509Certificate` chain received when `ClientAuthenticationMethod.TLS_CLIENT_AUTH` or `ClientAuthenticationMethod.SELF_SIGNED_TLS_CLIENT_AUTH` method is used during OAuth2 client authentication.
-It is also composed with a _"Certificate Verifier"_, which is used to verify the contents of the client `X509Certificate` after the TLS handshake has successfully completed.
+`X509ClientCertificateAuthenticationProvider` được sử dụng để authentication chain `X509Certificate` của client nhận được khi method `ClientAuthenticationMethod.TLS_CLIENT_AUTH` hoặc `ClientAuthenticationMethod.SELF_SIGNED_TLS_CLIENT_AUTH` được sử dụng trong quá trình client authentication OAuth2.
+Nó cũng được kết hợp với một _"Certificate Verifier"_, được sử dụng để kiểm tra nội dung của `X509Certificate` client sau khi TLS handshake hoàn tất thành công.
 
 [[oauth2AuthorizationServer-customizing-mutual-tls-client-authentication-pki-mutual-tls-method]]
-==== PKI Mutual-TLS Method
+==== Method PKI Mutual-TLS
 
-For the PKI Mutual-TLS (`ClientAuthenticationMethod.TLS_CLIENT_AUTH`) method, the default implementation of the certificate verifier verifies the subject distinguished name of the client `X509Certificate` against the setting `RegisteredClient.getClientSettings.getX509CertificateSubjectDN()`.
+Đối với method PKI Mutual-TLS (`ClientAuthenticationMethod.TLS_CLIENT_AUTH`), implementation mặc định của certificate verifier kiểm tra subject distinguished name của `X509Certificate` client dựa trên thiết lập `RegisteredClient.getClientSettings.getX509CertificateSubjectDN()`.
 
-If you need to verify another attribute of the client `X509Certificate`, for example, a Subject Alternative Name (SAN) entry, the following example shows how to configure `X509ClientCertificateAuthenticationProvider` with a custom implementation of a certificate verifier:
+Nếu cần kiểm tra một thuộc tính khác của `X509Certificate` client, chẳng hạn một entry Subject Alternative Name (SAN), ví dụ sau cho thấy cách cấu hình `X509ClientCertificateAuthenticationProvider` với một implementation tùy chỉnh của certificate verifier:
 
 [source,java]
 ----
@@ -381,25 +381,25 @@ private Consumer<List<AuthenticationProvider>> configureX509ClientCertificateVer
 ----
 
 [[oauth2AuthorizationServer-customizing-mutual-tls-client-authentication-self-signed-certificate-mutual-tls-method]]
-==== Self-Signed Certificate Mutual-TLS Method
+==== Method Self-Signed Certificate Mutual-TLS
 
-For the Self-Signed Certificate Mutual-TLS (`ClientAuthenticationMethod.SELF_SIGNED_TLS_CLIENT_AUTH`) method, the default implementation of the certificate verifier will retrieve the client's JSON Web Key Set using the setting `RegisteredClient.getClientSettings.getJwkSetUrl()` and expect to find a match against the client `X509Certificate` received during the TLS handshake.
+Đối với method Self-Signed Certificate Mutual-TLS (`ClientAuthenticationMethod.SELF_SIGNED_TLS_CLIENT_AUTH`), implementation mặc định của certificate verifier sẽ lấy JSON Web Key Set của client bằng thiết lập `RegisteredClient.getClientSettings.getJwkSetUrl()` và mong đợi tìm thấy một kết quả khớp với `X509Certificate` client nhận được trong TLS handshake.
 
 [NOTE]
-The `RegisteredClient.getClientSettings.getJwkSetUrl()` setting is used to retrieve the client's certificates via a JSON Web Key (JWK) Set.
-A certificate is represented with the `x5c` parameter of an individual JWK within the set.
+Thiết lập `RegisteredClient.getClientSettings.getJwkSetUrl()` được sử dụng để lấy certificate của client thông qua một JSON Web Key (JWK) Set.
+Một certificate được biểu diễn bằng parameter `x5c` của một JWK riêng lẻ trong set.
 
 [[oauth2AuthorizationServer-customizing-mutual-tls-client-authentication-client-certificate-bound-access-tokens]]
-==== Client Certificate-Bound Access Tokens
+==== Access Token Gắn với Client Certificate
 
-When Mutual-TLS client authentication is used at the token endpoint, the authorization server is able to bind the issued access token to the client's `X509Certificate`.
-The binding is accomplished by computing the SHA-256 thumbprint of the client's `X509Certificate` and associating the thumbprint with the access token.
-For example, a JWT access token would include a `x5t#S256` claim, containing the `X509Certificate` thumbprint, within the top-level `cnf` (confirmation method) claim.
+Khi Mutual-TLS client authentication được sử dụng tại token endpoint, Authorization Server có thể gắn access token đã cấp với `X509Certificate` của client.
+Việc gắn kết được thực hiện bằng cách tính thumbprint SHA-256 của `X509Certificate` client và liên kết thumbprint đó với access token.
+Ví dụ, một access token JWT sẽ bao gồm claim `x5t#S256` chứa thumbprint của `X509Certificate` bên trong claim `cnf` (confirmation method) cấp cao nhất.
 
-Binding the access token to the client's `X509Certificate` provides the ability to implement a proof-of-possession mechanism during protected resource access.
-For example, the protected resource would obtain the client's `X509Certificate` used during Mutual-TLS authentication and then verify that the certificate thumbprint matches the `x5t#S256` claim associated with the access token.
+Việc gắn access token với `X509Certificate` của client cho phép triển khai cơ chế proof-of-possession trong quá trình truy cập protected resource.
+Ví dụ, protected resource sẽ lấy `X509Certificate` của client được sử dụng trong Mutual-TLS authentication, sau đó kiểm tra thumbprint của certificate có khớp với claim `x5t#S256` liên kết với access token hay không.
 
-The following example shows how to enable certificate-bound access tokens for a client:
+Ví dụ sau cho thấy cách bật certificate-bound access token cho một client:
 
 [source,java]
 ----
