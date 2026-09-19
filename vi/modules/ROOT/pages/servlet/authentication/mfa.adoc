@@ -1,282 +1,282 @@
-= Multi-Factor Authentication
+= Authentication đa yếu tố
 
-https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html[Multi-Factor Authentication (MFA)] requires that a user provide factors in order to authenticate.
-OWASP places factors into the following categories:
+https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html[Authentication đa yếu tố (MFA)] yêu cầu người dùng cung cấp các yếu tố để thực hiện authentication.
+OWASP phân loại các yếu tố thành các nhóm sau:
 
-- Something the user knows (e.g. a password)
-- Something that the user has (e.g. access to SMS or email)
-- Something you are (e.g. biometrics)
-- Somewhere you are (e.g. geolocation)
-- Something you do (e.g. Behavior Profiling)
+- Điều người dùng biết (ví dụ: một password)
+- Điều người dùng có (ví dụ: quyền truy cập SMS hoặc email)
+- Điều thuộc về bản thân bạn (ví dụ: biometrics)
+- Nơi bạn đang ở (ví dụ: geolocation)
+- Điều bạn thực hiện (ví dụ: Behavior Profiling)
 
 == `FactorGrantedAuthority`
 
-At the time of authentication, Spring Security's authentication mechanisms add a javadoc:org.springframework.security.core.authority.FactorGrantedAuthority[].
-For example, when a user authenticates using a password a `FactorGrantedAuthority` with the `authority` of `FactorGrantedAuthority.PASSWORD_AUTHORITY` is automatically added to the `Authentication`.
-In order to require MFA with Spring Security you must:
+Tại thời điểm authentication, các authentication mechanism của Spring Security thêm một javadoc:org.springframework.security.core.authority.FactorGrantedAuthority[].
+Ví dụ, khi người dùng authenticate bằng password, một `FactorGrantedAuthority` có `authority` là `FactorGrantedAuthority.PASSWORD_AUTHORITY` sẽ tự động được thêm vào `Authentication`.
+Để yêu cầu MFA với Spring Security, bạn phải:
 
-- Specify an authorization rule that requires multiple factors
-- Setup authentication for each of those factors
+- Chỉ định một authorization rule yêu cầu nhiều yếu tố
+- Thiết lập authentication cho từng yếu tố đó
 
 [[emfa]]
 == @EnableMultiFactorAuthentication
 
-javadoc:org.springframework.security.config.annotation.authorization.EnableMultiFactorAuthentication[format=annotation] makes it easy to enable multifactor authentication.
-Below you can find a configuration that adds the requirement for both passwords and OTT to every authorization rule.
+javadoc:org.springframework.security.config.annotation.authorization.EnableMultiFactorAuthentication[format=annotation] giúp dễ dàng bật authentication đa yếu tố.
+Dưới đây là một cấu hình thêm yêu cầu về cả password và OTT vào mọi authorization rule.
 
 include-code::./EnableMultiFactorAuthenticationConfiguration[tag=enable-mfa,indent=0]
 
-We are now able to concisely create a configuration that always requires multiple factors.
+Giờ đây, chúng ta có thể tạo ngắn gọn một cấu hình luôn yêu cầu nhiều yếu tố.
 
 include-code::./EnableMultiFactorAuthenticationConfiguration[tag=httpSecurity,indent=0]
-<1> URLs that begin with `/admin/**` require the authorities `FACTOR_OTT`, `FACTOR_PASSWORD`, `ROLE_ADMIN`.
-<2> Every other URL requires the authorities `FACTOR_OTT`, `FACTOR_PASSWORD`
-<3> Set up the authentication mechanisms that can provide the required factors.
+<1> Các URL bắt đầu bằng `/admin/**` yêu cầu các authority `FACTOR_OTT`, `FACTOR_PASSWORD`, `ROLE_ADMIN`.
+<2> Mọi URL khác yêu cầu các authority `FACTOR_OTT`, `FACTOR_PASSWORD`
+<3> Thiết lập các authentication mechanism có thể cung cấp những yếu tố bắt buộc.
 
-Spring Security behind the scenes knows which endpoint to go to depending on which authority is missing.
-If the user logged in initially with their username and password, then Spring Security redirects to the One-Time-Token Login page.
-If the user logged in initially with a token, then Spring Security redirects to the Username/Password Login page.
+Đằng sau hậu trường, Spring Security biết phải chuyển đến endpoint nào tùy thuộc vào authority còn thiếu.
+Nếu ban đầu người dùng đăng nhập bằng username và password, Spring Security sẽ redirect đến trang One-Time-Token Login.
+Nếu ban đầu người dùng đăng nhập bằng token, Spring Security sẽ redirect đến trang Username/Password Login.
 
 [[mfa-when-webauthn-registered]]
-=== Conditionally Requiring MFA for WebAuthn Users
+=== Yêu cầu MFA có điều kiện đối với người dùng WebAuthn
 
-At times, you may want to conditionally require MFA only for users who have registered a WebAuthn credential (passkey).
-You can achieve this by specifying javadoc:org.springframework.security.config.annotation.authorization.EnableMultiFactorAuthentication#when()[when = MultiFactorCondition.WEBAUTHN_REGISTERED].
+Đôi khi, bạn có thể chỉ muốn yêu cầu MFA có điều kiện đối với người dùng đã đăng ký một WebAuthn credential (passkey).
+Bạn có thể thực hiện điều này bằng cách chỉ định javadoc:org.springframework.security.config.annotation.authorization.EnableMultiFactorAuthentication#when()[when = MultiFactorCondition.WEBAUTHN_REGISTERED].
 
 include-code::./WebAuthnConditionConfiguration[tag=enable-mfa-webauthn,indent=0]
 
-This configuration requires `FACTOR_WEBAUTHN` and `FACTOR_PASSWORD` only when the user has registered a passkey.
-It works by publishing a xref:./mfa.adoc#mfa-when-custom-conditions[`Customizer<AdditionalRequiredFactorsBuilder<Object>>`] that updates the xref:./mfa.adoc#programmatic-mfa[`withWhen`] method with the condition.
+Cấu hình này chỉ yêu cầu `FACTOR_WEBAUTHN` và `FACTOR_PASSWORD` khi người dùng đã đăng ký một passkey.
+Cấu hình hoạt động bằng cách publish một xref:./mfa.adoc#mfa-when-custom-conditions[`Customizer<AdditionalRequiredFactorsBuilder<Object>>`] để cập nhật method xref:./mfa.adoc#programmatic-mfa[`withWhen`] bằng điều kiện này.
 
-NOTE: This condition requires both a javadoc:org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository[] bean and a javadoc:org.springframework.security.web.webauthn.management.UserCredentialRepository[] bean to be published in order to determine if the user has registered a WebAuthn credential.
+NOTE: Điều kiện này yêu cầu phải publish cả bean javadoc:org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository[] và bean javadoc:org.springframework.security.web.webauthn.management.UserCredentialRepository[] để xác định người dùng đã đăng ký WebAuthn credential hay chưa.
 
 [[mfa-when-custom-conditions]]
-=== Custom MFA Conditions
+=== Điều kiện MFA tùy chỉnh
 
-You can also publish one or more `Customizer<AdditionalRequiredFactorsBuilder<Object>>` beans to customize the factory created by `@EnableMultiFactorAuthentication`.
-For example, you can conditionally apply MFA for specific users:
+Bạn cũng có thể publish một hoặc nhiều bean `Customizer<AdditionalRequiredFactorsBuilder<Object>>` để tùy chỉnh factory được tạo bởi `@EnableMultiFactorAuthentication`.
+Ví dụ, bạn có thể áp dụng MFA có điều kiện cho những người dùng cụ thể:
 
 include-code::./CustomizerAuthorizationManagerFactoryConfiguration[tag=customizer,indent=0]
 
 [[authorization-manager-factory]]
 == AuthorizationManagerFactory
 
-The `@EnableMultiFactorAuthentication` `authorities` property is just a shortcut for publishing an javadoc:org.springframework.security.authorization.AuthorizationManagerFactory[] Bean.
-When an `AuthorizationManagerFactory` Bean is available, it is used by Spring Security to create authorization rules, like `hasAnyRole(String)`, that are defined on the `AuthorizationManagerFactory` Bean interface.
-The implementation published by `@EnableMultiFactorAuthentication` will ensure that each authorization is combined with the requirement of having the specified factors.
+Property `authorities` của `@EnableMultiFactorAuthentication` chỉ là cách viết tắt để publish một javadoc:org.springframework.security.authorization.AuthorizationManagerFactory[] Bean.
+Khi có một `AuthorizationManagerFactory` Bean, Spring Security sẽ dùng nó để tạo các authorization rule, chẳng hạn `hasAnyRole(String)`, được định nghĩa trên interface `AuthorizationManagerFactory` Bean.
+Implementation được publish bởi `@EnableMultiFactorAuthentication` sẽ bảo đảm mỗi authorization được kết hợp với yêu cầu phải có các yếu tố đã chỉ định.
 
-The `AuthorizationManagerFactory` Bean below is what is published in the previously discussed xref:./mfa.adoc#emfa[`@EnableMultiFactorAuthentication` example].
+`AuthorizationManagerFactory` Bean dưới đây là Bean được publish trong xref:./mfa.adoc#emfa[ví dụ `@EnableMultiFactorAuthentication`] đã thảo luận trước đó.
 
 include-code::./UseAuthorizationManagerFactoryConfiguration[tag=authorizationManagerFactoryBean,indent=0]
 
 
 [[selective-mfa]]
-== Selectively Requiring MFA
+== Yêu cầu MFA có chọn lọc
 
-We have demonstrated how to configure an entire application to require MFA by using xref:./mfa.adoc#emfa[``@EnableMultiFactorAuthentication``s] `authorities` property.
-However, there are times that an application only wants parts of the application to require MFA.
-Consider the following requirements:
+Chúng ta đã trình bày cách cấu hình toàn bộ application để yêu cầu MFA bằng property `authorities` của xref:./mfa.adoc#emfa[``@EnableMultiFactorAuthentication``s].
+Tuy nhiên, đôi khi application chỉ muốn một số phần của application yêu cầu MFA.
+Hãy xem các yêu cầu sau:
 
-- URLs that begin with `/admin/` should require the authorities `FACTOR_OTT`, `FACTOR_PASSWORD`, `ROLE_ADMIN`.
-- URLs that begin with `/user/settings` should require the authorities `FACTOR_OTT`, `FACTOR_PASSWORD`
-- Every other URL requires an authenticated user
+- Các URL bắt đầu bằng `/admin/` phải yêu cầu các authority `FACTOR_OTT`, `FACTOR_PASSWORD`, `ROLE_ADMIN`.
+- Các URL bắt đầu bằng `/user/settings` phải yêu cầu các authority `FACTOR_OTT`, `FACTOR_PASSWORD`
+- Mọi URL khác yêu cầu một người dùng đã authentication
 
-In this case, some URLs require MFA while others do not.
-This means that the global approach that we saw before does not work.
-Fortunately, we can use what we learned in xref:./mfa.adoc#authorization-manager-factory[] to solve this in a concise manner.
+Trong trường hợp này, một số URL yêu cầu MFA còn những URL khác thì không.
+Điều đó có nghĩa là cách tiếp cận toàn cục đã thấy trước đây không hoạt động.
+May mắn là chúng ta có thể dùng những gì đã học trong xref:./mfa.adoc#authorization-manager-factory[] để giải quyết vấn đề này một cách ngắn gọn.
 
-Start by specifying `@EnableMultiFactorAuthentication` without any authorities.
-By doing so we enable MFA support, but no `AuthorizationManagerFactory` Bean is published.
+Bắt đầu bằng cách chỉ định `@EnableMultiFactorAuthentication` mà không có authority nào.
+Làm như vậy sẽ bật hỗ trợ MFA, nhưng không publish `AuthorizationManagerFactory` Bean nào.
 
 include-code::./SelectiveMfaConfiguration[tag=enable-mfa,indent=0]
 
-Next create an `AuthorizationManagerFactory` instance, but do not publish it as a Bean.
+Tiếp theo, tạo một instance `AuthorizationManagerFactory`, nhưng không publish nó dưới dạng Bean.
 
 include-code::./SelectiveMfaConfiguration[tag=httpSecurity,indent=0]
-<1> Create a `DefaultAuthorizationManagerFactory` as we did previously, but do not publish it as a Bean.
-By not publishing it as a Bean, we are able to selectively use the `AuthorizationManagerFactory` instead of using it for every authorization rule.
-<2> Explicitly use `AuthorizationManagerFactory` so that URLs that begin with `/admin/**` require `FACTOR_OTT`, `FACTOR_PASSWORD`, and `ROLE_ADMIN`.
-<3> Explicitly use `AuthorizationManagerFactory` so that URLs that begin with `/user/settings` require `FACTOR_OTT` and `FACTOR_PASSWORD`
-<4> Otherwise, the request must be authenticated.
-There is no MFA requirement, because the `AuthorizationManagerFactory` is not used.
-<5> Set up the authentication mechanisms that can provide the required factors.
+<1> Tạo một `DefaultAuthorizationManagerFactory` như trước đây, nhưng không publish nó dưới dạng Bean.
+Không publish nó dưới dạng Bean cho phép chúng ta sử dụng `AuthorizationManagerFactory` có chọn lọc thay vì dùng nó cho mọi authorization rule.
+<2> Sử dụng rõ ràng `AuthorizationManagerFactory` để các URL bắt đầu bằng `/admin/**` yêu cầu `FACTOR_OTT`, `FACTOR_PASSWORD` và `ROLE_ADMIN`.
+<3> Sử dụng rõ ràng `AuthorizationManagerFactory` để các URL bắt đầu bằng `/user/settings` yêu cầu `FACTOR_OTT` và `FACTOR_PASSWORD`
+<4> Nếu không, request phải được authenticated.
+Không có yêu cầu MFA vì `AuthorizationManagerFactory` không được sử dụng.
+<5> Thiết lập các authentication mechanism có thể cung cấp những yếu tố bắt buộc.
 
 [[valid-duration]]
-== Specifying a Valid Duration
+== Chỉ định thời lượng hợp lệ
 
-At times, we may want to define authorization rules based upon how recently we authenticated.
-For example, an application may want to require that the user has authenticated within the last hour in order to allow access to the `/user/settings` endpoint.
+Đôi khi, chúng ta có thể muốn định nghĩa các authorization rule dựa trên thời điểm gần đây nhất chúng ta thực hiện authentication.
+Ví dụ, application có thể muốn yêu cầu người dùng đã authenticated trong vòng một giờ qua để cho phép truy cập endpoint `/user/settings`.
 
-Remember at the time of authentication, a `FactorGrantedAuthority` is added to the `Authentication`.
-The `FactorGrantedAuthority` specifies when it was `issuedAt`, but does not describe how long it is valid for.
-This is intentional, because it allows a single `FactorGrantedAuthority` to be used with different ``validDuration``s.
+Hãy nhớ rằng tại thời điểm authentication, một `FactorGrantedAuthority` được thêm vào `Authentication`.
+`FactorGrantedAuthority` chỉ rõ thời điểm `issuedAt`, nhưng không mô tả nó có hiệu lực trong bao lâu.
+Đây là chủ ý, vì nó cho phép dùng một `FactorGrantedAuthority` duy nhất với các ``validDuration`` khác nhau.
 
-Let's take a look at an example that illustrates how to meet the following requirements:
+Hãy xem một ví dụ minh họa cách đáp ứng các yêu cầu sau:
 
-- URLs that begin with `/admin/` should require that a password has been provided within the last 30 minutes
-- URLs that being with `/user/settings` should require that a password has been provided within the last hour
-- Otherwise, authentication is required, but it does not care if it is a password or how long ago authentication occurred
+- Các URL bắt đầu bằng `/admin/` phải yêu cầu password đã được cung cấp trong 30 phút gần nhất
+- Các URL bắt đầu bằng `/user/settings` phải yêu cầu password đã được cung cấp trong một giờ gần nhất
+- Nếu không, authentication là bắt buộc, nhưng không quan tâm đó có phải password hay authentication đã xảy ra bao lâu trước
 
 include-code::./ValidDurationConfiguration[tag=httpSecurity,indent=0]
-<1> First we define `passwordIn30m` as a requirement for a password within 30 minutes
-<2> Next, we define `passwordInHour` as a requirement for a password within an hour
-<3> We use `passwordIn30m` to require that URLs that begin with `/admin/` should require that a password has been provided in the last 30 minutes and that the user has the `ROLE_ADMIN` authority
-<4> We use `passwordInHour` to require that URLs that begin with `/user/settings` should require that a password has been provided in the last hour
-<5> Otherwise, authentication is required, but it does not care if it is a password or how long ago authentication occurred
-<6> Set up the authentication mechanisms that can provide the required factors.
+<1> Trước tiên, chúng ta định nghĩa `passwordIn30m` là yêu cầu về một password trong vòng 30 phút
+<2> Tiếp theo, chúng ta định nghĩa `passwordInHour` là yêu cầu về một password trong vòng một giờ
+<3> Chúng ta dùng `passwordIn30m` để yêu cầu các URL bắt đầu bằng `/admin/` phải có password được cung cấp trong 30 phút gần nhất và người dùng có authority `ROLE_ADMIN`
+<4> Chúng ta dùng `passwordInHour` để yêu cầu các URL bắt đầu bằng `/user/settings` phải có password được cung cấp trong một giờ gần nhất
+<5> Nếu không, authentication là bắt buộc, nhưng không quan tâm đó có phải password hay authentication đã xảy ra bao lâu trước
+<6> Thiết lập các authentication mechanism có thể cung cấp những yếu tố bắt buộc.
 
 [[all-factors-anyof]]
 == AllRequiredFactorsAuthorizationManager.anyOf
 
-In the previous examples, access requires satisfying that the user has authenticated with all factors.
-There are times when an application wants to allow users to satisfy one of several different combinations of factors.
-javadoc:org.springframework.security.authorization.AllRequiredFactorsAuthorizationManager#anyOf(AllRequiredFactorsAuthorizationManager...)[AllRequiredFactorsAuthorizationManager.anyOf] grants access if at least one of the provided combinations of factors is satisfied.
+Trong các ví dụ trước, quyền truy cập yêu cầu người dùng đã authenticated với tất cả các yếu tố.
+Đôi khi application muốn cho phép người dùng đáp ứng một trong nhiều tổ hợp yếu tố khác nhau.
+javadoc:org.springframework.security.authorization.AllRequiredFactorsAuthorizationManager#anyOf(AllRequiredFactorsAuthorizationManager...)[AllRequiredFactorsAuthorizationManager.anyOf] cấp quyền truy cập nếu đáp ứng ít nhất một trong các tổ hợp yếu tố được cung cấp.
 
-Consider a scenario where a user can authenticate with WebAuthn alone, or with both a password and a one-time token.
+Hãy xét một kịch bản trong đó người dùng có thể authenticate chỉ bằng WebAuthn, hoặc bằng cả password và one-time token.
 
 include-code::./AnyOfRequiredFactorsConfiguration[tag=httpSecurity,indent=0]
-<1> Require WebAuthn
-<2> Require both a password and a one-time token
-<3> Combine the combinations of factors with `anyOf`, granting access if either is satisfied
-<4> URLs that begin with `/protected/**` require the user to satisfy either combination of factors
-<5> All other requests require only authentication
-<6> Set up the authentication mechanisms that can provide the required factors
+<1> Yêu cầu WebAuthn
+<2> Yêu cầu cả password và one-time token
+<3> Kết hợp các tổ hợp yếu tố bằng `anyOf`, cấp quyền truy cập nếu đáp ứng một trong hai tổ hợp
+<4> Các URL bắt đầu bằng `/protected/**` yêu cầu người dùng đáp ứng một trong hai tổ hợp yếu tố
+<5> Mọi request khác chỉ yêu cầu authentication
+<6> Thiết lập các authentication mechanism có thể cung cấp những yếu tố bắt buộc
 
 [[programmatic-mfa]]
-== Programmatic MFA
+== MFA bằng lập trình
 
-In our previous examples, MFA is a static decision per request.
-There are times when we might want to require MFA for some users, but not others.
-Determining if MFA is enabled per user can be achieved by using `AuthorizationManagerFactories.multiFactor().when` to conditionally require factors based upon the `Authentication`.
-This is implemented using xref:servlet/authorization/architecture.adoc#authz-conditional-authorization-manager[`ConditionalAuthorizationManager`].
+Trong các ví dụ trước, MFA là một quyết định tĩnh cho mỗi request.
+Đôi khi chúng ta có thể muốn yêu cầu MFA đối với một số người dùng nhưng không yêu cầu đối với những người dùng khác.
+Có thể xác định MFA có được bật cho từng người dùng hay không bằng cách dùng `AuthorizationManagerFactories.multiFactor().when` để yêu cầu các yếu tố có điều kiện dựa trên `Authentication`.
+Điều này được triển khai bằng xref:servlet/authorization/architecture.adoc#authz-conditional-authorization-manager[`ConditionalAuthorizationManager`].
 
-To enable the conditional MFA rules globally, we can publish an `AuthorizationManagerFactory` Bean.
+Để bật toàn cục các MFA rule có điều kiện, chúng ta có thể publish một `AuthorizationManagerFactory` Bean.
 
 include-code::./AdminMfaAuthorizationManagerConfiguration[tag=authorizationManagerFactory,indent=0]
-<1> Require `FACTOR_OTT` and `FACTOR_PASSWORD`
-<2> Only apply the requirement if the username is `admin`. Otherwise, MFA is not required.
-<3> Return the `AuthorizationManagerFactory` using `.build()`. Since it is published as a Bean, it is used globally.
+<1> Yêu cầu `FACTOR_OTT` và `FACTOR_PASSWORD`
+<2> Chỉ áp dụng yêu cầu nếu username là `admin`. Nếu không, MFA không bắt buộc.
+<3> Trả về `AuthorizationManagerFactory` bằng `.build()`. Vì nó được publish dưới dạng Bean nên được sử dụng trên toàn cục.
 
-This should feel very similar to our previous example in xref:./mfa.adoc#authorization-manager-factory[].
-The difference is that in the previous example, the `AuthorizationManagerFactories` creates an `AuthorizationManager` that always requires the same authorities.
+Điều này rất giống với ví dụ trước trong xref:./mfa.adoc#authorization-manager-factory[].
+Điểm khác biệt là trong ví dụ trước, `AuthorizationManagerFactories` tạo một `AuthorizationManager` luôn yêu cầu các authority giống nhau.
 
-We can now define our authorization rules which are combined with `AuthorizationManagerFactory`.
+Giờ đây, chúng ta có thể định nghĩa các authorization rule được kết hợp với `AuthorizationManagerFactory`.
 
 include-code::./AdminMfaAuthorizationManagerConfiguration[tag=httpSecurity,indent=0]
-<1> URLs that begin with `/admin/**` require `ROLE_ADMIN`.
-If the username is `admin`, then `FACTOR_OTT` and `FACTOR_PASSWORD` are also required.
-<2> Otherwise, the request must be authenticated.
-If the username is `admin`, then `FACTOR_OTT` and `FACTOR_PASSWORD` are also required.
+<1> Các URL bắt đầu bằng `/admin/**` yêu cầu `ROLE_ADMIN`.
+Nếu username là `admin` thì `FACTOR_OTT` và `FACTOR_PASSWORD` cũng bắt buộc.
+<2> Nếu không, request phải được authenticated.
+Nếu username là `admin` thì `FACTOR_OTT` và `FACTOR_PASSWORD` cũng bắt buộc.
 
-NOTE: MFA is enabled by username and not role because that is how we implemented `RequiredAuthoritiesAuthorizationManagerConfiguration`.
-If we preferred, we could change our logic to enable MFA based upon the roles rather than the username.
+NOTE: MFA được bật theo username chứ không phải role vì đó là cách chúng ta triển khai `RequiredAuthoritiesAuthorizationManagerConfiguration`.
+Nếu muốn, chúng ta có thể thay đổi logic để bật MFA dựa trên role thay vì username.
 
 [[raam-mfa]]
 == RequiredAuthoritiesAuthorizationManager
 
-We've demonstrated how we can dynamically determine the authorities for a particular user in xref:./mfa.adoc#programmatic-mfa[] using `AuthorizationManagerFactories.multiFactor().when`.
-However, this is such a common scenario that Spring Security provides built in support using javadoc:org.springframework.security.authorization.RequiredAuthoritiesAuthorizationManager[] and javadoc:org.springframework.security.authorization.RequiredAuthoritiesRepository[].
+Chúng ta đã trình bày cách xác định động các authority cho một người dùng cụ thể trong xref:./mfa.adoc#programmatic-mfa[] bằng `AuthorizationManagerFactories.multiFactor().when`.
+Tuy nhiên, đây là một kịch bản phổ biến đến mức Spring Security cung cấp hỗ trợ built-in bằng javadoc:org.springframework.security.authorization.RequiredAuthoritiesAuthorizationManager[] và javadoc:org.springframework.security.authorization.RequiredAuthoritiesRepository[].
 
-Let's implement the same requirement that we did in xref:./mfa.adoc#programmatic-mfa[] using the built-in support.
+Hãy triển khai cùng yêu cầu như trong xref:./mfa.adoc#programmatic-mfa[] bằng hỗ trợ built-in.
 
-We start by creating the `RequiredAuthoritiesAuthorizationManager` Bean to use.
+Bắt đầu bằng cách tạo `RequiredAuthoritiesAuthorizationManager` Bean để sử dụng.
 
 include-code::./RequiredAuthoritiesAuthorizationManagerConfiguration[tag=authorizationManager,indent=0]
-<1> Create a javadoc:org.springframework.security.authorization.MapRequiredAuthoritiesRepository[] that maps users with the username `admin` to require MFA.
-<2> Return a `RequiredAuthoritiesAuthorizationManager` that is injected with the `MapRequiredAuthoritiesRepository`.
+<1> Tạo javadoc:org.springframework.security.authorization.MapRequiredAuthoritiesRepository[] ánh xạ người dùng có username `admin` để yêu cầu MFA.
+<2> Trả về một `RequiredAuthoritiesAuthorizationManager` được inject `MapRequiredAuthoritiesRepository`.
 
-Next we can define an `AuthorizationManagerFactory` that uses the `RequiredAuthoritiesAuthorizationManager`.
+Tiếp theo, chúng ta có thể định nghĩa một `AuthorizationManagerFactory` sử dụng `RequiredAuthoritiesAuthorizationManager`.
 
 include-code::./RequiredAuthoritiesAuthorizationManagerConfiguration[tag=authorizationManagerFactory,indent=0]
-<1> Inject the `RequiredAuthoritiesAuthorizationManager` as the javadoc:org.springframework.security.authorization.DefaultAuthorizationManagerFactory#setAdditionalAuthorization(org.springframework.security.authorization.AuthorizationManager)[DefaultAuthorization.additionalAuthorization].
-This instructs `DefaultAuthorizationManagerFactory` that any authorization rule should apply `RequiredAuthoritiesAuthorizationManager` along with any authorization requirements defined by the application (e.g. `hasRole("ADMIN")`).
-<2> Publish `DefaultAuthorizationManagerFactory` as a Bean, so it is used globally
+<1> Inject `RequiredAuthoritiesAuthorizationManager` dưới dạng javadoc:org.springframework.security.authorization.DefaultAuthorizationManagerFactory#setAdditionalAuthorization(org.springframework.security.authorization.AuthorizationManager)[DefaultAuthorization.additionalAuthorization].
+Điều này chỉ dẫn `DefaultAuthorizationManagerFactory` áp dụng `RequiredAuthoritiesAuthorizationManager` cho mọi authorization rule cùng với mọi yêu cầu authorization do application định nghĩa (ví dụ: `hasRole("ADMIN")`).
+<2> Publish `DefaultAuthorizationManagerFactory` dưới dạng Bean để nó được sử dụng trên toàn cục
 
-We can now define our authorization rules which are combined with `RequiredAuthoritiesAuthorizationManager`.
+Giờ đây, chúng ta có thể định nghĩa các authorization rule được kết hợp với `RequiredAuthoritiesAuthorizationManager`.
 
 include-code::./RequiredAuthoritiesAuthorizationManagerConfiguration[tag=httpSecurity,indent=0]
-<1> URLs that begin with `/admin/**` require `ROLE_ADMIN`.
-If the username is `admin`, then `FACTOR_OTT` and `FACTOR_PASSWORD` are also required.
-<2> Otherwise, the request must be authenticated.
-If the username is `admin`, then `FACTOR_OTT` and `FACTOR_PASSWORD` are also required.
+<1> Các URL bắt đầu bằng `/admin/**` yêu cầu `ROLE_ADMIN`.
+Nếu username là `admin` thì `FACTOR_OTT` và `FACTOR_PASSWORD` cũng bắt buộc.
+<2> Nếu không, request phải được authenticated.
+Nếu username là `admin` thì `FACTOR_OTT` và `FACTOR_PASSWORD` cũng bắt buộc.
 
-Our example uses an in memory mapping of usernames to the additional required authorities.
-For more dynamic use cases that can be determined by the username, a custom implementation of javadoc:org.springframework.security.authorization.RequiredAuthoritiesRepository[] can be created.
-Possible examples would be looking up if a user has enabled MFA in an explicit setting, determining if a user has registered a passkey, etc.
+Ví dụ của chúng ta sử dụng ánh xạ trong memory từ username đến các authority bổ sung bắt buộc.
+Đối với các use case động hơn có thể được xác định bằng username, có thể tạo một implementation tùy chỉnh của javadoc:org.springframework.security.authorization.RequiredAuthoritiesRepository[].
+Các ví dụ có thể là tra cứu xem người dùng đã bật MFA trong một setting cụ thể hay chưa, xác định người dùng đã đăng ký passkey hay chưa, v.v.
 
-For cases that need to determine MFA based upon the `Authentication`, `AuthorizationManagerFactories.multiFactor().when` can be used as demonstrated in xref:./mfa.adoc#programmatic-mfa[].
+Đối với các trường hợp cần xác định MFA dựa trên `Authentication`, có thể sử dụng `AuthorizationManagerFactories.multiFactor().when` như đã trình bày trong xref:./mfa.adoc#programmatic-mfa[].
 
 
 [[hasallauthorities]]
-== Using hasAllAuthorities
+== Sử dụng hasAllAuthorities
 
-We've shown a lot of additional infrastructure for supporting MFA.
-However, for simple MFA use-cases, using `hasAllAuthorities` to require multiple factors is effective.
+Chúng ta đã trình bày nhiều infrastructure bổ sung để hỗ trợ MFA.
+Tuy nhiên, đối với các use case MFA đơn giản, sử dụng `hasAllAuthorities` để yêu cầu nhiều yếu tố là hiệu quả.
 
 include-code::./ListAuthoritiesConfiguration[tag=httpSecurity,indent=0]
-<1> Require `FACTOR_PASSWORD` and `FACTOR_OTT` for every request
-<2> Set up the authentication mechanisms that can provide the required factors.
+<1> Yêu cầu `FACTOR_PASSWORD` và `FACTOR_OTT` cho mọi request
+<2> Thiết lập các authentication mechanism có thể cung cấp những yếu tố bắt buộc.
 
-The configuration above works well only for the most simple use-cases.
-If you have lots of endpoints, you probably do not want to repeat the requirements for MFA in every authorization rule.
+Cấu hình trên chỉ hoạt động tốt đối với các use case đơn giản nhất.
+Nếu có nhiều endpoint, có lẽ bạn không muốn lặp lại các yêu cầu MFA trong mọi authorization rule.
 
-For example, consider the following configuration:
+Ví dụ, hãy xem xét cấu hình sau:
 
 include-code::./MultipleAuthorizationRulesConfiguration[tag=httpSecurity,indent=0]
-<1> For URLs that begin with `/admin/**`, the following authorities are required `FACTOR_OTT`, `FACTOR_PASSWORD`, `ROLE_ADMIN`.
-<2> For every other URL, the following authorities are required `FACTOR_OTT`, `FACTOR_PASSWORD`, `ROLE_USER`.
-<3> Set up the authentication mechanisms that can provide the required factors.
+<1> Đối với các URL bắt đầu bằng `/admin/**`, các authority sau là bắt buộc: `FACTOR_OTT`, `FACTOR_PASSWORD`, `ROLE_ADMIN`.
+<2> Đối với mọi URL khác, các authority sau là bắt buộc: `FACTOR_OTT`, `FACTOR_PASSWORD`, `ROLE_USER`.
+<3> Thiết lập các authentication mechanism có thể cung cấp những yếu tố bắt buộc.
 
-The configuration only specifies two authorization rules, but it is enough to see that the duplication is not desirable.
-Can you imagine what it would be like to declare hundreds of rules like this?
+Cấu hình chỉ chỉ định hai authorization rule, nhưng cũng đủ để thấy việc trùng lặp là không mong muốn.
+Bạn có thể hình dung việc khai báo hàng trăm rule như thế này sẽ ra sao không?
 
-What's more that it becomes difficult to express more complicated authorization rules.
-For example, how would you require two factors and either `ROLE_ADMIN` or `ROLE_USER`?
+Hơn nữa, việc biểu đạt các authorization rule phức tạp hơn trở nên khó khăn.
+Ví dụ, làm thế nào để yêu cầu hai yếu tố và `ROLE_ADMIN` hoặc `ROLE_USER`?
 
-The answer to these questions, as we have already seen, is to use xref:./mfa.adoc#emfa[]
+Như đã thấy, câu trả lời cho những câu hỏi này là sử dụng xref:./mfa.adoc#emfa[]
 
 [[re-authentication]]
-== Re-authentication
+== Authentication lại
 
-The most common of these is re-authentication.
-Imagine an application configured in the following way:
+Trường hợp phổ biến nhất trong số này là re-authentication.
+Hãy hình dung một application được cấu hình như sau:
 
 include-code::./SimpleConfiguration[tag=httpSecurity,indent=0]
 
-By default, this application has two authentication mechanisms that it allows, meaning that the user could use either one and be fully-authenticated.
+Theo mặc định, application này cho phép hai authentication mechanism, nghĩa là người dùng có thể sử dụng một trong hai và được fully-authenticated.
 
-If there is a set of endpoints that require a specific factor, we can specify that in `authorizeHttpRequests` as follows:
+Nếu có một nhóm endpoint yêu cầu một yếu tố cụ thể, chúng ta có thể chỉ định điều đó trong `authorizeHttpRequests` như sau:
 
 include-code::./RequireOttConfiguration[tag=httpSecurity,indent=0]
-<1> States that all `/profile/**` endpoints require one-time-token login to be authorized
+<1> Chỉ rõ rằng mọi endpoint `/profile/**` yêu cầu đăng nhập bằng one-time-token để được authorization
 
-Given the above configuration, users can log in with any mechanism that you support.
-And, if they want to visit the profile page, then Spring Security will redirect them to the One-Time-Token Login page to obtain it.
+Với cấu hình trên, người dùng có thể đăng nhập bằng bất kỳ mechanism nào được hỗ trợ.
+Và nếu họ muốn truy cập trang profile, Spring Security sẽ redirect họ đến trang One-Time-Token Login để lấy yếu tố đó.
 
-In this way, the authority given to a user is directly proportional to the amount of proof given.
-This adaptive approach allows users to give only the proof needed to perform their intended operations.
+Theo cách này, authority cấp cho người dùng tỷ lệ thuận trực tiếp với lượng bằng chứng được cung cấp.
+Cách tiếp cận thích ứng này cho phép người dùng chỉ cung cấp bằng chứng cần thiết để thực hiện các thao tác dự định.
 
 
 [[obtaining-more-authorization]]
-== Authorizing More Scopes
+== Cấp authorization cho nhiều scope hơn
 
-You can also configure exception handling to direct Spring Security on how to obtain a missing scope.
+Bạn cũng có thể cấu hình exception handling để chỉ dẫn Spring Security cách lấy scope còn thiếu.
 
-Consider an application that requires a specific OAuth 2.0 scope for a given endpoint:
+Hãy xem xét một application yêu cầu một OAuth 2.0 scope cụ thể cho một endpoint:
 
 include-code::./ScopeConfiguration[tag=httpSecurity,indent=0]
 
-If this is also configured with an `AuthorizationManagerFactory` bean like this one:
+Nếu application này cũng được cấu hình với một `AuthorizationManagerFactory` bean như sau:
 
 include-code::./MissingAuthorityConfiguration[tag=authorizationManagerFactoryBean,indent=0]
 
-Then the application will require an X.509 certificate as well as authorization from an OAuth 2.0 authorization server.
+Khi đó, application sẽ yêu cầu một chứng chỉ X.509 cũng như authorization từ một OAuth 2.0 authorization server.
 
-In the event that the user does not consent to `profile:read`, this application as it stands will issue a 403.
-However, if you have a way for the application to re-ask for consent, then you can implement this in an `AuthenticationEntryPoint` like the following:
+Trong trường hợp người dùng không consent cho `profile:read`, application ở trạng thái hiện tại sẽ trả về 403.
+Tuy nhiên, nếu có cách để application yêu cầu consent lại, bạn có thể triển khai điều này trong một `AuthenticationEntryPoint` như sau:
 
 include-code::./MissingAuthorityConfiguration[tag=authenticationEntryPoint,indent=0]
 
-Then, your filter chain declaration can bind this entry point to the given authority like so:
+Sau đó, khai báo filter chain của bạn có thể liên kết entry point này với authority đã cho như sau:
 
 include-code::./MissingAuthorityConfiguration[tag=httpSecurity,indent=0]
