@@ -17,7 +17,7 @@ Các phần này tập trung vào những cách cụ thể mà bạn có thể m
 * xref:servlet/oauth2/login/index.adoc#oauth2login[Đăng nhập OAuth 2.0] - Đăng nhập OAuth 2.0 với OpenID Connect và OAuth 2.0 Login không theo chuẩn (tức là GitHub)
 * xref:servlet/saml2/index.adoc#servlet-saml2[Đăng nhập SAML 2.0] - Đăng nhập SAML 2.0
 * xref:servlet/authentication/cas.adoc#servlet-cas[Central Authentication Server (CAS)] - Hỗ trợ Central Authentication Server (CAS)
-* xref:servlet/authentication/rememberme.adoc#servlet-rememberme[Ghi nhớ tôi] - cách ghi nhớ người dùng sau khi session hết hạn
+* xref:servlet/authentication/rememberme.adoc#servlet-rememberme[remember-me] - cách ghi nhớ người dùng sau khi session hết hạn
 * xref:servlet/authentication/jaas.adoc#servlet-jaas[JAAS Authentication] - thực hiện authentication bằng JAAS
 * xref:servlet/authentication/preauth.adoc#servlet-preauth[Các kịch bản Pre-Authentication] - thực hiện authentication bằng một cơ chế bên ngoài như https://www.siteminder.com/[SiteMinder] hoặc bảo mật Java EE nhưng vẫn sử dụng Spring Security cho authorization và bảo vệ khỏi các khai thác phổ biến.
 * xref:servlet/authentication/x509.adoc#servlet-x509[X509 Authentication] - Authentication X509
