@@ -1,36 +1,36 @@
 [[anonymous]]
-= Anonymous Authentication
+= Authentication ẩn danh
 
 
 [[anonymous-overview]]
-== Overview
-It is generally considered good security practice to adopt a "`deny-by-default`" stance, where you explicitly specify what is allowed and disallow everything else.
-Defining what is accessible to unauthenticated users is a similar situation, particularly for web applications.
-Many sites require that users must be authenticated for anything other than a few URLs (for example the home and login pages).
-In that case, it is easiest to define access configuration attributes for these specific URLs rather than for every secured resource.
-Put differently, sometimes it is nice to say `ROLE_SOMETHING` is required by default and allow only certain exceptions to this rule, such as for login, logout, and home pages of an application.
-You could also omit these pages from the filter chain entirely, thus bypassing the access control checks, but this may be undesirable for other reasons, particularly if the pages behave differently for authenticated users.
+== Tổng quan
+Thông thường, việc áp dụng lập trường "`deny-by-default`" được xem là một thực hành bảo mật tốt, trong đó bạn chỉ rõ những gì được phép và từ chối mọi thứ khác.
+Việc xác định những gì người dùng chưa authentication có thể truy cập cũng tương tự, đặc biệt là đối với các ứng dụng web.
+Nhiều website yêu cầu người dùng phải được authentication đối với mọi thứ ngoài một vài URL (ví dụ như các trang home và login).
+Trong trường hợp đó, cách dễ nhất là định nghĩa các thuộc tính cấu hình quyền truy cập cho những URL cụ thể này thay vì cho mọi tài nguyên được bảo vệ.
+Nói cách khác, đôi khi sẽ thuận tiện nếu mặc định yêu cầu `ROLE_SOMETHING` và chỉ cho phép một số ngoại lệ nhất định đối với quy tắc này, chẳng hạn như các trang login, logout và home của ứng dụng.
+Bạn cũng có thể hoàn toàn loại các trang này khỏi filter chain, qua đó bỏ qua các kiểm tra access control, nhưng điều này có thể không mong muốn vì những lý do khác, đặc biệt nếu các trang đó hoạt động khác nhau đối với người dùng đã authentication.
 
-This is what we mean by anonymous authentication.
-Note that there is no real conceptual difference between a user who is "`anonymously authenticated`" and an unauthenticated user.
-Spring Security's anonymous authentication just gives you a more convenient way to configure your access-control attributes.
-Calls to servlet API calls, such as `getCallerPrincipal`, still return null, even though there is actually an anonymous authentication object in the `SecurityContextHolder`.
+Đó là ý nghĩa của authentication ẩn danh.
+Lưu ý rằng về mặt khái niệm, không có khác biệt thực sự giữa người dùng "`được authentication ẩn danh`" và người dùng chưa authentication.
+Anonymous authentication của Spring Security chỉ cung cấp cho bạn một cách thuận tiện hơn để cấu hình các thuộc tính access control.
+Các lời gọi đến servlet API, chẳng hạn như `getCallerPrincipal`, vẫn trả về null, mặc dù thực tế có một object anonymous authentication trong `SecurityContextHolder`.
 
-There are other situations where anonymous authentication is useful, such as when an auditing interceptor queries the `SecurityContextHolder` to identify which principal was responsible for a given operation.
-Classes can be authored more robustly if they know the `SecurityContextHolder` always contains an `Authentication` object and never contains `null`.
+Có những tình huống khác mà anonymous authentication hữu ích, chẳng hạn khi một auditing interceptor truy vấn `SecurityContextHolder` để xác định principal nào chịu trách nhiệm cho một thao tác nhất định.
+Các class có thể được viết robust hơn nếu biết rằng `SecurityContextHolder` luôn chứa một object `Authentication` và không bao giờ chứa `null`.
 
 
 [[anonymous-config]]
-== Configuration
-Anonymous authentication support is provided automatically when you use the HTTP configuration (introduced in Spring Security 3.0).
-You can customize (or disable) it by using the `<anonymous>` element.
-You need not configure the beans described here unless you are using traditional bean configuration.
+== Cấu hình
+Hỗ trợ anonymous authentication được cung cấp tự động khi bạn sử dụng cấu hình HTTP (được giới thiệu trong Spring Security 3.0).
+Bạn có thể tùy chỉnh (hoặc vô hiệu hóa) nó bằng cách sử dụng element `<anonymous>`.
+Bạn không cần cấu hình các bean được mô tả ở đây trừ khi đang sử dụng cấu hình bean truyền thống.
 
-Three classes work together to provide the anonymous authentication feature.
-`AnonymousAuthenticationToken` is an implementation of `Authentication` and stores the `GrantedAuthority` instances that apply to the anonymous principal.
-There is a corresponding `AnonymousAuthenticationProvider`, which is chained into the `ProviderManager` so that `AnonymousAuthenticationToken` instances are accepted.
-Finally, an `AnonymousAuthenticationFilter` is chained after the normal authentication mechanisms and automatically adds an `AnonymousAuthenticationToken` to the `SecurityContextHolder` if there is no existing `Authentication` held there.
-The filter and authentication provider is defined as follows:
+Ba class phối hợp với nhau để cung cấp tính năng anonymous authentication.
+`AnonymousAuthenticationToken` là một implementation của `Authentication` và lưu trữ các instance `GrantedAuthority` áp dụng cho anonymous principal.
+Có một `AnonymousAuthenticationProvider` tương ứng, được nối vào `ProviderManager` để các instance `AnonymousAuthenticationToken` được chấp nhận.
+Cuối cùng, một `AnonymousAuthenticationFilter` được nối sau các cơ chế authentication thông thường và tự động thêm một `AnonymousAuthenticationToken` vào `SecurityContextHolder` nếu ở đó chưa có `Authentication` nào.
+Filter và authentication provider được định nghĩa như sau:
 
 [source,xml]
 ----
@@ -48,21 +48,21 @@ The filter and authentication provider is defined as follows:
 
 
 
-The `key` is shared between the filter and authentication provider, so that tokens created by the former are accepted by the latter
+`key` được dùng chung giữa filter và authentication provider, để các token do thành phần trước tạo ra được thành phần sau chấp nhận.
 
 [NOTE]
 ====
-The use of the `key` property should not be regarded as providing any real security here.
-It is merely a book-keeping exercise.
-If you share a `ProviderManager` that contains an `AnonymousAuthenticationProvider` in a scenario where it is possible for an authenticating client to construct the `Authentication` object (such as with RMI invocations), then a malicious client could submit an `AnonymousAuthenticationToken` that it had created itself (with the chosen username and authority list).
-If the `key` is guessable or can be found out, the token would be accepted by the anonymous provider.
-This is not a problem with normal usage. However, if you use RMI, you should use a customized `ProviderManager` that omits the anonymous provider rather than sharing the one you use for your HTTP authentication mechanisms.
+Không nên xem việc sử dụng property `key` là cung cấp bất kỳ bảo mật thực sự nào ở đây.
+Nó chỉ là một thao tác ghi sổ.
+Nếu bạn dùng chung một `ProviderManager` có chứa `AnonymousAuthenticationProvider` trong một kịch bản mà client authentication có thể tạo object `Authentication` (chẳng hạn với các lời gọi RMI), client độc hại có thể gửi một `AnonymousAuthenticationToken` do chính nó tạo ra (với username và danh sách authority đã chọn).
+Nếu có thể đoán được `key` hoặc biết được giá trị của nó, token sẽ được anonymous provider chấp nhận.
+Đây không phải là vấn đề trong cách sử dụng thông thường. Tuy nhiên, nếu sử dụng RMI, bạn nên dùng một `ProviderManager` đã tùy chỉnh và loại anonymous provider, thay vì dùng chung `ProviderManager` mà bạn sử dụng cho các cơ chế HTTP authentication.
 ====
 
-The `userAttribute` is expressed in the form of `usernameInTheAuthenticationToken,grantedAuthority[,grantedAuthority]`.
-The same syntax is used after the equals sign for the `userMap` property of `InMemoryDaoImpl`.
+`userAttribute` được biểu diễn dưới dạng `usernameInTheAuthenticationToken,grantedAuthority[,grantedAuthority]`.
+Cú pháp tương tự được sử dụng sau dấu bằng cho property `userMap` của `InMemoryDaoImpl`.
 
-As explained earlier, the benefit of anonymous authentication is that all URI patterns can have security applied to them, as the following example shows:
+Như đã giải thích trước đó, lợi ích của anonymous authentication là mọi URI pattern đều có thể được áp dụng security, như ví dụ sau đây cho thấy:
 
 [source,xml]
 ----
@@ -84,24 +84,24 @@ As explained earlier, the benefit of anonymous authentication is that all URI pa
 
 [[anonymous-auth-trust-resolver]]
 == AuthenticationTrustResolver
-Rounding out the anonymous authentication discussion is the `AuthenticationTrustResolver` interface, with its corresponding `AuthenticationTrustResolverImpl` implementation.
-This interface provides an `isAnonymous(Authentication)` method, which allows interested classes to take into account this special type of authentication status.
-The `ExceptionTranslationFilter` uses this interface in processing `AccessDeniedException` instances.
-If an `AccessDeniedException` is thrown and the authentication is of an anonymous type, instead of throwing a 403 (forbidden) response, the filter, instead, commences the `AuthenticationEntryPoint` so that the principal can authenticate properly.
-This is a necessary distinction. Otherwise, principals would always be deemed "`authenticated`" and never be given an opportunity to login through form, basic, digest, or some other normal authentication mechanism.
+Khép lại phần thảo luận về anonymous authentication là interface `AuthenticationTrustResolver`, cùng với implementation `AuthenticationTrustResolverImpl` tương ứng.
+Interface này cung cấp method `isAnonymous(Authentication)`, cho phép các class quan tâm tính đến loại trạng thái authentication đặc biệt này.
+`ExceptionTranslationFilter` sử dụng interface này khi xử lý các instance `AccessDeniedException`.
+Nếu một `AccessDeniedException` được ném ra và authentication thuộc kiểu anonymous, thay vì ném response 403 (bị từ chối), filter sẽ khởi chạy `AuthenticationEntryPoint` để principal có thể authentication đúng cách.
+Đây là một phân biệt cần thiết. Nếu không, các principal sẽ luôn được xem là "`authenticated`" và không bao giờ có cơ hội login thông qua form, basic, digest hoặc một cơ chế authentication thông thường khác.
 
-We often see the `ROLE_ANONYMOUS` attribute in the earlier interceptor configuration replaced with `IS_AUTHENTICATED_ANONYMOUSLY`, which is effectively the same thing when defining access controls.
-This is an example of the use of the `AuthenticatedVoter`, which we cover in the xref:servlet/authorization/architecture.adoc#authz-authenticated-voter[authorization chapter].
-It uses an `AuthenticationTrustResolver` to process this particular configuration attribute and grant access to anonymous users.
-The `AuthenticatedVoter` approach is more powerful, since it lets you differentiate between anonymous, remember-me, and fully authenticated users.
-If you do not need this functionality, though, you can stick with `ROLE_ANONYMOUS`, which is processed by Spring Security's standard `RoleVoter`.
+Chúng ta thường thấy attribute `ROLE_ANONYMOUS` trong cấu hình interceptor trước đó được thay thế bằng `IS_AUTHENTICATED_ANONYMOUSLY`, vốn về cơ bản có cùng ý nghĩa khi định nghĩa access control.
+Đây là một ví dụ về việc sử dụng `AuthenticatedVoter`, được đề cập trong xref:servlet/authorization/architecture.adoc#authz-authenticated-voter[chương authorization].
+Nó sử dụng một `AuthenticationTrustResolver` để xử lý attribute cấu hình cụ thể này và cấp quyền truy cập cho người dùng anonymous.
+Cách tiếp cận `AuthenticatedVoter` mạnh hơn vì cho phép bạn phân biệt giữa người dùng anonymous, remember-me và fully authenticated.
+Tuy nhiên, nếu không cần chức năng này, bạn có thể tiếp tục dùng `ROLE_ANONYMOUS`, được xử lý bởi `RoleVoter` tiêu chuẩn của Spring Security.
 
 [[anonymous-auth-mvc-controller]]
-== Getting Anonymous Authentications with Spring MVC
+== Lấy anonymous authentication với Spring MVC
 
-{spring-framework-reference-url}web/webmvc/mvc-controller/ann-methods/arguments.html[Spring MVC resolves parameters of type `Principal`] using its own argument resolver.
+{spring-framework-reference-url}web/webmvc/mvc-controller/ann-methods/arguments.html[Spring MVC phân giải các parameter có kiểu `Principal`] bằng argument resolver riêng của nó.
 
-This means that a construct like this one:
+Điều này có nghĩa là một cấu trúc như sau:
 
 [tabs]
 ======
@@ -134,13 +134,13 @@ fun method(authentication: Authentication?): String {
 ----
 ======
 
-will always return "not anonymous", even for anonymous requests.
-The reason is that Spring MVC resolves the parameter using `HttpServletRequest#getPrincipal`, which is `null` when the request is anonymous.
+Sẽ luôn trả về "not anonymous", ngay cả với các request anonymous.
+Lý do là Spring MVC phân giải parameter bằng `HttpServletRequest#getPrincipal`, vốn là `null` khi request là anonymous.
 
-If you'd like to obtain the `Authentication` in anonymous requests, use
-xref:servlet/integrations/mvc.adoc#mvc-current-security-context[`@CurrentSecurityContext`] instead:
+Nếu muốn lấy `Authentication` trong các request anonymous, hãy sử dụng
+xref:servlet/integrations/mvc.adoc#mvc-current-security-context[`@CurrentSecurityContext`] thay vào đó:
 
-.Use CurrentSecurityContext for Anonymous requests
+.Sử dụng CurrentSecurityContext cho các request ẩn danh
 [tabs]
 ======
 Java::
