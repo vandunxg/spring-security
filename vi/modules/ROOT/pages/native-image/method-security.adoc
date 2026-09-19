@@ -1,15 +1,15 @@
 [[native-image-method-security]]
-= Method Security in GraalVM Native Image
+= method security trong GraalVM Native Image
 
-Although xref:servlet/authorization/method-security.adoc[Method Security] is supported in GraalVM Native Image, there are some use cases that need additional hints provided by the application.
+Mặc dù xref:servlet/authorization/method-security.adoc[method security] được hỗ trợ trong GraalVM Native Image, một số trường hợp sử dụng cần application cung cấp thêm hint.
 
-== Using `@PreAuthorize` and `@PostAuthorize` Annotations
+== Sử dụng các annotation `@PreAuthorize` và `@PostAuthorize`
 
-Using `@PreAuthorize` and `@PostAuthorize` annotations require additional hints if you have a custom implementation of `UserDetails` or `Authentication` classes.
+Việc sử dụng các annotation `@PreAuthorize` và `@PostAuthorize` yêu cầu thêm hint nếu bạn có implementation tùy chỉnh của các class `UserDetails` hoặc `Authentication`.
 
-Let's take an example where you have a custom implementation of `UserDetails` class as follows and that implementation is returned by your `UserDetailsService`:
+Hãy xem ví dụ bạn có một implementation tùy chỉnh của class `UserDetails` như sau và implementation đó được `UserDetailsService` trả về:
 
-.Custom Implementation of UserDetails
+.Implementation tùy chỉnh của UserDetails
 [source,java]
 ----
 public class CustomUserDetails implements UserDetails {
@@ -28,9 +28,9 @@ public class CustomUserDetails implements UserDetails {
 }
 ----
 
-And you want to use the `isAdmin()` method inside a `@PreAuthorize` annotation as follows:
+Và bạn muốn sử dụng method `isAdmin()` bên trong annotation `@PreAuthorize` như sau:
 
-.Using isAdmin() to secure a method
+.Sử dụng isAdmin() để bảo vệ một method
 [source,java]
 ----
 @PreAuthorize("principal?.isAdmin()")
@@ -41,10 +41,10 @@ public String hello() {
 
 [NOTE]
 ====
-Remember that you need to xref:servlet/authorization/method-security.adoc#jc-enable-method-security[add `@EnableMethodSecurity` annotation] to your configuration class to enable method security annotations.
+Hãy nhớ rằng bạn cần xref:servlet/authorization/method-security.adoc#jc-enable-method-security[thêm annotation `@EnableMethodSecurity`] vào class cấu hình để bật các annotation method security.
 ====
 
-If you {spring-boot-reference-url}how-to/native-image/developing-your-first-application.html[run the native image] of your application with the above configuration, you will get an error similar to the following when trying to invoke the `hello()` method:
+Nếu bạn {spring-boot-reference-url}how-to/native-image/developing-your-first-application.html[chạy native image] của ứng dụng với cấu hình trên, bạn sẽ nhận được lỗi tương tự sau khi cố gọi method `hello()`:
 
 [source]
 ----
@@ -52,19 +52,19 @@ failed: java.lang.IllegalArgumentException: Failed to evaluate expression 'princ
 org.springframework.expression.spel.SpelEvaluationException: EL1004E: Method call: Method isAdmin() cannot be found on type com.mypackage.CustomUserDetails
 ----
 
-Which means that the `isAdmin()` method cannot be found on the `CustomUserDetails` class.
-This is because Spring Security uses reflection to invoke the `isAdmin()` method and GraalVM Native Image does not support reflection by default.
+Điều này có nghĩa là không tìm thấy method `isAdmin()` trên class `CustomUserDetails`.
+Nguyên nhân là Spring Security sử dụng reflection để gọi method `isAdmin()`, còn GraalVM Native Image không hỗ trợ reflection theo mặc định.
 
-To fix this issue, you need to give hints to GraalVM Native Image to allow reflection on the `CustomUserDetails#isAdmin()` method.
-We can do that by providing a {spring-boot-reference-url}reference/packaging/native-image/advanced-topics.html#packaging.native-image.advanced.custom-hints[custom hint].
-In this example we are going to use {spring-framework-reference-url}core/aot.html#aot.hints.register-reflection[the `@RegisterReflectionForBinding` annotation].
+Để khắc phục vấn đề này, bạn cần cung cấp hint cho GraalVM Native Image để cho phép reflection trên method `CustomUserDetails#isAdmin()`.
+Chúng ta có thể thực hiện việc này bằng cách cung cấp {spring-boot-reference-url}reference/packaging/native-image/advanced-topics.html#packaging.native-image.advanced.custom-hints[hint tùy chỉnh].
+Trong ví dụ này, chúng ta sẽ sử dụng {spring-framework-reference-url}core/aot.html#aot.hints.register-reflection[annotation `@RegisterReflectionForBinding`].
 
 [NOTE]
 ====
-You might need to register all your classes that you want to use in your `@PreAuthorize` and `@PostAuthorize` annotations.
+Bạn có thể cần đăng ký tất cả các class mà bạn muốn sử dụng trong các annotation `@PreAuthorize` và `@PostAuthorize`.
 ====
 
-.Using @RegisterReflectionForBinding
+.Sử dụng @RegisterReflectionForBinding
 [source,java]
 ----
 @Configuration
@@ -74,4 +74,4 @@ public class MyConfiguration {
 }
 ----
 
-And that's it, now you can run the native image of your application and it should work as expected.
+Vậy là xong; giờ bạn có thể chạy native image của ứng dụng và ứng dụng sẽ hoạt động như mong đợi.
