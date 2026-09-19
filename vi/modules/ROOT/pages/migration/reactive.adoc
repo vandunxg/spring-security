@@ -19,7 +19,7 @@ Java::
 JwtDecoder jwtDecoder() {
 	NimbusReactiveJwtDecoder jwtDecoder = NimbusReactiveJwtDecoder.withIssuerLocation(location)
         .validateTypes(false) <1>
-        // ... cấu hình còn lại của bạn
+        // ... your remaining configuration
         .build();
 	jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithValidators(
 		new JwtIssuerValidator(location), JwtTypeValidator.jwt())); <2>
@@ -35,7 +35,7 @@ Kotlin::
 fun jwtDecoder(): JwtDecoder {
     val jwtDecoder = NimbusReactiveJwtDecoder.withIssuerLocation(location)
         .validateTypes(false) <1>
-        // ... cấu hình còn lại của bạn
+        // ... your remaining configuration
         .build()
     jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithValidators(
         JwtIssuerValidator(location), JwtTypeValidator.jwt())) <2>
@@ -57,7 +57,7 @@ Java::
 @Bean
 NimbusReactiveJwtDecoder jwtDecoder() {
 	NimbusJwtDecoder jwtDecoder = NimbusReactiveJwtDecoder.withIssuerLocation(location)
-        // ... cấu hình còn lại của bạn <1>
+        // ... your remaining configuration <1>
         .build();
 	jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(location)); <2>
 	return jwtDecoder;
@@ -71,7 +71,7 @@ Kotlin::
 @Bean
 fun jwtDecoder(): NimbusReactiveJwtDecoder {
     val jwtDecoder = NimbusReactiveJwtDecoder.withIssuerLocation(location)
-        // ... cấu hình còn lại của bạn
+        // ... your remaining configuration
         .build()
     jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(location)) <2>
     return jwtDecoder
