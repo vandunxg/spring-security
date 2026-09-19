@@ -1,17 +1,17 @@
 [[test-mockmvc-securitycontextholder]]
-= Running a Test as a User in Spring MVC Test
+= Chạy một bài kiểm thử với tư cách người dùng trong Spring MVC Test
 
-It is often desirable to run tests as a specific user.
-There are two simple ways to populate the user:
+Thông thường, bạn muốn chạy các bài kiểm thử với tư cách một người dùng cụ thể.
+Có hai cách đơn giản để thiết lập người dùng:
 
-* <<test-mockmvc-securitycontextholder-rpp,Running as a User in Spring MVC Test with RequestPostProcessor>>
-* <<test-mockmvc-withmockuser,Running as a User in Spring MVC Test with Annotations>>
+* <<test-mockmvc-securitycontextholder-rpp,Chạy với tư cách người dùng trong Spring MVC Test bằng RequestPostProcessor>>
+* <<test-mockmvc-withmockuser,Chạy với tư cách người dùng trong Spring MVC Test bằng annotation>>
 
 [[test-mockmvc-securitycontextholder-rpp]]
-== Running as a User in Spring MVC Test with RequestPostProcessor
+== Chạy với tư cách người dùng trong Spring MVC Test bằng RequestPostProcessor
 
-You have a number of options to associate a user to the current `HttpServletRequest`.
-The following example runs as a user (which does not need to exist) whose username is `user`, whose password is `password`, and whose role is `ROLE_USER`:
+Bạn có một số lựa chọn để liên kết người dùng với `HttpServletRequest` hiện tại.
+Ví dụ sau chạy với tư cách một người dùng (không cần tồn tại) có tên người dùng là `user`, mật khẩu là `password` và role là `ROLE_USER`:
 
 [tabs]
 ======
@@ -35,19 +35,19 @@ mvc.get("/") {
 
 [NOTE]
 ====
-The support works by associating the user to the `HttpServletRequest`.
-To associate the request to the `SecurityContextHolder`, you need to ensure that the `SecurityContextPersistenceFilter` is associated with the `MockMvc` instance.
-You can do so in a number of ways:
+Tính năng hỗ trợ này hoạt động bằng cách liên kết người dùng với `HttpServletRequest`.
+Để liên kết request với `SecurityContextHolder`, bạn cần đảm bảo rằng `SecurityContextPersistenceFilter` được liên kết với đối tượng `MockMvc`.
+Bạn có thể thực hiện việc này bằng một trong các cách sau:
 
-* Invoking xref:servlet/test/mockmvc/setup.adoc#test-mockmvc-setup[`apply(springSecurity())`]
-* Adding Spring Security's `FilterChainProxy` to `MockMvc`
-* Manually adding `SecurityContextPersistenceFilter` to the `MockMvc` instance may make sense when using `MockMvcBuilders.standaloneSetup`
+* Gọi xref:servlet/test/mockmvc/setup.adoc#test-mockmvc-setup[`apply(springSecurity())`]
+* Thêm `FilterChainProxy` của Spring Security vào `MockMvc`
+* Khi sử dụng `MockMvcBuilders.standaloneSetup`, việc thêm thủ công `SecurityContextPersistenceFilter` vào đối tượng `MockMvc` có thể phù hợp
 ====
 
 
 
-You can easily make customizations.
-For example, the following will run as a user (which does not need to exist) with the username "admin", the password "pass", and the roles "ROLE_USER" and "ROLE_ADMIN".
+Bạn có thể dễ dàng thực hiện các tùy chỉnh.
+Ví dụ, đoạn sau sẽ chạy với tư cách một người dùng (không cần tồn tại) có tên người dùng là "admin", mật khẩu là "pass" và các role là "ROLE_USER" và "ROLE_ADMIN".
 
 [tabs]
 ======
@@ -69,8 +69,8 @@ mvc.get("/admin") {
 ----
 ======
 
-If you have a custom `UserDetails` that you would like to use, you can easily specify that as well.
-For example, the following will use the specified `UserDetails` (which does not need to exist) to run with a `UsernamePasswordAuthenticationToken` that has a principal of the specified `UserDetails`:
+Nếu bạn có một `UserDetails` tùy chỉnh muốn sử dụng, bạn cũng có thể dễ dàng chỉ định nó.
+Ví dụ, đoạn sau sẽ sử dụng `UserDetails` được chỉ định (không cần tồn tại) để chạy với một `UsernamePasswordAuthenticationToken` có principal là `UserDetails` được chỉ định:
 
 [tabs]
 ======
@@ -92,7 +92,7 @@ mvc.get("/") {
 ----
 ======
 
-You can run as anonymous user using the following:
+Bạn có thể chạy với tư cách người dùng ẩn danh bằng đoạn sau:
 
 [tabs]
 ======
@@ -114,9 +114,9 @@ mvc.get("/") {
 ----
 ======
 
-This is especially useful if you are running with a default user and wish to process a few requests as an anonymous user.
+Điều này đặc biệt hữu ích khi bạn đang chạy với một người dùng mặc định và muốn xử lý một vài request với tư cách người dùng ẩn danh.
 
-If you want a custom `Authentication` (which does not need to exist) you can do so using the following:
+Nếu muốn sử dụng một `Authentication` tùy chỉnh (không cần tồn tại), bạn có thể thực hiện như sau:
 
 [tabs]
 ======
@@ -138,7 +138,7 @@ mvc.get("/") {
 ----
 ======
 
-You can even customize the `SecurityContext` using the following:
+Bạn thậm chí có thể tùy chỉnh `SecurityContext` bằng đoạn sau:
 
 [tabs]
 ======
@@ -160,8 +160,8 @@ mvc.get("/") {
 ----
 ======
 
-We can also ensure to run as a specific user for every request by using ``MockMvcBuilders``'s default request.
-For example, the following will run as a user (which does not need to exist) with the username "admin", the password "password", and the role "ROLE_ADMIN":
+Bạn cũng có thể đảm bảo chạy với tư cách một người dùng cụ thể cho mọi request bằng request mặc định của ``MockMvcBuilders``.
+Ví dụ, đoạn sau sẽ chạy với tư cách một người dùng (không cần tồn tại) có tên người dùng là "admin", mật khẩu là "password" và role là "ROLE_ADMIN":
 
 [tabs]
 ======
@@ -188,8 +188,8 @@ mvc = MockMvcBuilders
 ----
 ======
 
-If you find you are using the same user in many of your tests, it is recommended to move the user to a method.
-For example, you can specify the following in your own class named `CustomSecurityMockMvcRequestPostProcessors`:
+Nếu nhận thấy mình đang sử dụng cùng một người dùng trong nhiều bài kiểm thử, bạn nên chuyển người dùng đó vào một method.
+Ví dụ, bạn có thể chỉ định đoạn sau trong class có tên `CustomSecurityMockMvcRequestPostProcessors` của riêng mình:
 
 [tabs]
 ======
@@ -212,7 +212,7 @@ fun rob(): RequestPostProcessor {
 ----
 ======
 
-Now you can perform a static import on `CustomSecurityMockMvcRequestPostProcessors` and use that within your tests:
+Bây giờ bạn có thể thực hiện static import đối với `CustomSecurityMockMvcRequestPostProcessors` và sử dụng nó trong các bài kiểm thử:
 
 [tabs]
 ======
@@ -243,10 +243,10 @@ mvc.get("/") {
 ======
 
 [[test-mockmvc-withmockuser]]
-== Running as a User in Spring MVC Test with Annotations
+== Chạy với tư cách người dùng trong Spring MVC Test bằng annotation
 
-As an alternative to using a `RequestPostProcessor` to create your user, you can use annotations described in xref:servlet/test/method.adoc[Testing Method Security].
-For example, the following will run the test with the user with username "user", password "password", and role "ROLE_USER":
+Thay vì sử dụng một `RequestPostProcessor` để tạo người dùng, bạn có thể sử dụng các annotation được mô tả trong xref:servlet/test/method.adoc[Kiểm thử method security].
+Ví dụ, đoạn sau sẽ chạy bài kiểm thử với người dùng có tên người dùng là "user", mật khẩu là "password" và role là "ROLE_USER":
 
 [tabs]
 ======
@@ -277,7 +277,7 @@ fun requestProtectedUrlWithUser() {
 ----
 ======
 
-Alternatively, the following will run the test with the user with username "user", password "password", and role "ROLE_ADMIN":
+Ngoài ra, đoạn sau sẽ chạy bài kiểm thử với người dùng có tên người dùng là "user", mật khẩu là "password" và role là "ROLE_ADMIN":
 
 [tabs]
 ======
