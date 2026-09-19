@@ -164,7 +164,7 @@ Có một số hướng mà bạn có thể tiếp tục từ đây.
 ** user trong xref:servlet/authentication/passwords/ldap.adoc[LDAP] hoặc xref:servlet/authentication/passwords/ldap.adoc#_active_directory[Active Directory], với xref:servlet/integrations/data.adoc[Spring Data] hoặc với xref:servlet/authentication/passwords/jdbc.adoc[JDBC]
 ** xref:servlet/authentication/passwords/storage.adoc[password]
 
-Nếu không trường hợp nào trong số đó phù hợp với nhu cầu của bạn, hãy cân nhắc application của bạn theo thứ tự sau:
+Nếu không có trường hợp nào trong số đó phù hợp với nhu cầu của bạn, hãy cân nhắc application của bạn theo thứ tự sau:
 
 1. *Protocol*: Trước tiên, hãy cân nhắc protocol mà application của bạn sẽ sử dụng để giao tiếp.
 Đối với application dựa trên servlet, Spring Security hỗ trợ HTTP cũng như xref:servlet/integrations/websocket.adoc[Websockets].
