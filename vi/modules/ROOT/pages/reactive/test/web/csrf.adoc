@@ -1,6 +1,6 @@
-= Testing with CSRF
+= Kiểm thử với CSRF
 
-Spring Security also provides support for CSRF testing with `WebTestClient` -- for example:
+Spring Security cũng cung cấp hỗ trợ kiểm thử CSRF với `WebTestClient` -- ví dụ:
 
 [tabs]
 ======
@@ -11,7 +11,7 @@ Java::
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 this.rest
-	// provide a valid CSRF token
+	// cung cấp một CSRF token hợp lệ
 	.mutateWith(csrf())
 	.post()
 	.uri("/login")
@@ -25,7 +25,7 @@ Kotlin::
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf
 
 this.rest
-    // provide a valid CSRF token
+    // cung cấp một CSRF token hợp lệ
     .mutateWith(csrf())
     .post()
     .uri("/login")
