@@ -1,15 +1,15 @@
 [[reactive-logout]]
 = Logout
 
-Spring Security provides a logout endpoint by default.
-Once logged in, you can `GET /logout` to see a default logout confirmation page, or you can `POST /logout` to initiate logout.
-This will:
+Spring Security cung cấp endpoint logout theo mặc định.
+Sau khi đăng nhập, bạn có thể `GET /logout` để xem trang xác nhận logout mặc định hoặc `POST /logout` để bắt đầu logout.
+Điều này sẽ:
 
-- clear the `ServerCsrfTokenRepository`, `ServerSecurityContextRepository`, and
-- redirect back to the login page
+- xóa `ServerCsrfTokenRepository`, `ServerSecurityContextRepository`, và
+- redirect trở lại trang đăng nhập
 
-Often, you will want to also invalidate the session on logout.
-To achieve this, you can add the `WebSessionServerLogoutHandler` to your logout configuration, like so:
+Thông thường, khi logout, bạn cũng sẽ muốn invalidate session.
+Để thực hiện việc này, bạn có thể thêm `WebSessionServerLogoutHandler` vào cấu hình logout như sau:
 
 [tabs]
 ======
