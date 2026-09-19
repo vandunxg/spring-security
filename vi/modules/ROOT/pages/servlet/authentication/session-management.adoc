@@ -1,95 +1,95 @@
 [[session-mgmt]]
-= Authentication Persistence and Session Management
+= Lưu trữ Authentication và Session Management
 
-Once you have got an application that is xref:servlet/authentication/index.adoc[authenticating requests], it is important to consider how that resulting authentication will be persisted and restored on future requests.
+Sau khi có một ứng dụng xref:servlet/authentication/index.adoc[thực hiện authentication cho request], điều quan trọng là xem xét authentication thu được sẽ được lưu trữ và khôi phục như thế nào trong các request sau.
 
-This is done automatically by default.
-If you have a custom filter or controller that is setting the security context, you will need to use a `SecurityContextRepository` to persist it across requests.
+Theo mặc định, việc này được thực hiện tự động.
+Nếu bạn có một filter hoặc controller tùy chỉnh đang thiết lập `SecurityContext`, bạn cần dùng `SecurityContextRepository` để lưu trữ nó qua các request.
 
-If you are upgrading from an older version, you may be interested in the `requireExplicitSave` setting that preserves Spring Security 5's default, though note that this is primarily for migration purposes.
+Nếu đang nâng cấp từ một version cũ hơn, bạn có thể quan tâm đến thiết lập `requireExplicitSave`, thiết lập này giữ lại mặc định của Spring Security 5; tuy nhiên, lưu ý rằng nó chủ yếu phục vụ mục đích migration.
 
-If you like, <<how-it-works-requireexplicitsave,you can read more about what requireExplicitSave is doing>> or <<requireexplicitsave,why it's important>>. Otherwise, in most cases you are done with this section.
+Nếu muốn, bạn có thể <<how-it-works-requireexplicitsave,đọc thêm về việc requireExplicitSave thực hiện gì>> hoặc <<requireexplicitsave,vì sao nó quan trọng>>. Nếu không, trong hầu hết trường hợp, bạn đã hoàn tất section này.
 
-But before you leave, consider if any of these use cases fit your application:
+Nhưng trước khi rời khỏi đây, hãy xem ứng dụng của bạn có thuộc trường hợp sử dụng nào sau đây không:
 
-* I want to <<understanding-session-management-components,Understand Session Management's components>>
-* I want to <<ns-concurrent-sessions,restrict the number of times>> a user can be logged in concurrently
-* I want <<store-authentication-manually,to store the authentication directly>> myself instead of Spring Security doing it for me
-* I am storing the authentication manually and I want <<properly-clearing-authentication,to remove it>>
-* I am using <<the-sessionmanagementfilter, `SessionManagementFilter`>> and I need <<moving-away-from-sessionmanagementfilter,guidance on moving away from that>>
-* I want to store the authentication <<customizing-where-authentication-is-stored,in something other than the session>>
-* I am using a <<stateless-authentication, stateless authentication>>, but <<storing-stateless-authentication-in-the-session,I'd still like to store it in the session>>
-* I am using `SessionCreationPolicy.NEVER` but <<never-policy-session-still-created,the application is still creating sessions>>.
+* Tôi muốn <<understanding-session-management-components,tìm hiểu các component của Session Management>>
+* Tôi muốn <<ns-concurrent-sessions,giới hạn số lần>> một người dùng có thể đăng nhập đồng thời
+* Tôi muốn <<store-authentication-manually,tự lưu authentication trực tiếp>> thay vì để Spring Security thực hiện việc đó
+* Tôi đang tự lưu authentication và muốn <<properly-clearing-authentication,xóa nó>>
+* Tôi đang dùng <<the-sessionmanagementfilter, `SessionManagementFilter`>> và cần <<moving-away-from-sessionmanagementfilter,hướng dẫn chuyển khỏi nó>>
+* Tôi muốn lưu authentication <<customizing-where-authentication-is-stored,vào nơi khác ngoài session>>
+* Tôi đang dùng <<stateless-authentication, stateless authentication>>, nhưng <<storing-stateless-authentication-in-the-session,vẫn muốn lưu nó vào session>>
+* Tôi đang dùng `SessionCreationPolicy.NEVER` nhưng <<never-policy-session-still-created,ứng dụng vẫn đang tạo session>>.
 
 
 [[understanding-session-management-components]]
-== Understanding Session Management's Components
+== Tìm hiểu các component của Session Management
 
-The Session Management support is composed of a few components that work together to provide the functionality.
-Those components are, xref:servlet/authentication/persistence.adoc#securitycontextholderfilter[the `SecurityContextHolderFilter`], xref:servlet/authentication/persistence.adoc#securitycontextpersistencefilter[the `SecurityContextPersistenceFilter`] and <<the-sessionmanagementfilter,the `SessionManagementFilter`>>.
+Hỗ trợ Session Management gồm một vài component phối hợp với nhau để cung cấp chức năng này.
+Các component đó là xref:servlet/authentication/persistence.adoc#securitycontextholderfilter[`SecurityContextHolderFilter`], xref:servlet/authentication/persistence.adoc#securitycontextpersistencefilter[`SecurityContextPersistenceFilter`] và <<the-sessionmanagementfilter,`SessionManagementFilter`>>.
 
 [NOTE]
 =====
-In Spring Security 6, the `SecurityContextPersistenceFilter` and `SessionManagementFilter` are not set by default.
-In addition to that, any application should only have either `SecurityContextHolderFilter` or `SecurityContextPersistenceFilter` set, never both.
+Trong Spring Security 6, `SecurityContextPersistenceFilter` và `SessionManagementFilter` không được thiết lập theo mặc định.
+Ngoài ra, mỗi ứng dụng chỉ nên thiết lập một trong `SecurityContextHolderFilter` hoặc `SecurityContextPersistenceFilter`, không bao giờ thiết lập cả hai.
 =====
 
 [[the-sessionmanagementfilter]]
-=== The `SessionManagementFilter`
+=== `SessionManagementFilter`
 
-The `SessionManagementFilter` checks the contents of the `SecurityContextRepository` against the current contents of the `SecurityContextHolder` to determine whether a user has been authenticated during the current request, typically by a non-interactive authentication mechanism, such as pre-authentication or remember-me  footnote:[
-Authentication by mechanisms which perform a redirect after authenticating (such as form-login) will not be detected by `SessionManagementFilter`, as the filter will not be invoked during the authenticating request.
-Session-management functionality has to be handled separately in these cases.
+`SessionManagementFilter` kiểm tra nội dung của `SecurityContextRepository` với nội dung hiện tại của `SecurityContextHolder` để xác định người dùng đã được authentication trong request hiện tại hay chưa, thường là bằng một cơ chế authentication không tương tác như pre-authentication hoặc remember-me  footnote:[
+Authentication bằng các cơ chế thực hiện redirect sau khi authentication (chẳng hạn form-login) sẽ không được `SessionManagementFilter` phát hiện, vì filter sẽ không được gọi trong request thực hiện authentication.
+Trong các trường hợp này, chức năng session management phải được xử lý riêng.
 ].
-If the repository contains a security context, the filter does nothing.
-If it doesn't, and the thread-local `SecurityContext` contains a (non-anonymous) `Authentication` object, the filter assumes they have been authenticated by a previous filter in the stack.
-It will then invoke the configured `SessionAuthenticationStrategy`.
+Nếu repository chứa `SecurityContext`, filter không làm gì cả.
+Nếu không, và `SecurityContext` thread-local chứa một object `Authentication` (không anonymous), filter giả định người dùng đã được authentication bởi một filter trước đó trong stack.
+Sau đó, filter sẽ gọi `SessionAuthenticationStrategy` đã được cấu hình.
 
-If the user is not currently authenticated, the filter will check whether an invalid session ID has been requested (because of a timeout, for example) and will invoke the configured `InvalidSessionStrategy`, if one is set.
-The most common behaviour is just to redirect to a fixed URL and this is encapsulated in the standard implementation `SimpleRedirectInvalidSessionStrategy`.
-The latter is also used when configuring an invalid session URL through the namespace, <<session-mgmt,as described earlier>>.
+Nếu người dùng hiện chưa được authentication, filter sẽ kiểm tra xem có request một session ID không hợp lệ hay không (chẳng hạn do timeout), rồi gọi `InvalidSessionStrategy` đã cấu hình nếu có.
+Hành vi phổ biến nhất chỉ là redirect đến một URL cố định; hành vi này được đóng gói trong implementation chuẩn `SimpleRedirectInvalidSessionStrategy`.
+Implementation này cũng được dùng khi cấu hình URL cho session không hợp lệ thông qua namespace, <<session-mgmt,như đã mô tả trước đó>>.
 
 [[moving-away-from-sessionmanagementfilter]]
-==== Moving Away From `SessionManagementFilter`
+==== Chuyển khỏi `SessionManagementFilter`
 
-In Spring Security 5, the default configuration relies on `SessionManagementFilter` to detect if a user just authenticated and invoke the javadoc:org.springframework.security.web.authentication.session.SessionAuthenticationStrategy[SessionAuthenticationStrategy].
-The problem with this is that it means that in a typical setup, the `HttpSession` must be read for every request.
+Trong Spring Security 5, cấu hình mặc định dựa vào `SessionManagementFilter` để phát hiện người dùng vừa authentication và gọi javadoc:org.springframework.security.web.authentication.session.SessionAuthenticationStrategy[SessionAuthenticationStrategy].
+Vấn đề là trong một setup điển hình, `HttpSession` phải được đọc trong mọi request.
 
-In Spring Security 6, the default is that authentication mechanisms themselves must invoke the `SessionAuthenticationStrategy`.
-This means that there is no need to detect when `Authentication` is done and thus the `HttpSession` does not need to be read for every request.
+Trong Spring Security 6, mặc định là chính các cơ chế authentication phải gọi `SessionAuthenticationStrategy`.
+Điều này có nghĩa là không cần phát hiện thời điểm `Authentication` hoàn tất, và do đó không cần đọc `HttpSession` trong mọi request.
 
-==== Things To Consider When Moving Away From `SessionManagementFilter`
+==== Điều cần cân nhắc khi chuyển khỏi `SessionManagementFilter`
 
-In Spring Security 6, the `SessionManagementFilter` is not used by default, therefore, some methods from the `sessionManagement` DSL will not have any effect.
+Trong Spring Security 6, `SessionManagementFilter` không được dùng theo mặc định; vì vậy, một số method của DSL `sessionManagement` sẽ không có tác dụng.
 
 |===
-|Method |Replacement
+|Method |Thay thế
 
 |`sessionAuthenticationErrorUrl`
-|Configure an javadoc:org.springframework.security.web.authentication.AuthenticationFailureHandler[] in your authentication mechanism
+|Cấu hình javadoc:org.springframework.security.web.authentication.AuthenticationFailureHandler[] trong cơ chế authentication
 
 |`sessionAuthenticationFailureHandler`
-|Configure an javadoc:org.springframework.security.web.authentication.AuthenticationFailureHandler[] in your authentication mechanism
+|Cấu hình javadoc:org.springframework.security.web.authentication.AuthenticationFailureHandler[] trong cơ chế authentication
 
 |`sessionAuthenticationStrategy`
-|Configure an `SessionAuthenticationStrategy` in your authentication mechanism as <<moving-away-from-sessionmanagementfilter,discussed above>>
+|Cấu hình `SessionAuthenticationStrategy` trong cơ chế authentication như đã <<moving-away-from-sessionmanagementfilter,thảo luận ở trên>>
 |===
 
-If you try to use any of these methods, an exception will be thrown.
+Nếu cố dùng bất kỳ method nào trong số này, một exception sẽ được ném ra.
 
 
 [[customizing-where-authentication-is-stored]]
-== Customizing Where the Authentication Is Stored
+== Tùy chỉnh nơi lưu Authentication
 
-By default, Spring Security stores the security context for you in the HTTP session. However, here are several reasons you may want to customize that:
+Theo mặc định, Spring Security lưu `SecurityContext` vào HTTP session. Tuy nhiên, có một số lý do khiến bạn có thể muốn tùy chỉnh việc này:
 
-* You may want to call individual setters on the `HttpSessionSecurityContextRepository` instance
-* You may want to store the security context in a cache or database to enable horizontal scaling
+* Bạn có thể muốn gọi các setter riêng lẻ trên instance `HttpSessionSecurityContextRepository`
+* Bạn có thể muốn lưu `SecurityContext` vào cache hoặc database để hỗ trợ horizontal scaling
 
-First, you need to create an implementation of `SecurityContextRepository` or use an existing implementation like `HttpSessionSecurityContextRepository`, then you can set it in `HttpSecurity`.
+Trước tiên, bạn cần tạo một implementation của `SecurityContextRepository` hoặc dùng implementation có sẵn như `HttpSessionSecurityContextRepository`, sau đó có thể thiết lập nó trong `HttpSecurity`.
 
 [[customizing-the-securitycontextrepository]]
-.Customizing the `SecurityContextRepository`
+.Tùy chỉnh `SecurityContextRepository`
 [tabs]
 ======
 Java::
@@ -138,18 +138,18 @@ XML::
 
 [NOTE]
 ====
-The above configuration sets the `SecurityContextRepository` on the `SecurityContextHolderFilter` and **participating** authentication filters, like `UsernamePasswordAuthenticationFilter`.
-To also set it in stateless filters, please see <<storing-stateless-authentication-in-the-session,how to customize the `SecurityContextRepository` for Stateless Authentication>>.
+Mục cấu hình trên thiết lập `SecurityContextRepository` trên `SecurityContextHolderFilter` và các authentication filter **tham gia**, chẳng hạn `UsernamePasswordAuthenticationFilter`.
+Để thiết lập nó trên cả stateless filter, hãy xem <<storing-stateless-authentication-in-the-session,cách tùy chỉnh `SecurityContextRepository` cho Stateless Authentication>>.
 ====
 
-If you are using a custom authentication mechanism, you might want to <<store-authentication-manually,store the `Authentication` by yourself>>.
+Nếu đang dùng cơ chế authentication tùy chỉnh, bạn có thể muốn <<store-authentication-manually,tự lưu `Authentication`>>.
 
 [[store-authentication-manually]]
-=== Storing the `Authentication` manually
+=== Tự lưu `Authentication`
 
-In some cases, for example, you might be authenticating a user manually instead of relying on Spring Security filters.
-You can use a custom filters or a {spring-framework-reference-url}/web.html#mvc-controller[Spring MVC controller] endpoint to do that.
-If you want to save the authentication between requests, in the `HttpSession`, for example, you have to do so:
+Trong một số trường hợp, chẳng hạn khi tự authentication cho người dùng thay vì dựa vào các filter của Spring Security.
+Bạn có thể dùng custom filter hoặc endpoint {spring-framework-reference-url}/web.html#mvc-controller[Spring MVC controller] để thực hiện việc đó.
+Nếu muốn lưu authentication giữa các request, chẳng hạn vào `HttpSession`, bạn phải làm như sau:
 
 [tabs]
 ======
@@ -181,29 +181,29 @@ class LoginRequest {
 ----
 ======
 
-<1> Add the `SecurityContextRepository` to the controller
-<2> Inject the `HttpServletRequest` and `HttpServletResponse` to be able to save the `SecurityContext`
-<3> Create an unauthenticated `UsernamePasswordAuthenticationToken` using the provided credentials
-<4> Call `AuthenticationManager#authenticate` to authenticate the user
-<5> Create a `SecurityContext` and set the `Authentication` in it
-<6> Save the `SecurityContext` in the `SecurityContextRepository`
+<1> Thêm `SecurityContextRepository` vào controller
+<2> Inject `HttpServletRequest` và `HttpServletResponse` để có thể lưu `SecurityContext`
+<3> Tạo `UsernamePasswordAuthenticationToken` chưa authentication bằng credential được cung cấp
+<4> Gọi `AuthenticationManager#authenticate` để authentication cho người dùng
+<5> Tạo `SecurityContext` và thiết lập `Authentication` vào đó
+<6> Lưu `SecurityContext` vào `SecurityContextRepository`
 
-And that's it.
-If you are not sure what `securityContextHolderStrategy` is in the above example, you can read more about it in the <<use-securitycontextholderstrategy, Using `SecurityContextStrategy` section>>.
+Chỉ vậy thôi.
+Nếu chưa rõ `securityContextHolderStrategy` trong ví dụ trên là gì, bạn có thể đọc thêm trong <<use-securitycontextholderstrategy,section Sử dụng `SecurityContextStrategy`>>.
 
 [[properly-clearing-authentication]]
-=== Properly Clearing an Authentication
+=== Xóa Authentication đúng cách
 
-If you are using Spring Security's xref:servlet/authentication/logout.adoc[Logout Support] then it handles a lot of stuff for you including clearing and saving the context.
-But, let's say you need to manually log users out of your app. In that case, you'll need to make sure you're xref:servlet/authentication/logout.adoc#creating-custom-logout-endpoint[clearing and saving the context properly].
+Nếu đang dùng xref:servlet/authentication/logout.adoc[Logout Support] của Spring Security, nó xử lý nhiều việc cho bạn, bao gồm xóa và lưu context.
+Nhưng nếu cần tự logout người dùng khỏi ứng dụng, bạn phải bảo đảm mình đang xref:servlet/authentication/logout.adoc#creating-custom-logout-endpoint[xóa và lưu context đúng cách].
 
 [[stateless-authentication]]
-=== Configuring Persistence for Stateless Authentication
+=== Cấu hình Persistence cho Stateless Authentication
 
-Sometimes there is no need to create and maintain a `HttpSession` for example, to persist the authentication across requests.
-Some authentication mechanisms like xref:servlet/authentication/passwords/basic.adoc[HTTP Basic] are stateless and, therefore, re-authenticates the user on every request.
+Đôi khi không cần tạo và duy trì `HttpSession`, chẳng hạn để lưu trữ authentication qua các request.
+Một số cơ chế authentication như xref:servlet/authentication/passwords/basic.adoc[HTTP Basic] là stateless và vì vậy authentication lại cho người dùng trong mỗi request.
 
-If you do not wish to create sessions, you can use `SessionCreationPolicy.STATELESS`, like so:
+Nếu không muốn tạo session, bạn có thể dùng `SessionCreationPolicy.STATELESS` như sau:
 
 [tabs]
 ======
@@ -248,23 +248,23 @@ XML::
 ----
 ======
 
-The above configuration is <<customizing-where-authentication-is-stored, configuring the `SecurityContextRepository`>> to use a `NullSecurityContextRepository` and is also xref:servlet/architecture.adoc#requestcache-prevent-saved-request[preventing the request from being saved in the session].
+Mục cấu hình trên là <<customizing-where-authentication-is-stored,cấu hình `SecurityContextRepository`>> để dùng `NullSecurityContextRepository`, đồng thời xref:servlet/architecture.adoc#requestcache-prevent-saved-request[ngăn request được lưu vào session].
 
 
 [[never-policy-session-still-created]]
-If you are using `SessionCreationPolicy.NEVER`, you might notice that the application is still creating a `HttpSession`.
-In most cases, this happens because the xref:servlet/architecture.adoc#savedrequests[request is saved in the session] for the authenticated resource to re-request after authentication is successful.
-To avoid that, please refer to xref:servlet/architecture.adoc#requestcache-prevent-saved-request[how to prevent the request of being saved] section.
+Nếu đang dùng `SessionCreationPolicy.NEVER`, bạn có thể nhận thấy ứng dụng vẫn đang tạo `HttpSession`.
+Trong hầu hết trường hợp, điều này xảy ra vì xref:servlet/architecture.adoc#savedrequests[request được lưu vào session] để request lại resource cần authentication sau khi authentication thành công.
+Để tránh điều đó, hãy tham khảo section xref:servlet/architecture.adoc#requestcache-prevent-saved-request[cách ngăn request được lưu].
 
 
 [[storing-stateless-authentication-in-the-session]]
-==== Storing Stateless Authentication in the Session
+==== Lưu Stateless Authentication vào Session
 
-If, for some reason, you are using a stateless authentication mechanism, but you still want to store the authentication in the session you can use the `HttpSessionSecurityContextRepository` instead of the `NullSecurityContextRepository`.
+Nếu vì lý do nào đó đang dùng cơ chế stateless authentication nhưng vẫn muốn lưu authentication vào session, bạn có thể dùng `HttpSessionSecurityContextRepository` thay cho `NullSecurityContextRepository`.
 
-For the xref:servlet/authentication/passwords/basic.adoc[HTTP Basic], you can add xref:servlet/configuration/java.adoc#post-processing-configured-objects[a `ObjectPostProcessor`] that changes the `SecurityContextRepository` used by the `BasicAuthenticationFilter`:
+Đối với xref:servlet/authentication/passwords/basic.adoc[HTTP Basic], bạn có thể thêm xref:servlet/configuration/java.adoc#post-processing-configured-objects[`ObjectPostProcessor`] để thay đổi `SecurityContextRepository` được `BasicAuthenticationFilter` dùng:
 
-.Store HTTP Basic authentication in the `HttpSession`
+.Lưu HTTP Basic authentication vào `HttpSession`
 [tabs]
 ======
 Java::
@@ -290,32 +290,32 @@ SecurityFilterChain web(HttpSecurity http) throws Exception {
 ----
 ======
 
-The above also applies to others authentication mechanisms, like xref:servlet/oauth2/resource-server/index.adoc[Bearer Token Authentication].
+Điều trên cũng áp dụng cho các cơ chế authentication khác, chẳng hạn xref:servlet/oauth2/resource-server/index.adoc[Bearer Token Authentication].
 
 
 [[requireexplicitsave]]
-== Understanding Require Explicit Save
+== Tìm hiểu Require Explicit Save
 
-In Spring Security 5, the default behavior is for the xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontext[`SecurityContext`] to automatically be saved to the xref:servlet/authentication/persistence.adoc#securitycontextrepository[`SecurityContextRepository`] using the <<securitycontextpersistencefilter, `SecurityContextPersistenceFilter`>>.
-Saving must be done just prior to the `HttpServletResponse` being committed and just before `SecurityContextPersistenceFilter`.
-Unfortunately, automatic persistence of the `SecurityContext` can surprise users when it is done prior to the request completing (i.e. just prior to committing the `HttpServletResponse`).
-It also is complex to keep track of the state to determine if a save is necessary causing unnecessary writes to the `SecurityContextRepository` (i.e. `HttpSession`) at times.
+Trong Spring Security 5, hành vi mặc định là xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontext[`SecurityContext`] được tự động lưu vào xref:servlet/authentication/persistence.adoc#securitycontextrepository[`SecurityContextRepository`] bằng <<securitycontextpersistencefilter, `SecurityContextPersistenceFilter`>>.
+Việc lưu phải được thực hiện ngay trước khi `HttpServletResponse` được commit và ngay trước `SecurityContextPersistenceFilter`.
+Đáng tiếc là persistence tự động của `SecurityContext` có thể khiến người dùng bất ngờ khi được thực hiện trước khi request hoàn tất (tức ngay trước khi commit `HttpServletResponse`).
+Việc theo dõi state để xác định có cần lưu hay không cũng phức tạp, đôi khi gây ra các lần ghi không cần thiết vào `SecurityContextRepository` (tức `HttpSession`).
 
-For these reasons, the `SecurityContextPersistenceFilter` has been deprecated to be replaced with the `SecurityContextHolderFilter`.
-In Spring Security 6, the default behavior is that xref:servlet/authentication/persistence.adoc#securitycontextholderfilter[the `SecurityContextHolderFilter`] will only read the `SecurityContext` from  `SecurityContextRepository` and populate it in the `SecurityContextHolder`.
-Users now must explicitly save the `SecurityContext` with the `SecurityContextRepository` if they want the `SecurityContext` to persist between requests.
-This removes ambiguity and improves performance by only requiring writing to the `SecurityContextRepository` (i.e. `HttpSession`) when it is necessary.
+Vì các lý do này, `SecurityContextPersistenceFilter` đã bị deprecated để được thay thế bằng `SecurityContextHolderFilter`.
+Trong Spring Security 6, hành vi mặc định là xref:servlet/authentication/persistence.adoc#securitycontextholderfilter[`SecurityContextHolderFilter`] chỉ đọc `SecurityContext` từ `SecurityContextRepository` và nạp nó vào `SecurityContextHolder`.
+Giờ đây, người dùng phải lưu tường minh `SecurityContext` bằng `SecurityContextRepository` nếu muốn `SecurityContext` được lưu trữ giữa các request.
+Điều này loại bỏ sự mơ hồ và cải thiện hiệu năng bằng cách chỉ yêu cầu ghi vào `SecurityContextRepository` (tức `HttpSession`) khi cần.
 
 [[how-it-works-requireexplicitsave]]
-=== How it works
+=== Cách hoạt động
 
-In summary, when `requireExplicitSave` is `true`, Spring Security sets up xref:servlet/authentication/persistence.adoc#securitycontextholderfilter[the `SecurityContextHolderFilter`] instead of xref:servlet/authentication/persistence.adoc#securitycontextpersistencefilter[the `SecurityContextPersistenceFilter`]
+Tóm lại, khi `requireExplicitSave` là `true`, Spring Security thiết lập xref:servlet/authentication/persistence.adoc#securitycontextholderfilter[`SecurityContextHolderFilter`] thay cho xref:servlet/authentication/persistence.adoc#securitycontextpersistencefilter[`SecurityContextPersistenceFilter`]
 
 
 [[ns-concurrent-sessions]]
-== Configuring Concurrent Session Control
-If you wish to place constraints on a single user's ability to log in to your application, Spring Security supports this out of the box with the following simple additions.
-First, you need to add the following listener to your configuration to keep Spring Security updated about session lifecycle events:
+== Cấu hình Concurrent Session Control
+Nếu muốn đặt giới hạn cho khả năng đăng nhập ứng dụng của một người dùng, Spring Security hỗ trợ sẵn điều này với các bổ sung đơn giản sau.
+Trước tiên, bạn cần thêm listener sau vào cấu hình để Spring Security được cập nhật về các event trong vòng đời session:
 
 [tabs]
 ======
@@ -351,7 +351,7 @@ web.xml::
 ----
 ======
 
-Then add the following lines to your security configuration:
+Sau đó thêm các dòng sau vào security configuration:
 
 [tabs]
 ======
@@ -400,10 +400,10 @@ XML::
 ======
 
 
-This will prevent a user from logging in multiple times - a second login will cause the first to be invalidated.
+Điều này ngăn người dùng đăng nhập nhiều lần; lần đăng nhập thứ hai sẽ khiến lần đầu bị invalidate.
 
-You can also adjust this based on who the user is.
-For example, administrators may be able to have more than one session:
+Bạn cũng có thể điều chỉnh dựa trên người dùng là ai.
+Ví dụ, administrator có thể được phép có nhiều hơn một session:
 
 [tabs]
 ======
@@ -457,7 +457,7 @@ XML::
 ----
 ======
 
-Using Spring Boot, you can test the above configurations in the following way:
+Khi dùng Spring Boot, bạn có thể kiểm thử các cấu hình trên như sau:
 
 [tabs]
 ======
@@ -485,7 +485,7 @@ public class MaximumSessionsTests {
 
         this.mvc.perform(formLogin()).andExpect(authenticated());
 
-        // first session is terminated by second login
+        // session đầu tiên bị chấm dứt bởi lần đăng nhập thứ hai
         this.mvc.perform(get("/").session(firstLoginSession))
                 .andExpect(unauthenticated());
     }
@@ -494,9 +494,9 @@ public class MaximumSessionsTests {
 ----
 ======
 
-You can try it using the {gh-samples-url}/servlet/spring-boot/java/session-management/maximum-sessions[Maximum Sessions sample].
+Bạn có thể thử bằng {gh-samples-url}/servlet/spring-boot/java/session-management/maximum-sessions[Maximum Sessions sample].
 
-It is also common that you would prefer to prevent a second login, in which case you can use:
+Một trường hợp phổ biến khác là bạn muốn ngăn lần đăng nhập thứ hai; khi đó có thể dùng:
 
 [tabs]
 ======
@@ -546,12 +546,12 @@ XML::
 ======
 
 
-The second login will then be rejected.
-By "rejected", we mean that the user will be sent to the `authentication-failure-url` if form-based login is being used.
-If the second authentication takes place through another non-interactive mechanism, such as "remember-me", an "unauthorized" (401) error will be sent to the client.
-If instead you want to use an error page, you can add the attribute `session-authentication-error-url` to the `session-management` element.
+Khi đó, lần đăng nhập thứ hai sẽ bị từ chối.
+"Bị từ chối" nghĩa là người dùng sẽ được gửi đến `authentication-failure-url` nếu đang dùng form-based login.
+Nếu lần authentication thứ hai diễn ra qua một cơ chế không tương tác khác, chẳng hạn "remember-me", client sẽ nhận lỗi "unauthorized" (401).
+Nếu muốn dùng error page thay vào đó, bạn có thể thêm attribute `session-authentication-error-url` vào element `session-management`.
 
-Using Spring Boot, you can test the above configuration the following way:
+Khi dùng Spring Boot, bạn có thể kiểm thử cấu hình trên như sau:
 
 [tabs]
 ======
@@ -577,10 +577,10 @@ public class MaximumSessionsPreventLoginTests {
         this.mvc.perform(get("/").session(firstLoginSession))
                 .andExpect(authenticated());
 
-        // second login is prevented
+        // lần đăng nhập thứ hai bị ngăn
         this.mvc.perform(formLogin()).andExpect(unauthenticated());
 
-        // first session is still valid
+        // session đầu tiên vẫn hợp lệ
         this.mvc.perform(get("/").session(firstLoginSession))
                 .andExpect(authenticated());
     }
@@ -589,22 +589,22 @@ public class MaximumSessionsPreventLoginTests {
 ----
 ======
 
-If you are using a customized authentication filter for form-based login, then you have to configure concurrent session control support explicitly.
-You can try it using the {gh-samples-url}/servlet/spring-boot/java/session-management/maximum-sessions-prevent-login[Maximum Sessions Prevent Login sample].
+Nếu đang dùng authentication filter tùy chỉnh cho form-based login, bạn phải cấu hình tường minh hỗ trợ concurrent session control.
+Bạn có thể thử bằng {gh-samples-url}/servlet/spring-boot/java/session-management/maximum-sessions-prevent-login[Maximum Sessions Prevent Login sample].
 
 [NOTE]
 =====
-If you are using a custom implementation of `UserDetails`, ensure you override the **equals()** and **hashCode()** methods.
-The default `SessionRegistry` implementation in Spring Security relies on an in-memory Map that uses these methods to correctly identify and manage user sessions.
-Failing to override them may lead to issues where session tracking and user comparison behave unexpectedly.
+Nếu đang dùng implementation tùy chỉnh của `UserDetails`, hãy bảo đảm bạn override các method **equals()** và **hashCode()**.
+Implementation `SessionRegistry` mặc định trong Spring Security dựa vào Map in-memory sử dụng các method này để nhận diện và quản lý session của người dùng một cách chính xác.
+Không override chúng có thể dẫn đến vấn đề khiến việc theo dõi session và so sánh người dùng hoạt động không như mong đợi.
 =====
 
-== Detecting Timeouts
+== Phát hiện Timeout
 
-Sessions expire on their own, and there is nothing that needs to be done to ensure that a security context gets removed.
-That said, Spring Security can detect when a session has expired and take specific actions that you indicate.
-For example, you may want to redirect to a specific endpoint when a user makes a request with an already-expired session.
-This is achieved through the `invalidSessionUrl` in `HttpSecurity`:
+Session tự hết hạn, và không cần làm gì để bảo đảm `SecurityContext` được xóa.
+Dù vậy, Spring Security có thể phát hiện khi session hết hạn và thực hiện các hành động cụ thể do bạn chỉ định.
+Ví dụ, bạn có thể muốn redirect đến một endpoint cụ thể khi người dùng thực hiện request bằng session đã hết hạn.
+Việc này được thực hiện thông qua `invalidSessionUrl` trong `HttpSecurity`:
 
 [tabs]
 ======
@@ -648,14 +648,14 @@ XML::
 ----
 ======
 
-Note that if you use this mechanism to detect session timeouts, it may falsely report an error if the user logs out and then logs back in without closing the browser.
-This is because the session cookie is not cleared when you invalidate the session and will be resubmitted even if the user has logged out.
-If that is your case, you might want to <<clearing-session-cookie-on-logout,configure logout to clear the session cookie>>.
+Lưu ý rằng nếu dùng cơ chế này để phát hiện session timeout, nó có thể báo lỗi không chính xác nếu người dùng logout rồi đăng nhập lại mà không đóng trình duyệt.
+Điều này xảy ra vì session cookie không được xóa khi bạn invalidate session và sẽ được gửi lại dù người dùng đã logout.
+Nếu gặp trường hợp đó, bạn có thể muốn <<clearing-session-cookie-on-logout,cấu hình logout để xóa session cookie>>.
 
-=== Customizing the Invalid Session Strategy
+=== Tùy chỉnh Invalid Session Strategy
 
-The `invalidSessionUrl` is a convenience method for setting the `InvalidSessionStrategy` using the javadoc:org.springframework.security.web.session.SimpleRedirectInvalidSessionStrategy[`SimpleRedirectInvalidSessionStrategy` implementation].
-If you want to customize the behavior, you can implement the javadoc:org.springframework.security.web.session.InvalidSessionStrategy[] interface and configure it using the `invalidSessionStrategy` method:
+`invalidSessionUrl` là một convenience method để thiết lập `InvalidSessionStrategy` bằng javadoc:org.springframework.security.web.session.SimpleRedirectInvalidSessionStrategy[implementation `SimpleRedirectInvalidSessionStrategy`].
+Nếu muốn tùy chỉnh hành vi, bạn có thể implement interface javadoc:org.springframework.security.web.session.InvalidSessionStrategy[] và cấu hình nó bằng method `invalidSessionStrategy`:
 
 [tabs]
 ======
@@ -701,9 +701,9 @@ XML::
 ======
 
 [[clearing-session-cookie-on-logout]]
-== Clearing Session Cookies on Logout
+== Xóa Session Cookie khi Logout
 
-You can explicitly delete the JSESSIONID cookie on logging out, for example by using the https://w3c.github.io/webappsec-clear-site-data/[`Clear-Site-Data` header] in the logout handler:
+Bạn có thể xóa tường minh cookie JSESSIONID khi logout, chẳng hạn bằng cách dùng https://w3c.github.io/webappsec-clear-site-data/[header `Clear-Site-Data`] trong logout handler:
 
 [tabs]
 ======
@@ -757,9 +757,9 @@ XML::
 ----
 ======
 
-This has the advantage of being container agnostic and will work with any container that supports the `Clear-Site-Data` header.
+Cách này có ưu điểm là không phụ thuộc container và sẽ hoạt động với mọi container hỗ trợ header `Clear-Site-Data`.
 
-As an alternative, you can also use the following syntax in the logout handler:
+Ngoài ra, bạn cũng có thể dùng cú pháp sau trong logout handler:
 
 [tabs]
 ======
@@ -802,12 +802,12 @@ XML::
 ----
 ======
 
-Unfortunately, this cannot be guaranteed to work with every servlet container, so you need to test it in your environment.
+Đáng tiếc là không thể bảo đảm cách này hoạt động với mọi servlet container, vì vậy bạn cần kiểm thử trong môi trường của mình.
 
 [NOTE]
 =====
-If you run your application behind a proxy, you may also be able to remove the session cookie by configuring the proxy server.
-For example, by using Apache HTTPD's `mod_headers`, the following directive deletes the `JSESSIONID` cookie by expiring it in the response to a logout request (assuming the application is deployed under the `/tutorial` path):
+Nếu chạy ứng dụng phía sau proxy, bạn cũng có thể xóa session cookie bằng cách cấu hình proxy server.
+Ví dụ, khi dùng `mod_headers` của Apache HTTPD, directive sau xóa cookie `JSESSIONID` bằng cách làm nó hết hạn trong response của logout request (giả sử ứng dụng được deploy dưới path `/tutorial`):
 =====
 
 [source,xml]
@@ -817,32 +817,32 @@ Header always set Set-Cookie "JSESSIONID=;Path=/tutorial;Expires=Thu, 01 Jan 197
 </LocationMatch>
 ----
 
-More details on the xref:servlet/exploits/headers.adoc#servlet-headers-clear-site-data[Clear Site Data] and xref:servlet/authentication/logout.adoc[Logout sections].
+Xem thêm chi tiết trong các section xref:servlet/exploits/headers.adoc#servlet-headers-clear-site-data[Clear Site Data] và xref:servlet/authentication/logout.adoc[Logout].
 
 
 
 [[ns-session-fixation]]
-== Understanding Session Fixation Attack Protection
+== Tìm hiểu Session Fixation Attack Protection
 
-https://en.wikipedia.org/wiki/Session_fixation[Session fixation] attacks are a potential risk where it is possible for a malicious attacker to create a session by accessing a site, then persuade another user to log in with the same session (by sending them a link containing the session identifier as a parameter, for example).
-Spring Security protects against this automatically by creating a new session or otherwise changing the session ID when a user logs in.
+Các cuộc tấn công https://en.wikipedia.org/wiki/Session_fixation[session fixation] là một rủi ro tiềm ẩn, trong đó kẻ tấn công độc hại có thể tạo một session bằng cách truy cập site, sau đó thuyết phục người dùng khác đăng nhập bằng cùng session đó (chẳng hạn gửi cho họ một liên kết chứa session identifier dưới dạng parameter).
+Spring Security tự động bảo vệ trước việc này bằng cách tạo session mới hoặc thay đổi session ID theo cách khác khi người dùng đăng nhập.
 
-=== Configuring Session Fixation Protection
+=== Cấu hình Session Fixation Protection
 
-You can control the strategy for Session Fixation Protection by choosing between three recommended options:
+Bạn có thể kiểm soát strategy cho Session Fixation Protection bằng cách chọn một trong ba option được khuyến nghị:
 
-* `changeSessionId` - Do not create a new session.
-Instead, use the session fixation protection provided by the Servlet container (`HttpServletRequest#changeSessionId()`).
-This option is only available in Servlet 3.1 (Java EE 7) and newer containers.
-Specifying it in older containers will result in an exception.
-This is the default in Servlet 3.1 and newer containers.
+* `changeSessionId` - Không tạo session mới.
+Thay vào đó, dùng cơ chế bảo vệ session fixation do Servlet container cung cấp (`HttpServletRequest#changeSessionId()`).
+Option này chỉ có trong Servlet 3.1 (Java EE 7) và các container mới hơn.
+Chỉ định option này trong container cũ hơn sẽ gây ra exception.
+Đây là mặc định trong Servlet 3.1 và các container mới hơn.
 
-* `newSession` - Create a new "clean" session, without copying the existing session data (Spring Security-related attributes will still be copied).
+* `newSession` - Tạo session "sạch" mới mà không copy dữ liệu session hiện tại (các attribute liên quan đến Spring Security vẫn được copy).
 
-* `migrateSession` - Create a new session and copy all existing session attributes to the new session.
-This is the default in Servlet 3.0 or older containers.
+* `migrateSession` - Tạo session mới và copy mọi session attribute hiện có sang session mới.
+Đây là mặc định trong Servlet 3.0 hoặc các container cũ hơn.
 
-You can configure the session fixation protection by doing:
+Bạn có thể cấu hình session fixation protection như sau:
 
 [tabs]
 ======
@@ -889,17 +889,17 @@ XML::
 ----
 ======
 
-When session fixation protection occurs, it results in a `SessionFixationProtectionEvent` being published in the application context.
-If you use `changeSessionId`, this protection will __also__ result in any  ``jakarta.servlet.http.HttpSessionIdListener``s being notified, so use caution if your code listens for both events.
+Khi session fixation protection xảy ra, một `SessionFixationProtectionEvent` sẽ được publish trong `ApplicationContext`.
+Nếu dùng `changeSessionId`, cơ chế bảo vệ này __cũng__ khiến mọi ``jakarta.servlet.http.HttpSessionIdListener`` được thông báo, vì vậy hãy cẩn thận nếu code của bạn lắng nghe cả hai event.
 
-You can also set the session fixation protection to `none` to disable it, but this is not recommended as it leaves your application vulnerable.
+Bạn cũng có thể đặt session fixation protection thành `none` để tắt, nhưng không khuyến nghị vì điều đó khiến ứng dụng dễ bị tấn công.
 
 
 
 [[use-securitycontextholderstrategy]]
-== Using `SecurityContextHolderStrategy`
+== Sử dụng `SecurityContextHolderStrategy`
 
-Consider the following block of code:
+Hãy xem block code sau:
 
 [tabs]
 ======
@@ -917,18 +917,18 @@ SecurityContextHolder.setContext(context); <3>
 ----
 ======
 
-1. Creates an empty `SecurityContext` instance by accessing the `SecurityContextHolder` statically.
-2. Sets the `Authentication` object in the `SecurityContext` instance.
-3. Sets the `SecurityContext` instance in the `SecurityContextHolder` statically.
+1. Tạo một instance `SecurityContext` rỗng bằng cách truy cập tĩnh vào `SecurityContextHolder`.
+2. Thiết lập object `Authentication` trong instance `SecurityContext`.
+3. Thiết lập instance `SecurityContext` vào `SecurityContextHolder` theo cách tĩnh.
 
-While the above code works fine, it can produce some undesired effects: when components access the `SecurityContext` statically through `SecurityContextHolder`, this can create race conditions when there are multiple application contexts that want to specify the `SecurityContextHolderStrategy`.
-This is because in `SecurityContextHolder` there is one strategy per classloader instead of one per application context.
+Dù code trên hoạt động tốt, nó có thể gây ra một số hiệu ứng không mong muốn: khi các component truy cập tĩnh vào `SecurityContext` thông qua `SecurityContextHolder`, điều này có thể tạo race condition khi có nhiều `ApplicationContext` muốn chỉ định `SecurityContextHolderStrategy`.
+Đó là vì trong `SecurityContextHolder` có một strategy cho mỗi classloader thay vì một strategy cho mỗi `ApplicationContext`.
 
-To address this, components can wire `SecurityContextHolderStrategy` from the application context.
-By default, they will still look up the strategy from `SecurityContextHolder`.
+Để giải quyết việc này, các component có thể wire `SecurityContextHolderStrategy` từ `ApplicationContext`.
+Theo mặc định, chúng vẫn lookup strategy từ `SecurityContextHolder`.
 
-These changes are largely internal, but they present the opportunity for applications to autowire the `SecurityContextHolderStrategy` instead of accessing the `SecurityContext` statically.
-To do so, you should change the code to the following:
+Các thay đổi này phần lớn là internal, nhưng tạo cơ hội để ứng dụng autowire `SecurityContextHolderStrategy` thay vì truy cập tĩnh vào `SecurityContext`.
+Để làm vậy, bạn nên thay code bằng:
 
 [tabs]
 ======
@@ -954,16 +954,16 @@ public class SomeClass {
 ----
 ======
 
-1. Creates an empty `SecurityContext` instance using the configured `SecurityContextHolderStrategy`.
-2. Sets the `Authentication` object in the `SecurityContext` instance.
-3. Sets the `SecurityContext` instance in the `SecurityContextHolderStrategy`.
+1. Tạo một instance `SecurityContext` rỗng bằng `SecurityContextHolderStrategy` đã cấu hình.
+2. Thiết lập object `Authentication` trong instance `SecurityContext`.
+3. Thiết lập instance `SecurityContext` vào `SecurityContextHolderStrategy`.
 
 
 [[session-mgmt-force-session-creation]]
-== Forcing Eager Session Creation
+== Ép tạo Session eager
 
-At times, it can be valuable to eagerly create sessions.
-This can be done by using the javadoc:org.springframework.security.web.session.ForceEagerSessionCreationFilter[] which can be configured using:
+Đôi khi việc tạo session eager có thể hữu ích.
+Bạn có thể thực hiện việc này bằng javadoc:org.springframework.security.web.session.ForceEagerSessionCreationFilter[], được cấu hình như sau:
 
 [tabs]
 ======
@@ -1008,6 +1008,6 @@ XML::
 
 
 
-== What to read next
+== Đọc tiếp
 
-- Clustered sessions with https://docs.spring.io/spring-session/reference/index.html[Spring Session]
+- Session dạng cluster với https://docs.spring.io/spring-session/reference/index.html[Spring Session]
