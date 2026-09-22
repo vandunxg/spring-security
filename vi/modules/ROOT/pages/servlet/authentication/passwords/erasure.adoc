@@ -13,7 +13,7 @@ Sau khi authentication thành công, một thực hành tốt về bảo mật l
 
 Việc không xóa credential đúng cách có thể dẫn đến một số rủi ro:
 
-* *Tấn công truy cập bộ nhớ*: Kẻ tấn công có thể truy cập credential thô từ bộ nhớ thông qua các exploit như tấn công buffer overflow hoặc memory dump.
+* *Tấn công truy cập bộ nhớ*: Kẻ tấn công có thể truy cập credential dạng raw từ bộ nhớ thông qua các exploit như tấn công buffer overflow hoặc memory dump.
 * *Mối đe dọa nội bộ*: Người nội gián độc hại có quyền truy cập hệ thống có thể trích xuất credential từ bộ nhớ ứng dụng.
 * *Lộ ngoài ý muốn*: Trong môi trường multi-tenant, credential còn tồn tại trong bộ nhớ có thể vô tình bị lộ cho các tenant khác.
 

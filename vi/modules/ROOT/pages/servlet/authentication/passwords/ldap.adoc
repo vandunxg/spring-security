@@ -1,14 +1,14 @@
 [[servlet-authentication-ldap]]
 = LDAP Authentication
 
-LDAP (Lightweight Directory Access Protocol) thường được các tổ chức sử dụng làm kho lưu trữ tập trung thông tin người dùng và làm authentication service.
+LDAP (Lightweight Directory Access Protocol) thường được các tổ chức sử dụng làm repository tập trung lưu trữ thông tin người dùng và làm authentication service.
 LDAP cũng có thể được dùng để lưu trữ thông tin role của người dùng ứng dụng.
 
-LDAP-based authentication của Spring Security được Spring Security sử dụng khi được cấu hình để xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-input[chấp nhận username/password] cho authentication.
-Tuy sử dụng username và password cho authentication, cơ chế này không sử dụng `UserDetailsService`, bởi vì trong <<servlet-authentication-ldap-bind,bind authentication>>, LDAP server không trả về password nên ứng dụng không thể thực hiện việc kiểm tra password.
+Spring Security sử dụng LDAP-based authentication khi được cấu hình để xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-input[chấp nhận username/password] cho authentication.
+Tuy sử dụng username và password cho authentication, cơ chế này không sử dụng `UserDetailsService`, bởi vì trong <<servlet-authentication-ldap-bind,bind authentication>>, LDAP server không trả về password nên ứng dụng không thể thực hiện validation cho password.
 
-Có nhiều kịch bản khác nhau để cấu hình LDAP server, vì vậy LDAP provider của Spring Security có thể được cấu hình hoàn toàn.
-Provider này sử dụng các strategy interface riêng cho authentication và việc lấy role, đồng thời cung cấp các implementation mặc định có thể được cấu hình để xử lý nhiều tình huống.
+Có nhiều kịch bản khác nhau để cấu hình LDAP server, vì vậy LDAP provider của Spring Security hoàn toàn có thể cấu hình.
+Provider này sử dụng các strategy interface riêng cho authentication và truy xuất role, đồng thời cung cấp các implementation mặc định có thể được cấu hình để xử lý nhiều tình huống.
 
 [[servlet-authentication-ldap-required-dependencies]]
 == Các dependency bắt buộc
@@ -48,7 +48,7 @@ dependencies {
 [[servlet-authentication-ldap-prerequisites]]
 == Điều kiện tiên quyết
 
-Bạn nên nắm rõ LDAP trước khi thử sử dụng LDAP với Spring Security.
+Bạn nên nắm rõ LDAP trước khi sử dụng LDAP với Spring Security.
 Liên kết sau cung cấp phần giới thiệu hữu ích về các khái niệm liên quan và hướng dẫn thiết lập directory bằng LDAP server miễn phí OpenLDAP: https://www.zytrax.com/books/ldap/.
 Việc quen thuộc ở mức nhất định với các JNDI API dùng để truy cập LDAP từ Java cũng có thể hữu ích.
 LDAP provider không sử dụng bất kỳ thư viện LDAP bên thứ ba nào (Mozilla, JLDAP hoặc thư viện khác), nhưng sử dụng rộng rãi Spring LDAP, vì vậy việc quen thuộc với project đó có thể hữu ích nếu bạn dự định thêm các tùy chỉnh của riêng mình.
@@ -70,7 +70,7 @@ Nếu chưa quen với cách thực hiện, hãy xem https://docs.oracle.com/jav
 [[servlet-authentication-ldap-embedded]]
 == Thiết lập Embedded LDAP Server
 
-Việc đầu tiên cần làm là bảo đảm bạn có LDAP Server để cấu hình trỏ tới.
+Việc đầu tiên cần làm là bảo đảm bạn có LDAP Server mà cấu hình của bạn sẽ trỏ tới.
 Để đơn giản, thường nên bắt đầu với embedded LDAP Server.
 Spring Security hỗ trợ sử dụng một trong các lựa chọn sau:
 
@@ -157,7 +157,7 @@ dependencies {
 ======
 
 Sau đó, bạn có thể cấu hình Embedded LDAP Server bằng `EmbeddedLdapServerContextSourceFactoryBean`.
-Cấu hình này yêu cầu Spring Security khởi động một LDAP server trong bộ nhớ:
+Cấu hình này sẽ khiến Spring Security khởi động một LDAP server trong bộ nhớ:
 
 .Cấu hình Embedded LDAP Server
 [tabs]
@@ -229,7 +229,7 @@ Thay vào đó, hãy sử dụng <<servlet-authentication-ldap-unboundid,Unbound
 [[servlet-authentication-ldap-contextsource]]
 == LDAP ContextSource
 
-Sau khi có LDAP Server để cấu hình trỏ tới, bạn cần cấu hình Spring Security trỏ tới LDAP server sẽ được dùng để authenticate user.
+Sau khi có LDAP Server mà cấu hình của bạn sẽ trỏ tới, bạn cần cấu hình Spring Security trỏ tới LDAP server dùng để authenticate users.
 Để thực hiện việc đó, hãy tạo một LDAP `ContextSource` (tương đương với JDBC `DataSource`).
 Nếu đã cấu hình `EmbeddedLdapServerContextSourceFactoryBean`, Spring Security sẽ tạo một LDAP `ContextSource` trỏ tới embedded LDAP server.
 
@@ -399,7 +399,7 @@ fun authenticationManager(contextSource: BaseLdapPathContextSource): Authenticat
 ======
 
 Khi được sử dụng với `ContextSource` <<servlet-authentication-ldap-contextsource,định nghĩa ở trên>>, cấu hình này sẽ thực hiện tìm kiếm dưới DN `ou=people,dc=springframework,dc=org` bằng `+(uid={0})+` làm filter.
-Một lần nữa, user login name được thay vào parameter trong filter name, vì vậy hệ thống tìm kiếm entry có attribute `uid` bằng user name.
+Một lần nữa, user login name được thay vào parameter trong filter, vì vậy hệ thống tìm kiếm entry có attribute `uid` bằng user name.
 Nếu không cung cấp user search base, việc tìm kiếm sẽ được thực hiện từ root.
 
 [[servlet-authentication-ldap-pwd]]
@@ -566,7 +566,7 @@ fun authenticationManager(
 
 == Active Directory
 
-Active Directory hỗ trợ các tùy chọn authentication không chuẩn riêng, và pattern sử dụng thông thường không hoàn toàn phù hợp với `LdapAuthenticationProvider` tiêu chuẩn.
+Active Directory hỗ trợ các tùy chọn authentication không chuẩn của riêng mình, và pattern sử dụng thông thường không hoàn toàn phù hợp với `LdapAuthenticationProvider` tiêu chuẩn.
 Thông thường, authentication được thực hiện bằng domain username (ở dạng `user@domain`) thay vì LDAP distinguished name.
 Để đơn giản hóa việc này, Spring Security có một authentication provider được tùy chỉnh cho thiết lập Active Directory điển hình.
 

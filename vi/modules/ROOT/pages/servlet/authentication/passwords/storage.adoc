@@ -6,5 +6,5 @@ Mỗi cơ chế được hỗ trợ để đọc tên người dùng và mật k
 
 * Lưu trữ đơn giản với xref:servlet/authentication/passwords/in-memory.adoc#servlet-authentication-inmemory[Authentication trong bộ nhớ]
 * Cơ sở dữ liệu quan hệ với xref:servlet/authentication/passwords/jdbc.adoc#servlet-authentication-jdbc[Authentication qua JDBC]
-* Kho dữ liệu tùy chỉnh với xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[UserDetailsService]
+* data store tùy chỉnh với xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[UserDetailsService]
 * Lưu trữ LDAP với xref:servlet/authentication/passwords/ldap.adoc#servlet-authentication-ldap[Authentication LDAP]

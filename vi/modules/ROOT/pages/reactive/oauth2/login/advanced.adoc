@@ -1,9 +1,9 @@
 [[webflux-oauth2-login-advanced]]
 = Cấu hình nâng cao
 
-OAuth 2.0 Authorization Framework định nghĩa các https://tools.ietf.org/html/rfc6749#section-3[endpoint của protocol] như sau:
+OAuth 2.0 Authorization Framework định nghĩa các https://tools.ietf.org/html/rfc6749#section-3[Protocol Endpoints] như sau:
 
-Quy trình authorization sử dụng hai endpoint của authorization server (các HTTP resource):
+Quy trình authorization sử dụng hai endpoint của authorization server (HTTP resource):
 
 * Authorization Endpoint: Được client sử dụng để lấy authorization từ resource owner thông qua chuyển hướng user-agent.
 * Token Endpoint: Được client sử dụng để đổi authorization grant lấy access token, thường kèm theo client authentication.
@@ -14,15 +14,15 @@ Cũng như một endpoint của client:
 
 OpenID Connect Core 1.0 specification định nghĩa https://openid.net/specs/openid-connect-core-1_0.html#UserInfo[UserInfo Endpoint] như sau:
 
-UserInfo Endpoint là một Protected Resource OAuth 2.0 trả về các claim về end-user đã authentication.
-Để lấy các claim được yêu cầu về end-user, client gửi request đến UserInfo Endpoint bằng access token nhận được thông qua OpenID Connect Authentication.
-Các claim này thường được biểu diễn dưới dạng JSON object chứa một tập các cặp name-value cho các claim.
+UserInfo Endpoint là một OAuth 2.0 Protected Resource trả về các claim về end-user đã được authenticated.
+Để lấy các claim được yêu cầu về end-user, client gửi request đến UserInfo Endpoint bằng access token nhận được qua OpenID Connect Authentication.
+Các claim này thường được biểu diễn dưới dạng một JSON object chứa một tập hợp các cặp name-value của claim.
 
-`ServerHttpSecurity.oauth2Login()` cung cấp một số tùy chọn cấu hình để tùy chỉnh OAuth 2.0 Login.
+`ServerHttpSecurity.oauth2Login()` cung cấp một số tùy chọn cấu hình để customize OAuth 2.0 Login.
 
-Đoạn code sau cho thấy đầy đủ các tùy chọn cấu hình có sẵn cho DSL `oauth2Login()`:
+Đoạn code sau hiển thị đầy đủ các tùy chọn cấu hình có sẵn cho DSL `oauth2Login()`:
 
-.Các tùy chọn cấu hình OAuth2 Login
+.Các tùy chọn cấu hình OAuth 2.0 Login
 [tabs]
 ======
 Java::
@@ -117,11 +117,11 @@ Dòng sau minh họa một ví dụ:
 <a href="/oauth2/authorization/google">Google</a>
 ----
 
-Để ghi đè trang login mặc định, hãy cấu hình `exceptionHandling().authenticationEntryPoint()` và (tùy chọn) `oauth2Login().authorizationRequestResolver()`.
+Để override trang login mặc định, hãy cấu hình `exceptionHandling().authenticationEntryPoint()` và (tùy chọn) `oauth2Login().authorizationRequestResolver()`.
 
-Danh sách sau minh họa một ví dụ:
+Ví dụ sau minh họa cách cấu hình:
 
-.Cấu hình trang OAuth2 Login
+.Cấu hình trang OAuth 2.0 Login
 [tabs]
 ======
 Java::
@@ -201,7 +201,7 @@ Bạn cần cung cấp một `@Controller` với `@RequestMapping("/login/oauth2
 [TIP]
 ====
 Như đã nêu trước đó, việc cấu hình `oauth2Login().authorizationRequestResolver()` là tùy chọn.
-Tuy nhiên, nếu chọn tùy chỉnh nó, hãy đảm bảo link đến mỗi OAuth Client khớp với pattern được cung cấp thông qua `ServerWebExchangeMatcher`.
+Tuy nhiên, nếu chọn customize nó, hãy đảm bảo link đến mỗi OAuth Client khớp với pattern được cung cấp thông qua `ServerWebExchangeMatcher`.
 
 Dòng sau minh họa một ví dụ:
 
@@ -221,11 +221,11 @@ Redirection Endpoint được Authorization Server sử dụng để trả Autho
 OAuth 2.0 Login sử dụng Authorization Code Grant.
 Do đó, authorization credential là authorization code.
 
-Endpoint chuyển hướng Authorization Response mặc định là `+/login/oauth2/code/{registrationId}+`.
+Redirection Endpoint mặc định của Authorization Response là `+/login/oauth2/code/{registrationId}+`.
 
-Nếu muốn tùy chỉnh endpoint chuyển hướng Authorization Response, hãy cấu hình như trong ví dụ sau:
+Nếu muốn customize Redirection Endpoint của Authorization Response, hãy cấu hình như trong ví dụ sau:
 
-.Cấu hình endpoint chuyển hướng
+.Cấu hình Redirection Endpoint
 [tabs]
 ======
 Java::
@@ -272,9 +272,9 @@ class OAuth2LoginSecurityConfig {
 
 [IMPORTANT]
 ====
-Bạn cũng cần đảm bảo `ClientRegistration.redirectUri` khớp với endpoint chuyển hướng Authorization Response tùy chỉnh.
+Bạn cũng cần đảm bảo `ClientRegistration.redirectUri` khớp với Redirection Endpoint tùy chỉnh của Authorization Response.
 
-Danh sách sau minh họa một ví dụ:
+Ví dụ sau minh họa cách cấu hình:
 
 [tabs]
 ======
@@ -316,16 +316,16 @@ UserInfo Endpoint bao gồm một số tùy chọn cấu hình, được mô t�
 [[webflux-oauth2-login-advanced-map-authorities]]
 === Ánh xạ authority của user
 
-Sau khi user authentication thành công với OAuth 2.0 Provider, `OAuth2User.getAuthorities()` (hoặc `OidcUser.getAuthorities()`) chứa một danh sách granted authority được lấy từ `OAuth2UserRequest.getAccessToken().getScopes()` và có tiền tố `SCOPE_`.
-Các granted authority này có thể được ánh xạ thành một tập `GrantedAuthority` instance mới, tập này sẽ được cung cấp cho `OAuth2AuthenticationToken` khi hoàn tất authentication.
+Sau khi user authenticated thành công với OAuth 2.0 Provider, `OAuth2User.getAuthorities()` (hoặc `OidcUser.getAuthorities()`) chứa một danh sách granted authority được lấy từ `OAuth2UserRequest.getAccessToken().getScopes()` và có prefix `SCOPE_`.
+Các granted authority này có thể được map thành một tập hợp các instance `GrantedAuthority` mới, tập hợp này sẽ được cung cấp cho `OAuth2AuthenticationToken` khi hoàn tất authentication.
 
 [TIP]
-`OAuth2AuthenticationToken.getAuthorities()` được sử dụng để authorization các request, chẳng hạn trong `hasRole('USER')` hoặc `hasRole('ADMIN')`.
+`OAuth2AuthenticationToken.getAuthorities()` được sử dụng để authorize các request, chẳng hạn trong `hasRole('USER')` hoặc `hasRole('ADMIN')`.
 
-Có một vài tùy chọn để lựa chọn khi ánh xạ authority của user:
+Có một vài tùy chọn để lựa chọn khi map authority của user:
 
 * <<webflux-oauth2-login-advanced-map-authorities-grantedauthoritiesmapper, Sử dụng GrantedAuthoritiesMapper>>
-* <<webflux-oauth2-login-advanced-map-authorities-reactiveoauth2userservice, Strategy dựa trên delegation với ReactiveOAuth2UserService>>
+* <<webflux-oauth2-login-advanced-map-authorities-reactiveoauth2userservice, Delegation-based strategy với ReactiveOAuth2UserService>>
 
 
 [[webflux-oauth2-login-advanced-map-authorities-grantedauthoritiesmapper]]
@@ -428,13 +428,13 @@ class OAuth2LoginSecurityConfig {
 ======
 
 [[webflux-oauth2-login-advanced-map-authorities-reactiveoauth2userservice]]
-==== Strategy dựa trên delegation với ReactiveOAuth2UserService
+==== Delegation-based strategy với ReactiveOAuth2UserService
 
-Strategy này nâng cao hơn so với việc sử dụng `GrantedAuthoritiesMapper`, tuy nhiên cũng linh hoạt hơn vì cho phép truy cập `OAuth2UserRequest` và `OAuth2User` (khi sử dụng UserService OAuth 2.0) hoặc `OidcUserRequest` và `OidcUser` (khi sử dụng UserService OpenID Connect 1.0).
+Strategy này nâng cao hơn so với việc sử dụng `GrantedAuthoritiesMapper`, nhưng cũng flexible hơn vì cho phép truy cập `OAuth2UserRequest` và `OAuth2User` (khi sử dụng OAuth 2.0 UserService) hoặc `OidcUserRequest` và `OidcUser` (khi sử dụng OpenID Connect 1.0 UserService).
 
-`OAuth2UserRequest` (và `OidcUserRequest`) cung cấp quyền truy cập vào `OAuth2AccessToken` liên kết, rất hữu ích trong trường hợp _delegator_ cần lấy thông tin authority từ một protected resource trước khi có thể ánh xạ các authority tùy chỉnh cho user.
+`OAuth2UserRequest` (và `OidcUserRequest`) cung cấp quyền truy cập vào `OAuth2AccessToken` liên kết, rất hữu ích trong trường hợp _delegator_ cần fetch thông tin authority từ một protected resource trước khi có thể map các authority custom cho user.
 
-Ví dụ sau cho thấy cách implement và cấu hình strategy dựa trên delegation bằng UserService OpenID Connect 1.0:
+Ví dụ sau cho thấy cách implement và configure một delegation-based strategy bằng OpenID Connect 1.0 UserService:
 
 .Cấu hình ReactiveOAuth2UserService
 [tabs]
@@ -461,7 +461,7 @@ public class OAuth2LoginSecurityConfig {
 		final OidcReactiveOAuth2UserService delegate = new OidcReactiveOAuth2UserService();
 
 		return (userRequest) -> {
-			// Ủy quyền cho implementation mặc định để tải user
+			// Ủy quyền cho implementation mặc định để load user
 			return delegate.loadUser(userRequest)
 					.flatMap((oidcUser) -> {
 						OAuth2AccessToken accessToken = userRequest.getAccessToken();
@@ -509,7 +509,7 @@ class OAuth2LoginSecurityConfig {
         val delegate = OidcReactiveOAuth2UserService()
 
         return ReactiveOAuth2UserService { userRequest ->
-            // Ủy quyền cho implementation mặc định để tải user
+            // Ủy quyền cho implementation mặc định để load user
             delegate.loadUser(userRequest)
                 .flatMap { oidcUser ->
                     val accessToken = userRequest.accessToken
@@ -537,7 +537,7 @@ class OAuth2LoginSecurityConfig {
 
 
 [[webflux-oauth2-login-advanced-oauth2-user-service]]
-=== UserService OAuth 2.0
+=== OAuth 2.0 UserService
 
 `DefaultReactiveOAuth2UserService` là một implementation của `ReactiveOAuth2UserService`, hỗ trợ các OAuth 2.0 Provider tiêu chuẩn.
 
@@ -603,7 +603,7 @@ class OAuth2LoginSecurityConfig {
 
 
 [[webflux-oauth2-login-advanced-oidc-user-service]]
-=== UserService OpenID Connect 1.0
+=== OpenID Connect 1.0 UserService
 
 `OidcReactiveOAuth2UserService` là một implementation của `ReactiveOAuth2UserService`, hỗ trợ các OpenID Connect 1.0 Provider.
 
@@ -668,14 +668,14 @@ class OAuth2LoginSecurityConfig {
 [[webflux-oauth2-login-advanced-idtoken-verify]]
 == Xác minh chữ ký ID Token
 
-OpenID Connect 1.0 Authentication giới thiệu https://openid.net/specs/openid-connect-core-1_0.html#IDToken[ID Token], một security token chứa các Claim về Authentication của End-User bởi Authorization Server khi được Client sử dụng.
+OpenID Connect 1.0 Authentication giới thiệu https://openid.net/specs/openid-connect-core-1_0.html#IDToken[ID Token], một security token chứa các Claim về Authentication của End-User do Authorization Server cung cấp khi được Client sử dụng.
 
 ID Token được biểu diễn dưới dạng https://tools.ietf.org/html/rfc7519[JSON Web Token] (JWT) và MUST được ký bằng https://tools.ietf.org/html/rfc7515[JSON Web Signature] (JWS).
 
 `ReactiveOidcIdTokenDecoderFactory` cung cấp một `ReactiveJwtDecoder` được sử dụng để xác minh chữ ký `OidcIdToken`. Algorithm mặc định là `RS256` nhưng có thể khác khi được chỉ định trong quá trình đăng ký client.
 Trong các trường hợp này, có thể cấu hình một resolver để trả về JWS algorithm dự kiến được chỉ định cho một client cụ thể.
 
-JWS algorithm resolver là một `Function` nhận `ClientRegistration` và trả về `JwsAlgorithm` dự kiến cho client, ví dụ `SignatureAlgorithm.RS256` hoặc `MacAlgorithm.HS256`.
+JWS algorithm resolver là một `Function` nhận `ClientRegistration` và trả về `JwsAlgorithm` dự kiến cho client, chẳng hạn `SignatureAlgorithm.RS256` hoặc `MacAlgorithm.HS256`.
 
 Đoạn code sau cho thấy cách cấu hình `@Bean` `OidcIdTokenDecoderFactory` để mặc định dùng `MacAlgorithm.HS256` cho mọi `ClientRegistration`:
 

@@ -3,12 +3,12 @@
 = Cấu hình Namespace Security
 
 
-Cấu hình Namespace đã có từ version 2.0 của Spring Framework.
-Nó cho phép bạn bổ sung cú pháp application context của Spring bean truyền thống bằng các phần tử từ XML schema bổ sung.
+Cấu hình namespace đã có từ version 2.0 của Spring Framework.
+Tính năng này cho phép bạn bổ sung cú pháp application context sử dụng Spring bean truyền thống bằng các phần tử từ một XML schema bổ sung.
 Bạn có thể tìm thêm thông tin trong {spring-framework-reference-url}index.html[Tài liệu tham khảo] của Spring.
-Bạn có thể sử dụng một phần tử namespace để cấu hình ngắn gọn hơn một bean riêng lẻ hoặc, mạnh mẽ hơn, để định nghĩa một cú pháp cấu hình thay thế gần hơn với miền bài toán và ẩn đi độ phức tạp bên dưới đối với user.
+Bạn có thể sử dụng một phần tử namespace để cấu hình một bean riêng lẻ ngắn gọn hơn hoặc, mạnh mẽ hơn, để định nghĩa một cú pháp cấu hình thay thế gần với problem domain hơn và ẩn complexity bên dưới khỏi user.
 Một phần tử đơn giản có thể che giấu việc nhiều bean và bước xử lý đang được thêm vào application context.
-Ví dụ, thêm phần tử sau từ namespace `security` vào application context sẽ khởi động một LDAP server embedded để sử dụng cho việc testing trong ứng dụng:
+Ví dụ, thêm phần tử sau từ namespace `security` vào application context sẽ khởi động một embedded LDAP server để dùng khi testing trong ứng dụng:
 
 [source,xml]
 ----
@@ -16,12 +16,12 @@ Ví dụ, thêm phần tử sau từ namespace `security` vào application conte
 ----
 
 Cách này đơn giản hơn nhiều so với việc wiring các bean UnboundID Server tương đương.
-Các yêu cầu cấu hình thay thế phổ biến nhất được hỗ trợ bằng các attribute trên phần tử `ldap-server`, và user không phải bận tâm về việc cần tạo những bean nào hay tên thuộc tính của bean là gì.
+Các yêu cầu cấu hình thay thế phổ biến nhất được hỗ trợ thông qua các attribute trên phần tử `ldap-server`, nhờ đó user không phải lo cần tạo bean nào hay tên property của bean là gì.
 Bạn có thể tìm hiểu thêm về cách sử dụng phần tử `ldap-server` trong chương về xref:servlet/authentication/passwords/ldap.adoc#servlet-authentication-ldap[LDAP Authentication].
 Một XML editor tốt trong khi chỉnh sửa file application context sẽ cung cấp thông tin về các attribute và phần tử hiện có.
 Chúng tôi khuyến nghị bạn dùng https://spring.io/tools/sts[Spring Tool Suite], vì công cụ này có các tính năng đặc biệt để làm việc với các namespace chuẩn của Spring.
 
-Để bắt đầu sử dụng namespace `security` trong application context, hãy thêm jar `spring-security-config` vào classpath.
+Để bắt đầu sử dụng namespace `security` trong application context, hãy thêm jar `spring-security-config` vào classpath của bạn.
 Sau đó, bạn chỉ cần thêm khai báo schema vào file application context:
 
 [source,xml]
@@ -71,8 +71,8 @@ Phần này thiết lập các Filter và các bean service liên quan được 
 * _AccessDecisionManager_ đưa ra quyết định access cho web security và method security.
 Một implementation mặc định được đăng ký, nhưng bạn có thể chọn sử dụng một implementation tùy chỉnh được khai báo bằng cú pháp Spring bean thông thường.
 
-* Các instance _AuthenticationProvider_ cung cấp các cơ chế mà authentication manager sử dụng để authentication user.
-Namespace hỗ trợ một số tùy chọn chuẩn và cung cấp cách thêm các bean tùy chỉnh được khai báo bằng cú pháp truyền thống.
+* Các instance _AuthenticationProvider_ cung cấp các cơ chế mà authentication manager sử dụng để authenticate user.
+Namespace hỗ trợ một số tùy chọn chuẩn và cung cấp cách thêm các custom bean được khai báo bằng cú pháp truyền thống.
 
 * _UserDetailsService_ có quan hệ chặt chẽ với các authentication provider nhưng thường cũng được các bean khác yêu cầu.
 
@@ -106,7 +106,7 @@ Việc đầu tiên bạn cần làm là thêm khai báo Filter sau vào file `w
 Trong trường hợp này, bean có tên là `springSecurityFilterChain`, một bean hạ tầng nội bộ được namespace tạo ra để xử lý web security.
 Trong trường hợp này, bean có tên là "springSecurityFilterChain", một bean hạ tầng nội bộ được namespace tạo ra để xử lý web security.
 Lưu ý rằng bạn không nên tự sử dụng tên bean này.
-Sau khi thêm bean này vào `web.xml`, bạn đã sẵn sàng bắt đầu chỉnh sửa file application context.
+Sau khi thêm bean này vào `web.xml`, bạn có thể bắt đầu chỉnh sửa file application context.
 Các service web security được cấu hình bằng phần tử `<http>`.
 
 [[ns-minimal]]
@@ -122,7 +122,7 @@ Các service web security được cấu hình bằng phần tử `<http>`.
 </http>
 ----
 
-Listing này cho biết chúng ta muốn:
+Listing đó cho biết chúng ta muốn:
 
 * Bảo vệ tất cả URL trong ứng dụng, yêu cầu role `ROLE_USER` để truy cập
 * Đăng nhập vào ứng dụng bằng form với username và password
@@ -165,7 +165,7 @@ Bạn cũng có thể thêm attribute `method` để giới hạn match vào m�
 ----
 
 Listing trước đó cho thấy một ví dụ về cách lưu trữ an toàn các password tương tự.
-Password được thêm prefix `+{bcrypt}+` để chỉ dẫn cho `DelegatingPasswordEncoder`, vốn hỗ trợ mọi `PasswordEncoder` đã cấu hình khi matching, rằng các password được hash bằng BCrypt:
+Password được thêm prefix `+{bcrypt}+` để chỉ dẫn cho `DelegatingPasswordEncoder`, vốn hỗ trợ mọi `PasswordEncoder` đã cấu hình khi matching, rằng các password đã được hash bằng BCrypt:
 
 [source,xml,attrs="-attributes"]
 ----
@@ -187,7 +187,7 @@ Password được thêm prefix `+{bcrypt}+` để chỉ dẫn cho `DelegatingPas
 [subs="quotes"]
 ****
 Phần tử `<http>` chịu trách nhiệm tạo một `FilterChainProxy` và các bean Filter mà nó sử dụng.
-Những vấn đề thường gặp trước đây, chẳng hạn như thứ tự Filter không đúng, không còn là vấn đề nữa vì vị trí của các Filter đã được định nghĩa trước.
+Những vấn đề thường gặp trước đây, chẳng hạn như thứ tự Filter không đúng, không còn đáng lo ngại vì vị trí của các Filter đã được định nghĩa trước.
 
 Phần tử `<authentication-provider>` tạo một bean `DaoAuthenticationProvider`, còn phần tử `<user-service>` tạo một `InMemoryDaoImpl`.
 Mọi phần tử `authentication-provider` phải là phần tử con của phần tử `<authentication-manager>`, phần tử này tạo một `ProviderManager` và đăng ký các authentication provider với nó.
@@ -196,7 +196,7 @@ Bạn nên đối chiếu appendix này nếu muốn bắt đầu tìm hiểu nh
 ****
 
 Cấu hình trước đó định nghĩa hai user, password của họ và role của họ trong ứng dụng (được sử dụng cho access control).
-Bạn cũng có thể tải thông tin user từ một properties file chuẩn bằng cách đặt attribute `properties` trên phần tử `user-service`.
+Bạn cũng có thể load thông tin user từ một properties file chuẩn bằng cách đặt attribute `properties` trên phần tử `user-service`.
 Xem phần về xref:servlet/authentication/passwords/in-memory.adoc#servlet-authentication-inmemory[in-memory authentication] để biết thêm chi tiết về định dạng file.
 Việc sử dụng phần tử `<authentication-provider>` nghĩa là authentication manager sẽ sử dụng thông tin user để xử lý các yêu cầu authentication.
 Bạn có thể có nhiều phần tử `<authentication-provider>` để định nghĩa các authentication source khác nhau. Mỗi source sẽ được tham vấn lần lượt.
@@ -206,8 +206,8 @@ Hãy thử hoặc thử thực hành với ứng dụng mẫu "`tutorial`" đi k
 
 [[ns-form-target]]
 ==== Thiết lập Đích Mặc định Sau Khi Login
-Nếu form login không được yêu cầu do một nỗ lực truy cập resource được bảo vệ, tùy chọn `default-target-url` sẽ được áp dụng.
-Đây là URL mà user được chuyển đến sau khi login thành công. Mặc định là `/`.
+Nếu form login không được hiển thị do user cố truy cập một resource được bảo vệ, tùy chọn `default-target-url` sẽ được áp dụng.
+Đây là URL mà user được chuyển đến sau khi login thành công. Mặc định, giá trị là `/`.
 Bạn cũng có thể cấu hình để user _luôn_ kết thúc ở trang này (bất kể login là "`on-demand`" hay user chủ động chọn login) bằng cách đặt attribute `always-use-default-target` thành `true`.
 Điều này hữu ích nếu ứng dụng của bạn luôn yêu cầu user bắt đầu tại một trang "`home`", ví dụ:
 
@@ -234,9 +234,9 @@ Nếu đã từng sử dụng Spring Security, bạn biết rằng framework duy
 Bạn có thể muốn thêm Filter của riêng mình vào stack tại những vị trí cụ thể hoặc sử dụng một Filter của Spring Security mà hiện chưa có tùy chọn cấu hình namespace (chẳng hạn CAS).
 // FIXME: Is it still true that there is no CAS filter?
 Ngoài ra, bạn có thể muốn sử dụng một phiên bản đã tùy chỉnh của Filter namespace chuẩn, chẳng hạn `UsernamePasswordAuthenticationFilter` (được tạo bởi phần tử `<form-login>`), để tận dụng một số tùy chọn cấu hình bổ sung có sẵn khi bạn sử dụng bean một cách tường minh.
-Bạn có thể làm điều này bằng cấu hình namespace như thế nào, khi filter chain không được expose trực tiếp?
+Vậy làm thế nào để thực hiện điều này bằng cấu hình namespace khi filter chain không được expose trực tiếp?
 
-Thứ tự của các Filter luôn được thực thi nghiêm ngặt khi bạn sử dụng namespace.
+Thứ tự của các Filter luôn được đảm bảo nghiêm ngặt khi bạn sử dụng namespace.
 Khi application context đang được tạo, các bean Filter được sắp xếp bằng code xử lý namespace, và mỗi Filter Spring Security chuẩn đều có một alias trong namespace cùng một vị trí được biết trước.
 
 [NOTE]
@@ -246,7 +246,7 @@ Trong version 3.0+, việc sắp xếp hiện được thực hiện ở cấp b
 Điều này ảnh hưởng đến cách bạn thêm Filter của riêng mình vào stack, vì toàn bộ danh sách Filter phải được biết trong quá trình parse phần tử `<http>`, nên cú pháp đã thay đổi một chút trong version 3.0.
 ====
 
-Các Filter, alias và phần tử, attribute namespace tạo ra Filter được trình bày trong bảng sau, theo thứ tự chúng xuất hiện trong filter chain:
+Các Filter, alias, cùng các phần tử và attribute namespace tạo ra Filter được trình bày trong bảng sau, theo thứ tự chúng xuất hiện trong filter chain:
 
 [[filter-stack]]
 .Bí danh và Thứ tự Filter Chuẩn
@@ -355,14 +355,14 @@ Bạn có thể sử dụng `FIRST` và `LAST` với attribute `position` để 
 .Tránh xung đột vị trí Filter
 [TIP]
 ====
-Nếu chèn một Filter tùy chỉnh có thể chiếm cùng vị trí với một Filter chuẩn do namespace tạo ra, bạn không nên vô tình đưa vào các phiên bản namespace.
+Nếu chèn một custom Filter có thể chiếm cùng vị trí với một Filter chuẩn do namespace tạo ra, bạn không nên vô tình thêm các Filter tương ứng do namespace tạo ra.
 Hãy xóa mọi phần tử tạo ra các Filter có chức năng mà bạn muốn thay thế.
 
-Lưu ý rằng bạn không thể thay thế các Filter được tạo ra bởi chính việc sử dụng phần tử `<http>`: `SecurityContextPersistenceFilter`, `ExceptionTranslationFilter` hoặc `FilterSecurityInterceptor`.
+Lưu ý rằng bạn không thể thay thế các Filter được tạo trực tiếp bởi phần tử `<http>`: `SecurityContextPersistenceFilter`, `ExceptionTranslationFilter` hoặc `FilterSecurityInterceptor`.
 Theo mặc định, một `AnonymousAuthenticationFilter` được thêm vào; và trừ khi bạn đã tắt xref:servlet/authentication/session-management.adoc#ns-session-fixation[bảo vệ session-fixation], một `SessionManagementFilter` cũng được thêm vào filter chain.
 ====
 
-Nếu thay thế một Filter namespace yêu cầu authentication entry point (nghĩa là quá trình authentication được kích hoạt bởi việc một user chưa được authentication cố truy cập resource được bảo vệ), bạn cũng cần thêm một bean entry-point tùy chỉnh.
+Nếu thay thế một Filter namespace yêu cầu authentication entry point (nghĩa là quá trình authentication được trigger khi một user unauthenticated cố truy cập một resource được bảo vệ), bạn cũng cần thêm một custom entry-point bean.
 
 [[ns-method-security]]
 == Method Security
@@ -373,10 +373,10 @@ Bạn có thể áp dụng security cho một bean riêng lẻ (bằng cách s�
 
 [[ns-access-manager]]
 == AccessDecisionManager Mặc định
-Phần này giả định rằng bạn có một số hiểu biết về architecture nền tảng cho access control trong Spring Security.
+Phần này giả định rằng bạn có một số hiểu biết về kiến trúc bên dưới cho access control trong Spring Security.
 Nếu không, bạn có thể bỏ qua và quay lại sau, vì phần này chỉ liên quan đến những người cần tùy chỉnh để sử dụng security phức tạp hơn security dựa trên role đơn giản.
 
-Khi sử dụng cấu hình namespace, một instance mặc định của `AccessDecisionManager` sẽ tự động được đăng ký cho bạn và được sử dụng để đưa ra quyết định access cho các lần gọi method và access URL web, dựa trên các access attribute bạn chỉ định trong khai báo `intercept-url` và `protect-pointcut` (và trong annotation nếu bạn sử dụng annotation để bảo vệ method).
+Khi sử dụng cấu hình namespace, một instance mặc định của `AccessDecisionManager` sẽ tự động được đăng ký cho bạn và được sử dụng để đưa ra quyết định access cho các method invocation và quyền truy cập URL web, dựa trên các access attribute bạn chỉ định trong khai báo `intercept-url` và `protect-pointcut` (và trong annotation nếu bạn sử dụng annotation để bảo vệ method).
 
 Strategy mặc định là sử dụng một `AccessDecisionManager` `AffirmativeBased` cùng với một `RoleVoter` và một `AuthenticatedVoter`.
 Bạn có thể tìm hiểu thêm về các thành phần này trong chương về xref:servlet/authorization/architecture.adoc#authz-arch[authorization].
@@ -384,7 +384,7 @@ Bạn có thể tìm hiểu thêm về các thành phần này trong chương v�
 
 [[ns-custom-access-mgr]]
 === Tùy chỉnh AccessDecisionManager
-Nếu cần sử dụng một strategy access control phức tạp hơn, bạn có thể đặt một lựa chọn thay thế cho cả method security và web security.
+Nếu cần sử dụng một strategy access control phức tạp hơn, bạn có thể cấu hình một implementation thay thế cho cả method security và web security.
 
 Đối với method security, bạn thực hiện việc này bằng cách đặt attribute `access-decision-manager-ref` trên `global-method-security` thành `id` của bean `AccessDecisionManager` phù hợp trong application context:
 

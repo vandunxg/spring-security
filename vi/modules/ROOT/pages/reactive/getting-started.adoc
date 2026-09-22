@@ -5,7 +5,7 @@ Phần này trình bày cấu hình tối thiểu để sử dụng Spring Secur
 
 [NOTE]
 ====
-Ứng dụng hoàn chỉnh có tại {gh-samples-url}/reactive/webflux/java/hello-security[kho lưu trữ mẫu của chúng tôi].
+Ứng dụng hoàn chỉnh có tại {gh-samples-url}/reactive/webflux/java/hello-security[repository mẫu của chúng tôi].
 Để thuận tiện, bạn có thể tải xuống một ứng dụng Reactive Spring Boot + Spring Security tối giản bằng cách https://start.spring.io/starter.zip?type=maven-project&language=java&packaging=jar&jvmVersion=1.8&groupId=example&artifactId=hello-security&name=hello-security&description=Hello%20Security&packageName=example.hello-security&dependencies=webflux,security[nhấp vào đây].
 ====
 
@@ -75,7 +75,7 @@ Using generated security password: 8e557245-73e2-4286-969a-ff57fe326336
 [[authenticating]]
 == Authentication
 
-Bạn có thể truy cập ứng dụng tại http://localhost:8080/; URL này sẽ redirect trình duyệt tới trang đăng nhập mặc định. Bạn có thể cung cấp username mặc định là `user` cùng password được tạo ngẫu nhiên và ghi vào console. Sau đó, trình duyệt sẽ được đưa tới trang mà bạn yêu cầu ban đầu.
+Bạn có thể truy cập ứng dụng tại http://localhost:8080/; URL này sẽ redirect browser tới trang login mặc định. Bạn có thể cung cấp username mặc định là `user` cùng password được tạo ngẫu nhiên và ghi vào console. Sau đó, browser sẽ được đưa tới trang mà bạn yêu cầu ban đầu.
 
 Để logout, bạn có thể truy cập http://localhost:8080/logout rồi xác nhận rằng bạn muốn logout.
 

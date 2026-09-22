@@ -1,13 +1,13 @@
 [[test-method]]
 = Kiểm thử method security
 
-Phần này trình bày cách sử dụng Test support của Spring Security để kiểm thử bảo mật dựa trên method.
-Trước tiên, chúng ta giới thiệu một `MessageService` yêu cầu người dùng phải được authenticated để có thể truy cập:
+Phần này hướng dẫn cách sử dụng test support của Spring Security để kiểm thử security dựa trên method.
+Trước tiên, chúng ta giới thiệu một `MessageService` yêu cầu user phải được authenticated mới có thể truy cập:
 
 include-code::./HelloMessageService[tag=authenticated,indent=0]
 
-Kết quả của `getMessage` là một `String` chứa lời chào "`Hello`" đến `Authentication` hiện tại của Spring Security.
-Danh sách sau hiển thị output mẫu:
+Kết quả của `getMessage` là một `String` chứa lời chào "`Hello`" dành cho `Authentication` hiện tại của Spring Security.
+Listing sau minh họa output:
 
 [source,text]
 ----
@@ -15,77 +15,77 @@ Hello org.springframework.security.authentication.UsernamePasswordAuthentication
 ----
 
 [[test-method-setup]]
-== Thiết lập kiểm thử security
+== Thiết lập test security
 
-Trước khi có thể sử dụng test support của Spring Security, chúng ta phải thực hiện một số thiết lập:
+Trước khi sử dụng test support của Spring Security, chúng ta cần thực hiện một số bước thiết lập:
 
 include-code::./WithMockUserTests[tag=setup,indent=0]
 
-<1> `@ExtendWith` chỉ dẫn cho module spring-test rằng module này phải tạo một `ApplicationContext`. Để biết thêm thông tin, xem {spring-framework-reference-url}testing.html#testcontext-junit-jupiter-extension[tài liệu tham khảo Spring].
-<2> `@ContextConfiguration` chỉ dẫn cho spring-test cấu hình cần sử dụng để tạo `ApplicationContext`. Vì không chỉ định cấu hình, các vị trí cấu hình mặc định sẽ được thử. Điều này không khác với việc sử dụng Spring Test support hiện có. Để biết thêm thông tin, xem {spring-framework-reference-url}testing.html#spring-testing-annotation-contextconfiguration[Tài liệu tham khảo Spring].
+<1> `@ExtendWith` chỉ dẫn cho module spring-test tạo một `ApplicationContext`. Để biết thêm thông tin, xem {spring-framework-reference-url}testing.html#testcontext-junit-jupiter-extension[tài liệu tham khảo của Spring].
+<2> `@ContextConfiguration` chỉ dẫn cho spring-test configuration cần dùng để tạo `ApplicationContext`. Vì không chỉ định configuration, framework sẽ thử các configuration location mặc định. Điều này không khác với việc sử dụng Spring Test support hiện có. Để biết thêm thông tin, xem {spring-framework-reference-url}testing.html#spring-testing-annotation-contextconfiguration[Tài liệu tham khảo Spring].
 
 [NOTE]
 ====
-Spring Security kết nối vào Spring Test support thông qua `WithSecurityContextTestExecutionListener`, đảm bảo các test của chúng ta được chạy với đúng người dùng.
-Listener này thực hiện việc đó bằng cách điền `SecurityContextHolder` trước khi chạy các test.
-Nếu sử dụng reactive method security, bạn cũng cần `ReactorContextTestExecutionListener`, listener này điền `ReactiveSecurityContextHolder`.
+Spring Security tích hợp với Spring Test support thông qua `WithSecurityContextTestExecutionListener`, đảm bảo test được chạy với đúng user.
+Listener này thực hiện việc đó bằng cách populate `SecurityContextHolder` trước khi chạy test.
+Nếu sử dụng reactive method security, cũng cần `ReactorContextTestExecutionListener`; listener này populate `ReactiveSecurityContextHolder`.
 Sau khi test hoàn tất, listener xóa `SecurityContextHolder`.
-Nếu chỉ cần support liên quan đến Spring Security, bạn có thể thay `@ContextConfiguration` bằng `@SecurityTestExecutionListeners`.
+Nếu chỉ cần Spring Security-related support, có thể thay `@ContextConfiguration` bằng `@SecurityTestExecutionListeners`.
 ====
 
-Hãy nhớ rằng chúng ta đã thêm annotation `@PreAuthorize` vào `HelloMessageService`, vì vậy cần có authenticated user để gọi service này.
-Nếu chạy các test, chúng ta kỳ vọng test sau sẽ pass:
+Hãy nhớ rằng chúng ta đã thêm annotation `@PreAuthorize` vào `HelloMessageService`, nên cần có user authenticated để invoke service này.
+Khi chạy test, test sau sẽ pass:
 
 include-code::./WithMockUserSampleTests[tag=snippet,indent=0]
 
 [[test-method-withmockuser]]
 == @WithMockUser
 
-Câu hỏi là: "Làm thế nào để chạy test dưới một người dùng cụ thể một cách dễ dàng nhất?"
+Câu hỏi là: "Làm thế nào để dễ dàng nhất chạy test dưới một user cụ thể?"
 Câu trả lời là sử dụng `@WithMockUser`.
-Test sau sẽ được chạy dưới một người dùng có username là "user", password là "password" và role là "ROLE_USER".
+Test sau sẽ chạy dưới một user có username là "user", password là "password" và role là "ROLE_USER".
 
 include-code::./WithMockUserTests[tag=mock-user,indent=0]
 
-Cụ thể, các điều sau là đúng:
+Cụ thể:
 
-* Người dùng có username là `user` không cần tồn tại, vì chúng ta mock user object.
-* `Authentication` được điền vào `SecurityContext` có kiểu `UsernamePasswordAuthenticationToken`.
-* principal trên `Authentication` là `User` object của Spring Security.
+* User có username là `user` không cần tồn tại vì user object được mock.
+* `Authentication` được populate vào `SecurityContext` có type `UsernamePasswordAuthenticationToken`.
+* principal của `Authentication` là `User` object của Spring Security.
 * `User` có username là `user`.
 * `User` có password là `password`.
 * Một `GrantedAuthority` duy nhất có tên `ROLE_USER` được sử dụng.
 
-Ví dụ trước khá tiện lợi vì cho phép chúng ta sử dụng nhiều giá trị mặc định.
+Ví dụ trên tiện lợi vì cho phép sử dụng nhiều giá trị mặc định.
 Nếu muốn chạy test với username khác thì sao?
 Test sau sẽ chạy với username là `customUser` (một lần nữa, user không cần thực sự tồn tại):
 
 include-code::./WithMockUserTests[tag=custom-user,indent=0]
 
-Chúng ta cũng có thể dễ dàng tùy chỉnh các role.
-Ví dụ, test sau được gọi với username là `admin` và các role `ROLE_USER`, `ROLE_ADMIN`.
+Chúng ta cũng có thể dễ dàng customize role.
+Ví dụ, test sau được invoke với username là `admin` và các role `ROLE_USER`, `ROLE_ADMIN`.
 
 include-code::./WithMockUserTests[tag=custom-roles,indent=0]
 
-Nếu không muốn giá trị được tự động thêm tiền tố `ROLE_`, chúng ta có thể sử dụng attribute `authorities`.
-Ví dụ, test sau được gọi với username là `admin` và các authority `USER`, `ADMIN`.
+Nếu không muốn value được tự động thêm tiền tố `ROLE_`, chúng ta có thể sử dụng attribute `authorities`.
+Ví dụ, test sau được invoke với username là `admin` và các authority `USER`, `ADMIN`.
 
 include-code::./WithMockUserTests[tag=custom-authorities,indent=0]
 
 Việc đặt annotation trên mọi test method có thể hơi mất công.
-Thay vào đó, chúng ta có thể đặt annotation ở cấp class. Khi đó, mọi test đều sử dụng user được chỉ định.
-Ví dụ sau chạy mọi test với một user có username là `admin`, password là `password` và có các role `ROLE_USER`, `ROLE_ADMIN`:
+Thay vào đó, chúng ta có thể đặt annotation ở cấp class. Khi đó, mọi test sẽ dùng user được chỉ định.
+Ví dụ sau chạy tất cả test với một user có username là `admin`, password là `password` và các role `ROLE_USER`, `ROLE_ADMIN`:
 
 include-code::./WithMockUserClassTests[tag=snippet,indent=0]
 
-Nếu sử dụng test support `@Nested` của JUnit 5, bạn cũng có thể đặt annotation trên enclosing class để áp dụng cho tất cả nested class.
-Ví dụ sau chạy mọi test với một user có username là `admin`, password là `password` và có các role `ROLE_USER`, `ROLE_ADMIN` cho cả hai test method:
+Nếu sử dụng test support `@Nested` của JUnit 5, bạn cũng có thể đặt annotation trên enclosing class để áp dụng cho mọi nested class.
+Ví dụ sau chạy tất cả test method với một user có username là `admin`, password là `password` và các role `ROLE_USER`, `ROLE_ADMIN` cho cả hai test method:
 
 include-code::./WithMockUserNestedTests[tag=snippet,indent=0]
 
-Theo mặc định, `SecurityContext` được thiết lập trong event `TestExecutionListener.beforeTestMethod`.
-Điều này tương đương với việc diễn ra trước `@Before` của JUnit.
-Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi test method được gọi:
+Theo mặc định, `SecurityContext` được set trong event `TestExecutionListener.beforeTestMethod`.
+Điều này tương đương với việc thiết lập diễn ra trước `@Before` của JUnit.
+Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi gọi test method:
 
 [source,java]
 ----
@@ -96,15 +96,15 @@ Bạn có thể thay đổi để việc này diễn ra trong event `TestExecuti
 [[test-method-withanonymoususer]]
 == @WithAnonymousUser
 
-Sử dụng `@WithAnonymousUser` cho phép chạy dưới một anonymous user.
-Điều này đặc biệt tiện lợi khi bạn muốn chạy phần lớn test với một user cụ thể nhưng muốn chạy một vài test dưới anonymous user.
-Ví dụ sau chạy `withMockUser1` và `withMockUser2` bằng cách sử dụng <<test-method-withmockuser,@WithMockUser>> và `anonymous` làm anonymous user:
+Sử dụng `@WithAnonymousUser` cho phép chạy test dưới một anonymous user.
+Điều này đặc biệt tiện lợi khi muốn chạy phần lớn test với một user cụ thể nhưng một vài test với anonymous user.
+Ví dụ sau chạy `withMockUser1` và `withMockUser2` bằng cách sử dụng <<test-method-withmockuser,@WithMockUser>> và dùng `anonymous` làm anonymous user:
 
 include-code::./WithUserClassLevelAuthenticationTests[tag=snippet,indent=0]
 
-Theo mặc định, `SecurityContext` được thiết lập trong event `TestExecutionListener.beforeTestMethod`.
-Điều này tương đương với việc diễn ra trước `@Before` của JUnit.
-Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi test method được gọi:
+Theo mặc định, `SecurityContext` được set trong event `TestExecutionListener.beforeTestMethod`.
+Điều này tương đương với việc thiết lập diễn ra trước `@Before` của JUnit.
+Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi gọi test method:
 
 [source,java]
 ----
@@ -115,34 +115,34 @@ Bạn có thể thay đổi để việc này diễn ra trong event `TestExecuti
 [[test-method-withuserdetails]]
 == @WithUserDetails
 
-Mặc dù `@WithMockUser` là cách thuận tiện để bắt đầu, annotation này có thể không hoạt động trong mọi trường hợp.
-Ví dụ, một số application mong đợi principal của `Authentication` có một kiểu cụ thể.
-Điều này cho phép application tham chiếu principal dưới dạng kiểu tùy chỉnh và giảm coupling với Spring Security.
+Mặc dù `@WithMockUser` là cách thuận tiện để bắt đầu, annotation này có thể không phù hợp trong mọi trường hợp.
+Ví dụ, một số application yêu cầu principal của `Authentication` có một type cụ thể.
+Nhờ đó, application có thể tham chiếu principal bằng custom type và giảm coupling với Spring Security.
 
-Custom principal thường được trả về bởi một `UserDetailsService` tùy chỉnh, service này trả về một object vừa implement `UserDetails` vừa implement kiểu tùy chỉnh.
-Trong những tình huống như vậy, việc tạo test user bằng một `UserDetailsService` tùy chỉnh sẽ rất hữu ích.
-Đó chính xác là việc `@WithUserDetails` thực hiện.
+Custom principal thường được trả về bởi custom `UserDetailsService`, service này trả về một object implement cả `UserDetails` lẫn custom type.
+Trong những trường hợp như vậy, việc tạo test user bằng custom `UserDetailsService` rất hữu ích.
+Đó chính là việc `@WithUserDetails` thực hiện.
 
-Giả sử chúng ta có một `UserDetailsService` được expose dưới dạng bean, test sau được gọi với một `Authentication` có kiểu `UsernamePasswordAuthenticationToken` và một principal được `UserDetailsService` trả về với username là `user`:
+Giả sử chúng ta có một `UserDetailsService` được expose dưới dạng bean, test sau sẽ được invoke với một `Authentication` có type `UsernamePasswordAuthenticationToken` và principal do `UserDetailsService` trả về với username là `user`:
 
 include-code::./WithUserDetailsTests[tag=user-details,indent=0]
 
-Chúng ta cũng có thể tùy chỉnh username được sử dụng để tra cứu user từ `UserDetailsService`.
-Ví dụ, test này có thể chạy với một principal được `UserDetailsService` trả về với username là `customUsername`:
+Chúng ta cũng có thể customize username dùng để lookup user từ `UserDetailsService`.
+Ví dụ, test này có thể chạy với principal do `UserDetailsService` trả về và có username là `customUsername`:
 
 include-code::./WithUserDetailsTests[tag=user-details-custom-username,indent=0]
 
-Chúng ta cũng có thể cung cấp rõ bean name để tra cứu `UserDetailsService`.
-Test sau tra cứu username `customUsername` bằng cách sử dụng `UserDetailsService` có bean name là `myUserDetailsService`:
+Chúng ta cũng có thể cung cấp rõ bean name dùng để lookup `UserDetailsService`.
+Test sau lookup user có username `customUsername` bằng `UserDetailsService` có bean name là `myUserDetailsService`:
 
 include-code::./WithCustomUserDetailsTests[tag=custom-user-details-service,indent=0]
 
-Tương tự như với `@WithMockUser`, chúng ta cũng có thể đặt annotation ở cấp class để mọi test sử dụng cùng một user.
-Tuy nhiên, không giống `@WithMockUser`, `@WithUserDetails` yêu cầu user phải tồn tại.
+Tương tự như với `@WithMockUser`, chúng ta cũng có thể đặt annotation ở cấp class để mọi test dùng cùng một user.
+Tuy nhiên, khác với `@WithMockUser`, `@WithUserDetails` yêu cầu user phải tồn tại.
 
-Theo mặc định, `SecurityContext` được thiết lập trong event `TestExecutionListener.beforeTestMethod`.
-Điều này tương đương với việc diễn ra trước `@Before` của JUnit.
-Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi test method được gọi:
+Theo mặc định, `SecurityContext` được set trong event `TestExecutionListener.beforeTestMethod`.
+Điều này tương đương với việc thiết lập diễn ra trước `@Before` của JUnit.
+Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi gọi test method:
 
 [source,java]
 ----
@@ -152,32 +152,32 @@ Bạn có thể thay đổi để việc này diễn ra trong event `TestExecuti
 [[test-method-withsecuritycontext]]
 == @WithSecurityContext
 
-Chúng ta đã thấy `@WithMockUser` là lựa chọn tuyệt vời nếu không sử dụng custom `Authentication` principal.
-Tiếp đó, chúng ta phát hiện `@WithUserDetails` cho phép sử dụng một `UserDetailsService` tùy chỉnh để tạo `Authentication` principal, nhưng yêu cầu user phải tồn tại.
-Bây giờ, chúng ta sẽ xem một tùy chọn linh hoạt nhất.
+Chúng ta đã thấy `@WithMockUser` là lựa chọn rất tốt nếu không sử dụng custom `Authentication` principal.
+Tiếp theo, `@WithUserDetails` cho phép sử dụng custom `UserDetailsService` để tạo `Authentication` principal, nhưng yêu cầu user phải tồn tại.
+Bây giờ, hãy xem tùy chọn linh hoạt nhất.
 
-Chúng ta có thể tạo annotation riêng sử dụng `@WithSecurityContext` để tạo bất kỳ `SecurityContext` nào mình muốn.
+Chúng ta có thể tạo annotation riêng sử dụng `@WithSecurityContext` để tạo bất kỳ `SecurityContext` nào mong muốn.
 Ví dụ, chúng ta có thể tạo một annotation tên là `@WithMockCustomUser`:
 
 include-code::./WithMockCustomUser[tag=snippet,indent=0]
 
-Bạn có thể thấy `@WithMockCustomUser` được đánh dấu bằng annotation `@WithSecurityContext`.
-Điều này báo hiệu cho Spring Security test support rằng chúng ta muốn tạo một `SecurityContext` cho test.
-Annotation `@WithSecurityContext` yêu cầu chúng ta chỉ định một `SecurityContextFactory` để tạo `SecurityContext` mới, dựa trên annotation `@WithMockCustomUser` của chúng ta.
-Dưới đây là implementation `WithMockCustomUserSecurityContextFactory`:
+Có thể thấy `@WithMockCustomUser` được đánh dấu bằng annotation `@WithSecurityContext`.
+Điều này báo cho Spring Security test support rằng chúng ta muốn tạo một `SecurityContext` cho test.
+Annotation `@WithSecurityContext` yêu cầu chỉ định một `SecurityContextFactory` để tạo `SecurityContext` mới dựa trên annotation `@WithMockCustomUser`.
+Implementation `WithMockCustomUserSecurityContextFactory` như sau:
 
 include-code::./WithMockCustomUserSecurityContextFactory[tag=snippet,indent=0]
 
-Giờ đây, chúng ta có thể đánh dấu một test class hoặc test method bằng annotation mới và `WithSecurityContextTestExecutionListener` của Spring Security để đảm bảo `SecurityContext` được điền phù hợp.
+Giờ đây, chúng ta có thể đánh dấu một test class hoặc test method bằng annotation mới; `WithSecurityContextTestExecutionListener` của Spring Security sẽ đảm bảo `SecurityContext` được populate đúng cách.
 
-Khi tạo các implementation `WithSecurityContextFactory` của riêng mình, thật hữu ích khi biết rằng chúng có thể được đánh dấu bằng các annotation Spring tiêu chuẩn.
-Ví dụ, `WithUserDetailsSecurityContextFactory` sử dụng annotation `@Autowired` để lấy `UserDetailsService`:
+Khi tạo implementation `WithSecurityContextFactory` của riêng mình, cần biết rằng chúng có thể được đánh dấu bằng các annotation Spring tiêu chuẩn.
+Ví dụ, `WithUserDetailsSecurityContextFactory` sử dụng annotation `@Autowired` để inject `UserDetailsService`:
 
 include-code::./WithUserDetailsSecurityContextFactory[tag=snippet,indent=0]
 
-Theo mặc định, `SecurityContext` được thiết lập trong event `TestExecutionListener.beforeTestMethod`.
-Điều này tương đương với việc diễn ra trước `@Before` của JUnit.
-Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi test method được gọi:
+Theo mặc định, `SecurityContext` được set trong event `TestExecutionListener.beforeTestMethod`.
+Điều này tương đương với việc thiết lập diễn ra trước `@Before` của JUnit.
+Bạn có thể thay đổi để việc này diễn ra trong event `TestExecutionListener.beforeTestExecution`, tức là sau `@Before` của JUnit nhưng trước khi gọi test method:
 
 [source,java]
 ----
@@ -186,26 +186,26 @@ Bạn có thể thay đổi để việc này diễn ra trong event `TestExecuti
 
 [NOTE]
 ====
-`@WithMockUser`, `@WithUserDetails` và `@WithSecurityContext` điền xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] cho test thread.
-Điều này không thể áp dụng cho các HTTP request đầy đủ mà test gửi đến server đang chạy, vì các request đó được xử lý bởi một thread khác.
-Đối với HTTP test end-to-end, hãy xref:servlet/authentication/index.adoc[xác thực] chính request đó (ví dụ bằng HTTP Basic hoặc bearer token).
+`@WithMockUser`, `@WithUserDetails` và `@WithSecurityContext` populate xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] cho test thread.
+Điều này không áp dụng cho full HTTP request mà test gửi đến running server, vì request đó được xử lý bởi một thread khác.
+Đối với end-to-end HTTP test, hãy xref:servlet/authentication/index.adoc[authenticate] chính request đó (ví dụ bằng HTTP Basic hoặc bearer token).
 ====
 
 
 [[test-method-meta-annotations]]
-== Meta annotation cho test
+== Meta annotation trong test
 
-Nếu thường xuyên sử dụng lại cùng một user trong các test, việc phải lặp đi lặp lại các attribute là không lý tưởng.
-Ví dụ, nếu có nhiều test liên quan đến một user quản trị với username là `admin` và các role `ROLE_USER`, `ROLE_ADMIN`, bạn phải viết:
+Nếu thường xuyên dùng lại cùng một user trong test, việc phải lặp lại các attribute là không lý tưởng.
+Ví dụ, nếu có nhiều test liên quan đến một administrative user với username là `admin` và các role `ROLE_USER`, `ROLE_ADMIN`, bạn phải viết:
 
 include-code::./WithMockUserTests[tag=snippet,indent=0]
 
-Thay vì lặp lại ở mọi nơi, chúng ta có thể sử dụng meta annotation.
-Ví dụ, chúng ta có thể tạo một meta annotation tên là `WithMockAdmin`:
+Thay vì lặp lại ở mọi nơi, chúng ta có thể dùng meta annotation.
+Ví dụ, có thể tạo một meta annotation tên là `WithMockAdmin`:
 
 include-code::./WithMockAdmin[tag=snippet,indent=0]
 
-Giờ đây, chúng ta có thể sử dụng `@WithMockAdmin` giống như `@WithMockUser` đầy đủ hơn.
+Giờ đây, có thể dùng `@WithMockAdmin` giống như cách viết đầy đủ hơn của `@WithMockUser`.
 
-Meta annotation hoạt động với bất kỳ testing annotation nào được mô tả ở trên.
+Meta annotation hoạt động với mọi testing annotation được mô tả ở trên.
 Ví dụ, điều này có nghĩa là chúng ta cũng có thể tạo meta annotation cho `@WithUserDetails("admin")`.

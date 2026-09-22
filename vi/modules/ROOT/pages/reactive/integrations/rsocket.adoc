@@ -56,11 +56,11 @@ open class HelloRSocketSecurityConfig {
 ----
 ======
 
-Cấu hình này bật <<rsocket-authentication-simple,authentication đơn giản>> và thiết lập <<rsocket-authorization,authorization RSocket>> để yêu cầu người dùng đã được authentication cho mọi request.
+Cấu hình này bật <<rsocket-authentication-simple,authentication đơn giản>> và thiết lập <<rsocket-authorization,authorization cho RSocket>> để yêu cầu mọi request phải có người dùng đã được authentication.
 
 == Thêm SecuritySocketAcceptorInterceptor
 
-Để Spring Security hoạt động, chúng ta cần áp dụng `SecuritySocketAcceptorInterceptor` cho `ServerRSocketFactory`.
+Để Spring Security hoạt động, chúng ta cần áp dụng `SecuritySocketAcceptorInterceptor` vào `ServerRSocketFactory`.
 Việc này kết nối `PayloadSocketAcceptorInterceptor` với hạ tầng RSocket.
 
 Spring Boot tự động đăng ký nó trong `RSocketSecurityAutoConfiguration` khi bạn thêm {gh-samples-url}/reactive/rsocket/hello-security/build.gradle[các dependency phù hợp].
@@ -94,15 +94,15 @@ fun springSecurityRSocketSecurity(interceptor: SecuritySocketAcceptorInterceptor
 ----
 ======
 
-Để tùy chỉnh chính interceptor này, hãy sử dụng `RSocketSecurity` để thêm <<rsocket-authentication,authentication>> và <<rsocket-authorization,authorization>>.
+Để tùy chỉnh interceptor này, hãy sử dụng `RSocketSecurity` để thêm <<rsocket-authentication,authentication>> và <<rsocket-authorization,authorization>>.
 
 [[rsocket-authentication]]
-== Authentication RSocket
+== Authentication cho RSocket
 
-Authentication RSocket được thực hiện bằng `AuthenticationPayloadInterceptor`, thành phần này hoạt động như một controller để gọi một instance `ReactiveAuthenticationManager`.
+Authentication cho RSocket được thực hiện bằng `AuthenticationPayloadInterceptor`, thành phần này hoạt động như một controller để gọi một instance `ReactiveAuthenticationManager`.
 
 [[rsocket-authentication-setup-vs-request]]
-=== Authentication tại thời điểm Setup so với thời điểm Request
+=== Authentication tại thời điểm setup so với thời điểm request
 
 Thông thường, authentication có thể diễn ra tại thời điểm setup, tại thời điểm request hoặc cả hai.
 
@@ -267,7 +267,7 @@ open fun findRadar(code: String): Mono<AirportLocation> {
 === JWT
 
 Spring Security hỗ trợ https://github.com/rsocket/rsocket/blob/5920ed374d008abb712cb1fd7c9d91778b2f4a68/Extensions/Security/Bearer.md[Bearer Token Authentication Metadata Extension].
-Hỗ trợ này thực hiện authentication một JWT (xác định rằng JWT hợp lệ), sau đó sử dụng JWT để đưa ra các quyết định authorization.
+Hỗ trợ này thực hiện authentication cho một JWT (xác định rằng JWT hợp lệ), sau đó sử dụng JWT để đưa ra các quyết định authorization.
 
 RSocket receiver có thể giải mã credential bằng cách sử dụng `BearerPayloadExchangeConverter`, thành phần được tự động thiết lập khi sử dụng phần `jwt` của DSL.
 Đoạn mã sau minh họa một cấu hình:
@@ -308,7 +308,7 @@ fun rsocketInterceptor(rsocket: RSocketSecurity): PayloadSocketAcceptorIntercept
 ----
 ======
 
-Cấu hình trên dựa vào việc một `@Bean` `ReactiveJwtDecoder` tồn tại.
+Cấu hình trên yêu cầu phải có một `@Bean` kiểu `ReactiveJwtDecoder`.
 Ví dụ tạo một bean từ issuer được trình bày dưới đây:
 
 [tabs]
@@ -409,9 +409,9 @@ open fun findRadar(code: String): Mono<AirportLocation> {
 ======
 
 [[rsocket-authorization]]
-== Authorization RSocket
+== Authorization cho RSocket
 
-Authorization RSocket được thực hiện bằng `AuthorizationPayloadInterceptor`, thành phần này hoạt động như một controller để gọi một instance `ReactiveAuthorizationManager`.
+Authorization cho RSocket được thực hiện bằng `AuthorizationPayloadInterceptor`, thành phần này hoạt động như một controller để gọi một instance `ReactiveAuthorizationManager`.
 Bạn có thể sử dụng DSL để thiết lập các rule authorization dựa trên `PayloadExchange`.
 Đoạn mã sau minh họa một cấu hình:
 
@@ -460,8 +460,8 @@ rsocket
 Matcher biểu diễn một biến có tên `username`, biến này được cung cấp trong `context`.
 Một rule authorization tùy chỉnh được cung cấp trong method `checkFriends`.
 <5> Rule này đảm bảo rằng một request chưa có rule sẽ yêu cầu người dùng đã được authentication.
-Request là nơi metadata được bao gồm.
-Request đó sẽ không bao gồm các payload bổ sung.
+Metadata được bao gồm trong request.
+Request đó không bao gồm các payload bổ sung.
 <6> Rule này đảm bảo rằng bất kỳ exchange nào chưa có rule đều được cho phép với mọi người.
 Trong ví dụ này, điều đó có nghĩa là các payload không có metadata cũng không có rule authorization.
 

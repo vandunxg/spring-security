@@ -1,8 +1,8 @@
 = Hỗ trợ GraalVM Native Image
 
 Spring Boot 3.0 cung cấp {spring-boot-reference-url}reference/packaging/native-image/introducing-graalvm-native-images.html[hỗ trợ tạo native image bằng GraalVM].
-Spring Security tích hợp với hỗ trợ đó và cung cấp các tính năng của mình ở trạng thái sẵn sàng cho native image.
+Spring Security tích hợp với support đó và cung cấp các feature của mình ở trạng thái sẵn sàng cho native image.
 
-Tuy nhiên, như đã đề cập trong {spring-boot-reference-url}reference/packaging/native-image/introducing-graalvm-native-images.html#packaging.native-image.introducing-graalvm-native-images.understanding-aot-processing[tài liệu Spring Boot], có một số trường hợp chúng ta cần cung cấp các gợi ý để GraalVM sử dụng.
+Tuy nhiên, như đã đề cập trong {spring-boot-reference-url}reference/packaging/native-image/introducing-graalvm-native-images.html#packaging.native-image.introducing-graalvm-native-images.understanding-aot-processing[tài liệu Spring Boot], có một số trường hợp chúng ta cần cung cấp hint để GraalVM sử dụng.
 
-Phần này nhằm cung cấp hướng dẫn về một số tính năng Spring Security có khả năng cần ứng dụng cung cấp thêm gợi ý.
+Phần này nhằm cung cấp hướng dẫn về một số feature của Spring Security có thể cần application cung cấp thêm hint.

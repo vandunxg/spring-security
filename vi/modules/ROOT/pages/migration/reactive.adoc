@@ -1,13 +1,13 @@
 = Reactive
 
-Nếu bạn đã thực hiện xref:migration/index.adoc[các bước chuyển đổi ban đầu] cho ứng dụng Reactive của mình, giờ bạn đã sẵn sàng thực hiện các bước dành riêng cho ứng dụng Reactive.
+Nếu bạn đã thực hiện xref:migration/index.adoc[các bước di chuyển ban đầu] cho ứng dụng Reactive của mình, giờ bạn đã sẵn sàng thực hiện các bước dành riêng cho ứng dụng Reactive.
 
-== Xác thực Header `typ` bằng `JwtTypeValidator`
+== Xác thực header `typ` bằng `JwtTypeValidator`
 
 Nếu khi thực hiện các bước chuẩn bị cho 6.5 bạn đã đặt `validateTypes` thành `false`, giờ bạn có thể xóa cấu hình này.
-Bạn cũng có thể xóa phần thêm tường minh `JwtTypeValidator` vào danh sách mặc định.
+Bạn cũng có thể xóa việc thêm tường minh `JwtTypeValidator` vào danh sách mặc định.
 
-Ví dụ, thay đổi từ:
+Ví dụ, thay đổi đoạn này:
 
 [tabs]
 ======

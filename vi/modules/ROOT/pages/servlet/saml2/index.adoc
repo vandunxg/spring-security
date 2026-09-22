@@ -3,4 +3,4 @@
 :page-section-summary-toc: 1
 
 Spring Security cung cấp hỗ trợ toàn diện cho SAML 2.
-Phần này trình bày cách tích hợp SAML 2 vào ứng dụng dựa trên servlet của bạn.
+Phần này trình bày cách tích hợp SAML 2 vào ứng dụng dựa trên Servlet của bạn.

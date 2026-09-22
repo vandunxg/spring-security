@@ -1,8 +1,8 @@
 [[data]]
 = Tích hợp Spring Data
 
-Spring Security cung cấp khả năng tích hợp Spring Data, cho phép tham chiếu đến người dùng hiện tại trong các truy vấn của bạn.
-Việc đưa người dùng vào các truy vấn không chỉ hữu ích mà còn cần thiết để hỗ trợ kết quả phân trang, vì việc lọc kết quả sau đó sẽ không thể mở rộng.
+Spring Security cung cấp khả năng tích hợp Spring Data, cho phép tham chiếu đến người dùng hiện tại trong các query của bạn.
+Việc đưa người dùng vào các query không chỉ hữu ích mà còn cần thiết để hỗ trợ paged results, vì việc filter results sau đó sẽ không scale được.
 
 [[data-configuration]]
 == Cấu hình Spring Data & Spring Security
@@ -41,9 +41,9 @@ Trong cấu hình XML, nội dung này sẽ như sau:
 ----
 
 [[data-query]]
-== Các biểu thức bảo mật trong @Query
+== Security Expressions trong @Query
 
-Giờ đây có thể sử dụng Spring Security trong các truy vấn của bạn.
+Giờ đây có thể sử dụng Spring Security trong các query của bạn.
 Ví dụ:
 
 [tabs]
@@ -71,6 +71,6 @@ interface MessageRepository : PagingAndSortingRepository<Message?, Long?> {
 ----
 ======
 
-Điều này kiểm tra xem `Authentication.getPrincipal().getId()` có bằng với người nhận của `Message` hay không.
-Lưu ý rằng ví dụ này giả định bạn đã tùy chỉnh principal thành một Object có thuộc tính id.
-Khi công khai bean `SecurityEvaluationContextExtension`, tất cả xref:servlet/authorization/method-security.adoc#authorization-expressions[Các biểu thức bảo mật thông dụng] đều khả dụng trong truy vấn.
+Điều này kiểm tra xem `Authentication.getPrincipal().getId()` có bằng với recipient của `Message` hay không.
+Lưu ý rằng ví dụ này giả định bạn đã tùy chỉnh principal thành một Object có property id.
+Khi expose bean `SecurityEvaluationContextExtension`, tất cả các xref:servlet/authorization/method-security.adoc#authorization-expressions[Security Expressions phổ biến] đều khả dụng trong query.

@@ -18,7 +18,7 @@ Dưới đây là một số cách tốt nhất để nhận trợ giúp:
 [[community-becoming-involved]]
 == Tham gia đóng góp
 Chúng tôi hoan nghênh sự tham gia của bạn vào dự án Spring Security.
-Có nhiều cách để đóng góp, bao gồm trả lời câu hỏi trên Stack Overflow, viết mã mới, cải thiện mã hiện có, hỗ trợ tài liệu, phát triển các ví dụ mẫu hoặc hướng dẫn, báo cáo lỗi, hoặc đơn giản là đưa ra đề xuất.
+Có nhiều cách để đóng góp, bao gồm trả lời câu hỏi trên Stack Overflow, viết code mới, cải thiện code hiện có, hỗ trợ tài liệu, phát triển sample hoặc tutorial, báo cáo lỗi, hoặc đơn giản là đưa ra đề xuất.
 Để biết thêm thông tin, hãy xem https://github.com/spring-projects/spring-security/blob/main/CONTRIBUTING.adoc[Tài liệu đóng góp] của chúng tôi.
 
 [[community-source]]
@@ -34,4 +34,4 @@ Spring Security là phần mềm mã nguồn mở được phát hành theo http
 == Mạng xã hội
 
 Bạn có thể theo dõi https://twitter.com/SpringSecurity[@SpringSecurity] và https://twitter.com/SpringSecurity/lists/team[nhóm Spring Security] trên Twitter để cập nhật những tin tức mới nhất.
-Bạn cũng có thể theo dõi https://twitter.com/SpringCentral[@SpringCentral] để cập nhật thông tin về toàn bộ danh mục Spring.
+Bạn cũng có thể theo dõi https://twitter.com/SpringCentral[@SpringCentral] để cập nhật thông tin về toàn bộ danh mục sản phẩm Spring.

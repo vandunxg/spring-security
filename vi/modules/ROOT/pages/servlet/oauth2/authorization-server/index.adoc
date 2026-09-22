@@ -2,18 +2,18 @@
 = OAuth 2.1 Authorization Server
 :page-section-summary-toc: 1
 
-Các tính năng OAuth 2.1 Authorization Server hỗ trợ vai trò Authorization Server được định nghĩa trong https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-07#section-1.1[OAuth 2.1 Authorization Framework].
+Các tính năng của OAuth 2.1 Authorization Server hỗ trợ vai trò Authorization Server được định nghĩa trong https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-07#section-1.1[OAuth 2.1 Authorization Framework].
 
-Các tính năng Authorization Server cung cấp implementation của các đặc tả https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-07[OAuth 2.1], https://openid.net/specs/openid-connect-core-1_0.html[OpenID Connect 1.0] và các đặc tả liên quan khác.
-Nó cung cấp nền tảng an toàn, nhẹ và có thể tùy chỉnh để xây dựng Identity Provider OpenID Connect 1.0 và các sản phẩm OAuth 2.1 Authorization Server.
+Các tính năng của Authorization Server cung cấp implementation cho các đặc tả https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-07[OAuth 2.1], https://openid.net/specs/openid-connect-core-1_0.html[OpenID Connect 1.0] và các đặc tả liên quan khác.
+Nó cung cấp nền tảng an toàn, gọn nhẹ và có thể tùy chỉnh để xây dựng các Identity Provider của OpenID Connect 1.0 và các sản phẩm OAuth 2.1 Authorization Server.
 
 [[oauth2AuthorizationServer-use-cases]]
-== Trường hợp sử dụng
+== Các use case
 
-Danh sách sau đưa ra một số trường hợp sử dụng Spring Security Authorization Server thay vì sử dụng sản phẩm Provider OAuth2 hoặc OpenID Connect 1.0 mã nguồn mở hay thương mại.
+Danh sách sau nêu một số use case khi sử dụng Spring Security Authorization Server thay vì sử dụng một sản phẩm Provider cho OAuth2 hoặc OpenID Connect 1.0, dù là mã nguồn mở hay thương mại.
 
-* Cung cấp toàn quyền kiểm soát cấu hình và tùy chỉnh khi cần các kịch bản tùy chỉnh nâng cao.
-* Ưu tiên một Authorization Server nhẹ thay vì sản phẩm thương mại bao gồm mọi tính năng nâng cao.
+* Toàn quyền kiểm soát cấu hình và tùy chỉnh cho các kịch bản nâng cao.
+* Ưu tiên một Authorization Server gọn nhẹ thay vì sản phẩm thương mại có đầy đủ tính năng nâng cao.
 * Có thể tiết kiệm chi phí cấp phép phần mềm và/hoặc chi phí hosting.
 * Khởi động nhanh và dễ sử dụng trong quá trình phát triển nhờ mô hình lập trình Spring quen thuộc.
 
@@ -77,22 +77,22 @@ Spring Security Authorization Server hỗ trợ các tính năng sau:
 * OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens (https://datatracker.ietf.org/doc/html/rfc8705[RFC 8705])
 * Proof Key for Code Exchange by OAuth Public Clients (PKCE) (https://tools.ietf.org/html/rfc7636[RFC 7636])
 
-|xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc[Các Protocol Endpoint]
+|xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc[Các protocol endpoint]
 |
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-endpoint[Authorization Endpoint OAuth2]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-pushed-authorization-request-endpoint[Pushed Authorization Request Endpoint OAuth2]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-authorization-endpoint[Device Authorization Endpoint OAuth2]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-verification-endpoint[Device Verification Endpoint OAuth2]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-endpoint[Token Endpoint OAuth2]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-introspection-endpoint[Token Introspection Endpoint OAuth2]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-revocation-endpoint[Token Revocation Endpoint OAuth2]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-client-registration-endpoint[Client Registration Endpoint OAuth2]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-server-metadata-endpoint[Authorization Server Metadata Endpoint OAuth2]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-endpoint[OAuth2 Authorization Endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-pushed-authorization-request-endpoint[OAuth2 Pushed Authorization Request Endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-authorization-endpoint[OAuth2 Device Authorization Endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-device-verification-endpoint[OAuth2 Device Verification Endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-endpoint[OAuth2 Token Endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-introspection-endpoint[OAuth2 Token Introspection Endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-token-revocation-endpoint[OAuth2 Token Revocation Endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-client-registration-endpoint[OAuth2 Client Registration Endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oauth2-authorization-server-metadata-endpoint[OAuth2 Authorization Server Metadata Endpoint]
 * xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-jwk-set-endpoint[JWK Set Endpoint]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-provider-configuration-endpoint[Provider Configuration Endpoint OpenID Connect 1.0]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-logout-endpoint[Logout Endpoint OpenID Connect 1.0]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-user-info-endpoint[UserInfo Endpoint OpenID Connect 1.0]
-* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-client-registration-endpoint[Client Registration Endpoint OpenID Connect 1.0]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-provider-configuration-endpoint[OpenID Connect 1.0 Provider Configuration Endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-logout-endpoint[OpenID Connect 1.0 Logout Endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-user-info-endpoint[OpenID Connect 1.0 UserInfo Endpoint]
+* xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc#oauth2AuthorizationServer-oidc-client-registration-endpoint[OpenID Connect 1.0 Client Registration Endpoint]
 |
 * OAuth 2.1 Authorization Framework (https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-07[bản nháp])
 ** https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-07#section-3.1[Authorization Endpoint]

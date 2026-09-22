@@ -1,7 +1,7 @@
-= Kiểm thử Form Login
+= Kiểm thử Form-based Authentication
 
-Bạn có thể dễ dàng tạo một request để kiểm thử authentication dựa trên biểu mẫu bằng hỗ trợ kiểm thử của Spring Security.
-Ví dụ, `formLogin` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`] sau sẽ gửi một POST đến "/login" với tên người dùng "user", mật khẩu "password" và một CSRF token hợp lệ:
+Bạn có thể dễ dàng tạo một request để kiểm thử form-based authentication bằng testing support của Spring Security.
+Ví dụ, `formLogin` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`] sau sẽ gửi một POST request đến "/login" với username "user", password "password" và một CSRF token hợp lệ:
 
 [tabs]
 ======
@@ -23,7 +23,7 @@ mvc
 ======
 
 Bạn có thể dễ dàng tùy chỉnh request.
-Ví dụ, đoạn sau sẽ gửi một POST đến "/auth" với tên người dùng "admin", mật khẩu "pass" và một CSRF token hợp lệ:
+Ví dụ, đoạn sau sẽ gửi một POST request đến "/auth" với username "admin", password "pass" và một CSRF token hợp lệ:
 
 [tabs]
 ======
@@ -44,8 +44,8 @@ mvc
 ----
 ======
 
-Bạn cũng có thể tùy chỉnh tên các tham số chứa tên người dùng và mật khẩu.
-Ví dụ, request ở trên được sửa đổi để đưa tên người dùng vào tham số HTTP "u" và mật khẩu vào tham số HTTP "p".
+Bạn cũng có thể tùy chỉnh tên của các parameter chứa username và password.
+Ví dụ, request ở trên được sửa đổi để đưa username vào HTTP parameter "u" và password vào HTTP parameter "p".
 
 [tabs]
 ======

@@ -2,13 +2,13 @@
 = Thay thế Authentication bằng Run-As
 
 [[runas-overview]]
-`AbstractSecurityInterceptor` có khả năng tạm thời thay thế đối tượng `Authentication` trong `SecurityContext` và `SecurityContextHolder` trong giai đoạn callback của đối tượng được bảo mật.
-Việc này chỉ xảy ra nếu đối tượng `Authentication` ban đầu đã được `AuthenticationManager` và `AccessDecisionManager` xử lý thành công.
-`RunAsManager` chỉ ra đối tượng `Authentication` thay thế, nếu có, cần được sử dụng trong `SecurityInterceptorCallback`.
+`AbstractSecurityInterceptor` có khả năng tạm thời thay thế `Authentication` object trong `SecurityContext` và `SecurityContextHolder` trong callback phase của secure object.
+Việc này chỉ xảy ra nếu `Authentication` object ban đầu đã được `AuthenticationManager` và `AccessDecisionManager` xử lý thành công.
+`RunAsManager` chỉ ra replacement `Authentication` object, nếu có, sẽ được sử dụng trong `SecurityInterceptorCallback`.
 
-Bằng cách tạm thời thay thế đối tượng `Authentication` trong giai đoạn callback của đối tượng được bảo mật, lời gọi được bảo mật có thể gọi các đối tượng khác yêu cầu các credential khác nhau cho authentication và authorization.
-Lời gọi đó cũng có thể thực hiện các kiểm tra bảo mật nội bộ đối với những đối tượng `GrantedAuthority` cụ thể.
-Vì Spring Security cung cấp một số class hỗ trợ tự động cấu hình các protocol remoting dựa trên nội dung của `SecurityContextHolder`, những thay thế run-as này đặc biệt hữu ích khi gọi các web service từ xa.
+Bằng cách tạm thời thay thế `Authentication` object trong callback phase của secure object, secured invocation có thể gọi các object khác yêu cầu các credential khác nhau cho authentication và authorization.
+Secured invocation cũng có thể thực hiện các security check nội bộ đối với các `GrantedAuthority` object cụ thể.
+Vì Spring Security cung cấp một số class hỗ trợ tự động cấu hình các remoting protocol dựa trên nội dung của `SecurityContextHolder`, các run-as replacement này đặc biệt hữu ích khi gọi remote web service.
 
 [[runas-config]]
 == Cấu hình
@@ -25,23 +25,23 @@ boolean supports(Class clazz);
 ----
 
 
-Method đầu tiên trả về đối tượng `Authentication` sẽ thay thế đối tượng `Authentication` hiện có trong suốt thời gian lời gọi method.
-Nếu method trả về `null`, điều đó cho biết không nên thực hiện việc thay thế.
-Method thứ hai được `AbstractSecurityInterceptor` sử dụng như một phần của việc validation lúc khởi động đối với các configuration attribute.
-Method `supports(Class)` được một triển khai security interceptor gọi để bảo đảm `RunAsManager` đã cấu hình hỗ trợ kiểu đối tượng được bảo mật mà security interceptor cung cấp.
+Method đầu tiên trả về `Authentication` object sẽ thay thế `Authentication` object hiện có trong suốt thời gian method invocation.
+Nếu method trả về `null`, điều đó cho biết không nên thực hiện replacement.
+Method thứ hai được `AbstractSecurityInterceptor` sử dụng như một phần của startup validation đối với các configuration attribute.
+Method `supports(Class)` được một security interceptor implementation gọi để bảo đảm `RunAsManager` đã cấu hình hỗ trợ kiểu secure object mà security interceptor cung cấp.
 
-Spring Security cung cấp một triển khai cụ thể của `RunAsManager`.
-Class `RunAsManagerImpl` trả về một `RunAsUserToken` thay thế nếu bất kỳ `ConfigAttribute` nào bắt đầu bằng `RUN_AS_`.
-Nếu tìm thấy `ConfigAttribute` như vậy, `RunAsUserToken` thay thế chứa cùng principal, credential và granted authority như đối tượng `Authentication` ban đầu, cùng với một `SimpleGrantedAuthority` mới cho mỗi `ConfigAttribute` `RUN_AS_`.
-Mỗi `SimpleGrantedAuthority` mới được thêm tiền tố `ROLE_`, theo sau là `ConfigAttribute` `RUN_AS`.
-Ví dụ, `RUN_AS_SERVER` tạo ra một `RunAsUserToken` thay thế chứa granted authority `ROLE_RUN_AS_SERVER`.
+Spring Security cung cấp một implementation cụ thể của `RunAsManager`.
+Class `RunAsManagerImpl` trả về một replacement `RunAsUserToken` nếu bất kỳ `ConfigAttribute` nào bắt đầu bằng `RUN_AS_`.
+Nếu tìm thấy `ConfigAttribute` như vậy, replacement `RunAsUserToken` chứa cùng principal, credentials và granted authorities như `Authentication` object ban đầu, cùng với một `SimpleGrantedAuthority` mới cho mỗi `RUN_AS_` `ConfigAttribute`.
+Mỗi `SimpleGrantedAuthority` mới được thêm prefix `ROLE_`, theo sau là `RUN_AS` `ConfigAttribute`.
+Ví dụ, `RUN_AS_SERVER` tạo ra một replacement `RunAsUserToken` chứa granted authority `ROLE_RUN_AS_SERVER`.
 
-`RunAsUserToken` thay thế cũng giống như bất kỳ đối tượng `Authentication` nào khác.
-Nó cần được `AuthenticationManager` thực hiện authentication, có thể thông qua việc ủy quyền cho một `AuthenticationProvider` phù hợp.
+Replacement `RunAsUserToken` cũng giống như mọi `Authentication` object khác.
+Nó cần được `AuthenticationManager` authenticated, có thể thông qua việc delegate đến một `AuthenticationProvider` phù hợp.
 `RunAsImplAuthenticationProvider` thực hiện authentication đó.
 `RunAsImplAuthenticationProvider` chấp nhận mọi `RunAsUserToken` được cung cấp là hợp lệ.
 
-Để bảo đảm code độc hại không thể tạo một `RunAsUserToken` rồi cung cấp nó để được `RunAsImplAuthenticationProvider` chấp nhận chắc chắn, hash của một key được lưu trong tất cả token được tạo.
+Để bảo đảm malicious code không thể tạo một `RunAsUserToken` rồi cung cấp token đó để `RunAsImplAuthenticationProvider` chấp nhận, hash của một key được lưu trong mọi token được tạo.
 `RunAsManagerImpl` và `RunAsImplAuthenticationProvider` được tạo trong bean context với cùng một key:
 
 [source,xml]
@@ -57,5 +57,5 @@ Nó cần được `AuthenticationManager` thực hiện authentication, có th�
 </bean>
 ----
 
-Bằng cách sử dụng cùng một key, mỗi `RunAsUserToken` có thể được validation vì nó được tạo bởi một `RunAsManagerImpl` đã được chấp thuận.
+Bằng cách sử dụng cùng một key, mỗi `RunAsUserToken` có thể được validate vì nó được tạo bởi một `RunAsManagerImpl` đã được chấp thuận.
 `RunAsUserToken` là bất biến sau khi được tạo, vì lý do bảo mật.

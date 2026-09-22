@@ -1,13 +1,13 @@
 [[websocket]]
 = Bảo mật WebSocket
 
-Spring Security 4 đã bổ sung hỗ trợ bảo mật cho {spring-framework-reference-url}web/websocket.html[hỗ trợ WebSocket của Spring].
+Spring Security 4 đã bổ sung hỗ trợ bảo mật cho {spring-framework-reference-url}web/websocket.html[tính năng WebSocket của Spring].
 Phần này mô tả cách sử dụng hỗ trợ WebSocket của Spring Security.
 
 .Hỗ trợ JSR-356 trực tiếp
 ****
 Spring Security không cung cấp hỗ trợ JSR-356 trực tiếp vì việc đó mang lại rất ít giá trị.
-Ngoài ra, JSR-356 không cung cấp cách đánh chặn thông điệp, nên việc bảo mật sẽ mang tính xâm lấn.
+Ngoài ra, JSR-356 không cung cấp cách đánh chặn message, nên việc bảo mật sẽ mang tính xâm lấn.
 
 Spring Framework cung cấp hỗ trợ sử dụng STOMP — một giao thức nhắn tin đơn giản, vốn được tạo ra để sử dụng trong các ngôn ngữ scripting với các frame lấy cảm hứng từ HTTP. STOMP được hỗ trợ rộng rãi và rất phù hợp để sử dụng qua WebSocket cũng như web. Để biết thêm chi tiết, xem {spring-framework-reference-url}web/websocket/stomp.html[tại đây].
 ****
@@ -19,7 +19,7 @@ WebSocket sử dụng lại cùng thông tin authentication có trong HTTP reque
 Điều này có nghĩa là `Principal` trên `HttpServletRequest` sẽ được chuyển cho WebSocket.
 Nếu bạn sử dụng Spring Security, `Principal` trên `HttpServletRequest` sẽ tự động được ghi đè.
 
-Cụ thể hơn, để bảo đảm một người dùng đã thực hiện authentication với ứng dụng WebSocket của bạn, bạn chỉ cần bảo đảm rằng mình đã thiết lập Spring Security để thực hiện authentication cho ứng dụng web dựa trên HTTP.
+Cụ thể hơn, để bảo đảm một người dùng đã authenticated với ứng dụng WebSocket của bạn, bạn chỉ cần bảo đảm rằng mình đã thiết lập Spring Security để thực hiện authentication cho ứng dụng web dựa trên HTTP.
 
 [[websocket-authorization]]
 == Authorization cho WebSocket
@@ -33,8 +33,8 @@ Một cách để thực hiện việc này là sử dụng `AuthorizationManage
 
 include-code::./WebSocketSecurityConfig[tag=snippet,indent=0]
 
-<1> Mọi thông điệp CONNECT gửi vào đều yêu cầu một CSRF token hợp lệ để thực thi <<websocket-sameorigin,Chính sách Same Origin>>.
-<2> `SecurityContextHolder` được điền người dùng từ attribute header `simpUser` cho mọi request gửi vào.
+<1> Mọi message `CONNECT` gửi vào đều yêu cầu một CSRF token hợp lệ để thực thi <<websocket-sameorigin,Chính sách Same Origin>>.
+<2> `SecurityContextHolder` được điền user từ header attribute `simpUser` cho mọi request gửi vào.
 <3> Các message của chúng ta yêu cầu authorization phù hợp. Cụ thể, mọi message gửi vào bắt đầu bằng `/user/` sẽ yêu cầu `ROLE_USER`. Bạn có thể tìm thêm chi tiết về authorization trong <<websocket-authorization>>
 
 [[custom-authorization]]
@@ -51,7 +51,7 @@ include-code::./AdvancedWebSocketSecurityConfig[tag=snippet,indent=0]
 
 Việc này sẽ bảo đảm rằng:
 
-<1> Mọi message không có destination (tức là mọi thứ không phải kiểu Message `MESSAGE` hoặc `SUBSCRIBE`) sẽ yêu cầu người dùng đã thực hiện authentication
+<1> Mọi message không có destination (tức là mọi thứ không phải kiểu Message `MESSAGE` hoặc `SUBSCRIBE`) sẽ yêu cầu người dùng đã authenticated
 <2> Bất kỳ ai cũng có thể SUBSCRIBE tới `/user/queue/errors`
 <3> Mọi message có destination bắt đầu bằng `"/app/"` sẽ yêu cầu người dùng có role `ROLE_USER`
 <4> Mọi message bắt đầu bằng `"/user/"` hoặc `"/topic/friends/"` và có kiểu SUBSCRIBE sẽ yêu cầu `ROLE_USER`
@@ -77,7 +77,7 @@ include-code::./WebSocketSecurityConfig[tag=snippet,indent=0]
 Để bảo mật ứng dụng đúng cách, bạn cần hiểu phần hỗ trợ WebSocket của Spring.
 
 [[websocket-authorization-notes-messagetypes]]
-==== Authorization WebSocket trên các kiểu message
+==== Authorization WebSocket đối với các kiểu message
 
 Bạn cần hiểu sự khác biệt giữa message kiểu `SUBSCRIBE` và `MESSAGE`, cũng như cách chúng hoạt động trong Spring.
 
@@ -92,7 +92,7 @@ Nếu cho phép gửi một `MESSAGE` tới `/topic/system/notifications`, clien
 Nhìn chung, các ứng dụng thường từ chối mọi `MESSAGE` được gửi tới một destination bắt đầu bằng {spring-framework-reference-url}web/websocket/stomp.html[tiền tố broker] (`/topic/` hoặc `/queue/`).
 
 [[websocket-authorization-notes-destinations]]
-==== Authorization WebSocket trên các destination
+==== Authorization WebSocket đối với các destination
 
 Bạn cũng nên hiểu cách các destination được biến đổi.
 
@@ -106,7 +106,7 @@ Hãy xét một ứng dụng chat:
 Với ứng dụng chat này, chúng ta muốn cho phép client lắng nghe `/user/queue`, vốn được chuyển thành `/queue/user/messages-<sessionid>`.
 Tuy nhiên, chúng ta không muốn client có thể lắng nghe `/queue/*`, vì điều đó sẽ cho phép client xem message của mọi người dùng.
 
-Nhìn chung, các ứng dụng thường từ chối mọi `SUBSCRIBE` được gửi tới một message bắt đầu bằng {spring-framework-reference-url}web/websocket/stomp.html[tiền tố broker] (`/topic/` hoặc `/queue/`).
+Nhìn chung, các ứng dụng thường từ chối mọi `SUBSCRIBE` tới một destination bắt đầu bằng {spring-framework-reference-url}web/websocket/stomp.html[tiền tố broker] (`/topic/` hoặc `/queue/`).
 Chúng ta có thể cung cấp các ngoại lệ để xử lý những trường hợp như
 //FIXME: Chẳng hạn như gì?
 
@@ -143,21 +143,21 @@ Vì SockJS cố gắng mô phỏng WebSocket nên nó cũng vượt qua Chính s
 Điều này có nghĩa là các developer cần chủ động bảo vệ ứng dụng của mình khỏi các domain bên ngoài khi sử dụng SockJS.
 
 [[websocket-sameorigin-spring]]
-=== Origin được cho phép của Spring WebSocket
+=== Origin được Spring WebSocket cho phép
 
 May mắn là kể từ Spring 4.1.5, hỗ trợ WebSocket và SockJS của Spring hạn chế quyền truy cập vào {spring-framework-reference-url}web/websocket/server.html#websocket-server-allowed-origins[domain hiện tại].
-Spring Security bổ sung một lớp bảo vệ khác để cung cấp https://en.wikipedia.org/wiki/Defence_in_depth_(non-military)#Information_security[bảo mật nhiều lớp].
+Spring Security bổ sung một lớp bảo vệ khác để cung cấp https://en.wikipedia.org/wiki/Defence_in_depth_(non-military)#Information_security[phòng thủ theo chiều sâu].
 
 [[websocket-sameorigin-csrf]]
-=== Thêm CSRF vào header Stomp
+=== Thêm CSRF vào các header STOMP
 
-Theo mặc định, Spring Security yêu cầu xref:features/exploits/csrf.adoc#csrf[CSRF token]  trong mọi message kiểu `CONNECT`.
+Theo mặc định, Spring Security yêu cầu xref:features/exploits/csrf.adoc#csrf[CSRF token] trong mọi message kiểu `CONNECT`.
 Điều này bảo đảm chỉ một site có quyền truy cập CSRF token mới có thể kết nối.
-Vì chỉ *origin giống nhau* mới có thể truy cập CSRF token, các domain bên ngoài không được phép tạo kết nối.
+Vì chỉ các site ở *cùng origin* mới có thể truy cập CSRF token, các domain bên ngoài không được phép tạo kết nối.
 
 Thông thường, chúng ta cần đưa CSRF token vào HTTP header hoặc HTTP parameter.
 Tuy nhiên, SockJS không cho phép các tùy chọn này.
-Thay vào đó, chúng ta phải đưa token vào header Stomp.
+Thay vào đó, chúng ta phải đưa token vào các header STOMP.
 
 Ứng dụng có thể xref:servlet/exploits/csrf.adoc#csrf-integration[lấy CSRF token] bằng cách truy cập request attribute có tên `_csrf`.
 Ví dụ sau cho phép truy cập `CsrfToken` trong JSP:
@@ -204,7 +204,7 @@ class CsrfController {
 
 JavaScript có thể thực hiện lệnh gọi REST tới endpoint và sử dụng response để điền `headerName` và token.
 
-Bây giờ chúng ta có thể đưa token vào Stomp client:
+Bây giờ chúng ta có thể đưa token vào STOMP client:
 
 [source,javascript]
 ----
@@ -241,7 +241,7 @@ include-code::./WebSocketSecurityConfig[tag=snippet,indent=0]
 <b:bean ref="myRef" class="org.springframework.security.messaging.access.expression.MessageAuthorizationContextSecurityExpressionHandler"/>
 ----
 
-Nếu bạn đang di chuyển từ cách sử dụng cũ của `websocket-message-broker` triển khai `SecurityExpressionHandler<Message<?>>`, bạn có thể:
+Nếu bạn đang di chuyển từ cách sử dụng cũ của `websocket-message-broker`, vốn triển khai `SecurityExpressionHandler<Message<?>>`, bạn có thể:
  1. Triển khai bổ sung method `createEvaluationContext(Supplier, Message)` rồi
  2. Bọc giá trị đó trong một `MessageAuthorizationContextSecurityExpressionHandler` như sau:
 
@@ -269,8 +269,8 @@ Khi sử dụng các tùy chọn dự phòng, chúng ta cần nới lỏng một
 === SockJS và frame-options
 
 SockJS có thể sử dụng một https://github.com/sockjs/sockjs-client/tree/v0.3.4[transport tận dụng iframe].
-Theo mặc định, Spring Security xref:features/exploits/headers.adoc#headers-frame-options[từ chối] việc frame site để ngăn chặn các cuộc tấn công clickjacking.
-Để các transport dựa trên frame của SockJS hoạt động, chúng ta cần cấu hình Spring Security cho phép origin giống nhau nhúng nội dung bằng frame.
+Theo mặc định, Spring Security xref:features/exploits/headers.adoc#headers-frame-options[từ chối] việc nhúng site bằng frame để ngăn chặn các cuộc tấn công clickjacking.
+Để các transport dựa trên frame của SockJS hoạt động, chúng ta cần cấu hình Spring Security cho phép site ở cùng origin nhúng nội dung bằng frame.
 
 Bạn có thể tùy chỉnh `X-Frame-Options` bằng phần tử xref:servlet/appendix/namespace/http.adoc#nsa-frame-options[frame-options].
 Ví dụ sau chỉ dẫn Spring Security sử dụng `X-Frame-Options: SAMEORIGIN`, cho phép iframe trong cùng domain:
@@ -287,17 +287,17 @@ Ví dụ sau chỉ dẫn Spring Security sử dụng `X-Frame-Options: SAMEORIGI
 </http>
 ----
 
-Tương tự, bạn có thể tùy chỉnh frame options để sử dụng origin giống nhau trong Java Configuration bằng cách sau:
+Tương tự, bạn có thể tùy chỉnh frame options để sử dụng cùng origin trong Java Configuration bằng cách sau:
 
 include-code::./WebSecurityConfig[tag=snippet,indent=0]
 
 [[websocket-sockjs-csrf]]
 === SockJS và nới lỏng CSRF
 
-SockJS sử dụng POST trên các message CONNECT cho mọi transport dựa trên HTTP.
+SockJS sử dụng POST cho các message `CONNECT` trên mọi transport dựa trên HTTP.
 Thông thường, chúng ta cần đưa CSRF token vào HTTP header hoặc HTTP parameter.
 Tuy nhiên, SockJS không cho phép các tùy chọn này.
-Thay vào đó, chúng ta phải đưa token vào header Stomp như mô tả trong <<websocket-sameorigin-csrf>>.
+Thay vào đó, chúng ta phải đưa token vào các header STOMP như mô tả trong <<websocket-sameorigin-csrf>>.
 
 Điều này cũng có nghĩa là chúng ta cần nới lỏng cơ chế bảo vệ CSRF ở lớp web.
 Cụ thể, chúng ta muốn vô hiệu hóa bảo vệ CSRF cho các URL connect.
@@ -306,7 +306,7 @@ Nếu không, site của chúng ta sẽ dễ bị tấn công CSRF.
 
 Chúng ta có thể dễ dàng đạt được điều này bằng cách cung cấp một CSRF `RequestMatcher`.
 Cấu hình Java giúp việc này trở nên dễ dàng.
-Ví dụ, nếu endpoint stomp của chúng ta là `/chat`, chúng ta chỉ có thể vô hiệu hóa bảo vệ CSRF cho các URL bắt đầu bằng `/chat/` bằng cách sử dụng cấu hình sau:
+Ví dụ, nếu STOMP endpoint của chúng ta là `/chat`, chúng ta chỉ có thể vô hiệu hóa bảo vệ CSRF cho các URL bắt đầu bằng `/chat/` bằng cách sử dụng cấu hình sau:
 
 include-code::./WebSecurityConfig[tag=snippet,indent=0]
 

@@ -1,8 +1,8 @@
 [[test-mockmvc-csrf]]
 = Kiểm thử với cơ chế bảo vệ CSRF
 
-Khi kiểm thử bất kỳ phương thức HTTP không an toàn nào và sử dụng cơ chế bảo vệ CSRF của Spring Security, bạn phải đưa một CSRF Token hợp lệ vào request.
-Để chỉ định một CSRF token hợp lệ dưới dạng request parameter, hãy sử dụng CSRF xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`] như sau:
+Khi kiểm thử bất kỳ HTTP method không an toàn nào và sử dụng cơ chế bảo vệ CSRF của Spring Security, bạn phải đưa CSRF token hợp lệ vào request.
+Để chỉ định CSRF token hợp lệ dưới dạng request parameter, hãy sử dụng xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`] dành cho CSRF như sau:
 
 [tabs]
 ======
@@ -46,7 +46,7 @@ mvc.post("/") {
 ----
 ======
 
-Bạn cũng có thể kiểm thử việc cung cấp một CSRF token không hợp lệ bằng cách sử dụng đoạn sau:
+Bạn cũng có thể kiểm thử với CSRF token không hợp lệ như sau:
 
 [tabs]
 ======

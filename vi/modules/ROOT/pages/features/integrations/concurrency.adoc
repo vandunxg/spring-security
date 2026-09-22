@@ -1,17 +1,17 @@
 [[concurrency]]
 = Hỗ trợ tính đồng thời
 
-Trong hầu hết môi trường, trạng thái bảo mật được lưu theo từng `Thread`.
+Trong hầu hết môi trường, Security được lưu theo từng `Thread`.
 Điều này có nghĩa là khi công việc được thực hiện trên một `Thread` mới, `SecurityContext` sẽ bị mất.
-Spring Security cung cấp một số hạ tầng để giúp việc này trở nên dễ dàng hơn nhiều cho người dùng.
-Spring Security cung cấp các lớp trừu tượng cấp thấp để làm việc với Spring Security trong môi trường đa luồng.
+Spring Security cung cấp một số infrastructure để giúp việc này dễ dàng hơn nhiều.
+Spring Security cung cấp các abstraction cấp thấp để làm việc với Spring Security trong môi trường multi-threaded.
 Trên thực tế, đây là nền tảng mà Spring Security sử dụng để tích hợp với xref:servlet/integrations/servlet-api.adoc#servletapi-start-runnable[AsyncContext.start(Runnable)] và xref:servlet/integrations/mvc.adoc#mvc-async[Tích hợp bất đồng bộ Spring MVC].
 
 == DelegatingSecurityContextRunnable
 
-Một trong những khối nền tảng nhất trong phần hỗ trợ tính đồng thời của Spring Security là `DelegatingSecurityContextRunnable`.
-Nó bọc một `Runnable` được ủy quyền để khởi tạo `SecurityContextHolder` với một `SecurityContext` được chỉ định cho Runnable đó.
-Sau đó, nó gọi Runnable được ủy quyền và đảm bảo xóa `SecurityContextHolder` sau đó.
+Một trong những building block cơ bản nhất trong concurrency support của Spring Security là `DelegatingSecurityContextRunnable`.
+Nó bọc một `Runnable` delegate để khởi tạo `SecurityContextHolder` với một `SecurityContext` được chỉ định cho delegate.
+Sau đó, nó gọi delegate Runnable và bảo đảm clear `SecurityContextHolder`.
 `DelegatingSecurityContextRunnable` có dạng như sau:
 
 [tabs]
@@ -45,10 +45,10 @@ fun run() {
 ----
 ======
 
-Dù rất đơn giản, nó giúp việc truyền `SecurityContext` từ `Thread` này sang `Thread` khác diễn ra liền mạch.
+Dù rất đơn giản, nó giúp truyền `SecurityContext` từ `Thread` này sang `Thread` khác một cách liền mạch.
 Điều này quan trọng vì trong hầu hết trường hợp, `SecurityContextHolder` hoạt động theo từng `Thread`.
-Ví dụ, bạn có thể đã sử dụng hỗ trợ xref:servlet/appendix/namespace/method-security.adoc#nsa-global-method-security[<global-method-security>] của Spring Security để bảo vệ một dịch vụ.
-Giờ đây, bạn có thể dễ dàng truyền `SecurityContext` của `Thread` hiện tại sang `Thread` gọi dịch vụ được bảo vệ.
+Ví dụ, bạn có thể đã sử dụng hỗ trợ xref:servlet/appendix/namespace/method-security.adoc#nsa-global-method-security[<global-method-security>] của Spring Security để bảo vệ một service.
+Giờ đây, bạn có thể dễ dàng truyền `SecurityContext` của `Thread` hiện tại sang `Thread` gọi service được bảo vệ.
 Ví dụ về cách thực hiện việc này nằm bên dưới:
 
 [tabs]
@@ -59,7 +59,7 @@ Java::
 ----
 Runnable originalRunnable = new Runnable() {
 public void run() {
-	// invoke secured service
+	// gọi service được bảo vệ
 }
 };
 
@@ -75,7 +75,7 @@ Kotlin::
 [source,kotlin,role="secondary"]
 ----
 val originalRunnable = Runnable {
-    // invoke secured service
+    // gọi service được bảo vệ
 }
 val context: SecurityContext = SecurityContextHolder.getContext()
 val wrappedRunnable = DelegatingSecurityContextRunnable(originalRunnable, context)
@@ -86,13 +86,13 @@ Thread(wrappedRunnable).start()
 
 Đoạn mã trên thực hiện các bước sau:
 
-* Tạo một `Runnable` sẽ gọi dịch vụ được bảo vệ.
-Lưu ý rằng nó không biết về Spring Security
+* Tạo một `Runnable` sẽ gọi service được bảo vệ.
+Lưu ý rằng nó không biết Spring Security
 * Lấy `SecurityContext` mà chúng ta muốn sử dụng từ `SecurityContextHolder` và khởi tạo `DelegatingSecurityContextRunnable`
-* Sử dụng `DelegatingSecurityContextRunnable` để tạo một Thread
-* Khởi động Thread đã tạo
+* Sử dụng `DelegatingSecurityContextRunnable` để tạo một `Thread`
+* Khởi động `Thread` đã tạo
 
-Vì việc tạo `DelegatingSecurityContextRunnable` với `SecurityContext` từ `SecurityContextHolder` khá phổ biến, nên có một constructor rút gọn cho trường hợp này.
+Vì việc tạo `DelegatingSecurityContextRunnable` với `SecurityContext` từ `SecurityContextHolder` khá phổ biến, nên class này có một constructor shortcut.
 Đoạn mã sau tương đương với đoạn mã ở trên:
 
 
@@ -104,7 +104,7 @@ Java::
 ----
 Runnable originalRunnable = new Runnable() {
 public void run() {
-	// invoke secured service
+	// gọi service được bảo vệ
 }
 };
 
@@ -119,7 +119,7 @@ Kotlin::
 [source,kotlin,role="secondary"]
 ----
 val originalRunnable = Runnable {
-    // invoke secured service
+    // gọi service được bảo vệ
 }
 
 val wrappedRunnable = DelegatingSecurityContextRunnable(originalRunnable)
@@ -128,15 +128,15 @@ Thread(wrappedRunnable).start()
 ----
 ======
 
-Đoạn mã này dễ sử dụng, nhưng vẫn yêu cầu biết rằng chúng ta đang sử dụng Spring Security.
-Trong phần tiếp theo, chúng ta sẽ xem cách sử dụng `DelegatingSecurityContextExecutor` để che giấu việc mã đang sử dụng Spring Security.
+Đoạn mã này dễ sử dụng, nhưng code vẫn phải biết rằng đang sử dụng Spring Security.
+Trong phần tiếp theo, chúng ta sẽ xem cách sử dụng `DelegatingSecurityContextExecutor` để code không cần biết rằng đang sử dụng Spring Security.
 
 == DelegatingSecurityContextExecutor
 
-Trong phần trước, chúng ta thấy rằng việc sử dụng `DelegatingSecurityContextRunnable` khá dễ dàng, nhưng chưa lý tưởng vì phải biết rằng mình đang sử dụng Spring Security.
-Hãy xem `DelegatingSecurityContextExecutor` có thể giúp mã không cần biết về việc đang sử dụng Spring Security như thế nào.
+Trong phần trước, chúng ta thấy rằng việc sử dụng `DelegatingSecurityContextRunnable` khá dễ dàng, nhưng chưa lý tưởng vì code phải biết rằng đang sử dụng Spring Security.
+Hãy xem `DelegatingSecurityContextExecutor` có thể giúp code không cần biết rằng đang sử dụng Spring Security như thế nào.
 
-Thiết kế của `DelegatingSecurityContextExecutor` rất giống `DelegatingSecurityContextRunnable`, ngoại trừ việc nó nhận một `Executor` được ủy quyền thay vì một `Runnable` được ủy quyền.
+Thiết kế của `DelegatingSecurityContextExecutor` rất giống `DelegatingSecurityContextRunnable`, ngoại trừ việc nó nhận một `Executor` delegate thay vì một `Runnable` delegate.
 Bạn có thể xem ví dụ về cách sử dụng bên dưới:
 
 
@@ -158,7 +158,7 @@ DelegatingSecurityContextExecutor executor =
 
 Runnable originalRunnable = new Runnable() {
 public void run() {
-	// invoke secured service
+	// gọi service được bảo vệ
 }
 };
 
@@ -178,24 +178,24 @@ val delegateExecutor = SimpleAsyncTaskExecutor()
 val executor = DelegatingSecurityContextExecutor(delegateExecutor, context)
 
 val originalRunnable = Runnable {
-    // invoke secured service
+    // gọi service được bảo vệ
 }
 
 executor.execute(originalRunnable)
 ----
 ======
 
-Đoạn mã thực hiện các bước sau:
+Đoạn mã này thực hiện các bước sau:
 
 * Tạo `SecurityContext` sẽ được sử dụng cho `DelegatingSecurityContextExecutor`.
 Lưu ý rằng trong ví dụ này, chúng ta chỉ tạo `SecurityContext` thủ công.
 Tuy nhiên, việc lấy `SecurityContext` ở đâu hoặc bằng cách nào không quan trọng (tức là nếu muốn, chúng ta có thể lấy nó từ `SecurityContextHolder`).
-* Tạo một delegateExecutor chịu trách nhiệm thực thi các ``Runnable`` được gửi đến
+* Tạo một delegateExecutor chịu trách nhiệm execute các ``Runnable`` được gửi đến
 * Cuối cùng, tạo một `DelegatingSecurityContextExecutor` chịu trách nhiệm bọc mọi Runnable được truyền vào method execute bằng một `DelegatingSecurityContextRunnable`.
 Sau đó, nó truyền Runnable đã được bọc cho delegateExecutor.
 Trong trường hợp này, cùng một `SecurityContext` sẽ được sử dụng cho mọi Runnable được gửi đến `DelegatingSecurityContextExecutor`.
-Điều này hữu ích nếu chúng ta đang chạy các tác vụ nền cần được thực hiện bởi một người dùng có đặc quyền cao hơn.
-* Lúc này, bạn có thể tự hỏi: "Việc này che giấu mọi hiểu biết về Spring Security khỏi mã của tôi như thế nào?" Thay vì tự tạo `SecurityContext` và `DelegatingSecurityContextExecutor` trong mã của mình, chúng ta có thể đưa vào một đối tượng `DelegatingSecurityContextExecutor` đã được khởi tạo sẵn.
+Điều này hữu ích nếu chúng ta đang chạy các background task cần được thực hiện bởi một user có elevated privileges.
+* Lúc này, bạn có thể tự hỏi: "Việc này giúp code của tôi không cần biết gì về Spring Security bằng cách nào?" Thay vì tự tạo `SecurityContext` và `DelegatingSecurityContextExecutor` trong code của mình, chúng ta có thể inject một instance `DelegatingSecurityContextExecutor` đã được initialize sẵn.
 
 [tabs]
 ======
@@ -204,12 +204,12 @@ Java::
 [source,java,role="primary"]
 ----
 @Autowired
-private Executor executor; // becomes an instance of our DelegatingSecurityContextExecutor
+private Executor executor; // trở thành một instance của DelegatingSecurityContextExecutor
 
 public void submitRunnable() {
 Runnable originalRunnable = new Runnable() {
 	public void run() {
-	// invoke secured service
+	// gọi service được bảo vệ
 	}
 };
 executor.execute(originalRunnable);
@@ -221,21 +221,21 @@ Kotlin::
 [source,kotlin,role="secondary"]
 ----
 @Autowired
-lateinit var executor: Executor // becomes an instance of our DelegatingSecurityContextExecutor
+lateinit var executor: Executor // trở thành một instance của DelegatingSecurityContextExecutor
 
 fun submitRunnable() {
     val originalRunnable = Runnable {
-        // invoke secured service
+        // gọi service được bảo vệ
     }
     executor.execute(originalRunnable)
 }
 ----
 ======
 
-Giờ đây mã của chúng ta không biết rằng `SecurityContext` được truyền sang `Thread`, sau đó `originalRunnable` được chạy, rồi `SecurityContextHolder` được xóa.
-Trong ví dụ này, cùng một người dùng được sử dụng để chạy mỗi luồng.
-Nếu muốn sử dụng người dùng từ `SecurityContextHolder` tại thời điểm gọi `executor.execute(Runnable)` (tức là người dùng hiện đang đăng nhập) để xử lý ``originalRunnable`` thì sao?
-Có thể thực hiện việc này bằng cách xóa đối số `SecurityContext` khỏi constructor của `DelegatingSecurityContextExecutor`.
+Giờ đây code của chúng ta không biết rằng `SecurityContext` được truyền sang `Thread`, sau đó `originalRunnable` được chạy và `SecurityContextHolder` được clear.
+Trong ví dụ này, cùng một user được dùng để chạy mỗi `Thread`.
+Nếu muốn dùng user từ `SecurityContextHolder` tại thời điểm gọi `executor.execute(Runnable)` (tức là user đang login) để process ``originalRunnable`` thì sao?
+Có thể làm vậy bằng cách bỏ argument `SecurityContext` khỏi constructor của `DelegatingSecurityContextExecutor`.
 Ví dụ:
 
 
@@ -259,12 +259,12 @@ val executor = DelegatingSecurityContextExecutor(delegateExecutor)
 ----
 ======
 
-Giờ đây, mỗi khi `executor.execute(Runnable)` được thực thi, `SecurityContext` trước tiên được lấy bởi `SecurityContextHolder`, sau đó `SecurityContext` đó được dùng để tạo `DelegatingSecurityContextRunnable`.
-Điều này có nghĩa là chúng ta chạy `Runnable` với cùng người dùng đã được sử dụng để gọi mã `executor.execute(Runnable)`.
+Giờ đây, mỗi khi `executor.execute(Runnable)` được gọi, `SecurityContext` trước tiên được lấy từ `SecurityContextHolder`, rồi `SecurityContext` đó được dùng để tạo `DelegatingSecurityContextRunnable`.
+Điều này có nghĩa là `Runnable` chạy với cùng user đã được dùng để gọi code `executor.execute(Runnable)`.
 
-== Các class về tính đồng thời của Spring Security
+== Các class concurrency của Spring Security
 
-Tham khảo Javadoc để biết thêm các tích hợp với cả các API đồng thời của Java và các lớp trừu tượng của Spring Task.
+Tham khảo Javadoc để biết thêm các integration với cả Java concurrent APIs và Spring Task abstractions.
 Sau khi hiểu đoạn mã trước, cách hoạt động của chúng khá rõ ràng.
 
 * `DelegatingSecurityContextCallable`

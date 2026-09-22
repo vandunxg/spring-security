@@ -1,19 +1,19 @@
 [[anonymous]]
-= Authentication ẩn danh
+= Anonymous Authentication
 
 
 [[anonymous-overview]]
 == Tổng quan
 Thông thường, việc áp dụng lập trường "`deny-by-default`" được xem là một thực hành bảo mật tốt, trong đó bạn chỉ rõ những gì được phép và từ chối mọi thứ khác.
-Việc xác định những gì người dùng chưa authentication có thể truy cập cũng tương tự, đặc biệt là đối với các ứng dụng web.
-Nhiều website yêu cầu người dùng phải được authentication đối với mọi thứ ngoài một vài URL (ví dụ như các trang home và login).
-Trong trường hợp đó, cách dễ nhất là định nghĩa các thuộc tính cấu hình quyền truy cập cho những URL cụ thể này thay vì cho mọi tài nguyên được bảo vệ.
+Việc xác định những gì người dùng unauthenticated có thể truy cập cũng tương tự, đặc biệt là đối với các ứng dụng web.
+Nhiều website yêu cầu người dùng phải authenticated đối với mọi thứ ngoài một vài URL (ví dụ như các trang home và login).
+Trong trường hợp đó, cách dễ nhất là định nghĩa các access configuration attribute cho những URL cụ thể này thay vì cho mọi tài nguyên được bảo vệ.
 Nói cách khác, đôi khi sẽ thuận tiện nếu mặc định yêu cầu `ROLE_SOMETHING` và chỉ cho phép một số ngoại lệ nhất định đối với quy tắc này, chẳng hạn như các trang login, logout và home của ứng dụng.
-Bạn cũng có thể hoàn toàn loại các trang này khỏi filter chain, qua đó bỏ qua các kiểm tra access control, nhưng điều này có thể không mong muốn vì những lý do khác, đặc biệt nếu các trang đó hoạt động khác nhau đối với người dùng đã authentication.
+Bạn cũng có thể hoàn toàn loại các trang này khỏi filter chain, qua đó bỏ qua các kiểm tra access control, nhưng điều này có thể không mong muốn vì những lý do khác, đặc biệt nếu các trang đó hoạt động khác nhau đối với người dùng đã authenticated.
 
-Đó là ý nghĩa của authentication ẩn danh.
-Lưu ý rằng về mặt khái niệm, không có khác biệt thực sự giữa người dùng "`được authentication ẩn danh`" và người dùng chưa authentication.
-Anonymous authentication của Spring Security chỉ cung cấp cho bạn một cách thuận tiện hơn để cấu hình các thuộc tính access control.
+Đó là ý nghĩa của anonymous authentication.
+Lưu ý rằng về mặt khái niệm, không có khác biệt thực sự giữa người dùng "`anonymously authenticated`" và người dùng `unauthenticated`.
+Anonymous authentication của Spring Security chỉ cung cấp cho bạn một cách thuận tiện hơn để cấu hình các access-control attribute.
 Các lời gọi đến servlet API, chẳng hạn như `getCallerPrincipal`, vẫn trả về null, mặc dù thực tế có một object anonymous authentication trong `SecurityContextHolder`.
 
 Có những tình huống khác mà anonymous authentication hữu ích, chẳng hạn khi một auditing interceptor truy vấn `SecurityContextHolder` để xác định principal nào chịu trách nhiệm cho một thao tác nhất định.
@@ -62,7 +62,7 @@ Nếu có thể đoán được `key` hoặc biết được giá trị của n�
 `userAttribute` được biểu diễn dưới dạng `usernameInTheAuthenticationToken,grantedAuthority[,grantedAuthority]`.
 Cú pháp tương tự được sử dụng sau dấu bằng cho property `userMap` của `InMemoryDaoImpl`.
 
-Như đã giải thích trước đó, lợi ích của anonymous authentication là mọi URI pattern đều có thể được áp dụng security, như ví dụ sau đây cho thấy:
+Như đã giải thích trước đó, lợi ích của anonymous authentication là mọi URI pattern đều có thể được áp dụng các quy tắc access control, như ví dụ sau đây cho thấy:
 
 [source,xml]
 ----
@@ -87,7 +87,7 @@ Như đã giải thích trước đó, lợi ích của anonymous authentication
 Khép lại phần thảo luận về anonymous authentication là interface `AuthenticationTrustResolver`, cùng với implementation `AuthenticationTrustResolverImpl` tương ứng.
 Interface này cung cấp method `isAnonymous(Authentication)`, cho phép các class quan tâm tính đến loại trạng thái authentication đặc biệt này.
 `ExceptionTranslationFilter` sử dụng interface này khi xử lý các instance `AccessDeniedException`.
-Nếu một `AccessDeniedException` được ném ra và authentication thuộc kiểu anonymous, thay vì ném response 403 (bị từ chối), filter sẽ khởi chạy `AuthenticationEntryPoint` để principal có thể authentication đúng cách.
+Nếu một `AccessDeniedException` được ném ra và authentication thuộc kiểu anonymous, thay vì ném response 403 (forbidden), filter sẽ gọi `AuthenticationEntryPoint` để principal có thể authentication đúng cách.
 Đây là một phân biệt cần thiết. Nếu không, các principal sẽ luôn được xem là "`authenticated`" và không bao giờ có cơ hội login thông qua form, basic, digest hoặc một cơ chế authentication thông thường khác.
 
 Chúng ta thường thấy attribute `ROLE_ANONYMOUS` trong cấu hình interceptor trước đó được thay thế bằng `IS_AUTHENTICATED_ANONYMOUSLY`, vốn về cơ bản có cùng ý nghĩa khi định nghĩa access control.
@@ -97,7 +97,7 @@ Cách tiếp cận `AuthenticatedVoter` mạnh hơn vì cho phép bạn phân bi
 Tuy nhiên, nếu không cần chức năng này, bạn có thể tiếp tục dùng `ROLE_ANONYMOUS`, được xử lý bởi `RoleVoter` tiêu chuẩn của Spring Security.
 
 [[anonymous-auth-mvc-controller]]
-== Lấy anonymous authentication với Spring MVC
+== Lấy Anonymous Authentication với Spring MVC
 
 {spring-framework-reference-url}web/webmvc/mvc-controller/ann-methods/arguments.html[Spring MVC phân giải các parameter có kiểu `Principal`] bằng argument resolver riêng của nó.
 
@@ -140,7 +140,7 @@ Lý do là Spring MVC phân giải parameter bằng `HttpServletRequest#getPrinc
 Nếu muốn lấy `Authentication` trong các request anonymous, hãy sử dụng
 xref:servlet/integrations/mvc.adoc#mvc-current-security-context[`@CurrentSecurityContext`] thay vào đó:
 
-.Sử dụng CurrentSecurityContext cho các request ẩn danh
+.Sử dụng CurrentSecurityContext cho các anonymous request
 [tabs]
 ======
 Java::

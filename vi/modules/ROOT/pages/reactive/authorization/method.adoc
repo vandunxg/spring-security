@@ -1,26 +1,26 @@
 [[jc-erms]]
 = EnableReactiveMethodSecurity
 
-Spring Security hỗ trợ method security bằng cách sử dụng https://projectreactor.io/docs/core/release/reference/advancedFeatures/context.html[Reactor's Context], được thiết lập bởi `ReactiveSecurityContextHolder`.
-Ví dụ sau cho thấy cách truy xuất message của user hiện đã đăng nhập:
+Spring Security hỗ trợ method security bằng cách sử dụng https://projectreactor.io/docs/core/release/reference/advancedFeatures/context.html[Reactor Context], được thiết lập bởi `ReactiveSecurityContextHolder`.
+Ví dụ sau cho thấy cách truy xuất message của user đang đăng nhập:
 
 [NOTE]
 ====
 Để ví dụ này hoạt động, kiểu trả về của method phải là `org.reactivestreams.Publisher` (tức là `Mono` hoặc `Flux`).
-Điều này cần thiết để tích hợp với `Context` của Reactor.
+Điều này cần thiết để tích hợp với `Reactor Context`.
 ====
 
 [[jc-enable-reactive-method-security-authorization-manager]]
 == EnableReactiveMethodSecurity với AuthorizationManager
 
-Trong Spring Security 5.8, chúng ta có thể bật security dựa trên annotation bằng annotation `@EnableReactiveMethodSecurity(useAuthorizationManager=true)` trên bất kỳ instance `@Configuration` nào.
+Trong Spring Security 5.8, chúng ta có thể bật annotation-based security bằng annotation `@EnableReactiveMethodSecurity(useAuthorizationManager=true)` trên bất kỳ instance nào của `@Configuration`.
 
 Điều này cải thiện `@EnableReactiveMethodSecurity` theo một số cách. `@EnableReactiveMethodSecurity(useAuthorizationManager=true)`:
 
 1. Sử dụng API `AuthorizationManager` được đơn giản hóa thay vì metadata sources, config attributes, decision managers và voters.
 Điều này giúp đơn giản hóa việc tái sử dụng và tùy chỉnh.
 2. Hỗ trợ các kiểu trả về reactive, bao gồm Kotlin coroutines.
-3. Được xây dựng bằng Spring AOP native, loại bỏ các abstraction và cho phép bạn sử dụng các building block của Spring AOP để tùy chỉnh.
+3. Được xây dựng bằng native Spring AOP, loại bỏ các abstraction và cho phép bạn sử dụng các building block của Spring AOP để tùy chỉnh.
 4. Kiểm tra các annotation xung đột để đảm bảo cấu hình security không mơ hồ.
 5. Tuân thủ JSR-250.
 
@@ -31,7 +31,7 @@ Với các version cũ hơn, hãy đọc về hỗ trợ tương tự bằng <<j
 
 Ví dụ sau sẽ bật annotation `@PreAuthorize` của Spring Security:
 
-.Cấu hình method security
+.Cấu hình Method Security
 [tabs]
 ======
 Java::
@@ -46,10 +46,10 @@ public class MethodSecurityConfig {
 ======
 
 Sau đó, việc thêm annotation vào một method (trên class hoặc interface) sẽ giới hạn quyền truy cập vào method đó tương ứng.
-Hỗ trợ annotation native của Spring Security xác định một tập attribute cho method.
-Các attribute này sẽ được truyền tới nhiều method interceptor khác nhau, chẳng hạn như `AuthorizationManagerBeforeReactiveMethodInterceptor`, để interceptor đưa ra quyết định thực tế:
+Tính năng hỗ trợ annotation native của Spring Security định nghĩa một tập attribute cho method.
+Các attribute này sẽ được truyền tới nhiều method interceptor khác nhau, chẳng hạn như `AuthorizationManagerBeforeReactiveMethodInterceptor`, để chúng đưa ra quyết định thực tế:
 
-.Cách sử dụng annotation cho method security
+.Cách sử dụng annotation của Method Security
 [tabs]
 ======
 Java::
@@ -69,12 +69,12 @@ public interface BankService {
 ----
 ======
 
-Trong trường hợp này, `hasRole` tham chiếu tới method trong `SecurityExpressionRoot` được SpEL evaluation engine gọi.
+Trong trường hợp này, `hasRole` tham chiếu tới method trong `SecurityExpressionRoot` được gọi bởi SpEL evaluation engine.
 
 `@bean` tham chiếu tới một component tùy chỉnh do bạn định nghĩa, trong đó `apply` có thể trả về `Boolean` hoặc `Mono<Boolean>` để biểu thị quyết định authorization.
 Một bean như vậy có thể trông như sau:
 
-.Expression Boolean reactive cho method security
+.Reactive Boolean Expression cho Method Security
 [tabs]
 ======
 Java::
@@ -88,19 +88,19 @@ public Function<Account, Mono<Boolean>> func() {
 ----
 ======
 
-Authorization cho method là sự kết hợp giữa authorization trước method và sau method.
+Authorization cho method là sự kết hợp giữa before-method authorization và after-method authorization.
 
 [NOTE]
 ====
-Authorization trước method được thực hiện trước khi method được gọi.
+Before-method authorization được thực hiện trước khi method được gọi.
 Nếu authorization đó từ chối quyền truy cập, method sẽ không được gọi và một `AccessDeniedException` sẽ được ném ra.
-Authorization sau method được thực hiện sau khi method được gọi nhưng trước khi method trả về cho caller.
+After-method authorization được thực hiện sau khi method được gọi nhưng trước khi method trả về cho caller.
 Nếu authorization đó từ chối quyền truy cập, value sẽ không được trả về và một `AccessDeniedException` sẽ được ném ra.
 ====
 
 Để tái tạo hành vi mặc định của việc thêm `@EnableReactiveMethodSecurity(useAuthorizationManager=true)`, bạn sẽ publish cấu hình sau:
 
-.Cấu hình method security pre-post đầy đủ
+.Cấu hình pre-post Method Security đầy đủ
 [tabs]
 ======
 Java::
@@ -145,11 +145,11 @@ Lưu ý rằng method security của Spring Security được xây dựng bằng
 
 === Tùy chỉnh authorization
 
-`@PreAuthorize`, `@PostAuthorize`, `@PreFilter` và `@PostFilter` của Spring Security được cung cấp kèm hỗ trợ dựa trên expression phong phú.
+`@PreAuthorize`, `@PostAuthorize`, `@PreFilter` và `@PostFilter` của Spring Security đi kèm với cơ chế hỗ trợ dựa trên expression phong phú.
 
 
 [[jc-reactive-method-security-custom-granted-authority-defaults]]
-Ngoài ra, đối với authorization dựa trên role, Spring Security thêm prefix `ROLE_` mặc định, được sử dụng khi đánh giá các expression như `hasRole`.
+Ngoài ra, đối với authorization dựa trên role, Spring Security thêm prefix `ROLE_` mặc định, được sử dụng khi evaluate các expression như `hasRole`.
 Bạn có thể cấu hình các quy tắc authorization để sử dụng prefix khác bằng cách expose một bean `GrantedAuthorityDefaults`, như sau:
 
 .GrantedAuthorityDefaults tùy chỉnh
@@ -169,21 +169,21 @@ static GrantedAuthorityDefaults grantedAuthorityDefaults() {
 
 [TIP]
 ====
-Chúng ta expose `GrantedAuthorityDefaults` bằng một method `static` để đảm bảo Spring publish nó trước khi khởi tạo các class `@Configuration` cho method security của Spring Security.
+Chúng ta expose `GrantedAuthorityDefaults` bằng một `static` method để đảm bảo Spring publish nó trước khi khởi tạo các class `@Configuration` cho method security của Spring Security.
 Vì bean `GrantedAuthorityDefaults` là một phần trong hoạt động nội bộ của Spring Security, chúng ta cũng nên expose nó dưới dạng infrastructural bean để tránh một số cảnh báo liên quan đến bean post-processing (xem https://github.com/spring-projects/spring-security/issues/14751[gh-14751]).
 ====
 
 [[use-programmatic-authorization]]
-== Thực hiện authorization cho method bằng lập trình
+== Authorization cho method bằng code
 
 Như đã thấy, có một số cách để bạn chỉ định các quy tắc authorization phức tạp bằng cách sử dụng xref:servlet/authorization/method-security.adoc#authorization-expressions[SpEL expression cho method security].
 
-Thay vào đó, có một số cách để bạn triển khai logic bằng Java thay vì bằng SpEL.
-Điều này cho phép bạn sử dụng toàn bộ ngôn ngữ Java để tăng khả năng test và kiểm soát flow.
+Bạn cũng có thể triển khai logic bằng Java thay vì bằng SpEL theo một số cách.
+Điều này cho phép bạn sử dụng đầy đủ ngôn ngữ Java để tăng khả năng test và kiểm soát flow.
 
 === Sử dụng bean tùy chỉnh trong SpEL
 
-Cách đầu tiên để thực hiện authorization cho method bằng lập trình là một quy trình gồm hai bước.
+Cách đầu tiên để thực hiện authorization cho method bằng code là một quy trình gồm hai bước.
 
 Trước tiên, khai báo một bean có method nhận một instance `MethodSecurityExpressionOperations` như sau:
 
@@ -247,10 +247,10 @@ open class MyController {
 ----
 ======
 
-Spring Security sẽ gọi method được chỉ định trên bean đó cho mỗi lần gọi method.
+Spring Security sẽ gọi method đã chỉ định trên bean đó cho mỗi lần gọi method.
 
 Ưu điểm của cách này là toàn bộ logic authorization của bạn nằm trong một class riêng, có thể được unit test độc lập và kiểm tra tính chính xác.
-Logic đó cũng có quyền truy cập vào toàn bộ ngôn ngữ Java.
+Logic đó cũng có thể sử dụng đầy đủ ngôn ngữ Java.
 
 [TIP]
 Ngoài việc trả về `Mono<Boolean>`, bạn cũng có thể trả về `Mono.empty()` để cho biết code không đưa ra quyết định.
@@ -286,7 +286,7 @@ open class AuthorizationLogic {
 ----
 ======
 
-Hoặc ném một instance `AuthorizationDeniedException` tùy chỉnh.
+Hoặc throw một instance `AuthorizationDeniedException` tùy chỉnh.
 Tuy nhiên, nên trả về một object hơn vì cách này không phát sinh chi phí tạo stacktrace.
 
 Sau đó, bạn có thể truy cập các detail tùy chỉnh khi xref:servlet/authorization/method-security.adoc#fallback-values-authorization-denied[tùy chỉnh cách xử lý kết quả authorization].
@@ -295,9 +295,9 @@ Sau đó, bạn có thể truy cập các detail tùy chỉnh khi xref:servlet/a
 [[custom-authorization-managers]]
 === Sử dụng AuthorizationManager tùy chỉnh
 
-Cách thứ hai để thực hiện authorization cho method bằng lập trình là tạo một xref:servlet/authorization/architecture.adoc#_the_authorizationmanager[`AuthorizationManager`] tùy chỉnh.
+Cách thứ hai để thực hiện authorization cho method bằng code là tạo một xref:servlet/authorization/architecture.adoc#_the_authorizationmanager[`AuthorizationManager`] tùy chỉnh.
 
-Trước tiên, khai báo một instance authorization manager, chẳng hạn như instance sau:
+Trước tiên, khai báo một instance của authorization manager, chẳng hạn như instance sau:
 
 [tabs]
 ======
@@ -380,7 +380,7 @@ class MethodSecurityConfig {
 
 [TIP]
 ====
-Bạn có thể đặt interceptor của mình giữa các method interceptor của Spring Security bằng cách sử dụng các hằng số order được chỉ định trong `AuthorizationInterceptorsOrder`.
+Bạn có thể đặt interceptor của mình giữa các method interceptor của Spring Security bằng cách sử dụng các hằng số `order` được chỉ định trong `AuthorizationInterceptorsOrder`.
 ====
 
 [[customizing-expression-handling]]
@@ -421,7 +421,7 @@ companion object {
 
 [TIP]
 ====
-Chúng ta expose `MethodSecurityExpressionHandler` bằng một method `static` để đảm bảo Spring publish nó trước khi khởi tạo các class `@Configuration` cho method security của Spring Security.
+Chúng ta expose `MethodSecurityExpressionHandler` bằng một `static` method để đảm bảo Spring publish nó trước khi khởi tạo các class `@Configuration` cho method security của Spring Security.
 ====
 
 Bạn cũng có thể subclass xref:servlet/authorization/method-security.adoc#subclass-defaultmethodsecurityexpressionhandler[`DefaultMessageSecurityExpressionHandler`] để thêm các authorization expression tùy chỉnh của riêng mình ngoài những expression mặc định.
@@ -489,7 +489,7 @@ fun findMessageByUsername(username: String): Mono<String> {
 ----
 ======
 
-Cấu hình method security tối thiểu sau đây cấu hình method security trong các ứng dụng reactive:
+Cấu hình tối thiểu sau đây bật method security trong các ứng dụng reactive:
 
 [tabs]
 ======

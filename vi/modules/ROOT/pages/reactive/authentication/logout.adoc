@@ -1,7 +1,7 @@
 [[reactive-logout]]
 = Logout
 
-Spring Security cung cấp endpoint logout theo mặc định.
+Spring Security cung cấp một endpoint logout theo mặc định.
 Sau khi đăng nhập, bạn có thể `GET /logout` để xem trang xác nhận logout mặc định hoặc `POST /logout` để bắt đầu logout.
 Điều này sẽ:
 

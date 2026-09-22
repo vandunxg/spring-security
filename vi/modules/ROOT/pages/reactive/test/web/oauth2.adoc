@@ -58,7 +58,7 @@ fun foo(@AuthenticationPrincipal user: OidcUser): Mono<String> {
 Trong trường hợp đó, phần hỗ trợ kiểm thử của Spring Security rất hữu ích.
 
 [[webflux-testing-oidc-login]]
-== Kiểm thử đăng nhập OIDC
+== Kiểm thử OIDC Login
 
 Kiểm thử method được trình bày trong <<webflux-testing-oauth2,phần trước>> bằng `WebTestClient` yêu cầu mô phỏng một dạng grant flow nào đó với một authorization server.
 Đây là một nhiệm vụ khó khăn, đó là lý do Spring Security cung cấp phần hỗ trợ để loại bỏ boilerplate này.
@@ -295,9 +295,9 @@ client
 ======
 
 [[webflux-testing-oauth2-login]]
-== Kiểm thử đăng nhập OAuth 2.0
+== Kiểm thử OAuth 2.0 Login
 
-Tương tự <<webflux-testing-oidc-login,kiểm thử đăng nhập OIDC>>, việc kiểm thử đăng nhập OAuth 2.0 cũng có một thách thức tương tự: giả lập một grant flow.
+Tương tự <<webflux-testing-oidc-login,kiểm thử OIDC Login>>, việc kiểm thử OAuth 2.0 Login cũng có một thách thức tương tự: giả lập một grant flow.
 Vì vậy, Spring Security cũng có phần hỗ trợ kiểm thử cho các trường hợp không dùng OIDC.
 
 Giả sử chúng ta có một controller lấy user đã đăng nhập dưới dạng `OAuth2User`:
@@ -535,9 +535,9 @@ client
 ======
 
 [[webflux-testing-oauth2-client]]
-== Kiểm thử OAuth 2.0 Client
+== Kiểm thử OAuth 2.0 Clients
 
-Bất kể user của bạn authentication như thế nào, request đang được kiểm thử có thể sử dụng các token và client registration khác.
+Bất kể user của bạn được authenticated như thế nào, request đang được kiểm thử có thể sử dụng các token và client registration khác.
 Ví dụ, controller của bạn có thể dựa vào client credentials grant để lấy một token hoàn toàn không liên kết với user:
 
 [tabs]
@@ -573,7 +573,7 @@ fun foo(@RegisteredOAuth2AuthorizedClient("my-app") authorizedClient: OAuth2Auth
 ----
 ======
 
-Mô phỏng quá trình bắt tay này với authorization server có thể khá rườm rà.
+Mô phỏng handshake này với authorization server có thể khá rườm rà.
 Thay vào đó, bạn có thể sử dụng `SecurityMockServerConfigurers#oauth2Client` để thêm một `OAuth2AuthorizedClient` vào `ServerOAuth2AuthorizedClientRepository` giả lập:
 
 [tabs]
@@ -787,10 +787,10 @@ client
 ======
 
 [[webflux-testing-jwt]]
-== Kiểm thử JWT authentication
+== Kiểm thử JWT Authentication
 
 Để thực hiện một request đã được authorization trên resource server, bạn cần một bearer token.
-Nếu resource server của bạn được cấu hình cho JWT, bearer token cần được ký rồi mã hóa theo đặc tả JWT.
+Nếu resource server của bạn được cấu hình cho JWT, bearer token cần được ký rồi encode theo đặc tả JWT.
 Tất cả việc này có thể khá khó khăn, đặc biệt khi đó không phải là trọng tâm của kiểm thử.
 
 May mắn là có một số cách đơn giản giúp bạn vượt qua khó khăn này để các kiểm thử tập trung vào authorization thay vì biểu diễn bearer token.
@@ -820,7 +820,7 @@ client
 ----
 ======
 
-Ví dụ này tạo một `Jwt` giả lập và truyền nó qua mọi API authentication để các cơ chế authorization của bạn có thể kiểm tra nó.
+Ví dụ này tạo một `Jwt` giả lập và đưa nó qua các authentication API để các cơ chế authorization của bạn có thể kiểm tra nó.
 
 Theo mặc định, `JWT` được tạo có các đặc điểm sau:
 
@@ -835,7 +835,7 @@ Theo mặc định, `JWT` được tạo có các đặc điểm sau:
 }
 ----
 
-Nếu kiểm thử `Jwt` kết quả, nó sẽ đạt kiểm tra như sau:
+Nếu kiểm thử `Jwt` được tạo ra, nó sẽ đạt kiểm tra như sau:
 
 [tabs]
 ======
@@ -1034,7 +1034,7 @@ client
 Lưu ý rằng, thay cho các cách trên, bạn cũng có thể mock bean `ReactiveJwtDecoder` bằng annotation `@MockBean`.
 
 [[webflux-testing-opaque-token]]
-== Kiểm thử opaque token authentication
+== Kiểm thử Opaque Token Authentication
 
 Tương tự <<webflux-testing-jwt,JWT>>, opaque token yêu cầu một authorization server để xác minh tính hợp lệ, điều này có thể khiến việc kiểm thử khó khăn hơn.
 Để hỗ trợ việc đó, Spring Security có phần hỗ trợ kiểm thử cho opaque token.

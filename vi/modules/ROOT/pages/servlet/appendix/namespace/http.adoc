@@ -4,17 +4,17 @@
 [[nsa-debug]]
 == <debug>
 Cho phép hạ tầng debug của Spring Security.
-Tính năng này cung cấp thông tin debug dễ đọc (nhiều dòng) để giám sát các request đi vào các security filter.
-Thông tin này có thể bao gồm dữ liệu nhạy cảm, chẳng hạn như request parameter hoặc header, và chỉ nên được sử dụng trong môi trường phát triển.
+Tính năng này cung cấp thông tin debug dễ đọc (nhiều dòng) để giám sát các request đi vào security filter.
+Thông tin này có thể bao gồm dữ liệu nhạy cảm, chẳng hạn như request parameter hoặc header, vì vậy chỉ nên được sử dụng trong môi trường phát triển.
 
 [[nsa-http]]
 == <http>
-Nếu sử dụng một element `<http>` trong ứng dụng, một bean `FilterChainProxy` có tên "springSecurityFilterChain" sẽ được tạo và cấu hình trong element được dùng để xây dựng một filter chain bên trong
+Nếu sử dụng một element `<http>` trong ứng dụng, một bean `FilterChainProxy` có tên "springSecurityFilterChain" sẽ được tạo, và cấu hình trong element này được dùng để xây dựng một filter chain bên trong
 `FilterChainProxy`.
 Kể từ Spring Security 3.1, có thể sử dụng các element `http` bổ sung để thêm các filter chain khác footnote:[Xem pass:specialcharacters,macros[xref:servlet/configuration/xml-namespace.adoc#ns-web-xml[chương giới thiệu]] để biết cách thiết lập ánh xạ từ `web.xml` của bạn ].
-Một số filter cốt lõi luôn được tạo trong filter chain, còn các filter khác sẽ được thêm vào stack tùy thuộc vào các attribute và child element hiện diện.
+Một số filter cốt lõi luôn được tạo trong filter chain, còn các filter khác sẽ được thêm vào stack tùy thuộc vào các attribute và child element hiện có.
 Vị trí của các filter tiêu chuẩn là cố định (xem
-xref:servlet/configuration/xml-namespace.adoc#filter-stack[bảng thứ tự filter] trong phần giới thiệu namespace), loại bỏ một nguồn lỗi phổ biến của các phiên bản framework trước, khi người dùng phải cấu hình filter chain một cách tường minh trong
+xref:servlet/configuration/xml-namespace.adoc#filter-stack[bảng thứ tự filter] trong phần giới thiệu namespace), loại bỏ một nguồn lỗi phổ biến của các phiên bản framework trước, khi người dùng phải tự cấu hình filter chain trong
 bean `FilterChainProxy`.
 Tất nhiên, bạn vẫn có thể làm vậy nếu cần toàn quyền kiểm soát cấu hình.
 
@@ -26,7 +26,7 @@ Các filter này là cố định và không thể được thay thế bằng l�
 
 
 [[nsa-http-attributes]]
-=== Attribute của <http>
+=== Các attribute của <http>
 Các attribute trên element `<http>` kiểm soát một số thuộc tính của các filter cốt lõi.
 
 [[nsa-http-use-authorization-manager]]
@@ -35,17 +35,17 @@ Dùng API AuthorizationManager thay cho SecurityMetadataSource (mặc định l�
 
 [[nsa-http-authorization-manager-ref]]
 * **authorization-manager-ref**
-Dùng AuthorizationManager này thay vì suy ra một instance từ các element <intercept-url>
+Dùng AuthorizationManager này thay vì suy ra một instance từ các element `<intercept-url>`.
 
 [[nsa-http-access-decision-manager-ref]]
 * **access-decision-manager-ref**
-Attribute tùy chọn chỉ định ID của implementation `AccessDecisionManager` được dùng để authorization các HTTP request.
+Attribute tùy chọn chỉ định ID của implementation `AccessDecisionManager` được dùng để thực hiện authorization cho các HTTP request.
 Mặc định, một implementation `AffirmativeBased` được dùng cùng với `RoleVoter` và `AuthenticatedVoter`.
 
 
 [[nsa-http-authentication-manager-ref]]
 * **authentication-manager-ref**
-Tham chiếu đến `AuthenticationManager` được dùng cho `FilterChain` do element http này tạo ra.
+Tham chiếu đến `AuthenticationManager` được dùng cho `FilterChain` do element `<http>` này tạo ra.
 
 [[nsa-http-observation-registry-ref]]
 * **observation-registry-ref**
@@ -54,7 +54,7 @@ Tham chiếu đến `ObservationRegistry` được dùng cho `FilterChain` và c
 [[nsa-http-auto-config]]
 * **auto-config**
 Tự động đăng ký form login, BASIC authentication và logout service.
-Nếu đặt thành "true", tất cả capability này sẽ được thêm vào (dù bạn vẫn có thể tùy chỉnh cấu hình của từng capability bằng cách cung cấp element tương ứng).
+Nếu đặt thành "true", tất cả capability này sẽ được thêm vào (dù bạn vẫn có thể tùy chỉnh từng capability bằng cách cung cấp element tương ứng).
 Nếu không chỉ định, mặc định là "false".
 Không khuyến nghị sử dụng attribute này.
 Thay vào đó, hãy dùng các element cấu hình tường minh để tránh nhầm lẫn.
@@ -66,7 +66,7 @@ Kiểm soát mức độ chủ động khi các class Spring Security tạo HTTP
 Các tùy chọn gồm:
 
 ** `always` - Spring Security sẽ chủ động tạo session nếu session chưa tồn tại.
-** `ifRequired` - Spring Security chỉ tạo session khi session được yêu cầu (giá trị mặc định).
+** `ifRequired` - Spring Security chỉ tạo session khi session được yêu cầu (value mặc định).
 ** `never` - Spring Security không bao giờ tạo session, nhưng sẽ sử dụng session nếu ứng dụng tạo nó.
 ** `stateless` - Spring Security không tạo session và bỏ qua session khi lấy `Authentication` của Spring.
 
@@ -80,7 +80,7 @@ Mặc định là `true`.
 [[nsa-http-entry-point-ref]]
 * **entry-point-ref**
 Thông thường, `AuthenticationEntryPoint` được dùng sẽ được thiết lập tùy thuộc vào các authentication mechanism đã cấu hình.
-Attribute này cho phép ghi đè hành vi đó bằng cách định nghĩa một bean `AuthenticationEntryPoint` tùy chỉnh để khởi động quy trình authentication.
+Attribute này cho phép override hành vi đó bằng cách định nghĩa một bean `AuthenticationEntryPoint` tùy chỉnh để khởi động quy trình authentication.
 
 
 [[nsa-http-jaas-api-provision]]
@@ -108,7 +108,7 @@ Mặc định là `true`.
 
 [[nsa-http-pattern]]
 * **pattern**
-Việc định nghĩa pattern cho element <<nsa-http,http>> kiểm soát các request sẽ được filter qua danh sách filter mà element này định nghĩa.
+Việc định nghĩa pattern cho element <<nsa-http,http>> kiểm soát các request sẽ đi qua danh sách filter mà element này định nghĩa.
 Cách diễn giải phụ thuộc vào <<nsa-http-request-matcher,request-matcher>> đã cấu hình.
 Nếu không định nghĩa pattern, mọi request sẽ được match, vì vậy các pattern cụ thể nhất nên được khai báo trước.
 
@@ -120,8 +120,8 @@ Tương ứng với property `realmName` trên `BasicAuthenticationEntryPoint`.
 
 [[nsa-http-redirect-to-https-request-matcher-ref]]
 * **redirect-to-https-request-matcher-ref**
-Tham chiếu đến bean triển khai `RequestMatcher` để xác định request nào phải redirect đến HTTPS.
-Điều này hữu ích, chẳng hạn khi muốn chạy HTTP cục bộ và HTTPS trên production bằng request header.
+Tham chiếu đến bean triển khai `RequestMatcher` để xác định request nào phải được redirect đến HTTPS.
+Điều này hữu ích, chẳng hạn khi muốn chạy HTTP cục bộ và HTTPS trên production dựa trên request header.
 
 [[nsa-http-request-matcher]]
 * **request-matcher**
@@ -129,8 +129,8 @@ Tham chiếu đến bean triển khai `RequestMatcher` để xác định reques
 Các tùy chọn hiện tại là `mvc`, `ant`, `regex` và `ciRegex`, lần lượt tương ứng với Spring MVC, ant, regular-expression và regular-expression không phân biệt chữ hoa chữ thường.
 Một instance riêng được tạo cho mỗi element <<nsa-intercept-url,intercept-url>> bằng các attribute <<nsa-intercept-url-pattern,pattern>>, <<nsa-intercept-url-method,method>> và <<nsa-intercept-url-servlet-path,servlet-path>> của element đó.
 Mặc định, path được match bằng `PathPatternRequestMatcher`; tuy nhiên, regular expression được match bằng `RegexRequestMatcher`.
-Xem Javadoc của các class này để biết thêm chi tiết về chính xác cách thực hiện matching.
-MVC là strategy mặc định nếu Spring MVC có trong classpath; nếu không, các Ant path được sử dụng.
+Xem Javadoc của các class này để biết thêm chi tiết về cách matching.
+MVC là strategy mặc định nếu Spring MVC có trong classpath; nếu không, các Ant path sẽ được sử dụng.
 
 
 [[nsa-http-request-matcher-ref]]
@@ -142,7 +142,7 @@ Tham chiếu đến bean triển khai `RequestMatcher` để xác định có n�
 [[nsa-http-security]]
 * **security**
 Một request pattern có thể được ánh xạ đến một filter chain rỗng bằng cách đặt attribute này thành `none`.
-Không có security nào được áp dụng và không có feature nào của Spring Security khả dụng.
+Không áp dụng security và không có feature nào của Spring Security khả dụng.
 
 [[nsa-http-security-context-holder-strategy-ref]]
 * **security-context-repository-ref**
@@ -161,18 +161,18 @@ Cho phép inject `SecurityContextRepository` tùy chỉnh vào `SecurityContextP
 
 [[nsa-http-servlet-api-provision]]
 * **servlet-api-provision**
-Cung cấp các phiên bản security method của `HttpServletRequest` như `isUserInRole()` và `getPrincipal()`, được triển khai bằng cách thêm bean `SecurityContextHolderAwareRequestFilter` vào stack.
+Cung cấp các security method của `HttpServletRequest` như `isUserInRole()` và `getPrincipal()`, được triển khai bằng cách thêm bean `SecurityContextHolderAwareRequestFilter` vào stack.
 Mặc định là `true`.
 
 
 [[nsa-http-use-expressions]]
 * **use-expressions**
-Cho phép EL-expression trong attribute `access`, như được mô tả trong chương xref:servlet/authorization/authorize-http-requests.adoc#authorization-expressions[access-control dựa trên expression].
+Cho phép EL expression trong attribute `access`, như được mô tả trong chương xref:servlet/authorization/authorize-http-requests.adoc#authorization-expressions[access control dựa trên expression].
 Giá trị mặc định là true.
 
 
 [[nsa-http-children]]
-=== Child Element của <http>
+=== Các child element của <http>
 * <<nsa-access-denied-handler,access-denied-handler>>
 * <<nsa-anonymous,anonymous>>
 * <<nsa-cors,cors>>
@@ -215,7 +215,7 @@ Nội dung này được thảo luận chi tiết hơn trong phần về xref:se
 
 [[nsa-access-denied-handler-error-page]]
 * **error-page**
-Trang access denied mà authenticated user sẽ được redirect đến nếu họ request một trang mà họ không có authority để truy cập.
+Trang access denied mà authenticated user sẽ được redirect đến nếu họ request một trang mà họ không có authority truy cập.
 
 
 [[nsa-access-denied-handler-ref]]
@@ -231,7 +231,7 @@ Nếu có Spring MVC, hệ thống sẽ cố tra cứu `CorsConfigurationSource`
 
 [[nsa-cors-attributes]]
 === Attribute của <cors>
-Các attribute trên element `<cors>` kiểm soát element headers.
+Các attribute trên element `<cors>` kiểm soát các header.
 
 [[nsa-cors-ref]]
 * **ref**
@@ -248,9 +248,9 @@ Attribute tùy chọn chỉ định tên bean của `CorsConfigurationSource` đ
 
 [[nsa-headers]]
 == <headers>
-Element này cho phép cấu hình các header (security) bổ sung được gửi cùng response.
+Element này cho phép cấu hình các security header bổ sung được gửi cùng response.
 Element này giúp dễ dàng cấu hình một số header và cũng cho phép đặt header tùy chỉnh thông qua element <<nsa-header,header>>.
-Có thể tìm thêm thông tin trong phần xref:features/exploits/headers.adoc#headers[Security Header] của tài liệu tham chiếu.
+Có thể tìm thêm thông tin trong phần xref:features/exploits/headers.adoc#headers[Security Headers] của tài liệu tham chiếu.
 
 ** `Cache-Control`, `Pragma` và `Expires` - Có thể được đặt bằng element <<nsa-cache-control,cache-control>>.
 Điều này bảo đảm browser không cache các trang được bảo vệ.
@@ -259,9 +259,9 @@ Có thể tìm thêm thông tin trong phần xref:features/exploits/headers.adoc
 ** `X-Frame-Options` - Có thể được đặt bằng element <<nsa-frame-options,frame-options>>.
 Header https://en.wikipedia.org/wiki/Clickjacking#X-Frame-Options[X-Frame-Options] có thể được dùng để ngăn các cuộc tấn công clickjacking.
 ** `X-XSS-Protection` - Có thể được đặt bằng element <<nsa-xss-protection,xss-protection>>.
-Header https://en.wikipedia.org/wiki/Cross-site_scripting[X-XSS-Protection ] có thể được browser dùng để thực hiện kiểm soát cơ bản.
+Header https://en.wikipedia.org/wiki/Cross-site_scripting[X-XSS-Protection ] có thể được browser dùng để thực hiện một số kiểm tra cơ bản.
 ** `X-Content-Type-Options` - Có thể được đặt bằng element <<nsa-content-type-options,content-type-options>>.
-Header https://blogs.msdn.com/b/ie/archive/2008/09/02/ie8-security-part-vi-beta-2-update.aspx[X-Content-Type-Options] ngăn Internet Explorer thực hiện MIME-sniffing response khác với content-type đã khai báo.
+Header https://blogs.msdn.com/b/ie/archive/2008/09/02/ie8-security-part-vi-beta-2-update.aspx[X-Content-Type-Options] ngăn Internet Explorer thực hiện MIME sniffing đối với response, khiến response có content-type khác với content-type đã khai báo.
 Điều này cũng áp dụng cho Google Chrome khi download extension.
 ** `Public-Key-Pinning` hoặc `Public-Key-Pinning-Report-Only` - Có thể được đặt bằng element <<nsa-hpkp,hpkp>>.
 Điều này cho phép website HTTPS chống lại việc bị attacker giả mạo bằng các certificate cấp sai hoặc gian lận theo cách khác.
@@ -271,11 +271,11 @@ https://www.w3.org/TR/CSP2/[Content Security Policy (CSP)] là cơ chế mà web
 ** `Feature-Policy` - Có thể được đặt bằng element <<nsa-feature-policy,feature-policy>>, https://wicg.github.io/feature-policy/[Feature-Policy] là cơ chế cho phép web developer chọn lọc bật, tắt và sửa đổi hành vi của một số API và web feature trong browser.
 ** `Cross-Origin-Opener-Policy` - Có thể được đặt bằng element <<nsa-cross-origin-opener-policy,cross-origin-opener-policy>>, https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy[Cross-Origin-Opener-Policy] là cơ chế cho phép bảo đảm một top-level document không chia sẻ browsing context group với cross-origin document.
 ** `Cross-Origin-Embedder-Policy` - Có thể được đặt bằng element <<nsa-cross-origin-embedder-policy,cross-origin-embedder-policy>>, https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy[Cross-Origin-Embedder-Policy] là cơ chế ngăn document tải các cross-origin resource không cấp quyền rõ ràng cho document.
-** `Cross-Origin-Resource-Policy` - Có thể được đặt bằng element <<nsa-cross-origin-resource-policy,cross-origin-resource-policy>>, https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Resource-Policy[Cross-Origin-Resource-Policy] là cơ chế thể hiện mong muốn browser chặn các request cross-origin/cross-site không có CORS đến resource được chỉ định.
+** `Cross-Origin-Resource-Policy` - Có thể được đặt bằng element <<nsa-cross-origin-resource-policy,cross-origin-resource-policy>>, https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Resource-Policy[Cross-Origin-Resource-Policy] là cơ chế cho phép browser chặn các no-cors request cross-origin/cross-site đến resource được chỉ định.
 
 [[nsa-headers-attributes]]
 === Attribute của <headers>
-Các attribute trên element `<headers>` kiểm soát element headers.
+Các attribute trên element `<headers>` kiểm soát các header.
 
 
 [[nsa-headers-defaults-disabled]]
@@ -581,7 +581,7 @@ Không bao gồm header để bảo vệ trước https://en.wikipedia.org/wiki/
 
 [[nsa-xss-protection-header-value]]
 * **xss-protection-header-value**
-Đặt tường minh value cho header https://en.wikipedia.org/wiki/Cross-site_scripting#Non-Persistent[reflected / Type-1 Cross-Site Scripting (XSS)].
+Đặt value một cách tường minh cho header https://en.wikipedia.org/wiki/Cross-site_scripting#Non-Persistent[reflected / Type-1 Cross-Site Scripting (XSS)].
 Một trong các giá trị: "0", "1", "1; mode=block". Mặc định là "0".
 
 
@@ -594,8 +594,8 @@ Một trong các giá trị: "0", "1", "1; mode=block". Mặc định là "0".
 
 [[nsa-content-type-options]]
 == <content-type-options>
-Thêm header X-Content-Type-Options với value nosniff vào response.
-Điều này https://blogs.msdn.com/b/ie/archive/2008/09/02/ie8-security-part-vi-beta-2-update.aspx[tắt MIME-sniffing] cho IE8+ và Chrome extension.
+Thêm header X-Content-Type-Options với value `nosniff` vào response.
+Điều này https://blogs.msdn.com/b/ie/archive/2008/09/02/ie8-security-part-vi-beta-2-update.aspx[tắt MIME sniffing] cho IE8+ và Chrome extension.
 
 
 [[nsa-content-type-options-attributes]]
@@ -726,7 +726,7 @@ Cần thiết nếu bạn sử dụng attribute `IS_AUTHENTICATED_ANONYMOUSLY`.
 
 [[nsa-anonymous-enabled]]
 * **enabled**
-Với thiết lập namespace mặc định, facility "authentication" anonymous được tự động bật.
+Với thiết lập namespace mặc định, facility anonymous authentication được tự động bật.
 Bạn có thể tắt facility này bằng property.
 
 
@@ -754,8 +754,8 @@ Nếu không đặt, mặc định là `anonymousUser`.
 
 [[nsa-csrf]]
 == <csrf>
-Element này sẽ thêm cơ chế bảo vệ https://en.wikipedia.org/wiki/Cross-site_request_forgery[Cross Site Request Forger (CSRF)] cho ứng dụng.
-Element này cũng cập nhật RequestCache mặc định để chỉ replay request "GET" sau khi authentication thành công.
+Element này sẽ thêm cơ chế bảo vệ https://en.wikipedia.org/wiki/Cross-site_request_forgery[Cross Site Request Forgery (CSRF)] cho ứng dụng.
+Element này cũng cập nhật `RequestCache` mặc định để chỉ replay request "GET" sau khi authentication thành công.
 Có thể tìm thêm thông tin trong phần xref:features/exploits/csrf.adoc#csrf[Cross Site Request Forgery (CSRF)] của tài liệu tham chiếu.
 
 
@@ -774,7 +774,7 @@ Có thể tìm thêm thông tin trong phần xref:features/exploits/csrf.adoc#cs
 * **disabled**
 Attribute tùy chọn chỉ định việc tắt cơ chế bảo vệ CSRF của Spring Security.
 Mặc định là false (cơ chế bảo vệ CSRF được bật).
-Đặc biệt khuyến nghị giữ cơ chế bảo vệ CSRF được bật.
+Bạn nên giữ cơ chế bảo vệ CSRF được bật.
 
 [[nsa-csrf-token-repository-ref]]
 * **token-repository-ref**
@@ -794,7 +794,7 @@ Mặc định là mọi HTTP method ngoại trừ "GET", "TRACE", "HEAD", "OPTIO
 [[nsa-custom-filter]]
 == <custom-filter>
 Element này được dùng để thêm filter vào filter chain.
-Element này không tạo thêm bean nào mà dùng để chọn bean kiểu `jakarta.servlet.Filter` đã được định nghĩa trong application context và thêm bean đó vào một vị trí cụ thể trong filter chain do Spring Security duy trì.
+Element này không tạo thêm bean nào mà dùng để chọn bean kiểu `jakarta.servlet.Filter` đã được định nghĩa trong application context, rồi thêm bean đó vào một vị trí cụ thể trong filter chain do Spring Security duy trì.
 Có thể tìm đầy đủ chi tiết trong xref:servlet/configuration/xml-namespace.adoc#ns-custom-filters[ chương namespace].
 
 
@@ -956,7 +956,7 @@ Mặc định là "username".
 
 [[nsa-oauth2-login]]
 == <oauth2-login>
-Feature xref:servlet/oauth2/login/index.adoc#oauth2login[OAuth 2.0 Login] cấu hình hỗ trợ authentication bằng OAuth 2.0 và/hoặc OpenID Connect 1.0 Provider.
+Feature xref:servlet/oauth2/login/index.adoc#oauth2login[OAuth 2.0 Login] cho phép cấu hình hỗ trợ authentication bằng OAuth 2.0 và/hoặc OpenID Connect 1.0 Provider.
 
 
 [[nsa-oauth2-login-parents]]
@@ -1080,7 +1080,7 @@ Tham chiếu đến `OAuth2AuthorizedClientService`.
 
 [[nsa-authorization-code-grant]]
 == <authorization-code-grant>
-Cấu hình xref:servlet/oauth2/client/authorization-grants.adoc#oauth2Client-auth-grant-support[OAuth 2.0 Authorization Code Grant].
+Cấu hình hỗ trợ cho xref:servlet/oauth2/client/authorization-grants.adoc#oauth2Client-auth-grant-support[OAuth 2.0 Authorization Code Grant].
 
 
 [[nsa-authorization-code-grant-parents]]
@@ -1157,7 +1157,7 @@ Client secret.
 
 [[nsa-client-registration-client-authentication-method]]
 * **client-authentication-method**
-Method được dùng để authentication Client với Provider.
+Method được dùng để authenticate Client với Provider.
 Các value được hỗ trợ là *client_secret_basic*, *client_secret_post*, *private_key_jwt*, *client_secret_jwt* và *none* https://tools.ietf.org/html/rfc6749#section-2.1[(public clients)].
 
 
@@ -1169,12 +1169,12 @@ Các value được hỗ trợ là `authorization_code`, `client_credentials`, `
 
 [[nsa-client-registration-redirect-uri]]
 * **redirect-uri**
-Redirect URI đã đăng ký của client mà _Authorization Server_ redirect user-agent của end-user đến sau khi end-user đã authentication và authorization quyền truy cập client.
+Redirect URI đã đăng ký của client mà _Authorization Server_ redirect user-agent của end-user đến sau khi end-user đã được authenticate và authorize để truy cập client.
 
 
 [[nsa-client-registration-scope]]
 * **scope**
-Scope được client request trong flow Authorization Request, chẳng hạn openid, email hoặc profile.
+Scope được client request trong flow Authorization Request, chẳng hạn `openid`, `email` hoặc `profile`.
 
 
 [[nsa-client-registration-client-name]]
@@ -1235,7 +1235,7 @@ Tên attribute được trả về trong UserInfo Response, tham chiếu đến 
 
 [[nsa-provider-jwk-set-uri]]
 * **jwk-set-uri**
-URI được dùng để lấy https://tools.ietf.org/html/rfc7517[JSON Web Key (JWK)] Set từ Authorization Server; set này chứa các cryptographic key dùng để verify https://tools.ietf.org/html/rfc7515[JSON Web Signature (JWS)] của ID Token và tùy chọn UserInfo Response.
+URI được dùng để lấy https://tools.ietf.org/html/rfc7517[JSON Web Key (JWK)] Set từ Authorization Server; set này chứa các cryptographic key dùng để verify https://tools.ietf.org/html/rfc7515[JSON Web Signature (JWS)] của ID Token và tùy chọn verify UserInfo Response.
 
 
 [[nsa-provider-issuer-uri]]
@@ -1281,7 +1281,7 @@ Không thể dùng cùng với `bearer-token-resolver-ref`.
 
 [[nsa-jwt]]
 == <jwt>
-Đại diện cho OAuth 2.0 Resource Server sẽ authorization JWT.
+Đại diện cho OAuth 2.0 Resource Server sẽ thực hiện authorization cho JWT.
 
 
 [[nsa-jwt-parents]]
@@ -1307,7 +1307,7 @@ JWK Set Uri được dùng để tải signing verification key từ OAuth 2.0 A
 
 [[nsa-opaque-token]]
 == <opaque-token>
-Đại diện cho OAuth 2.0 Resource Server sẽ authorization opaque token.
+Đại diện cho OAuth 2.0 Resource Server sẽ thực hiện authorization cho opaque token.
 
 [[nsa-opaque-token-parents]]
 === Parent Element của <opaque-token>
@@ -1323,7 +1323,7 @@ Tham chiếu đến `OpaqueTokenIntrospector`. Đây là component ở mức cao
 
 [[nsa-opaque-token-introspection-uri]]
 * **introspection-uri**
-Introspection Uri được dùng để introspect thông tin của opaque token. Phải đi kèm `client-id` và `client-secret`.
+Introspection URI được dùng để introspect thông tin của opaque token. Phải đi kèm `client-id` và `client-secret`.
 
 [[nsa-opaque-token-client-id]]
 * **client-id**
@@ -1386,17 +1386,17 @@ https://www.oasis-open.org/committees/download.php/51890/SAML%20MD%20simplified%
 
 [[nsa-relying-party-registration-assertion-consumer-service-location]]
 * **assertion-consumer-service-location**
-Vị trí AssertionConsumerService. Tương đương với value trong `&lt;AssertionConsumerService Location="..."/&gt;` của `&lt;SPSSODescriptor&gt;` của relying party.
+Location của AssertionConsumerService. Tương đương với value trong `&lt;AssertionConsumerService Location="..."/&gt;` của `&lt;SPSSODescriptor&gt;` của relying party.
 
 
 [[nsa-relying-party-registration-assertion-consumer-service-binding]]
 * **assertion-consumer-service-binding**
-Binding AssertionConsumerService. Tương đương với value trong `&lt;AssertionConsumerService Binding="..."/&gt;` của `&lt;SPSSODescriptor&gt;` của relying party.
+Binding của AssertionConsumerService. Tương đương với value trong `&lt;AssertionConsumerService Binding="..."/&gt;` của `&lt;SPSSODescriptor&gt;` của relying party.
 Các value được hỗ trợ là *POST* và *REDIRECT*.
 
 [[nsa-relying-party-registration-single-logout-service-location]]
 * **single-logout-service-location**
-Vị trí SingleLogoutService. Tương đương với value trong &lt;SingleLogoutService Location="..."/&gt; của &lt;SPSSODescriptor&gt; của relying party.
+Location của SingleLogoutService. Tương đương với value trong &lt;SingleLogoutService Location="..."/&gt; của &lt;SPSSODescriptor&gt; của relying party.
 
 [[nsa-relying-party-registration-single-logout-service-response-location]]
 * **single-logout-service-response-location**
@@ -1420,7 +1420,7 @@ Tham chiếu đến asserting party liên kết. Phải tham chiếu đến elem
 
 [[nsa-decryption-credential]]
 == <decryption-credential>
-Decryption credential liên kết với relying party.
+Decryption credential được liên kết với relying party.
 
 
 [[nsa-decryption-credential-parents]]
@@ -1444,7 +1444,7 @@ Vị trí lấy private key của Relying Party.
 
 [[nsa-signing-credential]]
 == <signing-credential>
-Signing credential liên kết với relying party.
+Signing credential được liên kết với relying party.
 
 
 [[nsa-signing-credential-parents]]
@@ -1494,7 +1494,7 @@ EntityID của Asserting Party.
 
 [[nsa-asserting-party-want-authn-requests-signed]]
 * **want-authn-requests-signed**
-Thiết lập `WantAuthnRequestsSigned`, cho biết preference của asserting party rằng relying party nên ký `AuthnRequest` trước khi gửi.
+Thiết lập `WantAuthnRequestsSigned`, cho biết asserting party muốn relying party ký `AuthnRequest` trước khi gửi.
 
 
 [[nsa-asserting-party-single-sign-on-service-location]]
@@ -1510,12 +1510,12 @@ Các value được hỗ trợ là *POST* và *REDIRECT*.
 
 [[nsa-asserting-party-signing-algorithms]]
 * **signing-algorithms**
-Danh sách Algorithm `org.opensaml.saml.ext.saml2alg.SigningMethod` cho asserting party này, theo thứ tự preference.
+Danh sách algorithm `org.opensaml.saml.ext.saml2alg.SigningMethod` cho asserting party này, theo thứ tự ưu tiên.
 
 
 [[nsa-asserting-party-single-logout-service-location]]
 * **single-logout-service-location**
-Vị trí SingleLogoutService. Tương đương với value trong &lt;SingleLogoutService Location="..."/&gt; của &lt;IDPSSODescriptor&gt; của asserting party.
+Location của SingleLogoutService. Tương đương với value trong &lt;SingleLogoutService Location="..."/&gt; của &lt;IDPSSODescriptor&gt; của asserting party.
 
 
 [[nsa-asserting-party-single-logout-service-response-location]]
@@ -1588,7 +1588,7 @@ Vị trí lấy private key của Relying Party.
 [[nsa-http-basic]]
 == <http-basic>
 Thêm `BasicAuthenticationFilter` và `BasicAuthenticationEntryPoint` vào cấu hình.
-`BasicAuthenticationEntryPoint` chỉ được dùng làm configuration entry point nếu form-based login không được bật.
+`BasicAuthenticationEntryPoint` chỉ được dùng làm entry point của cấu hình nếu form-based login không được bật.
 
 
 [[nsa-http-basic-parents]]
@@ -1633,7 +1633,7 @@ Implementation mặc định phù hợp với hầu hết ứng dụng.
 Element này được dùng để định nghĩa tập URL pattern mà ứng dụng quan tâm và cấu hình cách xử lý chúng.
 Element này được dùng để xây dựng `FilterInvocationSecurityMetadataSource` mà `FilterSecurityInterceptor` sử dụng.
 Element này cũng chịu trách nhiệm cấu hình `ChannelProcessingFilter` nếu, chẳng hạn, một số URL cần được truy cập bằng HTTPS.
-Khi match pattern đã chỉ định với request đi vào, việc matching được thực hiện theo thứ tự khai báo các element.
+Khi match các pattern đã chỉ định với request đi vào, việc matching được thực hiện theo thứ tự khai báo các element.
 Vì vậy, pattern cụ thể nhất nên đứng trước và pattern tổng quát nhất đứng sau cùng.
 
 
@@ -1658,7 +1658,7 @@ Liệt kê các access attribute sẽ được lưu trong `FilterInvocationSecur
 
 [[nsa-intercept-url-method]]
 * **method**
-HTTP Method được dùng kết hợp với pattern và servlet path (tùy chọn) để match request đi vào.
+HTTP method được dùng kết hợp với pattern và servlet path (tùy chọn) để match request đi vào.
 Nếu bỏ qua, mọi method đều match.
 Nếu một pattern giống hệt được chỉ định cả có method và không có method, match cụ thể theo method sẽ được ưu tiên.
 
@@ -1666,7 +1666,7 @@ Nếu một pattern giống hệt được chỉ định cả có method và kh�
 [[nsa-intercept-url-pattern]]
 * **pattern**
 Pattern định nghĩa URL path.
-Nội dung phụ thuộc vào attribute `request-matcher` của element http chứa nó, vì vậy sẽ mặc định dùng MVC matcher nếu Spring MVC có trong classpath.
+Nội dung phụ thuộc vào attribute `request-matcher` của element `<http>` chứa nó, vì vậy sẽ mặc định dùng MVC matcher nếu Spring MVC có trong classpath.
 
 
 [[nsa-intercept-url-request-matcher-ref]]
@@ -1680,7 +1680,7 @@ Có thể là "http" hoặc "https", tùy thuộc vào việc URL pattern cụ t
 Ngoài ra, có thể dùng value "any" khi không có preference.
 Nếu attribute này xuất hiện trên bất kỳ element `<intercept-url>` nào, một `ChannelProcessingFilter` sẽ được thêm vào filter stack và các dependency bổ sung của nó được thêm vào application context.
 
-Nếu thêm cấu hình `<port-mappings>`, cấu hình này sẽ được các bean `SecureChannelProcessor` và `InsecureChannelProcessor` sử dụng để xác định port dùng khi redirect đến HTTP/HTTPS.
+Nếu thêm cấu hình `<port-mappings>`, cấu hình này sẽ được các bean `SecureChannelProcessor` và `InsecureChannelProcessor` sử dụng để xác định port dùng khi redirect sang HTTP/HTTPS.
 
 NOTE: Property này không hợp lệ với <<nsa-filter-security-metadata-source,filter-security-metadata-source>>
 
@@ -1717,7 +1717,7 @@ Danh sách role phân tách bằng dấu phẩy cần tìm trong HttpServletRequ
 
 [[nsa-jee-user-service-ref]]
 * **user-service-ref**
-Tham chiếu đến Id của user-service (hoặc UserDetailsService bean).
+Tham chiếu đến ID của user-service (hoặc `UserDetailsService` bean).
 
 
 [[nsa-logout]]
@@ -1757,7 +1757,7 @@ Mặc định là <form-login-login-page>/?logout (tức là /login?logout).
 +
 
 Đặt attribute này sẽ inject `SimpleRedirectInvalidSessionStrategy` được cấu hình bằng value của attribute vào `SessionManagementFilter`.
-Khi một session ID không hợp lệ được gửi, strategy sẽ được invoke và redirect đến URL đã cấu hình.
+Khi một session ID không hợp lệ được gửi, strategy sẽ được gọi và redirect đến URL đã cấu hình.
 
 
 [[nsa-logout-logout-url]]
@@ -1768,12 +1768,12 @@ Mặc định là "/logout".
 
 [[nsa-logout-success-handler-ref]]
 * **success-handler-ref**
-Có thể dùng để cung cấp instance `LogoutSuccessHandler`, được invoke để kiểm soát điều hướng sau khi logout.
+Có thể dùng để cung cấp instance `LogoutSuccessHandler`, được gọi để kiểm soát điều hướng sau khi logout.
 
 
 [[nsa-saml2-login]]
 == <saml2-login>
-Feature xref:servlet/saml2/login/index.adoc#servlet-saml2login[SAML 2.0 Login] cấu hình hỗ trợ authentication bằng SAML 2.0 Service Provider.
+Feature xref:servlet/saml2/login/index.adoc#servlet-saml2login[SAML 2.0 Login] cho phép cấu hình hỗ trợ authentication bằng SAML 2.0 Service Provider.
 
 
 [[nsa-saml2-login-parents]]
@@ -1933,7 +1933,7 @@ Có thể tìm ví dụ ghi đè các mapping này trong xref:servlet/exploits/h
 
 [[nsa-port-mapping]]
 == <port-mapping>
-Cung cấp phương thức ánh xạ http port đến https port khi buộc redirect.
+Cung cấp cách map http port sang https port khi buộc redirect.
 
 
 [[nsa-port-mapping-parents]]
@@ -1955,7 +1955,7 @@ Http port cần dùng.
 
 [[nsa-port-mapping-https]]
 * **https**
-Https port cần dùng.
+HTTPS port cần dùng.
 
 
 [[nsa-remember-me]]
@@ -1990,7 +1990,7 @@ Nếu được đặt, `PersistentTokenBasedRememberMeServices` sẽ được d�
 
 [[nsa-remember-me-remember-me-parameter]]
 * **remember-me-parameter**
-Tên request parameter bật/tắt remember-me authentication.
+Tên request parameter bật hoặc tắt remember-me authentication.
 Mặc định là "remember-me".
 Ánh xạ đến property "parameter" của `AbstractRememberMeServices`.
 
@@ -2054,7 +2054,7 @@ Nếu có nhiều instance, bạn có thể chỉ định tường minh bean `id
 
 [[nsa-request-cache]]
 == Element <request-cache>
-Thiết lập instance `RequestCache` mà `ExceptionTranslationFilter` dùng để lưu thông tin request trước khi invoke `AuthenticationEntryPoint`.
+Thiết lập instance `RequestCache` mà `ExceptionTranslationFilter` dùng để lưu thông tin request trước khi gọi `AuthenticationEntryPoint`.
 
 
 [[nsa-request-cache-parents]]
@@ -2073,7 +2073,7 @@ Thiết lập instance `RequestCache` mà `ExceptionTranslationFilter` dùng đ�
 
 [[nsa-session-management]]
 == <session-management>
-Chức năng liên quan đến session-management được triển khai bằng cách thêm `SessionManagementFilter` vào filter stack.
+Chức năng liên quan đến session management được triển khai bằng cách thêm `SessionManagementFilter` vào filter stack.
 
 
 [[nsa-session-management-parents]]
@@ -2090,7 +2090,7 @@ Chức năng liên quan đến session-management được triển khai bằng c
 
 [[nsa-session-management-authentication-strategy-explicit-invocation]]
 * **authentication-strategy-explicit-invocation**
-Đặt attribute này thành true nghĩa là `SessionManagementFilter` sẽ không được inject và bắt buộc phải invoke tường minh SessionAuthenticationStrategy.
+Đặt attribute này thành true nghĩa là `SessionManagementFilter` sẽ không được inject và bắt buộc phải gọi `SessionAuthenticationStrategy` một cách tường minh.
 
 [[nsa-session-management-invalid-session-url]]
 * **invalid-session-url**
@@ -2099,24 +2099,24 @@ Khi một session ID không hợp lệ được gửi, strategy sẽ được in
 
 [[nsa-session-management-invalid-session-strategy-ref]]
 * **invalid-session-url**
-Cho phép inject instance InvalidSessionStrategy được SessionManagementFilter sử dụng.
+Cho phép inject instance `InvalidSessionStrategy` được `SessionManagementFilter` sử dụng.
 Dùng attribute này hoặc `invalid-session-url`, không dùng cả hai.
 
 [[nsa-session-management-session-authentication-error-url]]
 * **session-authentication-error-url**
-Định nghĩa URL của error page sẽ được hiển thị khi SessionAuthenticationStrategy ném exception.
+Định nghĩa URL của error page sẽ được hiển thị khi `SessionAuthenticationStrategy` ném exception.
 Nếu không đặt, error code unauthorized (401) sẽ được trả về client.
 Lưu ý attribute này không áp dụng nếu lỗi xảy ra trong form-based login, khi đó URL cho authentication failure sẽ được ưu tiên.
 
 
 [[nsa-session-management-session-authentication-strategy-ref]]
 * **session-authentication-strategy-ref**
-Cho phép inject instance SessionAuthenticationStrategy được SessionManagementFilter sử dụng.
+Cho phép inject instance `SessionAuthenticationStrategy` được `SessionManagementFilter` sử dụng.
 
 
 [[nsa-session-management-session-fixation-protection]]
 * **session-fixation-protection**
-Cho biết cách áp dụng cơ chế bảo vệ session fixation khi user authentication.
+Cho biết cách áp dụng cơ chế bảo vệ session fixation khi user authenticate.
 Nếu đặt thành "none", không áp dụng cơ chế bảo vệ.
 "newSession" tạo session rỗng mới, chỉ migrate các attribute liên quan đến Spring Security.
 "migrateSession" tạo session mới và copy toàn bộ session attribute sang session mới.
@@ -2160,13 +2160,13 @@ Một instance `SessionRegistry` (instance `SessionRegistryImpl`, trừ khi user
 
 [[nsa-concurrency-control-error-if-maximum-exceeded]]
 * **error-if-maximum-exceeded**
-Nếu đặt thành "true", `SessionAuthenticationException` sẽ được ném khi user cố vượt quá số session tối đa cho phép.
+Nếu đặt thành "true", `SessionAuthenticationException` sẽ được ném khi user cố vượt quá số session tối đa được phép.
 Hành vi mặc định là expire session ban đầu.
 
 
 [[nsa-concurrency-control-expired-url]]
 * **expired-url**
-URL mà user sẽ được redirect đến nếu cố sử dụng session đã bị concurrent session controller "expired" vì user vượt quá số session cho phép và đã login lại ở nơi khác.
+URL mà user sẽ được redirect đến nếu cố sử dụng session đã bị concurrent session controller "expired" vì user vượt quá số session được phép và đã login lại ở nơi khác.
 Nên được đặt trừ khi `exception-if-maximum-exceeded` được đặt.
 Nếu không cung cấp value, thông báo hết hạn sẽ được ghi trực tiếp vào response.
 
@@ -2237,7 +2237,7 @@ Nếu không đặt, hệ thống sẽ cố tự động tìm và sử dụng in
 
 [[nsa-filter-chain-map]]
 == <filter-chain-map>
-Được dùng để cấu hình tường minh một instance FilterChainProxy với FilterChainMap.
+Được dùng để cấu hình tường minh một instance `FilterChainProxy` với `FilterChainMap`.
 
 
 [[nsa-filter-chain-map-attributes]]
@@ -2260,7 +2260,7 @@ Các tùy chọn hiện tại là 'ant' (cho ant path pattern), 'regex' cho regu
 
 [[nsa-filter-chain]]
 == <filter-chain>
-Được dùng bên trong để định nghĩa URL pattern cụ thể và danh sách filter áp dụng cho các URL match pattern đó.
+Được dùng để định nghĩa URL pattern cụ thể và danh sách filter áp dụng cho các URL match pattern đó.
 Khi nhiều element filter-chain được tập hợp thành một danh sách để cấu hình FilterChainProxy, pattern cụ thể nhất phải được đặt ở đầu danh sách và pattern tổng quát nhất ở cuối.
 
 
@@ -2295,8 +2295,8 @@ Tham chiếu đến `RequestMatcher` được dùng để xác định có nên 
 [[nsa-filter-security-metadata-source]]
 == <filter-security-metadata-source>
 Được dùng để cấu hình tường minh bean FilterSecurityMetadataSource nhằm sử dụng với FilterSecurityInterceptor.
-Thông thường chỉ cần khi bạn cấu hình tường minh FilterChainProxy thay vì dùng element <http>.
-Các element intercept-url được dùng chỉ nên chứa attribute pattern, method và access.
+Thông thường chỉ cần khi bạn cấu hình tường minh `FilterChainProxy` thay vì dùng element `<http>`.
+Các element `<intercept-url>` được dùng chỉ nên chứa attribute pattern, method và access.
 Các attribute khác sẽ dẫn đến lỗi cấu hình.
 
 
@@ -2317,7 +2317,7 @@ Các tùy chọn hiện tại là 'ant' (cho ant path pattern), 'regex' cho regu
 
 [[nsa-filter-security-metadata-source-use-expressions]]
 * **use-expressions**
-Cho phép sử dụng expression trong attribute 'access' của các element <intercept-url> thay cho danh sách configuration attribute truyền thống.
+Cho phép sử dụng expression trong attribute `access` của các element `<intercept-url>` thay cho danh sách configuration attribute truyền thống.
 Mặc định là 'true'.
 Nếu được bật, mỗi attribute phải chứa một Boolean expression duy nhất.
 Nếu expression được đánh giá là 'true', quyền truy cập sẽ được cấp.

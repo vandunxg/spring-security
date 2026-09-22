@@ -1,5 +1,5 @@
 [[test-webtestclient]]
-= Kiểm thử bảo mật Web
+= Kiểm thử bảo mật web
 :page-section-summary-toc: 1
 
-Trong phần này, chúng ta sẽ trao đổi về việc kiểm thử các endpoint của ứng dụng web.
+Trong phần này, chúng ta sẽ thảo luận về việc kiểm thử các endpoint của ứng dụng web.

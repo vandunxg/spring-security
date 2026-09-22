@@ -1,11 +1,11 @@
 [[jc-logout]]
-= Xử lý Logout
+= Xử lý logout
 
-Trong một ứng dụng mà người dùng cuối có thể xref:servlet/authentication/index.adoc[đăng nhập], họ cũng nên có khả năng logout.
+Trong ứng dụng cho phép người dùng cuối xref:servlet/authentication/index.adoc[đăng nhập], họ cũng nên có thể logout.
 
-Theo mặc định, Spring Security thiết lập endpoint `/logout`, vì vậy không cần thêm code.
+Theo mặc định, Spring Security cung cấp endpoint `/logout`, vì vậy không cần thêm code.
 
-Phần còn lại của mục này trình bày một số trường hợp sử dụng mà bạn có thể cân nhắc:
+Phần còn lại của mục này trình bày một số use case mà bạn có thể cân nhắc:
 
 * Tôi muốn <<logout-java-configuration,hiểu kiến trúc của logout>>
 * Tôi muốn <<customizing-logout-uris,tùy chỉnh URI logout hoặc URI logout thành công>>
@@ -17,39 +17,39 @@ Phần còn lại của mục này trình bày một số trường hợp sử d
 
 [[logout-architecture]]
 [[logout-java-configuration]]
-== Tìm hiểu kiến trúc Logout
+== Tìm hiểu kiến trúc của logout
 
-Khi bạn thêm {spring-boot-reference-url}reference/using/build-systems.html#using.build-systems.starters[dependency `spring-boot-starter-security`] hoặc sử dụng annotation `@EnableWebSecurity`, Spring Security sẽ thêm hỗ trợ logout và theo mặc định phản hồi cả `GET /logout` lẫn `POST /logout`.
+Khi bạn include {spring-boot-reference-url}reference/using/build-systems.html#using.build-systems.starters[dependency `spring-boot-starter-security`] hoặc sử dụng annotation `@EnableWebSecurity`, Spring Security sẽ thêm hỗ trợ logout và theo mặc định xử lý cả `GET /logout` lẫn `POST /logout`.
 
-Nếu bạn yêu cầu `GET /logout`, Spring Security sẽ hiển thị trang xác nhận logout.
-Ngoài việc cung cấp một cơ chế kiểm tra lại hữu ích cho người dùng, trang này còn cung cấp một cách đơn giản để cung cấp xref:servlet/exploits/csrf.adoc[CSRF token cần thiết] cho `POST /logout`.
+Nếu bạn gửi request `GET /logout`, Spring Security sẽ hiển thị trang xác nhận logout.
+Ngoài việc cung cấp cơ chế xác nhận lại hữu ích cho người dùng, trang này còn cung cấp cách đơn giản để cung cấp xref:servlet/exploits/csrf.adoc[CSRF token cần thiết] cho `POST /logout`.
 
-Lưu ý rằng nếu xref:servlet/exploits/csrf.adoc[CSRF protection] bị vô hiệu hóa trong cấu hình, không có trang xác nhận logout nào được hiển thị cho người dùng và logout được thực hiện trực tiếp.
+Lưu ý rằng nếu xref:servlet/exploits/csrf.adoc[CSRF protection] bị vô hiệu hóa trong config, Spring Security sẽ không hiển thị trang xác nhận logout mà thực hiện logout trực tiếp.
 
 [TIP]
-Trong ứng dụng của bạn, không bắt buộc phải sử dụng `GET /logout` để thực hiện logout.
-Miễn là xref:servlet/exploits/csrf.adoc[CSRF token cần thiết] có trong request, ứng dụng của bạn có thể chỉ cần gửi `POST /logout` để thực hiện logout.
+Trong ứng dụng của bạn, không cần sử dụng `GET /logout` để thực hiện logout.
+Miễn là xref:servlet/exploits/csrf.adoc[CSRF token cần thiết] có trong request, ứng dụng của bạn chỉ cần gửi `POST /logout` để thực hiện logout.
 
-Nếu bạn yêu cầu `POST /logout`, nó sẽ thực hiện các thao tác mặc định sau bằng cách sử dụng một loạt instance javadoc:org.springframework.security.web.authentication.logout.LogoutHandler[]:
+Nếu bạn gửi request `POST /logout`, request này sẽ thực hiện các thao tác mặc định sau thông qua một loạt instance javadoc:org.springframework.security.web.authentication.logout.LogoutHandler[]:
 
 - Vô hiệu hóa HTTP session (javadoc:org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler[])
 - Xóa xref:servlet/authentication/session-management.adoc#use-securitycontextholderstrategy[`SecurityContextHolderStrategy`] (javadoc:org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler[])
 - Xóa xref:servlet/authentication/persistence.adoc#securitycontextrepository[`SecurityContextRepository`] (javadoc:org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler[])
-- Dọn dẹp mọi xref:servlet/authentication/rememberme.adoc[RememberMe authentication] (`TokenRememberMeServices` / `PersistentTokenRememberMeServices`)
+- Dọn dẹp mọi xref:servlet/authentication/rememberme.adoc[authentication bằng RememberMe] (`TokenRememberMeServices` / `PersistentTokenRememberMeServices`)
 - Xóa mọi xref:servlet/exploits/csrf.adoc[CSRF token] đã lưu (javadoc:org.springframework.security.web.csrf.CsrfLogoutHandler[])
-- xref:servlet/authentication/events.adoc[Phát] một `LogoutSuccessEvent` (javadoc:org.springframework.security.web.authentication.logout.LogoutSuccessEventPublishingLogoutHandler[])
+- xref:servlet/authentication/events.adoc[Phát] event `LogoutSuccessEvent` (javadoc:org.springframework.security.web.authentication.logout.LogoutSuccessEventPublishingLogoutHandler[])
 
-Sau khi hoàn tất, nó sẽ sử dụng javadoc:org.springframework.security.web.authentication.logout.LogoutSuccessHandler[] mặc định, handler này redirect đến `/login?logout`.
+Sau khi hoàn tất, nó sẽ gọi javadoc:org.springframework.security.web.authentication.logout.LogoutSuccessHandler[] mặc định để redirect đến `/login?logout`.
 
 [[customizing-logout-uris]]
-== Tùy chỉnh URI Logout
+== Tùy chỉnh URI logout
 
 Vì `LogoutFilter` xuất hiện trước xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] trong xref:servlet/architecture.adoc#servlet-filterchain-figure[filter chain], theo mặc định không cần cho phép rõ ràng endpoint `/logout`.
-Do đó, nhìn chung chỉ các <<permit-logout-endpoints,endpoint logout tùy chỉnh>> do bạn tự tạo mới cần cấu hình `permitAll` để có thể truy cập.
+Do đó, nhìn chung chỉ <<permit-logout-endpoints,endpoint logout tùy chỉnh>> do bạn tự tạo mới cần cấu hình `permitAll` để có thể truy cập.
 
-Ví dụ, nếu bạn chỉ muốn thay đổi URI mà Spring Security đang match, bạn có thể thực hiện trong DSL `logout` như sau:
+Ví dụ, nếu chỉ muốn thay đổi URI mà Spring Security đang match, bạn có thể thực hiện việc này trong DSL `logout` như sau:
 
-.URI Logout tùy chỉnh
+.URI logout tùy chỉnh
 [tabs]
 ======
 Java::
@@ -79,17 +79,17 @@ Xml::
 ----
 ======
 
-và không cần thay đổi authorization vì thao tác này chỉ điều chỉnh `LogoutFilter`.
+và không cần thay đổi authorization vì việc này chỉ điều chỉnh `LogoutFilter`.
 
 [NOTE]
 ====
-URI được truyền cho `logoutUrl` (và `logoutSuccessUrl`) được match và redirect theo đúng giá trị.
-Nếu bạn muốn một trong hai URI nằm dưới base path của servlet ứng dụng, hãy thêm rõ prefix đó, ví dụ `logoutUrl("/api/logout")`.
+URI được truyền cho `logoutUrl` (và `logoutSuccessUrl`) sẽ được match và redirect đúng theo giá trị đó.
+Nếu muốn một trong hai URI nằm dưới base path của servlet ứng dụng, hãy thêm rõ prefix đó, ví dụ `logoutUrl("/api/logout")`.
 ====
 
 [[permit-logout-endpoints]]
-Tuy nhiên, nếu bạn thiết lập endpoint logout thành công của riêng mình (hoặc trong trường hợp hiếm gặp, <<creating-custom-logout-endpoint,endpoint logout của riêng bạn>>), chẳng hạn bằng cách sử dụng {spring-framework-reference-url}web.html#spring-web[Spring MVC], bạn sẽ cần cho phép endpoint đó trong Spring Security.
-Điều này là do Spring MVC xử lý request của bạn sau khi Spring Security xử lý xong.
+Tuy nhiên, nếu bạn tạo endpoint logout thành công của riêng mình (hoặc trong trường hợp hiếm gặp, <<creating-custom-logout-endpoint,endpoint logout của riêng bạn>>), chẳng hạn bằng {spring-framework-reference-url}web.html#spring-web[Spring MVC], bạn sẽ cần cho phép endpoint đó trong Spring Security.
+Điều này là do Spring MVC xử lý request của bạn sau khi Spring Security đã xử lý xong.
 
 Bạn có thể thực hiện việc này bằng `authorizeHttpRequests` hoặc `<intercept-url>` như sau:
 
@@ -137,9 +137,9 @@ Trong ví dụ này, bạn yêu cầu `LogoutFilter` redirect đến `/my/succes
 Đồng thời, bạn cho phép rõ ràng endpoint `/my/success/endpoint` trong xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`].
 
 Tuy nhiên, việc chỉ định hai lần có thể khá rườm rà.
-Nếu đang sử dụng cấu hình Java, thay vào đó bạn có thể đặt property `permitAll` trong DSL `logout` như sau:
+Nếu đang sử dụng Java config, bạn có thể đặt property `permitAll` trong DSL `logout` như sau:
 
-.Cho phép Endpoint Logout tùy chỉnh
+.Cho phép endpoint logout tùy chỉnh
 [tabs]
 ======
 Java::
@@ -174,11 +174,11 @@ http
 thiết lập này sẽ tự thêm tất cả URI logout vào danh sách được phép cho bạn.
 
 [[add-logout-handler]]
-== Thêm các thao tác dọn dẹp
+== Thêm các tác vụ dọn dẹp
 
-Nếu đang sử dụng cấu hình Java, bạn có thể thêm các thao tác dọn dẹp của riêng mình bằng cách gọi method `addLogoutHandler` trong DSL `logout`, như sau:
+Nếu đang sử dụng Java config, bạn có thể thêm các tác vụ dọn dẹp riêng bằng cách gọi method `addLogoutHandler` trong DSL `logout`, như sau:
 
-.Logout Handler tùy chỉnh
+.Logout handler tùy chỉnh
 [tabs]
 ======
 Java::
@@ -203,13 +203,13 @@ http {
 ======
 
 [NOTE]
-Vì các instance javadoc:org.springframework.security.web.authentication.logout.LogoutHandler[] nhằm phục vụ việc dọn dẹp, chúng không nên ném exception.
+Vì các instance javadoc:org.springframework.security.web.authentication.logout.LogoutHandler[] được dùng để dọn dẹp, chúng không nên ném exception.
 
 [TIP]
 Vì javadoc:org.springframework.security.web.authentication.logout.LogoutHandler[] là một functional interface, bạn có thể cung cấp một instance tùy chỉnh dưới dạng lambda.
 
-Một số cấu hình logout handler đủ phổ biến để được cung cấp trực tiếp trong DSL `logout` và element `<logout>`.
-Một ví dụ là cấu hình vô hiệu hóa session và một ví dụ khác là chỉ định các cookie bổ sung cần xóa.
+Một số cấu hình của logout handler phổ biến đến mức được cung cấp trực tiếp trong DSL `logout` và element `<logout>`.
+Ví dụ, bạn có thể cấu hình việc vô hiệu hóa session hoặc chỉ định các cookie bổ sung cần xóa.
 
 Ví dụ, bạn có thể cấu hình javadoc:org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler[] như trên.
 
@@ -248,12 +248,12 @@ Xml::
 ======
 
 [NOTE]
-Không cần chỉ định cookie `JSESSIONID` vì javadoc:org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler[] xóa nó bằng cách vô hiệu hóa session.
+Không cần chỉ định cookie `JSESSIONID` vì javadoc:org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler[] sẽ xóa cookie này khi vô hiệu hóa session.
 
 [[clear-all-site-data]]
-=== Sử dụng Clear-Site-Data để Logout người dùng
+=== Sử dụng Clear-Site-Data để logout người dùng
 
-HTTP header `Clear-Site-Data` là header được các trình duyệt hỗ trợ như một chỉ thị để xóa cookie, storage và cache thuộc về website sở hữu nó.
+HTTP header `Clear-Site-Data` là chỉ thị được trình duyệt hỗ trợ để xóa cookie, storage và cache thuộc website đó.
 Đây là một cách tiện lợi và an toàn để đảm bảo mọi thứ, bao gồm session cookie, được dọn dẹp khi logout.
 
 Bạn có thể cấu hình Spring Security ghi header `Clear-Site-Data` khi logout như sau:
@@ -287,7 +287,7 @@ Bạn truyền cho constructor của `ClearSiteDataHeaderWriter` danh sách nh�
 
 Cấu hình trên xóa toàn bộ site data, nhưng bạn cũng có thể cấu hình để chỉ xóa cookie như sau:
 
-.Sử dụng Clear-Site-Data để xóa Cookie
+.Sử dụng Clear-Site-Data để xóa cookie
 [tabs]
 ======
 Java::
@@ -313,15 +313,15 @@ http {
 ======
 
 [[customizing-logout-success]]
-== Tùy chỉnh Logout thành công
+== Tùy chỉnh xử lý logout thành công
 
-Mặc dù sử dụng `logoutSuccessUrl` là đủ cho hầu hết trường hợp, bạn có thể cần thực hiện điều gì đó khác với việc redirect đến một URL sau khi logout hoàn tất.
+Mặc dù sử dụng `logoutSuccessUrl` là đủ cho hầu hết trường hợp, bạn có thể cần làm điều gì đó khác thay vì redirect đến một URL sau khi logout hoàn tất.
 javadoc:org.springframework.security.web.authentication.logout.LogoutSuccessHandler[] là component của Spring Security dùng để tùy chỉnh các thao tác sau khi logout thành công.
 
 Ví dụ, thay vì redirect, bạn có thể chỉ muốn trả về một status code.
-Trong trường hợp này, bạn có thể cung cấp một success handler instance như sau:
+Trong trường hợp này, bạn có thể cung cấp một instance của success handler như sau:
 
-.Tùy chỉnh Logout thành công để trả về mã HTTP status
+.Tùy chỉnh logout thành công để trả về HTTP status code
 [tabs]
 ======
 Java::
@@ -358,16 +358,16 @@ Xml::
 Vì javadoc:org.springframework.security.web.authentication.logout.LogoutSuccessHandler[] là một functional interface, bạn có thể cung cấp một instance tùy chỉnh dưới dạng lambda.
 
 [[creating-custom-logout-endpoint]]
-== Tạo Endpoint Logout tùy chỉnh
+== Tạo endpoint logout tùy chỉnh
 
 Bạn nên sử dụng DSL `logout` được cung cấp để cấu hình logout.
-Một lý do là rất dễ quên gọi các component cần thiết của Spring Security để đảm bảo logout đúng cách và đầy đủ.
+Một lý do là rất dễ quên gọi các component cần thiết của Spring Security để đảm bảo logout đầy đủ và đúng cách.
 
-Trên thực tế, việc <<add-logout-handler,đăng ký một `LogoutHandler` tùy chỉnh>> thường đơn giản hơn việc tạo một endpoint {spring-framework-reference-url}web.html#spring-web[Spring MVC] để thực hiện logout.
+Trên thực tế, <<add-logout-handler,đăng ký một `LogoutHandler` tùy chỉnh>> thường đơn giản hơn việc tạo một endpoint {spring-framework-reference-url}web.html#spring-web[Spring MVC] để thực hiện logout.
 
 Tuy vậy, nếu bạn gặp trường hợp cần một endpoint logout tùy chỉnh, như ví dụ sau:
 
-.Endpoint Logout tùy chỉnh
+.Endpoint logout tùy chỉnh
 [tabs]
 ======
 Java::
@@ -396,7 +396,7 @@ fun performLogout(): String {
 thì endpoint đó cần gọi javadoc:org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler[] của Spring Security để đảm bảo logout an toàn và đầy đủ.
 Tối thiểu cần có đoạn tương tự như sau:
 
-.Endpoint Logout tùy chỉnh
+.Endpoint logout tùy chỉnh
 [tabs]
 ======
 Java::
@@ -436,15 +436,15 @@ Ngoài ra, bạn sẽ cần <<permit-logout-endpoints,cho phép rõ ràng endpoi
 Việc không gọi javadoc:org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler[] có nghĩa là xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontext[`SecurityContext`] vẫn có thể khả dụng trong các request tiếp theo, nghĩa là người dùng thực sự chưa logout.
 
 [[testing-logout]]
-== Kiểm thử Logout
+== Kiểm thử logout
 Sau khi cấu hình logout, bạn có thể kiểm thử bằng xref:servlet/test/mockmvc/logout.adoc[hỗ trợ MockMvc của Spring Security].
 
 [[jc-logout-references]]
-== Các tham chiếu khác liên quan đến Logout
+== Các tài liệu tham khảo khác về logout
 
-- xref:servlet/test/mockmvc/logout.adoc#test-logout[Kiểm thử Logout]
+- xref:servlet/test/mockmvc/logout.adoc#test-logout[Kiểm thử logout]
 - xref:servlet/integrations/servlet-api.adoc#servletapi-logout[HttpServletRequest.logout()]
-- xref:servlet/authentication/rememberme.adoc#remember-me-impls[Interface và Implementation của Remember-Me]
+- xref:servlet/authentication/rememberme.adoc#remember-me-impls[Các interface và implementation của Remember-Me]
 - xref:servlet/exploits/csrf.adoc#csrf-considerations-logout[Logout] trong mục Các lưu ý về CSRF
 - Mục xref:servlet/authentication/cas.adoc#cas-singlelogout[Single Logout] (giao thức CAS)
 - Tài liệu về xref:servlet/appendix/namespace/http.adoc#nsa-logout[element logout] trong mục Spring Security XML Namespace

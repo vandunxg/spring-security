@@ -1,12 +1,12 @@
 = Di chuyển SAML 2.0
 
-== Mong đợi `<saml2:LogoutResponse>` khi việc kiểm tra tính hợp lệ của `<saml2:LogoutRequest>` thất bại
+== Kỳ vọng `<saml2:LogoutResponse>` khi validation của `<saml2:LogoutRequest>` thất bại
 
-Các Identity Provider của SAML mong đợi Service Provider trả về một `<saml2:LogoutResponse>` báo lỗi nếu việc xử lý `<saml2:LogoutRequest>` thất bại.
+SAML identity provider mong đợi service provider trả về một `<saml2:LogoutResponse>` báo lỗi nếu việc process `<saml2:LogoutRequest>` thất bại.
 
-Các phiên bản trước của Spring Security trả về 401 trong một số trường hợp, làm gián đoạn chuỗi các yêu cầu và phản hồi logout từ mỗi Relying Party.
+Các version trước của Spring Security trả về 401 trong một số trường hợp, làm gián đoạn chuỗi logout request và response từ mỗi relying party.
 
-Trong Spring Security 7, hành vi này đã được sửa và bạn không cần làm gì.
+Trong Spring Security 7, hành vi này đã được khắc phục và bạn không cần làm gì.
 
 Tuy nhiên, nếu điều này gây ra vấn đề cho bạn, bạn có thể quay lại hành vi cũ bằng cách công bố một `Saml2LogoutRequestResolver` trả về `null` khi cần một `<saml2:LogoutRequest>` báo lỗi.
 Bạn có thể tạo một delegate như sau:
@@ -56,17 +56,17 @@ fun logoutResponseResolver(registrations: RelyingPartyRegistrationRepository?): 
 
 == Ưu tiên `Saml2ResponseAuthenticationAccessor` thay vì `Saml2AuthenticatedPrincipal`
 
-Spring Security 7 tách các chi tiết `<saml2:Assertion>` khỏi principal.
+Spring Security 7 tách các chi tiết của `<saml2:Assertion>` khỏi principal.
 Điều này cho phép Spring Security truy xuất các chi tiết assertion cần thiết để thực hiện Single Logout.
 
-Điều này đánh dấu `Saml2AuthenticatedPrincipal` là deprecated.
-Bạn không còn cần triển khai nó để sử dụng `Saml2Authentication`.
+Điều này khiến `Saml2AuthenticatedPrincipal` trở thành deprecated.
+Bạn không còn cần implement nó để sử dụng `Saml2Authentication`.
 
-Thay vào đó, credential triển khai `Saml2ResponseAssertionAccessor`, accessor mà Spring Security 7 ưu tiên khi xác định hành động thích hợp dựa trên authentication.
+Thay vào đó, credential implement `Saml2ResponseAssertionAccessor`; Spring Security 7 ưu tiên accessor này khi xác định action thích hợp dựa trên authentication.
 
 Thay đổi này được tự động thực hiện cho bạn khi sử dụng các giá trị mặc định.
 
-Nếu điều này gây ra vấn đề cho bạn khi nâng cấp, bạn có thể công bố một `ResponseAuhenticationConverter` tùy chỉnh để trả về `Saml2Authentication` thay vì trả về `Saml2AssertionAuthentication` như sau:
+Nếu điều này gây ra vấn đề cho bạn khi nâng cấp, bạn có thể cung cấp một `ResponseAuthenticationConverter` tùy chỉnh để trả về `Saml2Authentication` thay vì `Saml2AssertionAuthentication` như sau:
 
 [tabs]
 ======
@@ -107,15 +107,15 @@ fun authenticationProvider(): OpenSaml5AuthenticationProvider {
 ----
 ======
 
-Nếu tự xây dựng một đối tượng `Saml2Authentication`, hãy cân nhắc chuyển sang `Saml2AssertionAuthentication` để nhận được lợi ích tương tự như giá trị mặc định hiện tại.
+Nếu tự tạo một instance `Saml2Authentication`, hãy cân nhắc chuyển sang `Saml2AssertionAuthentication` để nhận được lợi ích tương tự như giá trị mặc định hiện tại.
 
-== Không xử lý các yêu cầu GET `<saml2:Response>` bằng `Saml2AuthenticationTokenConverter`
+== Không process GET request `<saml2:Response>` bằng `Saml2AuthenticationTokenConverter`
 
-Spring Security không hỗ trợ xử lý dữ liệu `<saml2:Response>` qua GET vì điều này không được đặc tả SAML 2.0 hỗ trợ.
+Spring Security không hỗ trợ process payload `<saml2:Response>` qua GET vì SAML 2.0 spec không hỗ trợ cách này.
 
 Để tuân thủ điều này tốt hơn, kể từ Spring Security 8, `Saml2AuthenticationTokenConverter` và `OpenSaml5AuthenticationTokenConverter` sẽ không xử lý các yêu cầu GET theo mặc định.
-Để chuẩn bị cho điều này, thuộc tính `shouldConvertGetRequests` được cung cấp.
-Để sử dụng, hãy công bố converter của riêng bạn như sau:
+Để chuẩn bị cho điều này, property `shouldConvertGetRequests` khả dụng.
+Để sử dụng, hãy cung cấp converter riêng như sau:
 
 [tabs]
 ======
@@ -144,4 +144,4 @@ fun authenticationConverter(val registrations: RelyingPartyRegistrationRepositor
 ----
 ======
 
-Nếu bắt buộc phải tiếp tục sử dụng `Saml2AuthenticationTokenConverter` hoặc `OpenSaml5AuthenticationTokenConverter` để xử lý các yêu cầu GET, bạn có thể gọi `setShouldConvertGetRequests` với `true.`
+Nếu bắt buộc phải tiếp tục sử dụng `Saml2AuthenticationTokenConverter` hoặc `OpenSaml5AuthenticationTokenConverter` để process GET request, bạn có thể gọi `setShouldConvertGetRequests` với `true`.

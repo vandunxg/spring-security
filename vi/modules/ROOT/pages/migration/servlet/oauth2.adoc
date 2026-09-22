@@ -1,9 +1,9 @@
-= Di chuyển OAuth 2.0
+= Các migration OAuth 2.0
 
-== Xác thực Header `typ` bằng `JwtTypeValidator`
+== Validate Header `typ` bằng `JwtTypeValidator`
 
 Nếu khi thực hiện các bước chuẩn bị cho 6.5, bạn đã đặt `validateTypes` thành `false`, giờ đây bạn có thể loại bỏ nó.
-Bạn cũng có thể loại bỏ việc thêm rõ ràng `JwtTypeValidator` vào danh sách các trình xác thực mặc định.
+Bạn cũng có thể loại bỏ việc thêm explicit `JwtTypeValidator` vào danh sách default.
 
 Ví dụ, thay đổi đoạn này:
 
@@ -41,8 +41,8 @@ fun jwtDecoder(): JwtDecoder {
 }
 ----
 ======
-<1> - Tắt việc Nimbus xác thực `typ`
-<2> - Thêm trình xác thực `typ` mặc định
+<1> - Tắt việc Nimbus validate `typ`
+<2> - Thêm default `typ` validator
 
 thành:
 
@@ -76,14 +76,14 @@ fun jwtDecoder(): JwtDecoder {
 }
 ----
 ======
-<1> - `validateTypes` hiện mặc định là `false`
-<2> - `JwtTypeValidator#jwt` được thêm bởi tất cả các phương thức `createDefaultXXX`
+<1> - `validateTypes` mặc định là `false`
+<2> - `JwtTypeValidator#jwt` được thêm bởi mọi method `createDefaultXXX`
 
 == Cung cấp một AuthenticationConverter cho BearerTokenAuthenticationFilter
 
 Trong Spring Security 7, `BearerTokenAuthenticationFilter#setBearerTokenResolver` và `#setAuthenticaionDetailsSource` đã bị deprecated; thay vào đó, hãy cấu hình chúng trên `BearerTokenAuthenticationConverter`.
 
-DSL `oauth2ResourceServer` đáp ứng hầu hết các trường hợp sử dụng và bạn không cần làm gì.
+DSL `oauth2ResourceServer` đáp ứng hầu hết use case và bạn không cần làm gì.
 
 Nếu bạn đang đặt `BearerTokenResolver` hoặc `AuthenticationDetailsSource` trực tiếp trên `BearerTokenAuthenticationFilter` như sau:
 
@@ -133,10 +133,10 @@ authenticationConverter.setAuthenticationDetailsSource(myAuthenticationDetailsSo
 val filter = BearerTokenAuthenticationFilter(authenticationManager, authenticationConverter)
 ----
 
-== Các thời gian chờ kết nối và đọc mặc định của `NimbusJwtDecoder` hiện là 30 giây
+== Connect timeout và read timeout mặc định của `NimbusJwtDecoder` hiện là 30 giây
 
-`RestOperations` mặc định của `NimbusJwtDecoder`, được dùng để lấy một JWK Set khi không có `RestOperations` nào khác được cấu hình, trước đây sử dụng thời gian chờ kết nối và đọc 500 mili giây.
-Giá trị này quá ngắn đối với nhiều môi trường triển khai và hiện là 30 giây, phù hợp với các thời gian chờ kết nối và đọc đã được sử dụng ở nơi khác trong phần hỗ trợ OAuth2 Client và Resource Server, chẳng hạn như xref:servlet/oauth2/client/index.adoc[`ClientRegistrations`].
+Default `RestOperations` của `NimbusJwtDecoder`, được dùng để fetch một JWK Set khi không có `RestOperations` nào khác được configure, trước đây sử dụng connect timeout và read timeout 500 mili giây.
+Giá trị này quá ngắn đối với nhiều môi trường deploy và hiện là 30 giây, phù hợp với connect timeout và read timeout đã được sử dụng ở nơi khác trong phần hỗ trợ OAuth2 Client và Resource Server, chẳng hạn như xref:servlet/oauth2/client/index.adoc[`ClientRegistrations`].
 
-Nếu ứng dụng của bạn phụ thuộc vào thời gian chờ ngắn hơn trước đây -- ví dụ, mong muốn thất bại nhanh khi Authorization Server không thể truy cập -- bạn có thể khôi phục thời gian chờ đó bằng cách đặt các thuộc tính hệ thống `sun.net.client.defaultConnectTimeout` và `sun.net.client.defaultReadTimeout` của JDK (tính bằng mili giây), hoặc cung cấp `RestOperations` của riêng bạn, như mô tả trong xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-timeouts[Cấu hình thời gian chờ].
+Nếu ứng dụng của bạn phụ thuộc vào timeout ngắn hơn trước đây -- ví dụ, mong muốn fail fast khi Authorization Server không thể truy cập -- bạn có thể khôi phục timeout đó bằng cách đặt các system property `sun.net.client.defaultConnectTimeout` và `sun.net.client.defaultReadTimeout` của JDK (tính bằng mili giây), hoặc cung cấp `RestOperations` của riêng bạn, như mô tả trong xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-timeouts[Cấu hình timeout].
 ======

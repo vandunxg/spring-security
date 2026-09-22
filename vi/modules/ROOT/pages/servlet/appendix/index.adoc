@@ -1,8 +1,8 @@
 = Phụ lục
 
 Đây là phần phụ lục dành cho Spring Security dựa trên Servlet.
-Phần này gồm các mục sau:
+Phần này có các mục sau:
 
-* xref:servlet/appendix/database-schema.adoc[Lược đồ cơ sở dữ liệu]
+* xref:servlet/appendix/database-schema.adoc[Các lược đồ cơ sở dữ liệu]
 * xref:servlet/appendix/namespace/index.adoc[Namespace XML]
 * xref:servlet/appendix/faq.adoc[FAQ]

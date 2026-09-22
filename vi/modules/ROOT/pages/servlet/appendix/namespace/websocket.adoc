@@ -1,27 +1,27 @@
 [[nsa-websocket-security]]
 = Bảo mật WebSocket
 
-Spring Security 4.0+ cung cấp hỗ trợ cho việc authorization các message.
+Spring Security 4.0+ cung cấp hỗ trợ authorization cho các message.
 Một ví dụ cụ thể về trường hợp hỗ trợ này hữu ích là cung cấp authorization trong các ứng dụng dựa trên WebSocket.
 
 [[nsa-websocket-message-broker]]
 == <websocket-message-broker>
 
-Phần tử websocket-message-broker có hai mode khác nhau.
+Element websocket-message-broker có hai mode khác nhau.
 Nếu không chỉ định <<nsa-websocket-message-broker-id,websocket-message-broker@id>>, element này sẽ thực hiện những việc sau:
 
 * Đảm bảo mọi SimpAnnotationMethodMessageHandler đều đăng ký AuthenticationPrincipalArgumentResolver làm custom argument resolver.
 Điều này cho phép sử dụng `@AuthenticationPrincipal` để resolve principal của `Authentication` hiện tại.
 * Đảm bảo SecurityContextChannelInterceptor được tự động đăng ký với clientInboundChannel.
-Điều này điền user được tìm thấy trong Message vào SecurityContextHolder.
+Điều này đưa user được tìm thấy trong Message vào SecurityContextHolder.
 * Đảm bảo một ChannelSecurityInterceptor được đăng ký với clientInboundChannel.
 Điều này cho phép chỉ định các authorization rule cho một message.
 * Đảm bảo một CsrfChannelInterceptor được đăng ký với clientInboundChannel.
-Điều này đảm bảo chỉ các request từ domain ban đầu được bật.
+Điều này đảm bảo chỉ các request từ domain ban đầu mới được cho phép.
 * Đảm bảo một CsrfTokenHandshakeInterceptor được đăng ký với WebSocketHttpRequestHandler, TransportHandlingSockJsService hoặc DefaultSockJsService.
 Điều này đảm bảo CsrfToken mong đợi từ HttpServletRequest được sao chép vào các attribute của WebSocket Session.
 
-Nếu cần quyền kiểm soát bổ sung, có thể chỉ định id và một ChannelSecurityInterceptor sẽ được gán cho id đã chỉ định.
+Nếu cần quyền kiểm soát bổ sung, có thể chỉ định id và một ChannelSecurityInterceptor sẽ được gán cho id đó.
 Sau đó, có thể thực hiện thủ công toàn bộ wiring với messaging infrastructure của Spring.
 Cách này cồng kềnh hơn, nhưng cung cấp quyền kiểm soát lớn hơn đối với configuration.
 
@@ -31,7 +31,7 @@ Cách này cồng kềnh hơn, nhưng cung cấp quyền kiểm soát lớn hơn
 
 [[nsa-websocket-message-broker-id]]
 * **id** Một bean identifier, được dùng để tham chiếu bean ChannelSecurityInterceptor ở nơi khác trong context.
-Nếu được chỉ định, Spring Security yêu cầu explicit configuration trong Spring Messaging.
+Nếu được chỉ định, Spring Security yêu cầu configuration tường minh trong Spring Messaging.
 Nếu không được chỉ định, Spring Security sẽ tự động tích hợp với messaging infrastructure như mô tả trong <<nsa-websocket-message-broker>>
 
 [[nsa-websocket-message-broker-same-origin-disabled]]
@@ -48,7 +48,7 @@ Thay đổi giá trị mặc định hữu ích khi cần cho phép các origin 
 * **security-context-holder-strategy-ref** Sử dụng `SecurityContextHolderStrategy` này (lưu ý chỉ được hỗ trợ khi kết hợp với API `AuthorizationManager`)
 
 [[nsa-websocket-message-broker-children]]
-=== Các phần tử con của <websocket-message-broker>
+=== Các element con của <websocket-message-broker>
 
 
 * xref:servlet/appendix/namespace/http.adoc#nsa-expression-handler[expression-handler]
@@ -61,7 +61,7 @@ Thay đổi giá trị mặc định hữu ích khi cần cho phép các origin 
 
 
 [[nsa-intercept-message-parents]]
-=== Các phần tử cha của <intercept-message>
+=== Các element cha của <intercept-message>
 
 
 * <<nsa-websocket-message-broker,websocket-message-broker>>

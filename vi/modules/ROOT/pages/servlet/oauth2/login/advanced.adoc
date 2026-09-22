@@ -2,11 +2,11 @@
 = Cấu hình nâng cao
 
 `HttpSecurity.oauth2Login()` cung cấp một số tùy chọn cấu hình để tùy chỉnh OAuth 2.0 Login.
-Các tùy chọn cấu hình chính được nhóm theo các endpoint tương ứng trong protocol.
+Các tùy chọn cấu hình chính được nhóm theo các protocol endpoint tương ứng.
 
 Ví dụ, `oauth2Login().authorizationEndpoint()` cho phép cấu hình _Authorization Endpoint_, trong khi `oauth2Login().tokenEndpoint()` cho phép cấu hình _Token Endpoint_.
 
-Đoạn code sau đây minh họa một ví dụ:
+Đoạn code sau đây minh họa cấu hình này:
 
 .Cấu hình OAuth2 Login nâng cao
 [tabs]
@@ -77,22 +77,22 @@ Mục tiêu chính của DSL `oauth2Login()` là bám sát cách đặt tên đ�
 
 OAuth 2.0 Authorization Framework định nghĩa các https://tools.ietf.org/html/rfc6749#section-3[Protocol Endpoints] như sau:
 
-Quy trình authorization sử dụng hai endpoint của Authorization Server (các tài nguyên HTTP):
+Quy trình authorization sử dụng hai endpoint của Authorization Server (các HTTP resource):
 
 * Authorization Endpoint: Được client sử dụng để lấy authorization từ resource owner thông qua chuyển hướng user-agent.
 * Token Endpoint: Được client sử dụng để đổi authorization grant lấy access token, thường kèm theo client authentication.
 
 Quy trình authorization cũng sử dụng một client endpoint:
 
-* Redirection Endpoint: Được Authorization Server sử dụng để trả về các response chứa authorization credential cho client thông qua user-agent của resource owner.
+* Redirection Endpoint: Được Authorization Server sử dụng để trả về các response chứa các authorization credential cho client thông qua user-agent của resource owner.
 
 OpenID Connect Core 1.0 specification định nghĩa https://openid.net/specs/openid-connect-core-1_0.html#UserInfo[UserInfo Endpoint] như sau:
 
-UserInfo Endpoint là một OAuth 2.0 Protected Resource trả về các claim về end-user đã authentication.
+UserInfo Endpoint là một OAuth 2.0 Protected Resource trả về các claim về end-user đã được authenticated.
 Để lấy các claim được yêu cầu về end-user, client gửi request đến UserInfo Endpoint bằng access token nhận được thông qua OpenID Connect Authentication.
-Các claim này thường được biểu diễn bằng một JSON object chứa tập hợp các cặp name-value của claim.
+Các claim này thường được biểu diễn dưới dạng một JSON object chứa một tập hợp các cặp name-value của claim.
 
-Đoạn code sau đây cho thấy đầy đủ các tùy chọn cấu hình có trong DSL `oauth2Login()`:
+Đoạn code sau đây cho thấy đầy đủ các tùy chọn cấu hình có sẵn trong DSL `oauth2Login()`:
 
 .Các tùy chọn cấu hình OAuth2 Login
 [tabs]
@@ -177,7 +177,7 @@ class OAuth2LoginSecurityConfig {
 
 Ngoài DSL `oauth2Login()`, cấu hình XML cũng được hỗ trợ.
 
-Đoạn code sau đây cho thấy đầy đủ các tùy chọn cấu hình có trong xref:servlet/appendix/namespace/http.adoc#nsa-oauth2-login[ namespace bảo mật]:
+Đoạn code sau đây cho thấy đầy đủ các tùy chọn cấu hình có sẵn trong xref:servlet/appendix/namespace/http.adoc#nsa-oauth2-login[ security namespace]:
 
 .Các tùy chọn cấu hình XML của OAuth2 Login
 [source,xml]
@@ -200,7 +200,7 @@ Ngoài DSL `oauth2Login()`, cấu hình XML cũng được hỗ trợ.
 </http>
 ----
 
-Các section sau đây trình bày chi tiết hơn về từng tùy chọn cấu hình hiện có:
+Các section sau đây trình bày chi tiết hơn từng tùy chọn cấu hình hiện có:
 
 * <<oauth2login-advanced-login-page>>
 * <<oauth2login-advanced-redirection-endpoint>>
@@ -212,16 +212,16 @@ Các section sau đây trình bày chi tiết hơn về từng tùy chọn cấu
 [[oauth2login-advanced-login-page]]
 == Trang OAuth 2.0 Login
 
-Theo mặc định, Trang OAuth 2.0 Login được tự động tạo bởi `DefaultLoginPageGeneratingFilter`.
-Trang login mặc định hiển thị mỗi OAuth Client đã cấu hình cùng `ClientRegistration.clientName` dưới dạng một link, có thể khởi tạo Authorization Request (hoặc OAuth 2.0 Login).
+Theo mặc định, trang OAuth 2.0 Login được tự động tạo bởi `DefaultLoginPageGeneratingFilter`.
+Trang login mặc định hiển thị từng OAuth Client đã được cấu hình, với `ClientRegistration.clientName` làm link có thể khởi tạo Authorization Request (hoặc OAuth 2.0 Login).
 
 [NOTE]
 ====
-Để `DefaultLoginPageGeneratingFilter` hiển thị link cho các OAuth Client đã cấu hình, `ClientRegistrationRepository` đã đăng ký cũng cần implement `Iterable<ClientRegistration>`.
+Để `DefaultLoginPageGeneratingFilter` hiển thị link cho các OAuth Client đã cấu hình, `ClientRegistrationRepository` được đăng ký cũng cần implement `Iterable<ClientRegistration>`.
 Xem `InMemoryClientRegistrationRepository` để tham khảo.
 ====
 
-Đích đến của link cho mỗi OAuth Client mặc định là:
+URL đích của link cho mỗi OAuth Client mặc định là:
 
 `+OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI + "/{registrationId}"+`
 
@@ -234,7 +234,7 @@ Dòng sau đây minh họa một ví dụ:
 
 Để ghi đè trang login mặc định, hãy cấu hình `oauth2Login().loginPage()` và (tùy chọn) `oauth2Login().authorizationEndpoint().baseUri()`.
 
-Danh sách sau đây minh họa một ví dụ:
+Ví dụ sau đây minh họa cấu hình:
 
 .Cấu hình trang OAuth2 Login
 [tabs]
@@ -300,7 +300,7 @@ Xml::
 
 [IMPORTANT]
 ====
-Bạn cần cung cấp một `@Controller` với `@RequestMapping("/login/oauth2")` có khả năng render trang login tùy chỉnh.
+Bạn cần cung cấp một `@Controller` với `@RequestMapping("/login/oauth2")` có thể render trang login tùy chỉnh.
 ====
 
 [TIP]
@@ -319,7 +319,7 @@ Dòng sau đây minh họa một ví dụ:
 [[oauth2login-advanced-redirection-endpoint]]
 == Redirection Endpoint
 
-Redirection Endpoint được Authorization Server sử dụng để trả Authorization Response (chứa authorization credential) cho client thông qua user-agent của Resource Owner.
+Redirection Endpoint được Authorization Server sử dụng để trả về Authorization Response (chứa các authorization credential) cho client thông qua user-agent của Resource Owner.
 
 [TIP]
 ====
@@ -327,7 +327,7 @@ OAuth 2.0 Login sử dụng Authorization Code Grant.
 Do đó, authorization credential là authorization code.
 ====
 
-`baseUri` Authorization Response mặc định (redirection endpoint) là `*/login/oauth2/code/**`, được định nghĩa trong `OAuth2LoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI`.
+`baseUri` mặc định của Authorization Response (redirection endpoint) là `*/login/oauth2/code/**`, được định nghĩa trong `OAuth2LoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI`.
 
 Nếu muốn tùy chỉnh `baseUri` của Authorization Response, hãy cấu hình như sau:
 
@@ -392,9 +392,9 @@ Xml::
 
 [IMPORTANT]
 =====
-Bạn cũng cần bảo đảm `ClientRegistration.redirectUri` khớp với `baseUri` Authorization Response tùy chỉnh.
+Bạn cũng cần bảo đảm `ClientRegistration.redirectUri` khớp với `baseUri` tùy chỉnh của Authorization Response.
 
-Danh sách sau đây minh họa một ví dụ:
+Ví dụ sau đây minh họa cấu hình:
 
 [tabs]
 ======
@@ -436,13 +436,13 @@ UserInfo Endpoint bao gồm một số tùy chọn cấu hình, được mô t�
 [[oauth2login-advanced-map-authorities]]
 === Ánh xạ authority của user
 
-Sau khi user authentication thành công với OAuth 2.0 Provider, `OAuth2User.getAuthorities()` (hoặc `OidcUser.getAuthorities()`) chứa danh sách authority đã cấp, được lấy từ `OAuth2UserRequest.getAccessToken().getScopes()` và thêm tiền tố `SCOPE_`.
-Các authority đã cấp này có thể được ánh xạ thành một tập hợp instance `GrantedAuthority` mới, rồi cung cấp cho `OAuth2AuthenticationToken` khi hoàn tất authentication.
+Sau khi user authenticated thành công với OAuth 2.0 Provider, `OAuth2User.getAuthorities()` (hoặc `OidcUser.getAuthorities()`) chứa danh sách các authority được cấp, được lấy từ `OAuth2UserRequest.getAccessToken().getScopes()` và thêm tiền tố `SCOPE_`.
+Các authority được cấp này có thể được ánh xạ thành một tập hợp instance `GrantedAuthority` mới, rồi cung cấp cho `OAuth2AuthenticationToken` khi hoàn tất authentication.
 
 [TIP]
-`OAuth2AuthenticationToken.getAuthorities()` được sử dụng để authorization cho các request, chẳng hạn trong `hasRole('USER')` hoặc `hasRole('ADMIN')`.
+`OAuth2AuthenticationToken.getAuthorities()` được sử dụng để authorize các request, chẳng hạn trong `hasRole('USER')` hoặc `hasRole('ADMIN')`.
 
-Có một số tùy chọn để lựa chọn khi ánh xạ authority của user:
+Có một số tùy chọn khi ánh xạ authority của user:
 
 * <<oauth2login-advanced-map-authorities-grantedauthoritiesmapper>>
 * <<oauth2login-advanced-map-authorities-oauth2userservice>>
@@ -562,7 +562,7 @@ Xml::
 ----
 ======
 
-Ngoài ra, bạn có thể đăng ký một `GrantedAuthoritiesMapper` `@Bean` để tự động áp dụng vào cấu hình, như sau:
+Ngoài ra, bạn có thể đăng ký một `GrantedAuthoritiesMapper` `@Bean` để tự động áp dụng cho configuration, như sau:
 
 .Cấu hình bean Granted Authorities Mapper
 [tabs]
@@ -615,7 +615,7 @@ class OAuth2LoginSecurityConfig {
 
 [TIP]
 ====
-Sau khi authentication hoàn tất, nó cũng chứa authority đã cấp `FACTOR_AUTHORIZATION_CODE`.
+Sau khi authentication hoàn tất, `OAuth2AuthenticationToken` cũng chứa authority được cấp `FACTOR_AUTHORIZATION_CODE`.
 ====
 
 [[oauth2login-advanced-map-authorities-oauth2userservice]]
@@ -623,9 +623,9 @@ Sau khi authentication hoàn tất, nó cũng chứa authority đã cấp `FACTO
 
 Chiến lược này nâng cao hơn so với việc sử dụng `GrantedAuthoritiesMapper`. Tuy nhiên, nó cũng linh hoạt hơn vì cho phép bạn truy cập `OAuth2UserRequest` và `OAuth2User` (khi sử dụng OAuth 2.0 UserService) hoặc `OidcUserRequest` và `OidcUser` (khi sử dụng OpenID Connect 1.0 UserService).
 
-`OAuth2UserRequest` (và `OidcUserRequest`) cung cấp quyền truy cập vào `OAuth2AccessToken` tương ứng. Điều này rất hữu ích khi _delegator_ cần lấy thông tin authority từ một protected resource trước khi có thể ánh xạ các authority tùy chỉnh cho user.
+`OAuth2UserRequest` (và `OidcUserRequest`) cho phép truy cập `OAuth2AccessToken` tương ứng. Điều này rất hữu ích khi _delegator_ cần lấy thông tin authority từ một protected resource trước khi có thể ánh xạ các authority tùy chỉnh cho user.
 
-Ví dụ sau đây cho thấy cách implement và cấu hình một chiến lược dựa trên delegation bằng OpenID Connect 1.0 UserService:
+Ví dụ sau đây cho thấy cách implement và cấu hình một chiến lược dựa trên delegation bằng một OpenID Connect 1.0 UserService:
 
 .Cấu hình OAuth2UserService
 [tabs]
@@ -654,7 +654,7 @@ public class OAuth2LoginSecurityConfig {
 		final OidcUserService delegate = new OidcUserService();
 
 		return (userRequest) -> {
-			// Ủy quyền cho implementation mặc định để tải user
+			// Delegate cho implementation mặc định để load user
 			OidcUser oidcUser = delegate.loadUser(userRequest);
 
 			OAuth2AccessToken accessToken = userRequest.getAccessToken();
@@ -704,7 +704,7 @@ class OAuth2LoginSecurityConfig  {
         val delegate = OidcUserService()
 
         return OAuth2UserService { userRequest ->
-            // Ủy quyền cho implementation mặc định để tải user
+            // Delegate cho implementation mặc định để load user
             val oidcUser = delegate.loadUser(userRequest)
 
             val accessToken = userRequest.accessToken
@@ -742,14 +742,14 @@ Xml::
 [[oauth2login-advanced-oauth2-user-service]]
 === OAuth 2.0 UserService
 
-`DefaultOAuth2UserService` là một implementation của `OAuth2UserService` hỗ trợ các OAuth 2.0 Provider tiêu chuẩn.
+`DefaultOAuth2UserService` là một implementation của `OAuth2UserService` hỗ trợ các OAuth 2.0 Provider chuẩn.
 
 [NOTE]
 ====
-`OAuth2UserService` lấy các thuộc tính user của end-user (resource owner) từ UserInfo Endpoint (bằng access token được cấp cho client trong authorization flow) và trả về một `AuthenticatedPrincipal` dưới dạng `OAuth2User`.
+`OAuth2UserService` lấy các user attribute của end-user (resource owner) từ UserInfo Endpoint (bằng access token được cấp cho client trong authorization flow) và trả về một `AuthenticatedPrincipal` dưới dạng `OAuth2User`.
 ====
 
-`DefaultOAuth2UserService` sử dụng một instance `RestOperations` khi request các thuộc tính user tại UserInfo Endpoint.
+`DefaultOAuth2UserService` sử dụng một instance `RestOperations` khi request các user attribute tại UserInfo Endpoint.
 
 Nếu cần tùy chỉnh việc xử lý trước UserInfo Request, bạn có thể cung cấp một `Converter<OAuth2UserRequest, RequestEntity<?>>` tùy chỉnh cho `DefaultOAuth2UserService.setRequestEntityConverter()`.
 Implementation mặc định `OAuth2UserRequestEntityConverter` tạo một biểu diễn `RequestEntity` của UserInfo Request, mặc định đặt `OAuth2AccessToken` trong header `Authorization`.
@@ -830,7 +830,7 @@ class OAuth2LoginSecurityConfig {
 
 `OidcUserService` là một implementation của `OAuth2UserService` hỗ trợ các OpenID Connect 1.0 Provider.
 
-`OidcUserService` sử dụng `DefaultOAuth2UserService` khi request các thuộc tính user tại UserInfo Endpoint.
+`OidcUserService` sử dụng `DefaultOAuth2UserService` khi request các user attribute tại UserInfo Endpoint.
 
 Nếu cần tùy chỉnh việc xử lý trước UserInfo Request hoặc xử lý sau UserInfo Response, bạn cần cung cấp một `DefaultOAuth2UserService` được cấu hình tùy chỉnh cho `OidcUserService.setOauth2UserService()`.
 
@@ -896,7 +896,7 @@ class OAuth2LoginSecurityConfig {
 [[oauth2login-advanced-idtoken-verify]]
 == Xác minh chữ ký ID Token
 
-OpenID Connect 1.0 Authentication giới thiệu https://openid.net/specs/openid-connect-core-1_0.html#IDToken[ID Token], một security token chứa các Claim về Authentication của End-User bởi Authorization Server khi được Client sử dụng.
+OpenID Connect 1.0 Authentication giới thiệu https://openid.net/specs/openid-connect-core-1_0.html#IDToken[ID Token], một security token chứa các Claim về việc một End-User được Authorization Server authenticated khi token được Client sử dụng.
 
 ID Token được biểu diễn dưới dạng https://tools.ietf.org/html/rfc7519[JSON Web Token] (JWT) và MUST được ký bằng https://tools.ietf.org/html/rfc7515[JSON Web Signature] (JWS).
 

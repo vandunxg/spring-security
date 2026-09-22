@@ -1,5 +1,5 @@
 = Tích hợp
 :page-section-summary-toc: 1
 
-Spring Security tích hợp với nhiều framework và API.
-Phần này mô tả các cách Spring Security tích hợp với những công nghệ khác:
+Spring Security tích hợp với nhiều frameworks và APIs.
+Phần này mô tả các tích hợp khác nhau giữa Spring Security và những công nghệ khác:

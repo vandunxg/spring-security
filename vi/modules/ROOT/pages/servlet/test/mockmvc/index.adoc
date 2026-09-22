@@ -2,10 +2,10 @@
 = Tích hợp Spring MVC Test
 :page-section-summary-toc: 1
 
-Spring Security cung cấp tích hợp toàn diện với {spring-framework-reference-url}testing/mockmvc.html[Spring MVC Test]
+Spring Security cung cấp khả năng tích hợp toàn diện với {spring-framework-reference-url}testing/mockmvc.html[Spring MVC Test]
 
 Để bắt đầu sử dụng tích hợp MockMvc của Spring Security, trước tiên bạn cần
 xref:servlet/test/mockmvc/setup.adoc#test-mockmvc-setup[cấu hình MockMvc],
 sau đó bạn có thể sử dụng
-xref:servlet/test/mockmvc/request-post-processors.adoc[RequestPostProcessors] của Security
+xref:servlet/test/mockmvc/request-post-processors.adoc[RequestPostProcessors] của Spring Security
 và các hỗ trợ kiểm thử MockMvc khác.

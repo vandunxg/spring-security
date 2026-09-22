@@ -2,72 +2,72 @@
 = Basic Authentication
 :figures: servlet/authentication/unpwd
 
-Phần này cung cấp thông tin chi tiết về cách Spring Security hỗ trợ https://tools.ietf.org/html/rfc7617[Basic HTTP Authentication] cho các ứng dụng dựa trên Servlet.
-// FIXME: describe authenticationentrypoint, authenticationfailurehandler, authenticationsuccesshandler
+Phần này trình bày chi tiết cách Spring Security hỗ trợ https://tools.ietf.org/html/rfc7617[Basic HTTP Authentication] cho các ứng dụng dựa trên Servlet.
+// FIXME: mô tả authenticationentrypoint, authenticationfailurehandler, authenticationsuccesshandler
 
 Phần này mô tả cách HTTP Basic Authentication hoạt động trong Spring Security.
-Trước tiên, chúng ta thấy header https://tools.ietf.org/html/rfc7235#section-4.1[WWW-Authenticate] được gửi lại cho một client chưa được authentication:
+Trước tiên, hãy xem header https://tools.ietf.org/html/rfc7235#section-4.1[WWW-Authenticate] được gửi đến một client chưa authenticated:
 
 .Gửi header WWW-Authenticate
 [.invert-dark]
 image::{figures}/basicauthenticationentrypoint.png[]
 
-Hình trước được xây dựng dựa trên sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] của chúng ta.
+Hình minh họa trên được xây dựng dựa trên sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] của chúng ta.
 
-image:{icondir}/number_1.png[] Trước tiên, user gửi một request chưa được authentication đến resource `/private`, là resource mà user không được authorization.
+image:{icondir}/number_1.png[] Trước tiên, người dùng gửi một request chưa authenticated đến resource `/private`, đối với resource này người dùng chưa được authorization.
 
-image:{icondir}/number_2.png[] xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] của Spring Security cho biết request chưa được authentication bị __Denied__ bằng cách ném một `AccessDeniedException`.
+image:{icondir}/number_2.png[] xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] của Spring Security đánh dấu request chưa authenticated là __Bị từ chối__ bằng cách ném một `AccessDeniedException`.
 
-image:{icondir}/number_3.png[] Vì user chưa được authentication, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] khởi động __Bắt đầu authentication__.
-xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] được cấu hình là một instance của javadoc:org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint[], gửi một header WWW-Authenticate.
-`RequestCache` thường là một `NullRequestCache` không lưu request vì client có khả năng replay các request mà nó đã gửi ban đầu.
+image:{icondir}/number_3.png[] Vì người dùng chưa authenticated, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] khởi động __Bắt đầu authentication__.
+xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] được cấu hình là một instance của javadoc:org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint[], gửi một header `WWW-Authenticate`.
+`RequestCache` thường là một `NullRequestCache` không lưu request vì client có khả năng replay các request mà client đã gửi.
 
 [NOTE]
 ====
-HTTP Basic Auth Provider mặc định sẽ suppress cả Response body và header `WWW-Authenticate` trong response 401 khi request được gửi với header `X-Requested-With: XMLHttpRequest`.
-Điều này cho phép frontend triển khai authentication code riêng, thay vì kích hoạt hộp thoại đăng nhập của browser.
+HTTP Basic Auth Provider mặc định sẽ không gửi cả response body lẫn header `WWW-Authenticate` trong response 401 khi request được gửi kèm header `X-Requested-With: XMLHttpRequest`.
+Điều này cho phép frontend triển khai logic authentication riêng, thay vì kích hoạt hộp thoại đăng nhập của trình duyệt.
 Để override, hãy triển khai javadoc:org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint[] của riêng bạn.
 ====
 
-Khi client nhận được header `WWW-Authenticate`, client biết rằng nó nên retry với username và password.
-Hình ảnh sau đây cho thấy flow xử lý username và password:
+Khi client nhận được header `WWW-Authenticate`, client biết rằng mình cần retry với username và password.
+Hình minh họa sau đây cho thấy luồng xử lý username và password:
 
 [[servlet-authentication-basicauthenticationfilter]]
-.Authentication Username và Password
+.Authentication với username và password
 [.invert-dark]
 image::{figures}/basicauthenticationfilter.png[]
 
-Hình trước được xây dựng dựa trên sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] của chúng ta.
+Hình minh họa trên được xây dựng dựa trên sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] của chúng ta.
 
 
-image:{icondir}/number_1.png[] Khi user gửi username và password, `BasicAuthenticationFilter` tạo một `UsernamePasswordAuthenticationToken`, là một loại xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`], bằng cách trích xuất username và password từ `HttpServletRequest`.
+image:{icondir}/number_1.png[] Khi người dùng gửi username và password, `BasicAuthenticationFilter` tạo một `UsernamePasswordAuthenticationToken`, là một kiểu xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`], bằng cách trích xuất username và password từ `HttpServletRequest`.
 
-image:{icondir}/number_2.png[] Tiếp theo, `UsernamePasswordAuthenticationToken` được truyền vào `AuthenticationManager` để được authentication.
-Chi tiết về cấu trúc của `AuthenticationManager` phụ thuộc vào cách xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd[lưu trữ thông tin user].
+image:{icondir}/number_2.png[] Tiếp theo, `UsernamePasswordAuthenticationToken` được truyền vào `AuthenticationManager` để được authenticate.
+Cách triển khai `AuthenticationManager` phụ thuộc vào cách xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd[thông tin người dùng được lưu trữ].
 
 image:{icondir}/number_3.png[] Nếu authentication thất bại thì __Thất bại__.
 
 . xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder] được xóa.
 . `RememberMeServices.loginFail` được gọi.
-Nếu `remember-me` chưa được cấu hình thì đây là no-op.
+Nếu `remember-me` chưa được cấu hình, đây là no-op.
 Xem interface javadoc:org.springframework.security.web.authentication.RememberMeServices[] trong Javadoc.
-. `AuthenticationEntryPoint` được gọi để kích hoạt việc gửi lại WWW-Authenticate.
+. `AuthenticationEntryPoint` được gọi để trigger việc gửi lại header `WWW-Authenticate`.
 Xem interface javadoc:org.springframework.security.web.AuthenticationEntryPoint[] trong Javadoc.
 
 image:{icondir}/number_4.png[] Nếu authentication thành công thì __Thành công__.
 
-* Mọi `Authentication` đã được authentication trước đó trong xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] được load và các authority của nó được thêm vào xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] được trả về.
-. xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication] được set trên xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder].
+* Mọi `Authentication` đã authenticated trong xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] được tải và các authority của nó được thêm vào xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] được trả về.
+. xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication] được thiết lập trong xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder].
 . `RememberMeServices.loginSuccess` được gọi.
-Nếu `remember-me` chưa được cấu hình thì đây là no-op.
+Nếu `remember-me` chưa được cấu hình, đây là no-op.
 Xem interface javadoc:org.springframework.security.web.authentication.RememberMeServices[] trong Javadoc.
 . `BasicAuthenticationFilter` gọi `FilterChain.doFilter(request,response)` để tiếp tục phần logic còn lại của ứng dụng.
-Xem Class javadoc:org.springframework.security.web.authentication.www.BasicAuthenticationFilter[] trong Javadoc.
+Xem class javadoc:org.springframework.security.web.authentication.www.BasicAuthenticationFilter[] trong Javadoc.
 
 Theo mặc định, hỗ trợ HTTP Basic Authentication của Spring Security được bật.
-Tuy nhiên, ngay khi bất kỳ cấu hình dựa trên Servlet nào được cung cấp, HTTP Basic phải được cung cấp một cách tường minh.
+Tuy nhiên, ngay khi cung cấp bất kỳ cấu hình dựa trên Servlet nào, HTTP Basic phải được cấu hình tường minh.
 
-Ví dụ sau đây cho thấy một cấu hình tường minh, tối thiểu:
+Ví dụ sau đây cho thấy một cấu hình HTTP Basic tường minh, tối thiểu:
 
 .Cấu hình HTTP Basic tường minh
 [tabs]

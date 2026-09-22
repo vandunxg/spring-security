@@ -2,9 +2,9 @@
 = OAuth 2.0 Client
 :page-section-summary-toc: 1
 
-Các tính năng OAuth 2.0 Client cung cấp hỗ trợ cho vai trò Client được định nghĩa trong https://tools.ietf.org/html/rfc6749#section-1.1[OAuth 2.0 Authorization Framework].
+Các tính năng của OAuth 2.0 Client hỗ trợ vai trò Client được định nghĩa trong https://tools.ietf.org/html/rfc6749#section-1.1[OAuth 2.0 Authorization Framework].
 
-Ở mức tổng quan, các tính năng cốt lõi hiện có gồm:
+Ở mức khái quát, các tính năng cốt lõi gồm:
 
 .Hỗ trợ Authorization Grant
 * xref:reactive/oauth2/client/authorization-grants.adoc#oauth2-client-authorization-code[Authorization Code]
@@ -17,7 +17,7 @@ Các tính năng OAuth 2.0 Client cung cấp hỗ trợ cho vai trò Client đư
 * xref:reactive/oauth2/client/client-authentication.adoc#oauth2-client-authentication-jwt-bearer[JWT Bearer]
 
 .Hỗ trợ HTTP Client
-* xref:reactive/oauth2/client/authorized-clients.adoc#oauth2-client-web-client[Tích hợp `WebClient` cho môi trường Reactive] (để yêu cầu các tài nguyên được bảo vệ)
+* xref:reactive/oauth2/client/authorized-clients.adoc#oauth2-client-web-client[Tích hợp `WebClient` cho các môi trường Reactive] (để gửi request đến các resource được bảo vệ)
 
 DSL `ServerHttpSecurity.oauth2Client()` cung cấp một số tùy chọn cấu hình để tùy chỉnh các thành phần cốt lõi được OAuth 2.0 Client sử dụng.
 

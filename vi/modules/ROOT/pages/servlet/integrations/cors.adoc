@@ -1,9 +1,9 @@
 [[cors]]
 = CORS
 
-Spring Framework cung cấp {spring-framework-reference-url}web/webmvc-cors.html[hỗ trợ hàng đầu cho CORS].
+Spring Framework cung cấp {spring-framework-reference-url}web/webmvc-cors.html[hỗ trợ hạng nhất cho CORS].
 CORS phải được xử lý trước Spring Security, vì pre-flight request không chứa cookie nào (cụ thể là `JSESSIONID`).
-Nếu request không chứa cookie nào và Spring Security được xử lý trước, Spring Security sẽ xác định rằng người dùng chưa được authentication (vì request không có cookie nào) và từ chối request đó.
+Nếu request không chứa cookie nào và Spring Security được xử lý trước, Spring Security sẽ xác định rằng người dùng chưa được authenticated (vì request không có cookie nào) và từ chối request đó.
 
 [[cors-configuration-source]]
 == Cung cấp một `CorsConfigurationSource`
@@ -121,8 +121,8 @@ open class WebSecurityConfig {
 [[cors-per-chain-configuration]]
 == Cấu hình theo từng chain
 
-Nếu có nhiều hơn một bean `CorsConfigurationSource`, Spring Security sẽ không tự động cấu hình hỗ trợ CORS cho bạn, vì nó không thể quyết định nên sử dụng bean nào.
-Nếu muốn chỉ định một `CorsConfigurationSource` khác nhau cho mỗi `SecurityFilterChain`, bạn có thể truyền trực tiếp nó vào DSL `.cors()`.
+Nếu có từ hai bean `CorsConfigurationSource` trở lên, Spring Security sẽ không tự động cấu hình hỗ trợ CORS cho bạn, vì nó không thể quyết định nên sử dụng bean nào.
+Nếu muốn chỉ định một `CorsConfigurationSource` khác cho mỗi `SecurityFilterChain`, bạn có thể truyền trực tiếp `CorsConfigurationSource` đó vào DSL `.cors()`.
 
 [tabs]
 ======
@@ -197,8 +197,8 @@ fun corsConfigurationSource(): UrlBasedCorsConfigurationSource {
 [[cors-preflight-request-handler]]
 == `PreFlightRequestHandler` và `PreFlightRequestFilter`
 
-Spring Framework định nghĩa {spring-framework-api-url}org/springframework/web/cors/PreFlightRequestHandler.html[`PreFlightRequestHandler`] cho các ứng dụng cần xử lý CORS preflight request (`OPTIONS`) bên ngoài `CorsFilter`.
-Khi Spring Security chọn một `PreFlightRequestHandler` cho một filter chain, nó đăng ký {spring-framework-api-url}org/springframework/web/filter/PreFlightRequestFilter.html[`PreFlightRequestFilter`] trong security filter chain (trước `CorsFilter`) để preflight có thể được xử lý sớm trong vòng đời request.
+Spring Framework định nghĩa {spring-framework-api-url}org/springframework/web/cors/PreFlightRequestHandler.html[`PreFlightRequestHandler`] cho các ứng dụng cần xử lý các CORS preflight request (`OPTIONS`) bên ngoài `CorsFilter`.
+Khi Spring Security chọn một `PreFlightRequestHandler` cho một filter chain, nó đăng ký {spring-framework-api-url}org/springframework/web/filter/PreFlightRequestFilter.html[`PreFlightRequestFilter`] trong security filter chain (trước `CorsFilter`) để preflight có thể được xử lý sớm trong vòng đời của request.
 
 Bạn có thể cung cấp handler theo một trong các cách sau:
 

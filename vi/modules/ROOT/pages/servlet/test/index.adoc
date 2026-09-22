@@ -4,6 +4,6 @@
 
 Phần này mô tả phần hỗ trợ kiểm thử do Spring Security cung cấp.
 
-Để sử dụng phần hỗ trợ kiểm thử của Spring Security, bạn phải đưa `spring-security-test-{spring-security-version}.jar` vào làm dependency của dự án.
+Để sử dụng phần hỗ trợ kiểm thử của Spring Security, bạn phải thêm `spring-security-test-{spring-security-version}.jar` làm dependency cho dự án.
 
 Ở mức khái quát, phần hỗ trợ kiểm thử của Spring Security cung cấp khả năng tích hợp cho:

@@ -1,14 +1,14 @@
 [[appendix-proxy-server]]
 = Cấu hình Proxy Server
 
-Khi sử dụng proxy server, điều quan trọng là phải bảo đảm bạn đã cấu hình ứng dụng đúng cách.
-Ví dụ, nhiều ứng dụng có một load balancer phản hồi yêu cầu đến https://example.com/ bằng cách chuyển tiếp yêu cầu đến application server tại https://192.168.1:8080
-Nếu không được cấu hình đúng, application server sẽ không biết load balancer tồn tại và xử lý yêu cầu như thể client đã yêu cầu https://192.168.1:8080.
+Khi sử dụng proxy server, điều quan trọng là phải bảo đảm application đã được cấu hình đúng cách.
+Ví dụ, nhiều application có một load balancer nhận request tới https://example.com/ rồi chuyển tiếp request đó đến application server tại https://192.168.1:8080
+Nếu không được cấu hình đúng, application server sẽ không biết load balancer tồn tại và sẽ xử lý request như thể client đã gửi request tới https://192.168.1:8080.
 
-Để khắc phục điều này, bạn có thể sử dụng https://tools.ietf.org/html/rfc7239[RFC 7239] để chỉ rõ rằng đang sử dụng load balancer.
-Để ứng dụng nhận biết điều này, bạn cần cấu hình application server để nhận biết các header X-Forwarded.
+Để khắc phục điều này, bạn có thể sử dụng https://tools.ietf.org/html/rfc7239[RFC 7239] để chỉ định rằng đang sử dụng một load balancer.
+Để application nhận biết điều này, bạn cần cấu hình application server để nhận biết các header X-Forwarded.
 Ví dụ, Tomcat sử dụng https://tomcat.apache.org/tomcat-10.1-doc/api/org/apache/catalina/valves/RemoteIpValve.html[RemoteIpValve], còn Jetty sử dụng https://eclipse.dev/jetty/javadoc/jetty-11/org/eclipse/jetty/server/ForwardedRequestCustomizer.html[ForwardedRequestCustomizer].
 Ngoài ra, người dùng Spring 4.3+ có thể sử dụng https://github.com/spring-projects/spring-framework/blob/v4.3.3.RELEASE/spring-web/src/main/java/org/springframework/web/filter/ForwardedHeaderFilter.java[ForwardedHeaderFilter].
 
-Người dùng Spring Boot có thể sử dụng property `server.use-forward-headers` để cấu hình ứng dụng.
+Người dùng Spring Boot có thể sử dụng property `server.use-forward-headers` để cấu hình application.
 Xem {spring-boot-reference-url}how-to/webserver.html#howto.webserver.use-behind-a-proxy-server[tài liệu Spring Boot] để biết thêm chi tiết.

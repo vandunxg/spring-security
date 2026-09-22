@@ -8,7 +8,7 @@ Phần này trình bày chi tiết hơn về việc tích hợp.
 [[mvc-enablewebsecurity]]
 == @EnableWebSecurity
 
-Để bật việc tích hợp Spring Security với Spring MVC, hãy thêm annotation `@EnableWebSecurity` vào cấu hình của bạn.
+Để bật tích hợp Spring Security với Spring MVC, hãy thêm annotation `@EnableWebSecurity` vào cấu hình của bạn.
 
 [NOTE]
 ====
@@ -19,8 +19,8 @@ Spring Security cung cấp cấu hình bằng cách sử dụng {spring-framewor
 [[mvc-requestmatcher]]
 == PathPatternRequestMatcher
 
-Spring Security cung cấp tích hợp sâu với cách Spring MVC so khớp URL bằng `PathPatternRequestMatcher`.
-Điều này giúp đảm bảo các quy tắc Security của bạn khớp với logic được dùng để xử lý các request.
+Spring Security tích hợp sâu với cơ chế Spring MVC dùng để so khớp URL thông qua `PathPatternRequestMatcher`.
+Điều này giúp đảm bảo các quy tắc bảo mật của bạn khớp với logic được dùng để xử lý các request.
 
 `PathPatternRequestMatcher` phải sử dụng cùng `PathPatternParser` với Spring MVC.
 Nếu bạn không tùy chỉnh `PathPatternParser`, bạn có thể làm như sau:
@@ -55,17 +55,17 @@ Xml::
 ----
 ======
 
-và Spring Security sẽ tìm cấu hình Spring MVC phù hợp cho bạn.
+Sau đó, Spring Security sẽ tìm cấu hình Spring MVC phù hợp cho bạn.
 
 Nếu bạn *có* tùy chỉnh instance `PathPatternParser` của Spring MVC, bạn sẽ cần <<security-mvc-same-application-context, cấu hình Spring Security và Spring MVC trong cùng một `ApplicationContext`>>.
 
 [NOTE]
 ====
-Chúng tôi luôn khuyến nghị bạn cung cấp các quy tắc authorization bằng cách so khớp trên `HttpServletRequest` và method security.
+Chúng tôi luôn khuyến nghị bạn xây dựng các quy tắc authorization bằng cách so khớp với `HttpServletRequest` và sử dụng method security.
 
-Việc cung cấp các quy tắc authorization bằng cách so khớp trên `HttpServletRequest` là hữu ích, vì việc này diễn ra rất sớm trong code path và giúp giảm https://en.wikipedia.org/wiki/Attack_surface[bề mặt tấn công].
-Method security đảm bảo rằng nếu ai đó đã vượt qua các quy tắc web authorization, ứng dụng của bạn vẫn được bảo vệ.
-Điều này được gọi là https://en.wikipedia.org/wiki/Defense_in_depth_(computing)[Defense in Depth]
+Việc xây dựng các quy tắc authorization bằng cách so khớp với `HttpServletRequest` hữu ích vì việc này diễn ra rất sớm trong code path và giúp giảm https://en.wikipedia.org/wiki/Attack_surface[bề mặt tấn công].
+Method security đảm bảo rằng nếu ai đó bypass được các quy tắc web authorization, ứng dụng của bạn vẫn được bảo vệ.
+Điều này được gọi là https://en.wikipedia.org/wiki/Defense_in_depth_(computing)[phòng thủ theo chiều sâu]
 ====
 
 Giờ đây Spring MVC đã được tích hợp với Spring Security, bạn đã sẵn sàng viết một số xref:servlet/authorization/authorize-http-requests.adoc[quy tắc authorization] sử dụng `PathPatternRequestMatcher`.
@@ -73,7 +73,7 @@ Giờ đây Spring MVC đã được tích hợp với Spring Security, bạn đ
 [[mvc-authentication-principal]]
 == @AuthenticationPrincipal
 
-Spring Security cung cấp `AuthenticationPrincipalArgumentResolver`, có thể tự động resolve `Authentication.getPrincipal()` hiện tại cho các argument của Spring MVC.
+Spring Security cung cấp `AuthenticationPrincipalArgumentResolver`, có thể tự động resolve `Authentication.getPrincipal()` hiện tại cho các argument trong Spring MVC.
 Khi sử dụng `@EnableWebSecurity`, thành phần này sẽ tự động được thêm vào cấu hình Spring MVC của bạn.
 Nếu sử dụng cấu hình dựa trên XML, bạn phải tự thêm thành phần này:
 
@@ -86,9 +86,9 @@ Nếu sử dụng cấu hình dựa trên XML, bạn phải tự thêm thành ph
 </mvc:annotation-driven>
 ----
 
-Sau khi đã cấu hình đúng `AuthenticationPrincipalArgumentResolver`, bạn có thể hoàn toàn tách Spring Security khỏi layer Spring MVC của mình.
+Sau khi cấu hình đúng `AuthenticationPrincipalArgumentResolver`, bạn có thể hoàn toàn tách layer Spring MVC khỏi Spring Security.
 
-Hãy xét tình huống một `UserDetailsService` tùy chỉnh trả về một `Object` triển khai `UserDetails` và `Object` `CustomUser` của riêng bạn. Có thể truy cập `CustomUser` của user đã authentication hiện tại bằng đoạn code sau:
+Hãy xét tình huống một `UserDetailsService` tùy chỉnh trả về một `Object` triển khai `UserDetails` và một `Object` `CustomUser` do bạn định nghĩa. Có thể truy cập `CustomUser` của user hiện tại đã được authenticated bằng đoạn code sau:
 
 [tabs]
 ======
@@ -120,7 +120,7 @@ open fun findMessagesForUser(): ModelAndView {
 ----
 ======
 
-Kể từ Spring Security 3.2, chúng ta có thể resolve argument trực tiếp hơn bằng cách thêm một annotation:
+Kể từ Spring Security 3.2, bạn có thể resolve argument trực tiếp hơn bằng cách thêm một annotation:
 
 [tabs]
 ======
@@ -152,7 +152,7 @@ open fun findMessagesForUser(@AuthenticationPrincipal customUser: CustomUser?): 
 ======
 
 Đôi khi bạn có thể cần biến đổi principal theo một cách nào đó.
-Ví dụ, nếu `CustomUser` cần là final thì nó không thể được kế thừa.
+Ví dụ, nếu `CustomUser` là `final` thì bạn không thể kế thừa nó.
 Trong tình huống này, `UserDetailsService` có thể trả về một `Object` triển khai `UserDetails` và cung cấp method có tên `getCustomUser` để truy cập `CustomUser`:
 
 [tabs]
@@ -184,7 +184,7 @@ class CustomUserUserDetails(
 ----
 ======
 
-Sau đó chúng ta có thể truy cập `CustomUser` bằng cách sử dụng {spring-framework-reference-url}core/expressions.html[biểu thức SpEL] lấy `Authentication.getPrincipal()` làm root object:
+Sau đó, bạn có thể truy cập `CustomUser` bằng {spring-framework-reference-url}core/expressions.html[biểu thức SpEL] sử dụng `Authentication.getPrincipal()` làm root object:
 
 [tabs]
 ======
@@ -219,8 +219,8 @@ open fun findMessagesForUser(@AuthenticationPrincipal(expression = "customUser")
 ----
 ======
 
-Chúng ta cũng có thể tham chiếu đến các bean trong biểu thức SpEL.
-Ví dụ, chúng ta có thể sử dụng đoạn sau nếu dùng JPA để quản lý user và muốn sửa đổi rồi lưu một property trên user hiện tại:
+Bạn cũng có thể tham chiếu đến các bean trong biểu thức SpEL.
+Ví dụ, bạn có thể sử dụng đoạn sau nếu dùng JPA để quản lý user và muốn sửa đổi rồi lưu một property của user hiện tại:
 
 [tabs]
 ======
@@ -265,13 +265,13 @@ open fun updateName(
 ----
 ======
 
-Chúng ta có thể loại bỏ thêm dependency vào Spring Security bằng cách biến `@AuthenticationPrincipal` thành meta-annotation trên annotation của riêng mình.
+Bạn có thể tiếp tục loại bỏ dependency vào Spring Security bằng cách biến `@AuthenticationPrincipal` thành meta-annotation trên annotation của riêng mình.
 Ví dụ tiếp theo minh họa cách thực hiện điều này trên annotation có tên `@CurrentUser`.
 
 [NOTE]
 ====
-Để loại bỏ dependency vào Spring Security, chính consuming application sẽ tạo `@CurrentUser`.
-Bước này không bắt buộc nghiêm ngặt nhưng giúp cô lập dependency của bạn vào Spring Security ở một vị trí tập trung hơn.
+Để loại bỏ dependency vào Spring Security, chính application sử dụng sẽ tạo `@CurrentUser`.
+Bước này không bắt buộc nghiêm ngặt nhưng giúp cô lập dependency vào Spring Security ở một vị trí tập trung hơn.
 ====
 
 [tabs]
@@ -299,8 +299,8 @@ annotation class CurrentUser
 ----
 ======
 
-Chúng ta đã cô lập dependency vào Spring Security trong một file duy nhất.
-Giờ đây `@CurrentUser` đã được xác định, chúng ta có thể dùng nó để báo rằng cần resolve `CustomUser` của user đã authentication hiện tại:
+Bạn đã cô lập dependency vào Spring Security trong một file duy nhất.
+Giờ đây `@CurrentUser` đã được xác định, bạn có thể dùng nó để cho biết cần resolve `CustomUser` của user hiện tại đã được authenticated:
 
 [tabs]
 ======
@@ -327,9 +327,9 @@ open fun findMessagesForUser(@CurrentUser customUser: CustomUser?): ModelAndView
 ----
 ======
 
-Khi đã là một meta-annotation, bạn cũng có thể truyền parameter cho nó.
+Khi annotation là một meta-annotation, bạn cũng có thể truyền parameter cho nó.
 
-Ví dụ, hãy xét trường hợp bạn có JWT làm principal và muốn chỉ định claim nào cần truy xuất.
+Ví dụ, hãy xét trường hợp JWT là principal và bạn muốn chỉ định claim nào cần truy xuất.
 Là một meta-annotation, bạn có thể viết như sau:
 
 [tabs]
@@ -357,10 +357,10 @@ annotation class CurrentUser
 ----
 ======
 
-Điều này đã khá mạnh.
+Cách này đã khá mạnh.
 Tuy nhiên, nó cũng bị giới hạn ở việc truy xuất claim `sub`.
 
-Để linh hoạt hơn, trước tiên hãy publish bean `AnnotationTemplateExpressionDefaults` như sau:
+Để linh hoạt hơn, trước tiên hãy đăng ký bean `AnnotationTemplateExpressionDefaults` như sau:
 
 [tabs]
 ======
@@ -392,7 +392,7 @@ Xml::
 ----
 ======
 
-và sau đó bạn có thể cung cấp parameter cho `@CurrentUser` như sau:
+Sau đó, bạn có thể cung cấp parameter cho `@CurrentUser` như sau:
 
 [tabs]
 ======
@@ -421,7 +421,7 @@ annotation class CurrentUser(val claim: String = "sub")
 ----
 ======
 
-Điều này cho phép bạn linh hoạt hơn giữa các application của mình theo cách sau:
+Điều này cho phép bạn linh hoạt hơn giữa các application của bạn theo cách sau:
 
 [tabs]
 ======
@@ -451,7 +451,7 @@ open fun findMessagesForUser(@CurrentUser("user_id") userId: String?): ModelAndV
 [[mvc-current-security-context]]
 == @CurrentSecurityContext
 
-Spring Security cung cấp `CurrentSecurityContextArgumentResolver`, có thể tự động resolve `SecurityContext` hiện tại cho các argument của Spring MVC.
+Spring Security cung cấp `CurrentSecurityContextArgumentResolver`, có thể tự động resolve `SecurityContext` hiện tại cho các argument trong Spring MVC.
 Khi sử dụng `@EnableWebSecurity`, thành phần này sẽ tự động được thêm vào cấu hình Spring MVC của bạn.
 Nếu sử dụng cấu hình dựa trên XML, bạn phải tự thêm thành phần này:
 
@@ -515,11 +515,11 @@ fun me(@CurrentSecurityContext(expression = "authentication") authentication: Au
 ======
 
 [[mvc-async]]
-== Tích hợp Async của Spring MVC
+== Tích hợp async trong Spring MVC
 
 Spring Web MVC 3.2+ hỗ trợ rất tốt {spring-framework-reference-url}web/webmvc/mvc-ann-async.html[xử lý request bất đồng bộ].
-Không cần cấu hình bổ sung, Spring Security tự động thiết lập `SecurityContext` cho `Thread` gọi một `Callable` được controller của bạn trả về.
-Ví dụ, method sau đây tự động có `Callable` được gọi với `SecurityContext` đã có tại thời điểm `Callable` được tạo:
+Không cần cấu hình bổ sung, Spring Security tự động thiết lập `SecurityContext` cho `Thread` thực thi một `Callable` do controller của bạn trả về.
+Ví dụ, `Callable` của method sau đây sẽ tự động được gọi với `SecurityContext` có tại thời điểm `Callable` được tạo:
 
 [tabs]
 ======
@@ -554,23 +554,23 @@ open fun processUpload(file: MultipartFile?): Callable<String> {
 ======
 
 
-.Liên kết SecurityContext với các Callable
+.Gắn SecurityContext với Callable
 [NOTE]
 ====
 Nói chính xác hơn về mặt kỹ thuật, Spring Security tích hợp với `WebAsyncManager`.
-`SecurityContext` được dùng để xử lý `Callable` là `SecurityContext` tồn tại trên `SecurityContextHolder` khi `startCallableProcessing` được gọi.
+`SecurityContext` dùng để xử lý `Callable` là `SecurityContext` đang tồn tại trên `SecurityContextHolder` khi `startCallableProcessing` được gọi.
 ====
 
 Không có tích hợp tự động với `DeferredResult` được controller trả về.
-Điều này là vì `DeferredResult` được user xử lý, do đó không có cách nào tích hợp tự động với nó.
-Tuy nhiên, bạn vẫn có thể sử dụng xref:features/integrations/concurrency.adoc#concurrency[Hỗ trợ Concurrency] để cung cấp tích hợp minh bạch với Spring Security.
+Điều này là vì `DeferredResult` do user tự xử lý, do đó không có cách nào tích hợp tự động với nó.
+Tuy nhiên, bạn vẫn có thể sử dụng xref:features/integrations/concurrency.adoc#concurrency[Hỗ trợ concurrency] để cung cấp tích hợp minh bạch với Spring Security.
 
 [[mvc-csrf]]
 == Tích hợp Spring MVC và CSRF
 
 Spring Security tích hợp với Spring MVC để bổ sung cơ chế bảo vệ CSRF.
 
-=== Tự động đưa Token vào
+=== Tự động đưa token vào
 
 Spring Security tự động xref:servlet/exploits/csrf.adoc#csrf-integration-form[đưa CSRF Token vào] các form sử dụng {spring-framework-reference-url}web/webmvc-view/mvc-jsp.html#mvc-view-jsp-formtaglib-formtag[form tag của Spring MVC].
 Hãy xét JSP sau:
@@ -614,13 +614,13 @@ Ví dụ trên xuất ra HTML tương tự như sau:
 ----
 
 [[mvc-csrf-resolver]]
-=== Resolve CsrfToken
+=== Resolve `CsrfToken`
 
 Spring Security cung cấp `CsrfTokenArgumentResolver`, có thể tự động resolve `CsrfToken` hiện tại cho các argument của Spring MVC.
 Khi sử dụng xref:servlet/configuration/java.adoc#jc-hello-wsca[@EnableWebSecurity], thành phần này sẽ tự động được thêm vào cấu hình Spring MVC của bạn.
 Nếu sử dụng cấu hình dựa trên XML, bạn phải tự thêm thành phần này.
 
-Sau khi cấu hình đúng `CsrfTokenArgumentResolver`, bạn có thể expose `CsrfToken` cho application dựa trên HTML tĩnh của mình:
+Sau khi cấu hình đúng `CsrfTokenArgumentResolver`, bạn có thể cung cấp `CsrfToken` cho application sử dụng HTML tĩnh của mình:
 
 [tabs]
 ======
@@ -652,17 +652,17 @@ class CsrfController {
 ----
 ======
 
-Điều quan trọng là phải giữ bí mật `CsrfToken` với các domain khác.
-Điều này có nghĩa là nếu sử dụng https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS[Cross Origin Sharing (CORS)], bạn *KHÔNG* nên expose `CsrfToken` cho bất kỳ domain bên ngoài nào.
+Điều quan trọng là không để lộ `CsrfToken` cho các domain khác.
+Điều này có nghĩa là nếu sử dụng https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS[Cross-Origin Resource Sharing (CORS)], bạn *KHÔNG* nên expose `CsrfToken` cho bất kỳ domain bên ngoài nào.
 
 [[security-mvc-same-application-context]]
-== Cấu hình Spring MVC và Spring Security trong cùng một Application Context
+== Cấu hình Spring MVC và Spring Security trong cùng một `ApplicationContext`
 
 Nếu sử dụng Boot, theo mặc định Spring MVC và Spring Security nằm trong cùng một application context.
 
-Nếu không, đối với Java Config, việc bao gồm cả `@EnableWebMvc` và `@EnableWebSecurity` sẽ tạo các component của Spring Security và Spring MVC trong cùng context.
+Nếu không, đối với Java Config, việc cấu hình cả `@EnableWebMvc` và `@EnableWebSecurity` sẽ khởi tạo các component của Spring Security và Spring MVC trong cùng context.
 
-Hoặc nếu sử dụng ``ServletListener``s, bạn có thể làm như sau:
+Hoặc nếu dùng các ``ServletListener``s, bạn có thể làm như sau:
 
 [tabs]
 ======
@@ -714,7 +714,7 @@ class SecurityInitializer : AbstractAnnotationConfigDispatcherServletInitializer
 ----
 ======
 
-Cuối cùng, đối với file `web.xml`, bạn cấu hình `DispatcherServlet` như sau:
+Cuối cùng, với file `web.xml`, bạn cấu hình `DispatcherServlet` như sau:
 
 [source,xml]
 ----
@@ -745,4 +745,3 @@ Cuối cùng, đối với file `web.xml`, bạn cấu hình `DispatcherServlet`
 ----
 
 `WebSecurityConfiguration` sau đây được đặt trong `ApplicationContext` của `DispatcherServlet`.
-

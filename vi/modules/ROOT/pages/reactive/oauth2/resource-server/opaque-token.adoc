@@ -1,4 +1,4 @@
-= Opaque Token của Resource Server OAuth 2.0
+= Opaque Token của OAuth 2.0 Resource Server
 
 [[webflux-oauth2resourceserver-opaque-minimaldependencies]]
 == Dependency tối thiểu cho Introspection
@@ -36,18 +36,18 @@ spring:
 
 Trong đó, `https://idp.example.com/introspect` là introspection endpoint do authorization server của bạn lưu trữ, còn `client-id` và `client-secret` là các credential cần thiết để truy cập endpoint đó.
 
-Resource Server sử dụng các property này để tự cấu hình thêm, sau đó xác thực các JWT đến.
+Resource Server sử dụng các property này để tự cấu hình thêm, sau đó validate các JWT đến.
 
 [NOTE]
 ====
-Nếu authorization server phản hồi rằng token hợp lệ thì token đó hợp lệ.
+Nếu authorization server phản hồi token hợp lệ thì token đó được xem là hợp lệ.
 ====
 
 === Hành vi khi khởi động
 
-Khi sử dụng property và các dependency này, Resource Server tự động cấu hình để xác thực Opaque Bearer Token.
+Khi sử dụng property và các dependency này, Resource Server tự động cấu hình để validate Opaque Bearer Token.
 
-Quy trình khởi động này đơn giản hơn khá nhiều so với JWT, vì không cần discovery endpoint và cũng không thêm quy tắc xác thực nào.
+Quy trình khởi động này đơn giản hơn khá nhiều so với JWT, vì không cần discovery endpoint và cũng không bổ sung validation rule nào.
 
 === Hành vi khi chạy
 
@@ -78,7 +78,7 @@ Từ đây, bạn có thể chuyển đến:
 [[webflux-oauth2resourceserver-opaque-attributes]]
 == Tra cứu Attribute sau Authentication
 
-Sau khi token được authentication, một instance của `BearerTokenAuthentication` được đặt trong `SecurityContext`.
+Sau khi token được authenticated, một instance của `BearerTokenAuthentication` được đặt trong `SecurityContext`.
 
 Điều này có nghĩa là nó khả dụng trong các method `@Controller` khi bạn sử dụng `@EnableWebFlux` trong cấu hình:
 
@@ -262,7 +262,7 @@ Ví dụ trước yêu cầu scope `message:read` cho mọi URL bắt đầu b�
 
 Các method trên DSL `oauth2ResourceServer` cũng ghi đè hoặc thay thế auto-configuration.
 
-Ví dụ, `@Bean` thứ hai mà Spring Boot tạo là một `ReactiveOpaqueTokenIntrospector`, dùng để giải mã token `String` thành các instance đã được xác thực của `OAuth2AuthenticatedPrincipal`:
+Ví dụ, `@Bean` thứ hai mà Spring Boot tạo là một `ReactiveOpaqueTokenIntrospector`, dùng để giải mã token `String` thành các instance đã được validate của `OAuth2AuthenticatedPrincipal`:
 
 [tabs]
 ======
@@ -402,7 +402,7 @@ fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain 
 [[webflux-oauth2resourceserver-opaque-introspector-bean]]
 === Expose `@Bean` `ReactiveOpaqueTokenIntrospector`
 
-Hoặc việc expose `@Bean` `ReactiveOpaqueTokenIntrospector` có tác dụng tương tự như `introspector()`:
+Tương tự, expose một `@Bean` `ReactiveOpaqueTokenIntrospector` cũng có tác dụng như `introspector()`:
 
 [tabs]
 ======
@@ -514,7 +514,7 @@ fun getMessages(): Flux<Message> { }
 [[webflux-oauth2resourceserver-opaque-authorization-extraction]]
 === Trích xuất Authority thủ công
 
-Theo mặc định, hỗ trợ Opaque Token trích xuất claim scope từ introspection response và phân tích nó thành các instance `GrantedAuthority` riêng lẻ.
+Theo mặc định, hỗ trợ Opaque Token trích xuất claim scope từ introspection response và parse nó thành các instance `GrantedAuthority` riêng lẻ.
 
 Hãy xem ví dụ sau:
 
@@ -614,7 +614,7 @@ Hỗ trợ Opaque Token của Spring Security được thiết kế để không
 
 Vì vậy, giả sử bạn cần kiểm tra với authorization server trong mỗi request, phòng trường hợp JWT đã bị thu hồi.
 
-Mặc dù bạn sử dụng định dạng JWT cho token, phương thức xác thực của bạn là introspection, nghĩa là bạn sẽ thực hiện như sau:
+Mặc dù bạn sử dụng định dạng JWT cho token, phương thức validate của bạn là introspection, nghĩa là bạn sẽ thực hiện như sau:
 
 [source,yaml]
 ----
@@ -722,14 +722,14 @@ fun introspector(): ReactiveOpaqueTokenIntrospector {
 [[webflux-oauth2resourceserver-opaque-userinfo]]
 == Gọi Endpoint `/userinfo`
 
-Nói chung, Resource Server không quan tâm đến user bên dưới mà quan tâm đến các authority đã được cấp.
+Nói chung, Resource Server không quan tâm đến user đứng sau mà quan tâm đến các authority đã được cấp.
 
-Tuy vậy, đôi khi việc liên kết phát biểu authorization trở lại với một user có thể hữu ích.
+Tuy vậy, đôi khi việc gắn kết authorization với một user có thể hữu ích.
 
 Nếu một ứng dụng cũng sử dụng `spring-security-oauth2-client` và đã thiết lập `ClientRegistrationRepository` phù hợp, bạn có thể thực hiện việc này bằng một `OpaqueTokenIntrospector` tùy chỉnh.
 Phần triển khai trong listing tiếp theo thực hiện ba việc:
 
-* Ủy quyền cho introspection endpoint để xác nhận tính hợp lệ của token.
+* Ủy thác việc xác nhận tính hợp lệ của token cho introspection endpoint.
 * Tra cứu client registration phù hợp liên kết với endpoint `/userinfo`.
 * Gọi và trả về response từ endpoint `/userinfo`.
 

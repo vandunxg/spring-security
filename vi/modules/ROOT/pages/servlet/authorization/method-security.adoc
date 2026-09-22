@@ -550,7 +550,7 @@ Nếu không, Spring Security sẽ ném `AccessDeniedException` và trả về s
 Lưu ý rằng `@PostAuthorize` không được khuyến nghị cho các class thực hiện ghi vào database vì điều đó thường có nghĩa là thay đổi database đã xảy ra trước khi các invariant về security được kiểm tra.
 Một ví dụ phổ biến là khi bạn có `@Transactional` và `@PostAuthorize` trên cùng một method.
 Thay vào đó, trước tiên hãy đọc giá trị bằng cách sử dụng `@PostAuthorize` cho thao tác đọc, rồi thực hiện ghi vào database nếu thao tác đọc đó được authorization.
-Nếu bắt buộc phải làm như vậy, bạn có thể <<changing-the-order,đảm bảo `@EnableTransactionManagement` đứng trước `@EnableMethodSecurity>>.
+Nếu bắt buộc phải làm như vậy, bạn có thể <<changing-the-order,đảm bảo `@EnableTransactionManagement` đứng trước `@EnableMethodSecurity`>>.
 =====
 
 [[use-prefilter]]
@@ -1917,7 +1917,7 @@ Xml::
 <1> Không ai có thể gọi method này vì bất kỳ lý do nào
 <2> Method này chỉ có thể được gọi bởi ``Authentication`` được cấp authority `ROLE_ADMIN`
 <3> Method này chỉ có thể được gọi bởi ``Authentication`` được cấp các authority `db` và `ROLE_ADMIN`
-<4> Method này chỉ có thể được gọi bởi ``Princpal`` có claim `aud` bằng "my-audience"
+<4> Method này chỉ có thể được gọi bởi ``Principal`` có claim `aud` bằng "my-audience"
 <5> Method này chỉ có thể được gọi nếu method `check` của bean ``authz`` trả về `true`
 
 [TIP]

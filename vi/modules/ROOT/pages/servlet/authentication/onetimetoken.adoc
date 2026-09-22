@@ -2,145 +2,145 @@
 = Đăng nhập bằng One-Time Token
 
 Spring Security hỗ trợ authentication bằng One-Time Token (OTT) thông qua DSL `oneTimeTokenLogin()`.
-Trước khi đi vào chi tiết triển khai, cần làm rõ phạm vi của tính năng OTT trong framework, nêu rõ những gì được hỗ trợ và những gì không được hỗ trợ.
+Trước khi đi vào chi tiết triển khai, cần làm rõ phạm vi của tính năng OTT trong framework, bao gồm những gì được hỗ trợ và những gì không được hỗ trợ.
 
 == Tìm hiểu One-Time Token và One-Time Password
 
-One-Time Token (OTT) thường bị nhầm lẫn với https://en.wikipedia.org/wiki/One-time_password[One-Time Password] (OTP), nhưng trong Spring Security, hai khái niệm này khác nhau ở một số điểm chính.
+One-Time Token (OTT) thường bị nhầm lẫn với https://en.wikipedia.org/wiki/One-time_password[One-Time Password] (OTP), nhưng trong Spring Security, hai khái niệm này khác nhau ở một số điểm quan trọng.
 Để rõ ràng, trong tài liệu này OTP được hiểu là https://en.wikipedia.org/wiki/Time-based_one-time_password[TOTP] (Time-Based One-Time Password) hoặc https://en.wikipedia.org/wiki/HMAC-based_one-time_password[HOTP] (HMAC-Based One-Time Password).
 
-=== Yêu cầu thiết lập
+=== Yêu cầu setup
 
-- OTT: Không yêu cầu thiết lập ban đầu. Người dùng không cần cấu hình trước bất kỳ điều gì.
-- OTP: Thông thường yêu cầu thiết lập, chẳng hạn như tạo và chia sẻ một secret key với một công cụ bên ngoài để tạo các one-time password.
+- OTT: Không cần setup ban đầu. Người dùng không cần cấu hình gì trước.
+- OTP: Thông thường cần setup, chẳng hạn như tạo và chia sẻ một secret key với một external tool để tạo one-time passwords.
 
-=== Phân phối token
+=== Token delivery
 
-- OTT: Thông thường cần triển khai một javadoc:org.springframework.security.web.authentication.ott.OneTimeTokenGenerationSuccessHandler[] tùy chỉnh, chịu trách nhiệm phân phối token đến người dùng cuối.
-- OTP: Token thường được tạo bởi một công cụ bên ngoài, vì vậy không cần gửi token đến người dùng thông qua ứng dụng.
+- OTT: Thông thường cần triển khai một javadoc:org.springframework.security.web.authentication.ott.OneTimeTokenGenerationSuccessHandler[] tùy chỉnh, chịu trách nhiệm delivery token đến end user.
+- OTP: Token thường được generate bởi một external tool, vì vậy không cần delivery token đến user qua application.
 
-=== Tạo token
+=== Token generation
 
-- OTT: Method javadoc:org.springframework.security.authentication.ott.OneTimeTokenService#generate(org.springframework.security.authentication.ott.GenerateOneTimeTokenRequest)[] yêu cầu trả về một javadoc:org.springframework.security.authentication.ott.OneTimeToken[], nhấn mạnh việc tạo token ở phía server.
-- OTP: Token không nhất thiết được tạo ở phía server; thường được tạo bởi client bằng secret đã chia sẻ.
+- OTT: Method javadoc:org.springframework.security.authentication.ott.OneTimeTokenService#generate(org.springframework.security.authentication.ott.GenerateOneTimeTokenRequest)[] yêu cầu trả về một javadoc:org.springframework.security.authentication.ott.OneTimeToken[], nhấn mạnh việc generate token ở server-side.
+- OTP: Token không nhất thiết được generate ở server-side; thường được client tạo bằng shared secret.
 
-Tóm lại, One-Time Token (OTT) cung cấp một cách để authentication người dùng mà không cần thiết lập tài khoản bổ sung, khác với One-Time Password (OTP), vốn thường có quy trình thiết lập phức tạp hơn và dựa vào các công cụ bên ngoài để tạo token.
+Tóm lại, One-Time Token (OTT) cung cấp một cách để authenticate user mà không cần setup account bổ sung, khác với One-Time Password (OTP), vốn thường có quy trình setup phức tạp hơn và dựa vào external tool để generate token.
 
 Đăng nhập bằng One-Time Token hoạt động qua hai bước chính.
 
-1. Người dùng yêu cầu token bằng cách gửi user identifier, thường là username, và token được phân phối đến họ, thường dưới dạng Magic Link, qua email, SMS, v.v.
-2. Người dùng gửi token đến endpoint đăng nhập bằng one-time token và nếu token hợp lệ, người dùng sẽ được đăng nhập.
+1. User submit user identifier để request token, thường là username, và token được delivery đến họ, thường dưới dạng Magic Link, qua e-mail, SMS, v.v.
+2. User submit token đến one-time token login endpoint; nếu token hợp lệ, user sẽ được authenticated.
 
 Các phần sau sẽ trình bày cách cấu hình OTT Login theo nhu cầu của bạn.
 
-- <<default-pages,Tìm hiểu việc tích hợp với trang đăng nhập được tạo mặc định>>
-- <<sending-token-to-user,Gửi token đến người dùng>>
-- <<changing-submit-page-url,Cấu hình trang gửi One-Time Token>>
-- <<changing-generate-url,Thay đổi URL tạo One-Time Token>>
-- <<customize-generate-consume-token,Tùy chỉnh cách tạo và sử dụng token>>
-- <<validating-account-status,Xác thực trạng thái tài khoản>>
+- <<default-pages,Tìm hiểu việc tích hợp với login page được generate mặc định>>
+- <<sending-token-to-user,Delivery token đến user>>
+- <<changing-submit-page-url,Cấu hình One-Time Token submit page>>
+- <<changing-generate-url,Thay đổi One-Time Token generate URL>>
+- <<customize-generate-consume-token,Customize cách generate và consume token>>
+- <<validating-account-status,Validate trạng thái account>>
 
 [[default-pages]]
-== Trang đăng nhập mặc định và trang gửi One-Time Token mặc định
+== Default Login Page và Default One-Time Token Submit Page
 
-Khi sử dụng DSL `oneTimeTokenLogin()`, theo mặc định, trang đăng nhập bằng One-Time Token được tự động tạo bởi javadoc:org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter[].
-DSL cũng thiết lập javadoc:org.springframework.security.web.authentication.ui.DefaultOneTimeTokenSubmitPageGeneratingFilter[] để tạo trang gửi One-Time Token mặc định.
+Khi sử dụng DSL `oneTimeTokenLogin()`, theo mặc định, One-Time Token Login Page được auto-generate bởi javadoc:org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter[].
+DSL cũng thiết lập javadoc:org.springframework.security.web.authentication.ui.DefaultOneTimeTokenSubmitPageGeneratingFilter[] để generate default One-Time Token submit page.
 
 [[sending-token-to-user]]
-== Gửi token đến người dùng
+== Token delivery đến user
 
-Spring Security không thể xác định một cách hợp lý phương thức phân phối token đến người dùng của bạn.
-Do đó, cần cung cấp một javadoc:org.springframework.security.web.authentication.ott.OneTimeTokenGenerationSuccessHandler[] tùy chỉnh để phân phối token đến người dùng theo nhu cầu của bạn.
-Một trong những chiến lược phân phối phổ biến nhất là Magic Link, qua email, SMS, v.v.
-Trong ví dụ sau, chúng ta sẽ tạo một magic link và gửi nó đến email của người dùng.
+Spring Security không thể xác định một cách hợp lý cách token được delivery đến user của bạn.
+Do đó, cần cung cấp một javadoc:org.springframework.security.web.authentication.ott.OneTimeTokenGenerationSuccessHandler[] tùy chỉnh để delivery token đến user theo nhu cầu của bạn.
+Một trong những delivery strategy phổ biến nhất là Magic Link, qua e-mail, SMS, v.v.
+Trong ví dụ sau, chúng ta sẽ tạo một magic link và gửi link đó đến email của user.
 
 include-code::./SecurityConfig[tag=config,indent=0]
 include-code::./MagicLinkOneTimeTokenGenerationSuccessHandler[tag=snippet,indent=0]
-<1> Tạo `MagicLinkOneTimeTokenGenerationSuccessHandler` thành một Spring bean
-<2> Tạo URL xử lý đăng nhập với `token` làm query param
-<3> Lấy email của người dùng dựa trên username
-<4> Sử dụng API `MailSender` để gửi email chứa magic link đến người dùng
+<1> Đăng ký `MagicLinkOneTimeTokenGenerationSuccessHandler` dưới dạng Spring bean
+<2> Tạo login processing URL với `token` làm query param
+<3> Retrieve email của user dựa trên username
+<4> Sử dụng API `MailSender` để gửi email chứa magic link đến user
 <5> Sử dụng `RedirectOneTimeTokenGenerationSuccessHandler` để redirect đến URL mong muốn
 
 Nội dung email sẽ tương tự như sau:
 
 > Use the following link to sign in into the application: \http://localhost:8080/login/ott?token=a830c444-29d8-4d98-9b46-6aba7b22fe5b
 
-Trang gửi mặc định sẽ phát hiện URL có query param `token` và tự động điền trường biểu mẫu bằng giá trị token.
+Default submit page sẽ detect URL có query param `token` và tự động điền form field bằng token value.
 
 [[changing-generate-url]]
-== Thay đổi URL tạo One-Time Token
+== Thay đổi One-Time Token Generate URL
 
-Theo mặc định, javadoc:org.springframework.security.web.authentication.ott.GenerateOneTimeTokenFilter[] lắng nghe các request `POST /ott/generate`.
-Có thể thay đổi URL đó bằng method DSL `tokenGeneratingUrl(String)`:
+Theo mặc định, javadoc:org.springframework.security.web.authentication.ott.GenerateOneTimeTokenFilter[] xử lý các request `POST /ott/generate`.
+Có thể thay đổi URL đó bằng DSL method `tokenGeneratingUrl(String)`:
 
 include-code::./SecurityConfig[tag=config,indent=0]
 include-code::./MagicLinkOneTimeTokenGenerationSuccessHandler[tag=snippet,indent=0]
 
 [NOTE]
 ====
-URI được truyền vào `tokenGeneratingUrl` được so khớp theo nghĩa đen.
-Nếu muốn URI nằm dưới base path của servlet ứng dụng, hãy đưa rõ prefix đó vào, ví dụ: `tokenGeneratingUrl("/api/ott/generate")`.
+URI được truyền vào `tokenGeneratingUrl` được match theo nghĩa đen.
+Nếu muốn URI nằm dưới base path của application servlet, hãy đưa rõ prefix đó vào, ví dụ: `tokenGeneratingUrl("/api/ott/generate")`.
 Điều tương tự cũng áp dụng cho `loginProcessingUrl` và `tokenGeneratingUrl` ở những phần khác của trang này.
 ====
 
 [[changing-submit-page-url]]
-== Thay đổi URL của trang gửi mặc định
+== Thay đổi URL của Default Submit Page
 
-Trang gửi One-Time Token mặc định được tạo bởi javadoc:org.springframework.security.web.authentication.ui.DefaultOneTimeTokenSubmitPageGeneratingFilter[] và lắng nghe `GET /login/ott`.
+Default One-Time Token submit page được generate bởi javadoc:org.springframework.security.web.authentication.ui.DefaultOneTimeTokenSubmitPageGeneratingFilter[] và xử lý `GET /login/ott`.
 Cũng có thể thay đổi URL như sau:
 
 include-code::./SecurityConfig[tag=config,indent=0]
 include-code::./MagicLinkOneTimeTokenGenerationSuccessHandler[tag=snippet,indent=0]
 
 [[disabling-default-submit-page]]
-== Vô hiệu hóa trang gửi mặc định
+== Disable default submit page
 
-Nếu muốn sử dụng trang gửi One-Time Token của riêng mình, bạn có thể vô hiệu hóa trang mặc định rồi cung cấp endpoint riêng.
+Nếu muốn sử dụng One-Time Token submit page của riêng mình, bạn có thể disable default page rồi cung cấp endpoint riêng.
 
 include-code::./SecurityConfig[tag=config,indent=0]
 include-code::./MagicLinkOneTimeTokenGenerationSuccessHandler[tag=snippet,indent=0]
 include-code::./MyController[tag=snippet,indent=0]
 
 [[customize-generate-consume-token]]
-== Tùy chỉnh cách tạo và sử dụng One-Time Token
+== Customize cách generate và consume One-Time Token
 
-Interface định nghĩa các thao tác chung để tạo và sử dụng one-time token là javadoc:org.springframework.security.authentication.ott.OneTimeTokenService[].
-Nếu không cung cấp implementation nào, Spring Security sử dụng javadoc:org.springframework.security.authentication.ott.InMemoryOneTimeTokenService[] làm implementation mặc định của interface đó.
-Trong môi trường production, hãy cân nhắc sử dụng javadoc:org.springframework.security.authentication.ott.JdbcOneTimeTokenService[].
+Interface định nghĩa các operation chung để generate và consume one-time token là javadoc:org.springframework.security.authentication.ott.OneTimeTokenService[].
+Nếu không cung cấp implementation nào, Spring Security sử dụng javadoc:org.springframework.security.authentication.ott.InMemoryOneTimeTokenService[] làm default implementation của interface đó.
+Trong production, hãy cân nhắc sử dụng javadoc:org.springframework.security.authentication.ott.JdbcOneTimeTokenService[].
 
-Một số lý do phổ biến nhất để tùy chỉnh `OneTimeTokenService` bao gồm, nhưng không giới hạn ở:
+Một số lý do phổ biến nhất để customize `OneTimeTokenService` bao gồm, nhưng không giới hạn ở:
 
-- Thay đổi thời gian hết hạn của one-time token
-- Lưu thêm thông tin từ request tạo token
-- Thay đổi cách tạo giá trị token
-- Bổ sung validation khi sử dụng one-time token
+- Thay đổi expire time của one-time token
+- Lưu thêm information từ generate token request
+- Thay đổi cách generate token value
+- Bổ sung validation khi consume one-time token
 
-Có hai lựa chọn để tùy chỉnh `OneTimeTokenService`.
-Một lựa chọn là cung cấp nó dưới dạng bean để DSL `oneTimeTokenLogin()` có thể tự động nhận diện:
+Có hai option để customize `OneTimeTokenService`.
+Một option là cung cấp nó dưới dạng bean để DSL `oneTimeTokenLogin()` có thể tự động pick up:
 
 include-code::./OneTimeTokenServiceBeanSecurityConfig[tag=config,indent=0]
 include-code::./MagicLinkOneTimeTokenGenerationSuccessHandler[tag=snippet,indent=0]
 
-Lựa chọn thứ hai là truyền instance `OneTimeTokenService` vào DSL. Cách này hữu ích khi có nhiều `SecurityFilterChain` và cần một `OneTimeTokenService` khác nhau cho từng chain.
+Option thứ hai là truyền instance `OneTimeTokenService` vào DSL. Cách này hữu ích khi có nhiều `SecurityFilterChain` và cần một `OneTimeTokenService` khác nhau cho từng chain.
 
 include-code::./OneTimeTokenServiceDSLSecurityConfig[tag=config,indent=0]
 include-code::./MagicLinkOneTimeTokenGenerationSuccessHandler[tag=snippet,indent=0]
 
 [[customize-generate-token-request]]
-== Tùy chỉnh instance GenerateOneTimeTokenRequest
-Có một số lý do khiến bạn muốn điều chỉnh GenerateOneTimeTokenRequest. Ví dụ, bạn có thể muốn đặt expiresIn thành 10 mins, trong khi Spring Security đặt mặc định là 5 mins.
+== Customize instance của GenerateOneTimeTokenRequest
+Có một số lý do khiến bạn muốn adjust GenerateOneTimeTokenRequest. Ví dụ, bạn có thể muốn set expiresIn thành 10 mins, trong khi Spring Security set mặc định là 5 mins.
 
-Bạn có thể tùy chỉnh các thành phần của GenerateOneTimeTokenRequest bằng cách publish một GenerateOneTimeTokenRequestResolver dưới dạng `@Bean`, như sau:
+Bạn có thể customize các thành phần của GenerateOneTimeTokenRequest bằng cách publish một GenerateOneTimeTokenRequestResolver dưới dạng `@Bean`, như sau:
 
 include-code::./SecurityConfig[tag=config,indent=0]
 
 [[validating-account-status]]
-== Xác thực trạng thái tài khoản
+== Validate trạng thái account
 
-Theo mặc định, javadoc:org.springframework.security.authentication.ott.OneTimeTokenAuthenticationProvider[] không validation trạng thái của tài khoản đã authentication, chẳng hạn tài khoản có bị khóa, bị vô hiệu hóa hoặc hết hạn hay không.
-Điều này giữ cho hành vi của provider nhất quán với các phiên bản Spring Security trước đây; mặc định này có thể thay đổi trong các phiên bản Spring Security tương lai.
+Theo mặc định, javadoc:org.springframework.security.authentication.ott.OneTimeTokenAuthenticationProvider[] không validate trạng thái của account đã authenticated, chẳng hạn account có bị locked, disabled hoặc expired hay không.
+Điều này giúp behavior của provider nhất quán với các version Spring Security trước đây; default này có thể thay đổi trong các version Spring Security tương lai.
 
-Nếu muốn `OneTimeTokenAuthenticationProvider` từ chối authentication bằng One-Time Token đối với các tài khoản như vậy, hãy cung cấp cho nó một javadoc:org.springframework.security.core.userdetails.UserDetailsChecker[], chẳng hạn javadoc:org.springframework.security.authentication.AccountStatusUserDetailsChecker[], bằng `setUserDetailsChecker`:
+Nếu muốn `OneTimeTokenAuthenticationProvider` reject One-Time Token authentication đối với các account như vậy, hãy cung cấp cho nó một javadoc:org.springframework.security.core.userdetails.UserDetailsChecker[], chẳng hạn javadoc:org.springframework.security.authentication.AccountStatusUserDetailsChecker[], thông qua `setUserDetailsChecker`:
 
 include-code::./OneTimeTokenAccountStatusExample[tag=userDetailsChecker,indent=0]

@@ -6,17 +6,17 @@ Phần này trình bày chi tiết cách Spring Security hỗ trợ https://tool
 [WARNING]
 ====
 Bạn không nên sử dụng Digest Authentication trong các ứng dụng hiện đại vì cơ chế này không được xem là an toàn.
-Vấn đề rõ ràng nhất là bạn phải lưu mật khẩu dưới dạng văn bản thuần hoặc ở định dạng được mã hóa hay MD5.
+Vấn đề rõ ràng nhất là bạn phải lưu mật khẩu dưới dạng plaintext hoặc ở định dạng mã hóa hay MD5.
 Tất cả các định dạng lưu trữ này đều được xem là không an toàn.
-Thay vào đó, bạn nên lưu credential bằng cách sử dụng hàm băm mật khẩu thích ứng một chiều (bCrypt, PBKDF2, SCrypt và các hàm khác), vốn không được Digest Authentication hỗ trợ.
+Thay vào đó, bạn nên lưu credential bằng cách sử dụng hàm băm mật khẩu adaptive một chiều (bCrypt, PBKDF2, SCrypt và các hàm khác), vốn không được Digest Authentication hỗ trợ.
 ====
 
 Digest Authentication cố gắng giải quyết nhiều điểm yếu của xref:servlet/authentication/passwords/basic.adoc#servlet-authentication-basic[Basic authentication], cụ thể là bảo đảm credential không bao giờ được gửi dưới dạng văn bản rõ qua mạng.
 Nhiều https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Digest#Browser_compatibility[trình duyệt hỗ trợ Digest Authentication].
 
-Tiêu chuẩn quy định HTTP Digest Authentication được định nghĩa bởi https://tools.ietf.org/html/rfc2617[RFC 2617], tiêu chuẩn này cập nhật phiên bản trước đó của tiêu chuẩn Digest Authentication được quy định bởi https://tools.ietf.org/html/rfc2069[RFC 2069].
+Tiêu chuẩn quy định HTTP Digest Authentication được định nghĩa trong https://tools.ietf.org/html/rfc2617[RFC 2617], RFC này cập nhật phiên bản trước đó của tiêu chuẩn Digest Authentication được quy định trong https://tools.ietf.org/html/rfc2069[RFC 2069].
 Hầu hết user agent đều triển khai RFC 2617.
-Tính năng hỗ trợ Digest Authentication của Spring Security tương thích với mức bảo vệ "`auth`" (`qop`) được RFC 2617 quy định, đồng thời cung cấp khả năng tương thích ngược với RFC 2069.
+Tính năng hỗ trợ Digest Authentication của Spring Security tương thích với quality of protection "`auth`" (`qop`) được RFC 2617 quy định, đồng thời cung cấp khả năng tương thích ngược với RFC 2069.
 Digest Authentication từng được xem là một lựa chọn hấp dẫn hơn nếu bạn cần sử dụng HTTP không mã hóa (không có TLS hoặc HTTPS) và muốn tối đa hóa tính bảo mật của quy trình authentication.
 Tuy nhiên, mọi người nên sử dụng xref:features/exploits/http.adoc#http[HTTPS].
 
@@ -32,11 +32,11 @@ expirationTime:   The date and time when the nonce expires, expressed in millise
 key:              A private key to prevent modification of the nonce token
 ----
 
-Bạn cần bảo đảm mình xref:features/authentication/password-storage.adoc#authentication-password-storage-configuration[cấu hình] xref:features/authentication/password-storage.adoc#authentication-password-storage[Lưu trữ mật khẩu] dạng văn bản thuần không an toàn bằng `NoOpPasswordEncoder`.
+Bạn cần bảo đảm đã xref:features/authentication/password-storage.adoc#authentication-password-storage-configuration[cấu hình] xref:features/authentication/password-storage.adoc#authentication-password-storage[Lưu trữ mật khẩu] không an toàn ở dạng plaintext bằng `NoOpPasswordEncoder`.
 (Xem class javadoc:org.springframework.security.crypto.password.NoOpPasswordEncoder[] trong Javadoc.)
-Ví dụ sau minh họa cách cấu hình Digest Authentication bằng cấu hình Java:
+Ví dụ sau minh họa cách cấu hình Digest Authentication bằng Java Configuration:
 
-.Digest Authentication
+.Cấu hình Digest Authentication
 [tabs]
 ======
 Java::

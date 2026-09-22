@@ -1,11 +1,11 @@
 [[servlet-authorization-authorizationfilter]]
 = Ủy quyền ServerHttpRequest
 
-Spring Security cung cấp hỗ trợ cho việc ủy quyền các HTTP request đến.
+Spring Security cung cấp hỗ trợ cho việc ủy quyền các HTTP request gửi đến.
 Theo mặc định, authorization của Spring Security yêu cầu mọi request phải được authenticated.
 Cấu hình tường minh như sau:
 
-.Mọi request yêu cầu user authenticated
+.Mọi request đều yêu cầu user phải được authenticated
 [tabs]
 ======
 Java::
@@ -42,7 +42,7 @@ fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain 
 ======
 
 
-Có thể cấu hình Spring Security với các rule khác nhau bằng cách thêm các rule theo thứ tự ưu tiên.
+Chúng ta có thể cấu hình Spring Security với các rule khác nhau bằng cách thêm các rule theo thứ tự ưu tiên.
 
 .Nhiều rule ủy quyền request
 [tabs]
@@ -98,13 +98,13 @@ fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain 
 
 <1> Có nhiều rule authorization được chỉ định.
 Mỗi rule được xem xét theo thứ tự khai báo.
-<2> Đã chỉ định nhiều URL pattern mà mọi user đều có thể truy cập.
+<2> Chúng ta đã chỉ định nhiều URL pattern mà mọi user đều có thể truy cập.
 Cụ thể, mọi user có thể truy cập request nếu URL bắt đầu bằng "/resources/", bằng "/signup" hoặc bằng "/about".
 <3> Mọi URL bắt đầu bằng "/admin/" sẽ bị giới hạn cho user có authority "ROLE_ADMIN".
 Bạn sẽ thấy rằng vì gọi method `hasRole`, không cần chỉ định prefix "ROLE_".
 <4> Mọi URL bắt đầu bằng "/db/" yêu cầu user có cả "ROLE_ADMIN" và "ROLE_DBA".
 Điều này minh họa tính linh hoạt của việc cung cấp một `ReactiveAuthorizationManager` tùy chỉnh, cho phép triển khai logic authorization bất kỳ.
-Để đơn giản, sample sử dụng lambda và delegate tới implementation hiện có của `AuthorityReactiveAuthorizationManager.hasRole`.
-Tuy nhiên, trong tình huống thực tế, application có thể sẽ triển khai logic trong một class phù hợp implement `ReactiveAuthorizationManager`.
+Để đơn giản, sample sử dụng lambda và delegate việc xử lý cho implementation hiện có của `AuthorityReactiveAuthorizationManager.hasRole`.
+Tuy nhiên, trong tình huống thực tế, application nhiều khả năng sẽ triển khai logic trong một class riêng triển khai `ReactiveAuthorizationManager`.
 <5> Mọi URL chưa được match trước đó đều bị từ chối access.
-Đây là một strategy tốt nếu bạn không muốn vô tình quên cập nhật các rule authorization.
+Đây là một chiến lược tốt nếu bạn không muốn vô tình quên cập nhật các rule authorization.

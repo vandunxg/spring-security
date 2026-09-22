@@ -2,11 +2,11 @@
 = Lưu trữ Authentication
 :figures: servlet/authentication
 
-Lần đầu tiên người dùng request một tài nguyên được bảo vệ, họ sẽ được xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[nhắc nhập credential].
-Một trong những cách phổ biến nhất để nhắc nhập credential là redirect người dùng đến xref:servlet/authentication/passwords/form.adoc[trang đăng nhập].
-Một HTTP exchange được tóm tắt của người dùng chưa được authentication khi request một tài nguyên được bảo vệ có thể như sau:
+Lần đầu user request một protected resource, họ sẽ được xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[yêu cầu cung cấp credential].
+Một trong những cách phổ biến nhất để yêu cầu credential là redirect user đến xref:servlet/authentication/passwords/form.adoc[trang login].
+Một HTTP exchange được tóm tắt cho user unauthenticated đang request một protected resource có thể như sau:
 
-.Người dùng chưa được Authentication request tài nguyên được bảo vệ
+.User chưa authenticated request protected resource
 ====
 [source,http]
 ----
@@ -22,9 +22,9 @@ Location: /login
 ----
 ====
 
-Người dùng gửi username và password của họ.
+User submit username và password của họ.
 
-.Username và password được gửi
+.Username và password được submit
 [source,http]
 ----
 POST /login HTTP/1.1
@@ -34,9 +34,9 @@ Cookie: SESSION=91470ce0-3f3c-455b-b7ad-079b02290f7b
 username=user&password=password&_csrf=35942e65-a172-4cd4-a1d4-d16a51147b3e
 ----
 
-Sau khi authentication người dùng, người dùng được liên kết với một session id mới để ngăn chặn xref:servlet/authentication/session-management.adoc#ns-session-fixation[tấn công session fixation].
+Sau khi authenticate user, user được associate với một session ID mới để ngăn xref:servlet/authentication/session-management.adoc#ns-session-fixation[session fixation attack].
 
-.Người dùng đã được Authentication được liên kết với session mới
+.User authenticated được associate với session mới
 [source,http]
 ----
 HTTP/1.1 302 Found
@@ -44,9 +44,9 @@ Location: /
 Set-Cookie: SESSION=4c66e474-3f5a-43ed-8e48-cc1d8cb1d1c8; Path=/; HttpOnly; SameSite=Lax
 ----
 
-Các request tiếp theo chứa session cookie được dùng để authentication người dùng trong thời gian còn lại của session.
+Các request tiếp theo include session cookie được dùng để authenticate user trong phần còn lại của session.
 
-.Session đã được Authentication được cung cấp làm Credential
+.Authenticated session được cung cấp làm credential
 [source,http]
 ----
 GET / HTTP/1.1
@@ -59,8 +59,8 @@ Cookie: SESSION=4c66e474-3f5a-43ed-8e48-cc1d8cb1d1c8
 == SecurityContextRepository
 
 // FIXME: tài liệu API
-Trong Spring Security, việc liên kết người dùng với các request tiếp theo được thực hiện bằng javadoc:org.springframework.security.web.context.SecurityContextRepository[].
-Implementation mặc định của `SecurityContextRepository` là javadoc:org.springframework.security.web.context.DelegatingSecurityContextRepository[], delegate đến các thành phần sau:
+Trong Spring Security, việc associate user với các request tiếp theo được thực hiện bằng javadoc:org.springframework.security.web.context.SecurityContextRepository[].
+Implementation mặc định của `SecurityContextRepository` là javadoc:org.springframework.security.web.context.DelegatingSecurityContextRepository[] và delegate đến các thành phần sau:
 
 * <<httpsecuritycontextrepository,`HttpSessionSecurityContextRepository`>>
 * <<requestattributesecuritycontextrepository,`RequestAttributeSecurityContextRepository`>>
@@ -68,23 +68,23 @@ Implementation mặc định của `SecurityContextRepository` là javadoc:org.s
 [[httpsecuritycontextrepository]]
 === HttpSessionSecurityContextRepository
 
-javadoc:org.springframework.security.web.context.HttpSessionSecurityContextRepository[] liên kết xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontext[`SecurityContext`] với `HttpSession`.
-Người dùng có thể thay thế `HttpSessionSecurityContextRepository` bằng một implementation khác của `SecurityContextRepository` nếu muốn liên kết người dùng với các request tiếp theo theo cách khác hoặc hoàn toàn không liên kết.
+javadoc:org.springframework.security.web.context.HttpSessionSecurityContextRepository[] thực hiện việc associate xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontext[`SecurityContext`] với `HttpSession`.
+User có thể thay thế `HttpSessionSecurityContextRepository` bằng một implementation khác của `SecurityContextRepository` nếu muốn associate user với các request tiếp theo theo cách khác hoặc hoàn toàn không associate.
 
 [[nullsecuritycontextrepository]]
 === NullSecurityContextRepository
 
-Nếu không muốn liên kết `SecurityContext` với `HttpSession` (tức là khi authentication bằng OAuth), javadoc:org.springframework.security.web.context.NullSecurityContextRepository[] là một implementation của `SecurityContextRepository` không thực hiện thao tác nào.
+Nếu không muốn associate `SecurityContext` với `HttpSession` (ví dụ khi authenticate bằng OAuth), javadoc:org.springframework.security.web.context.NullSecurityContextRepository[] là một implementation của `SecurityContextRepository` không làm gì cả.
 
 [[requestattributesecuritycontextrepository]]
 === RequestAttributeSecurityContextRepository
 
-javadoc:org.springframework.security.web.context.RequestAttributeSecurityContextRepository[] lưu `SecurityContext` dưới dạng một request attribute để bảo đảm `SecurityContext` khả dụng cho một request duy nhất diễn ra qua các kiểu dispatch có thể xóa `SecurityContext`.
+javadoc:org.springframework.security.web.context.RequestAttributeSecurityContextRepository[] lưu `SecurityContext` dưới dạng một request attribute để bảo đảm `SecurityContext` khả dụng trong một request duy nhất đi qua các dispatch type có thể clear `SecurityContext`.
 
-Ví dụ, giả sử client thực hiện một request, được authentication, rồi xảy ra lỗi.
-Tùy thuộc vào implementation của servlet container, lỗi này có nghĩa là mọi `SecurityContext` đã được thiết lập sẽ bị xóa, sau đó error dispatch được thực hiện.
+Ví dụ, giả sử client thực hiện một request, được authenticated, sau đó xảy ra error.
+Tùy thuộc vào implementation của servlet container, error có thể khiến mọi `SecurityContext` đã được thiết lập bị clear, sau đó thực hiện error dispatch.
 Khi error dispatch được thực hiện, không có `SecurityContext` nào được thiết lập.
-Điều này có nghĩa là error page không thể dùng `SecurityContext` để authorization hoặc hiển thị người dùng hiện tại, trừ khi `SecurityContext` được lưu trữ bằng cách nào đó.
+Điều này có nghĩa là error page không thể dùng `SecurityContext` cho authorization hoặc hiển thị current user, trừ khi `SecurityContext` được persist bằng cách nào đó.
 
 .Sử dụng RequestAttributeSecurityContextRepository
 [tabs]
@@ -120,7 +120,7 @@ XML::
 
 javadoc:org.springframework.security.web.context.DelegatingSecurityContextRepository[] lưu `SecurityContext` vào nhiều delegate `SecurityContextRepository` và cho phép lấy lại từ bất kỳ delegate nào theo thứ tự được chỉ định.
 
-Cấu hình hữu ích nhất cho trường hợp này được thể hiện trong ví dụ sau, cho phép sử dụng đồng thời cả xref:requestattributesecuritycontextrepository[`RequestAttributeSecurityContextRepository`] và xref:httpsecuritycontextrepository[`HttpSessionSecurityContextRepository`].
+Cấu hình hữu ích nhất cho trường hợp này được thể hiện trong ví dụ sau, cho phép dùng đồng thời cả xref:requestattributesecuritycontextrepository[`RequestAttributeSecurityContextRepository`] và xref:httpsecuritycontextrepository[`HttpSessionSecurityContextRepository`].
 
 .Cấu hình DelegatingSecurityContextRepository
 [tabs]
@@ -189,40 +189,40 @@ Trong Spring Security 6, ví dụ trên là cấu hình mặc định.
 [[securitycontextpersistencefilter]]
 == SecurityContextPersistenceFilter
 
-javadoc:org.springframework.security.web.context.SecurityContextPersistenceFilter[] chịu trách nhiệm lưu trữ `SecurityContext` giữa các request bằng cách sử dụng xref::servlet/authentication/persistence.adoc#securitycontextrepository[`SecurityContextRepository`].
+javadoc:org.springframework.security.web.context.SecurityContextPersistenceFilter[] chịu trách nhiệm persist `SecurityContext` giữa các request bằng cách sử dụng xref::servlet/authentication/persistence.adoc#securitycontextrepository[`SecurityContextRepository`].
 
 [.invert-dark]
 image::{figures}/securitycontextpersistencefilter.png[]
 
-image:{icondir}/number_1.png[] Trước khi chạy phần còn lại của ứng dụng, `SecurityContextPersistenceFilter` tải `SecurityContext` từ `SecurityContextRepository` và đặt nó vào `SecurityContextHolder`.
+image:{icondir}/number_1.png[] Trước khi chạy phần còn lại của ứng dụng, `SecurityContextPersistenceFilter` load `SecurityContext` từ `SecurityContextRepository` và set nó vào `SecurityContextHolder`.
 
 image:{icondir}/number_2.png[] Tiếp theo, ứng dụng được chạy.
 
-image:{icondir}/number_3.png[] Cuối cùng, nếu `SecurityContext` đã thay đổi, chúng ta lưu `SecurityContext` bằng `SecurityContextRepository`.
-Điều này có nghĩa là khi sử dụng `SecurityContextPersistenceFilter`, chỉ cần đặt `SecurityContextHolder` là đủ để bảo đảm `SecurityContext` được lưu trữ bằng `SecurityContextRepository`.
+image:{icondir}/number_3.png[] Cuối cùng, nếu `SecurityContext` đã thay đổi, chúng ta save `SecurityContext` bằng `SecurityContextRepository`.
+Điều này có nghĩa là khi sử dụng `SecurityContextPersistenceFilter`, chỉ cần set `SecurityContextHolder` là đủ để bảo đảm `SecurityContext` được persist bằng `SecurityContextRepository`.
 
 Trong một số trường hợp, response được commit và ghi vào client trước khi method của `SecurityContextPersistenceFilter` hoàn tất.
-Ví dụ, nếu một redirect được gửi đến client, response ngay lập tức được ghi trả về client.
-Điều này có nghĩa là không thể thiết lập một `HttpSession` ở bước 3 vì session id không thể được đưa vào response đã được ghi.
-Một tình huống khác có thể xảy ra là client authentication thành công, response được commit trước khi `SecurityContextPersistenceFilter` hoàn tất, và client thực hiện request thứ hai trước khi `SecurityContextPersistenceFilter` hoàn tất. Khi đó, authentication không đúng có thể xuất hiện trong request thứ hai.
+Ví dụ, nếu một redirect được gửi đến client, response ngay lập tức được ghi về client.
+Điều này có nghĩa là không thể thiết lập một `HttpSession` ở bước 3 vì session ID không thể được đưa vào response đã được ghi.
+Một tình huống khác có thể xảy ra khi client authenticate thành công, response được commit trước khi `SecurityContextPersistenceFilter` hoàn tất, và client thực hiện request thứ hai trước khi `SecurityContextPersistenceFilter` hoàn tất. Khi đó, authentication không đúng có thể xuất hiện trong request thứ hai.
 
 
-Để tránh các vấn đề này, `SecurityContextPersistenceFilter` bọc cả `HttpServletRequest` và `HttpServletResponse` nhằm phát hiện `SecurityContext` có thay đổi hay không và, nếu có, lưu `SecurityContext` ngay trước khi response được commit.
+Để tránh các vấn đề này, `SecurityContextPersistenceFilter` wrap cả `HttpServletRequest` và `HttpServletResponse` để phát hiện `SecurityContext` có thay đổi hay không và, nếu có, save `SecurityContext` ngay trước khi response được commit.
 
 [[securitycontextholderfilter]]
 == SecurityContextHolderFilter
 
-javadoc:org.springframework.security.web.context.SecurityContextHolderFilter[] chịu trách nhiệm tải `SecurityContext` giữa các request bằng cách sử dụng xref::servlet/authentication/persistence.adoc#securitycontextrepository[`SecurityContextRepository`].
+javadoc:org.springframework.security.web.context.SecurityContextHolderFilter[] chịu trách nhiệm load `SecurityContext` giữa các request bằng cách sử dụng xref::servlet/authentication/persistence.adoc#securitycontextrepository[`SecurityContextRepository`].
 
 [.invert-dark]
 image::{figures}/securitycontextholderfilter.png[]
 
-image:{icondir}/number_1.png[] Trước khi chạy phần còn lại của ứng dụng, `SecurityContextHolderFilter` tải `SecurityContext` từ `SecurityContextRepository` và đặt nó vào `SecurityContextHolder`.
+image:{icondir}/number_1.png[] Trước khi chạy phần còn lại của ứng dụng, `SecurityContextHolderFilter` load `SecurityContext` từ `SecurityContextRepository` và set nó vào `SecurityContextHolder`.
 
 image:{icondir}/number_2.png[] Tiếp theo, ứng dụng được chạy.
 
-Không giống xref:servlet/authentication/persistence.adoc#securitycontextpersistencefilter[`SecurityContextPersistenceFilter`], `SecurityContextHolderFilter` chỉ tải `SecurityContext` mà không lưu `SecurityContext`.
-Điều này có nghĩa là khi sử dụng `SecurityContextHolderFilter`, bắt buộc phải lưu `SecurityContext` một cách rõ ràng.
+Không giống xref:servlet/authentication/persistence.adoc#securitycontextpersistencefilter[`SecurityContextPersistenceFilter`], `SecurityContextHolderFilter` chỉ load `SecurityContext`, không save `SecurityContext`.
+Điều này có nghĩa là khi sử dụng `SecurityContextHolderFilter`, bắt buộc phải save `SecurityContext` một cách tường minh.
 
 
 include::partial$servlet/architecture/security-context-explicit.adoc[]

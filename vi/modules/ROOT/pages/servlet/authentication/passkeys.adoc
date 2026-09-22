@@ -5,7 +5,7 @@ Spring Security hỗ trợ https://www.passkeys.com[passkey].
 Passkey là phương thức authentication bảo mật hơn mật khẩu và được xây dựng bằng https://www.w3.org/TR/webauthn-3/[WebAuthn].
 
 Để sử dụng passkey cho authentication, trước hết người dùng phải xref:servlet/authentication/passkeys.adoc#passkeys-register[đăng ký credential mới].
-Sau khi credential được đăng ký, có thể dùng credential để authentication bằng cách xref:servlet/authentication/passkeys.adoc#passkeys-verify[xác minh authentication assertion].
+Sau khi credential được đăng ký, người dùng có thể dùng credential đó để thực hiện authentication bằng cách xref:servlet/authentication/passkeys.adoc#passkeys-verify[xác minh authentication assertion].
 
 [[passkeys-dependencies]]
 == Các dependency bắt buộc
@@ -156,8 +156,8 @@ Nếu JDBC không đáp ứng nhu cầu, bạn có thể tự tạo implementati
 [[passkeys-configuration-pkccor]]
 === PublicKeyCredentialCreationOptionsRepository tùy chỉnh
 
-`PublicKeyCredentialCreationOptionsRepository` được dùng để lưu `PublicKeyCredentialCreationOptions` giữa các request.
-Mặc định là lưu trong `HttpSession`, nhưng đôi khi người dùng cần tùy chỉnh hành vi này.
+`PublicKeyCredentialCreationOptionsRepository` được dùng để persist `PublicKeyCredentialCreationOptions` giữa các request.
+Mặc định, `PublicKeyCredentialCreationOptions` được persist trong `HttpSession`, nhưng đôi khi người dùng cần tùy chỉnh hành vi này.
 Có thể thực hiện việc này bằng cách đặt property tùy chọn `creationOptionsRepository` như minh họa trong xref:./passkeys.adoc#passkeys-configuration[Cấu hình] hoặc cung cấp một Bean `PublicKeyCredentialCreationOptionsRepository`:
 
 [tabs]
@@ -211,7 +211,7 @@ POST /webauthn/register/options
 X-CSRF-TOKEN: 4bfd1575-3ad1-4d21-96c7-4ef2d9f86721
 ----
 
-Yêu cầu trên sẽ lấy các tùy chọn đăng ký cho người dùng hiện đã authentication.
+Yêu cầu trên sẽ lấy các tùy chọn đăng ký cho người dùng hiện tại đã authenticated.
 Vì challenge được persist (state bị thay đổi) để so sánh tại thời điểm đăng ký, request phải là POST và phải bao gồm CSRF token.
 
 .Phản hồi cho các tùy chọn đăng ký
@@ -307,7 +307,7 @@ HTTP/1.1 200 OK
 [[passkeys-verify]]
 == Xác minh authentication assertion
 
-Sau khi xref:./passkeys.adoc#passkeys-register[], có thể https://www.w3.org/TR/webauthn-3/#sctn-verifying-assertion[xác minh] (authentication) passkey.
+Sau khi xref:./passkeys.adoc#passkeys-register[], passkey có thể được https://www.w3.org/TR/webauthn-3/#sctn-verifying-assertion[xác minh] (authenticated).
 
 Việc xác minh credential gồm hai bước:
 
@@ -391,7 +391,7 @@ HTTP/1.1 200 OK
 }
 ----
 <1> URL để redirect đến
-<2> Cho biết người dùng đã authentication
+<2> Cho biết người dùng đã authenticated
 
 .Ví dụ phản hồi authentication thất bại
 [source,http]

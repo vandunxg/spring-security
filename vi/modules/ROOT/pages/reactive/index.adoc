@@ -1,4 +1,4 @@
-= Ứng dụng Reactive
+= Các ứng dụng Reactive
 
-Các ứng dụng Reactive hoạt động rất khác so với xref:servlet/index.adoc#servlet-applications[Ứng dụng Servlet].
-Phần này thảo luận về cách Spring Security hoạt động với các ứng dụng Reactive, vốn thường được viết bằng Spring WebFlux.
+Các ứng dụng Reactive hoạt động rất khác với xref:servlet/index.adoc#servlet-applications[các ứng dụng Servlet].
+Phần này trình bày cách Spring Security hoạt động với các ứng dụng Reactive, vốn thường được viết bằng Spring WebFlux.

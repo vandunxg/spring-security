@@ -1,6 +1,6 @@
 = Kiểm thử authentication
 
-Sau khi xref:reactive/test/web/setup.adoc[áp dụng hỗ trợ Spring Security cho `WebTestClient`], chúng ta có thể sử dụng annotation hoặc hỗ trợ `mutateWith` -- ví dụ:
+Sau khi xref:reactive/test/web/setup.adoc[áp dụng hỗ trợ Spring Security cho `WebTestClient`], chúng ta có thể sử dụng các annotation hoặc hỗ trợ `mutateWith` -- ví dụ:
 
 [tabs]
 ======
@@ -116,4 +116,4 @@ fun messageWhenMutateWithMockAdminThenOk() {
 ----
 ======
 
-Ngoài `mockUser()`, Spring Security cung cấp một số mutator tiện lợi khác cho những thứ như xref:reactive/test/web/csrf.adoc[CSRF] và xref:reactive/test/web/oauth2.adoc[OAuth 2.0].
+Ngoài `mockUser()`, Spring Security cung cấp một số mutator tiện lợi khác cho các tính năng như xref:reactive/test/web/csrf.adoc[CSRF] và xref:reactive/test/web/oauth2.adoc[OAuth 2.0].

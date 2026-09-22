@@ -1,12 +1,12 @@
 [[prerequisites]]
 = Điều kiện tiên quyết
 
-Spring Security yêu cầu Môi trường Runtime Java 17 trở lên.
+Spring Security yêu cầu Java Runtime Environment 17 trở lên.
 
-Vì Spring Security hướng đến việc hoạt động theo cách tự chứa, bạn không cần đặt bất kỳ tệp cấu hình đặc biệt nào trong Môi trường Runtime Java của mình.
-Đặc biệt, bạn không cần cấu hình tệp policy đặc biệt cho Java Authentication and Authorization Service (JAAS) hoặc đặt Spring Security vào các vị trí classpath dùng chung.
+Vì Spring Security hướng tới việc hoạt động độc lập, bạn không cần đặt bất kỳ tệp cấu hình đặc biệt nào trong Java Runtime Environment của mình.
+Đặc biệt, bạn không cần cấu hình tệp policy đặc biệt cho Java Authentication and Authorization Service (JAAS) hoặc đặt Spring Security vào các vị trí chung trên classpath.
 
 Tương tự, nếu bạn sử dụng EJB Container hoặc Servlet Container, bạn không cần đặt các tệp cấu hình đặc biệt ở bất kỳ đâu hoặc đưa Spring Security vào classloader của server.
 Tất cả các tệp bắt buộc đều nằm trong ứng dụng của bạn.
 
-Thiết kế này mang lại tính linh hoạt tối đa trong quá trình triển khai, vì bạn có thể sao chép artifact đích (dù là JAR, WAR hay EAR) từ hệ thống này sang hệ thống khác và nó sẽ hoạt động ngay lập tức.
+Thiết kế này mang lại tính linh hoạt tối đa trong quá trình triển khai, vì bạn có thể sao chép artifact đích (dù là JAR, WAR hay EAR) từ system này sang system khác và nó sẽ hoạt động ngay lập tức.

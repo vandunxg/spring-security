@@ -1,11 +1,11 @@
 [[servlet-authentication-inmemory]]
 = Authentication trong bộ nhớ
 
-`InMemoryUserDetailsManager` của Spring Security triển khai xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[UserDetailsService] để hỗ trợ authentication dựa trên username/password được lưu trong bộ nhớ.
-`InMemoryUserDetailsManager` cung cấp khả năng quản lý `UserDetails` bằng cách triển khai interface `UserDetailsManager`.
-Spring Security sử dụng authentication dựa trên `UserDetails` khi được cấu hình để xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-input[chấp nhận username và password] cho authentication.
+`InMemoryUserDetailsManager` của Spring Security triển khai xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[UserDetailsService] để cung cấp hỗ trợ cho authentication dựa trên username và password được lưu trong bộ nhớ.
+`InMemoryUserDetailsManager` cung cấp khả năng quản lý `UserDetails` thông qua interface `UserDetailsManager`.
+Spring Security sử dụng authentication dựa trên `UserDetails` khi được cấu hình để xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-input[chấp nhận username/password] cho authentication.
 
-Trong ví dụ sau, chúng ta sử dụng xref:features/authentication/password-storage.adoc#authentication-password-storage-boot-cli[Spring Boot CLI] để encode giá trị password là `password` và nhận được password đã encode là `+{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW+`:
+Trong ví dụ sau, chúng ta sử dụng xref:features/authentication/password-storage.adoc#authentication-password-storage-boot-cli[Spring Boot CLI] để encode password có giá trị `password` và nhận được password đã encode là `+{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW+`:
 
 .Cấu hình Java cho InMemoryUserDetailsManager
 [tabs]
@@ -65,11 +65,11 @@ fun users(): UserDetailsService {
 ----
 ======
 
-Các ví dụ trước lưu password ở định dạng an toàn nhưng trải nghiệm làm quen ban đầu còn nhiều điểm chưa thuận tiện.
+Các ví dụ trên lưu password ở định dạng an toàn nhưng chưa mang lại trải nghiệm tốt khi bắt đầu sử dụng.
 
-Trong ví dụ sau, chúng ta sử dụng xref:features/authentication/password-storage.adoc#authentication-password-storage-dep-getting-started[User.withDefaultPasswordEncoder] để đảm bảo password được lưu trong bộ nhớ được bảo vệ.
-Tuy nhiên, cách này không ngăn được việc lấy password bằng cách dịch ngược mã nguồn.
-Vì lý do này, `User.withDefaultPasswordEncoder` chỉ nên được sử dụng để "`làm quen ban đầu`" và không dành cho production.
+Trong ví dụ sau, chúng ta sử dụng xref:features/authentication/password-storage.adoc#authentication-password-storage-dep-getting-started[User.withDefaultPasswordEncoder] để đảm bảo password lưu trong bộ nhớ được bảo vệ.
+Tuy nhiên, cách này không bảo vệ password khỏi việc bị lấy ra bằng cách decompile source code.
+Vì lý do này, `User.withDefaultPasswordEncoder` chỉ nên được sử dụng trong giai đoạn bắt đầu sử dụng và không dành cho production.
 
 .InMemoryUserDetailsManager với User.withDefaultPasswordEncoder
 [tabs]
@@ -119,8 +119,8 @@ fun users(): UserDetailsService {
 ----
 ======
 
-Không có cách đơn giản nào để sử dụng `User.withDefaultPasswordEncoder` với cấu hình dựa trên XML.
-Đối với demo hoặc chỉ để bắt đầu sử dụng, bạn có thể thêm tiền tố `+{noop}+` vào password để chỉ ra rằng xref:features/authentication/password-storage.adoc#authentication-password-storage-dpe-format[không được sử dụng encoding]:
+Không có cách đơn giản nào để sử dụng `User.withDefaultPasswordEncoder` với cấu hình XML.
+Để dùng trong demo hoặc chỉ để bắt đầu, bạn có thể thêm tiền tố `+{noop}+` vào password để chỉ ra rằng xref:features/authentication/password-storage.adoc#authentication-password-storage-dpe-format[không sử dụng encoding]:
 
 .<user-service> `+{noop}+` Cấu hình XML
 [source,xml,attrs="-attributes"]

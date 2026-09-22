@@ -2,4 +2,4 @@
 = Ứng dụng Servlet
 :page-section-summary-toc: 1
 
-Spring Security tích hợp với Servlet Container bằng cách sử dụng một Servlet `Filter` tiêu chuẩn. Điều này có nghĩa là nó hoạt động với mọi ứng dụng chạy trong Servlet Container. Cụ thể hơn, bạn không cần sử dụng Spring trong ứng dụng dựa trên Servlet của mình để tận dụng Spring Security.
+Spring Security tích hợp với Servlet Container bằng cách sử dụng một Servlet `Filter` tiêu chuẩn. Điều này có nghĩa là nó hoạt động với mọi ứng dụng chạy trong Servlet Container. Cụ thể hơn, bạn không cần sử dụng Spring trong ứng dụng Servlet của mình để sử dụng Spring Security.

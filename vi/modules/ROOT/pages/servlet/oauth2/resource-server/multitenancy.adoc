@@ -1,12 +1,12 @@
-= Multi-tenancy của OAuth 2.0 Resource Server
+= Multi-tenancy trong OAuth 2.0 Resource Server
 
 [[oauth2reourceserver-opaqueandjwt]]
 == Hỗ trợ cả JWT và opaque token
 
-Trong một số trường hợp, bạn có thể cần truy cập cả hai loại token.
-Ví dụ, bạn có thể hỗ trợ nhiều tenant, trong đó một tenant phát hành JWT còn tenant kia phát hành opaque token.
+Trong một số trường hợp, bạn có thể cần xử lý cả hai loại token.
+Ví dụ, bạn có thể hỗ trợ nhiều tenant, trong đó một tenant phát hành JWT còn tenant còn lại phát hành opaque token.
 
-Nếu quyết định này phải được đưa ra tại thời điểm request, bạn có thể dùng `AuthenticationManagerResolver` để thực hiện việc đó như sau:
+Nếu quyết định này phải được đưa ra tại thời điểm nhận request, bạn có thể dùng `AuthenticationManagerResolver` để thực hiện việc đó như sau:
 
 [tabs]
 ======
@@ -46,11 +46,11 @@ fun tokenAuthenticationManagerResolver
 ----
 ======
 
-NOTE: Việc triển khai `useJwt(HttpServletRequest)` nhiều khả năng sẽ phụ thuộc vào thông tin tùy chỉnh của request, chẳng hạn như path.
+NOTE: Việc triển khai `useJwt(HttpServletRequest)` nhiều khả năng sẽ phụ thuộc vào dữ liệu tùy chỉnh của request, chẳng hạn như path.
 
-Tiếp theo, chỉ định `AuthenticationManagerResolver` này trong DSL:
+Sau đó, chỉ định `AuthenticationManagerResolver` này trong DSL:
 
-.Bộ phân giải AuthenticationManager
+.AuthenticationManager Resolver
 [tabs]
 ======
 Java::
@@ -93,10 +93,10 @@ Xml::
 [[oauth2resourceserver-multitenancy]]
 == Đa tenant
 
-Một resource server được xem là đa tenant khi có nhiều chiến lược xác minh bearer token, được xác định bằng một tenant identifier.
+Một resource server được xem là multi-tenant khi có nhiều strategy xác minh bearer token, được phân biệt bằng một tenant identifier.
 
 Ví dụ, resource server của bạn có thể chấp nhận bearer token từ hai authorization server khác nhau.
-Hoặc authorization server của bạn có thể đại diện cho nhiều issuer.
+Hoặc authorization server của bạn có thể đại diện cho nhiều issuer khác nhau.
 
 Trong mỗi trường hợp, cần thực hiện hai việc và có các đánh đổi tương ứng với cách bạn chọn để thực hiện chúng:
 
@@ -105,9 +105,9 @@ Trong mỗi trường hợp, cần thực hiện hai việc và có các đánh 
 
 === Xác định tenant bằng claim
 
-Một cách để phân biệt các tenant là dựa trên issuer claim. Vì issuer claim đi kèm với JWT đã ký, bạn có thể thực hiện việc này bằng `JwtIssuerAuthenticationManagerResolver` như sau:
+Một cách để phân biệt các tenant là dựa trên issuer claim. Vì issuer claim nằm trong JWT đã ký, bạn có thể thực hiện việc này bằng `JwtIssuerAuthenticationManagerResolver` như sau:
 
-.Tenant trong mô hình đa tenant bằng JWT claim
+.Tenant trong mô hình multi-tenant bằng JWT claim
 [tabs]
 ======
 Java::
@@ -162,14 +162,14 @@ Xml::
 ----
 ======
 
-Điều này hữu ích vì các issuer endpoint được tải lazy.
-Thực tế, `JwtAuthenticationProvider` tương ứng chỉ được khởi tạo khi request đầu tiên có issuer tương ứng được gửi đi.
+Điều này hữu ích vì các issuer endpoint được load theo cơ chế lazy.
+Thực tế, `JwtAuthenticationProvider` tương ứng chỉ được khởi tạo khi request đầu tiên có issuer tương ứng được gửi đến.
 Điều này cho phép ứng dụng khởi động mà không phụ thuộc vào việc các authorization server đó đang hoạt động và sẵn sàng.
 
 ==== Tenant động
 
 Đương nhiên, có thể bạn không muốn khởi động lại ứng dụng mỗi khi thêm tenant mới.
-Trong trường hợp này, bạn có thể cấu hình `JwtIssuerAuthenticationManagerResolver` bằng một repository chứa các instance `AuthenticationManager`, repository này có thể chỉnh sửa tại runtime, như sau:
+Trong trường hợp này, bạn có thể cấu hình `JwtIssuerAuthenticationManagerResolver` bằng một repository chứa các instance `AuthenticationManager`, repository này có thể cập nhật tại runtime, như sau:
 
 [tabs]
 ======
@@ -223,17 +223,17 @@ http {
 ----
 ======
 
-Trong trường hợp này, bạn tạo `JwtIssuerAuthenticationManagerResolver` bằng một strategy để lấy `AuthenticationManager` tương ứng với issuer.
-Cách tiếp cận này cho phép chúng ta thêm và xóa các phần tử khỏi repository (được thể hiện dưới dạng `Map` trong đoạn mã) tại runtime.
+Trong trường hợp này, bạn tạo `JwtIssuerAuthenticationManagerResolver` bằng một strategy để lấy `AuthenticationManager` dựa trên issuer.
+Cách tiếp cận này cho phép chúng ta thêm và xóa các phần tử khỏi repository (được thể hiện dưới dạng `Map` trong đoạn code) tại runtime.
 
 NOTE: Sẽ không an toàn nếu chỉ cần nhận bất kỳ issuer nào rồi tạo `AuthenticationManager` từ issuer đó.
 Issuer phải là giá trị mà code có thể xác minh từ một nguồn đáng tin cậy, chẳng hạn như danh sách issuer được cho phép.
 
-==== Chỉ phân tích claim một lần
+==== Chỉ parse claim một lần
 
-Bạn có thể đã nhận thấy strategy này tuy đơn giản nhưng có đánh đổi: JWT được `AuthenticationManagerResolver` phân tích một lần, rồi lại được xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-architecture-jwtdecoder[`JwtDecoder`] phân tích lần nữa ở thời điểm sau trong request.
+Bạn có thể đã nhận thấy strategy này tuy đơn giản nhưng có đánh đổi: JWT được `AuthenticationManagerResolver` parse một lần, rồi lại được xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-architecture-jwtdecoder[`JwtDecoder`] parse lần nữa ở thời điểm sau trong request.
 
-Có thể giảm việc phân tích bổ sung này bằng cách cấu hình trực tiếp xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-architecture-jwtdecoder[`JwtDecoder`] với một `JWTClaimsSetAwareJWSKeySelector` từ Nimbus:
+Có thể giảm số lần parse bổ sung này bằng cách cấu hình trực tiếp xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-architecture-jwtdecoder[`JwtDecoder`] với một `JWTClaimsSetAwareJWSKeySelector` của Nimbus:
 
 [tabs]
 ======
@@ -319,16 +319,16 @@ class TenantJWSKeySelector(tenants: TenantRepository) : JWTClaimsSetAwareJWSKeyS
 }
 ----
 ======
-<1> Một nguồn giả định cung cấp thông tin tenant
-<2> Một cache cho các ``JWSKeySelector``, được lập chỉ mục theo tenant identifier
-<3> Tra cứu tenant an toàn hơn so với chỉ tính toán endpoint JWK Set ngay lập tức - việc tra cứu hoạt động như một danh sách các tenant được cho phép
-<4> Tạo một `JWSKeySelector` thông qua các loại key trả về từ endpoint JWK Set - việc tra cứu lazy ở đây nghĩa là bạn không cần cấu hình tất cả tenant khi khởi động
+<1> Một source giả định cung cấp thông tin về tenant
+<2> Một cache cho các ``JWSKeySelector``, được key theo tenant identifier
+<3> Lookup tenant an toàn hơn so với việc tự tính endpoint JWK Set on the fly - việc lookup hoạt động như một danh sách các tenant được cho phép
+<4> Tạo một `JWSKeySelector` dựa trên các loại key trả về từ endpoint JWK Set - việc lookup lazy ở đây nghĩa là bạn không cần cấu hình tất cả tenant khi khởi động
 
-Key selector ở trên là sự kết hợp của nhiều key selector.
+Key selector ở trên là composition của nhiều key selector.
 Nó chọn key selector cần dùng dựa trên claim `iss` trong JWT.
 
-NOTE: Để sử dụng cách tiếp cận này, hãy đảm bảo authorization server được cấu hình để đưa claim set vào một phần của chữ ký token.
-Nếu không, bạn không có gì đảm bảo issuer chưa bị thay đổi bởi kẻ xấu.
+NOTE: Để sử dụng cách tiếp cận này, hãy đảm bảo authorization server được cấu hình để đưa claim set vào chữ ký của token.
+Nếu không, bạn không có gì đảm bảo issuer chưa bị thay đổi bởi kẻ tấn công.
 
 Tiếp theo, chúng ta có thể tạo một `JWTProcessor`:
 
@@ -361,10 +361,10 @@ fun jwtProcessor(keySelector: JWTClaimsSetAwareJWSKeySelector<SecurityContext>):
 ======
 
 Như bạn đã thấy, đánh đổi của việc đưa khả năng nhận biết tenant xuống mức này là cần thêm cấu hình.
-Chúng ta chỉ còn thêm một chút cấu hình.
+Chỉ còn thêm một ít cấu hình.
 
-Tiếp theo, chúng ta vẫn cần đảm bảo đang xác thực issuer.
-Tuy nhiên, vì issuer có thể khác nhau với từng JWT, bạn cũng sẽ cần một validator nhận biết tenant:
+Tiếp theo, chúng ta vẫn cần đảm bảo đang validate issuer.
+Tuy nhiên, vì issuer có thể khác nhau với từng JWT, bạn cũng sẽ cần một tenant-aware validator:
 
 [tabs]
 ======
@@ -409,7 +409,7 @@ class TenantJwtIssuerValidator(private val tenants: TenantRepository) : OAuth2To
 }
 ----
 ======
-Bây giờ chúng ta đã có processor và validator nhận biết tenant, có thể tiếp tục tạo xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-architecture-jwtdecoder[`JwtDecoder`] của mình:
+Bây giờ chúng ta đã có tenant-aware processor và validator, có thể tiếp tục tạo xref:servlet/oauth2/resource-server/jwt.adoc#oauth2resourceserver-jwt-architecture-jwtdecoder[`JwtDecoder`] của mình:
 
 [tabs]
 ======
@@ -444,6 +444,6 @@ fun jwtDecoder(jwtProcessor: JWTProcessor<SecurityContext>?, jwtValidator: OAuth
 Chúng ta đã hoàn tất phần xác định tenant.
 
 Nếu bạn chọn xác định tenant bằng một thứ khác ngoài JWT claim, bạn cần đảm bảo xử lý các downstream resource server theo cùng cách.
-Ví dụ, nếu xác định bằng subdomain, bạn có thể cần truy cập downstream resource server bằng cùng subdomain đó.
+Ví dụ, nếu xác định tenant bằng subdomain, bạn có thể cần gửi request đến downstream resource server bằng cùng subdomain đó.
 
-Tuy nhiên, nếu bạn xác định bằng một claim trong bearer token, hãy đọc tiếp để tìm hiểu về xref:servlet/oauth2/resource-server/bearer-tokens.adoc#oauth2resourceserver-bearertoken-resolver[hỗ trợ của Spring Security cho việc truyền bearer token].
+Tuy nhiên, nếu bạn xác định tenant bằng một claim trong bearer token, hãy đọc tiếp để tìm hiểu về xref:servlet/oauth2/resource-server/bearer-tokens.adoc#oauth2resourceserver-bearertoken-resolver[tính năng hỗ trợ bearer token propagation của Spring Security].

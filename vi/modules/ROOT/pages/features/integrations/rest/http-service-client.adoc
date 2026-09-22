@@ -5,17 +5,17 @@ Hỗ trợ OAuth của Spring Security có thể tích hợp với `RestClient` 
 
 [[configuration]]
 == Cấu hình
-Sau cấu hình riêng cho xref:features/integrations/rest/http-service-client.adoc#configuration-restclient[RestClient] hoặc xref:features/integrations/rest/http-service-client.adoc#configuration-webclient[WebClient], việc sử dụng xref:features/integrations/rest/http-service-client.adoc[] chỉ yêu cầu thêm xref:features/integrations/rest/http-service-client.adoc#client-registration-id[`@ClientRegistrationId`] vào các method yêu cầu OAuth hoặc vào HTTP interface khai báo các method đó.
+Sau khi cấu hình riêng cho xref:features/integrations/rest/http-service-client.adoc#configuration-restclient[RestClient] hoặc xref:features/integrations/rest/http-service-client.adoc#configuration-webclient[WebClient], việc sử dụng xref:features/integrations/rest/http-service-client.adoc[] chỉ cần thêm xref:features/integrations/rest/http-service-client.adoc#client-registration-id[`@ClientRegistrationId`] vào các method cần OAuth hoặc vào HTTP interface khai báo các method đó.
 
-Vì sự hiện diện của xref:features/integrations/rest/http-service-client.adoc#client-registration-id[`@ClientRegistrationId`] xác định việc OAuth token có được phân giải hay không và được phân giải như thế nào, bạn có thể an toàn thêm hỗ trợ OAuth của Spring Security vào bất kỳ cấu hình nào.
+Vì sự hiện diện của xref:features/integrations/rest/http-service-client.adoc#client-registration-id[`@ClientRegistrationId`] quyết định có resolve OAuth token hay không và resolve theo cách nào, việc thêm hỗ trợ OAuth của Spring Security vào mọi cấu hình là an toàn.
 
 [[configuration-restclient]]
 === Cấu hình RestClient
 
-Hỗ trợ OAuth của Spring Security có thể tích hợp với {spring-framework-reference-url}integration/rest-clients.html#rest-http-service-client[HTTP Service Clients] được hỗ trợ bởi `RestClient`.
+Hỗ trợ OAuth của Spring Security có thể tích hợp với {spring-framework-reference-url}integration/rest-clients.html#rest-http-service-client[HTTP Service Clients] dựa trên `RestClient`.
 Bước đầu tiên là xref:servlet/oauth2/client/core.adoc#oauth2Client-authorized-manager-provider[tạo một Bean `OAuthAuthorizedClientManager`].
 
-Tiếp theo, bạn phải cấu hình `HttpServiceProxyFactory` và `RestClient` để nhận biết xref:./http-service-client.adoc#client-registration-id[@ClientRegistrationId]
+Tiếp theo, bạn phải cấu hình `HttpServiceProxyFactory` và `RestClient` để nhận diện xref:./http-service-client.adoc#client-registration-id[@ClientRegistrationId]
 Để đơn giản hóa cấu hình này, hãy sử dụng javadoc:org.springframework.security.oauth2.client.web.client.support.OAuth2RestClientHttpServiceGroupConfigurer[].
 
 include-code::./RestClientHttpInterfaceIntegrationConfiguration[tag=config,indent=0]
@@ -28,10 +28,10 @@ Cấu hình này:
 [[configuration-webclient]]
 === Cấu hình WebClient
 
-Hỗ trợ OAuth của Spring Security có thể tích hợp với {spring-framework-reference-url}integration/rest-clients.html#rest-http-service-client[HTTP Service Clients] được hỗ trợ bởi `WebClient`.
+Hỗ trợ OAuth của Spring Security có thể tích hợp với {spring-framework-reference-url}integration/rest-clients.html#rest-http-service-client[HTTP Service Clients] dựa trên `WebClient`.
 Bước đầu tiên là xref:reactive/oauth2/client/core.adoc#oauth2Client-authorized-manager-provider[tạo một Bean `ReactiveOAuthAuthorizedClientManager`].
 
-Tiếp theo, bạn phải cấu hình `HttpServiceProxyFactory` và `WebRestClient` để nhận biết xref:./http-service-client.adoc#client-registration-id[@ClientRegistrationId]
+Tiếp theo, bạn phải cấu hình `HttpServiceProxyFactory` và `WebRestClient` để nhận diện xref:./http-service-client.adoc#client-registration-id[@ClientRegistrationId]
 Để đơn giản hóa cấu hình này, hãy sử dụng javadoc:org.springframework.security.oauth2.client.web.reactive.function.client.support.OAuth2WebClientHttpServiceGroupConfigurer[].
 
 include-code::./ServerWebClientHttpInterfaceIntegrationConfiguration[tag=config,indent=0]
@@ -45,7 +45,7 @@ Cấu hình này:
 [[client-registration-id]]
 == @ClientRegistrationId
 
-Bạn có thể thêm javadoc:org.springframework.security.oauth2.client.annotation.ClientRegistrationId[] vào HTTP Service để chỉ định javadoc:org.springframework.security.oauth2.client.registration.ClientRegistration[] nào sẽ được sử dụng.
+Bạn có thể thêm javadoc:org.springframework.security.oauth2.client.annotation.ClientRegistrationId[] vào HTTP Service để chỉ định javadoc:org.springframework.security.oauth2.client.registration.ClientRegistration[] cần sử dụng.
 
 include-code::./UserService[tag=getAuthenticatedUser]
 
@@ -61,7 +61,7 @@ include-code::./UserService[tag=type]
 [[client-registration-id-processor]]
 == `ClientRegistrationIdProcessor`
 
-xref:features/integrations/rest/http-service-client.adoc#configuration[Thành phần được cấu hình] javadoc:org.springframework.security.oauth2.client.web.client.ClientRegistrationIdProcessor[] sẽ:
+xref:features/integrations/rest/http-service-client.adoc#configuration[Sau khi] javadoc:org.springframework.security.oauth2.client.web.client.ClientRegistrationIdProcessor[] được cấu hình, nó sẽ:
 
 - Tự động gọi javadoc:org.springframework.security.oauth2.client.web.ClientAttributes#clientRegistrationId(java.lang.String)[] cho mỗi xref:features/integrations/rest/http-service-client.adoc#client-registration-id[`@ClientRegistrationId`].
 - Thao tác này thêm javadoc:org.springframework.security.oauth2.client.registration.ClientRegistration#getId()[] vào các thuộc tính

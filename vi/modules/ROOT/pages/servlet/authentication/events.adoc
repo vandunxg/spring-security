@@ -1,9 +1,9 @@
 [[servlet-events]]
-= Các sự kiện authentication
+= Các event authentication
 
-Với mỗi authentication thành công hoặc thất bại, tương ứng một `AuthenticationSuccessEvent` hoặc `AuthenticationFailureEvent` được phát ra.
+Với mỗi authentication thành công hoặc thất bại, tương ứng một `AuthenticationSuccessEvent` hoặc `AuthenticationFailureEvent` được publish.
 
-Để lắng nghe các sự kiện này, trước tiên bạn phải publish một `AuthenticationEventPublisher`.
+Để lắng nghe các event này, trước tiên bạn phải publish một `AuthenticationEventPublisher`.
 `DefaultAuthenticationEventPublisher` của Spring Security hoạt động phù hợp cho mục đích này:
 
 [tabs]
@@ -72,14 +72,14 @@ class AuthenticationEvents {
 ----
 ======
 
-Mặc dù tương tự `AuthenticationSuccessHandler` và `AuthenticationFailureHandler`, các sự kiện này có ưu điểm là có thể được sử dụng độc lập với Servlet API.
+Mặc dù tương tự `AuthenticationSuccessHandler` và `AuthenticationFailureHandler`, các event này có ưu điểm là có thể được sử dụng độc lập với Servlet API.
 
-== Thêm ánh xạ ngoại lệ
+== Thêm exception mapping
 
-Theo mặc định, `DefaultAuthenticationEventPublisher` publish một `AuthenticationFailureEvent` cho các sự kiện sau:
+Theo mặc định, `DefaultAuthenticationEventPublisher` publish một `AuthenticationFailureEvent` cho các event sau:
 
 |============
-| Ngoại lệ | Sự kiện
+| Exception | Event
 | `BadCredentialsException` | `AuthenticationFailureBadCredentialsEvent`
 | `UsernameNotFoundException` | `AuthenticationFailureBadCredentialsEvent`
 | `AccountExpiredException` | `AuthenticationFailureExpiredEvent`
@@ -91,9 +91,9 @@ Theo mặc định, `DefaultAuthenticationEventPublisher` publish một `Authent
 | `InvalidBearerTokenException` | `AuthenticationFailureBadCredentialsEvent`
 |============
 
-Publisher thực hiện so khớp `Exception` chính xác, nghĩa là các lớp con của những ngoại lệ này cũng không tạo ra sự kiện.
+Publisher thực hiện match chính xác với `Exception`, nghĩa là các subclass của những exception này cũng không tạo ra event.
 
-Vì vậy, bạn có thể cung cấp thêm các ánh xạ cho publisher thông qua method `setAdditionalExceptionMappings`:
+Vì vậy, bạn có thể cung cấp thêm các mapping cho publisher thông qua method `setAdditionalExceptionMappings`:
 
 [tabs]
 ======
@@ -130,9 +130,9 @@ fun authenticationEventPublisher
 ----
 ======
 
-== Sự kiện mặc định
+== Default Event
 
-Bạn cũng có thể cung cấp một sự kiện bắt tất cả để phát ra trong trường hợp có bất kỳ `AuthenticationException` nào:
+Bạn cũng có thể cung cấp một catch-all event để publish trong trường hợp có bất kỳ `AuthenticationException` nào:
 
 [tabs]
 ======

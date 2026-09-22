@@ -1,13 +1,13 @@
 [[servlet-events]]
-= Các sự kiện authorization
+= Các event authorization
 
-Mỗi khi một authorization bị từ chối, một `AuthorizationDeniedEvent` sẽ được phát ra.
-Ngoài ra, có thể phát một `AuthorizationGrantedEvent` cho các authorization được cấp phép.
+Với mỗi authorization bị từ chối, một `AuthorizationDeniedEvent` được publish.
+Ngoài ra, có thể publish một `AuthorizationGrantedEvent` cho các authorization được cấp.
 
-Để lắng nghe các sự kiện này, trước tiên bạn phải công bố một `AuthorizationEventPublisher`.
+Để lắng nghe các event này, trước tiên bạn phải publish một `AuthorizationEventPublisher`.
 
-`SpringAuthorizationEventPublisher` của Spring Security có thể đáp ứng tốt nhu cầu này.
-Thành phần này phát hành các sự kiện authorization bằng `ApplicationEventPublisher` của Spring:
+`SpringAuthorizationEventPublisher` của Spring Security có lẽ sẽ đáp ứng tốt nhu cầu này.
+Publisher này publish các event authorization bằng `ApplicationEventPublisher` của Spring:
 
 [tabs]
 ======
@@ -68,14 +68,14 @@ class AuthenticationEvents {
 ======
 
 [[authorization-granted-events]]
-== Các sự kiện authorization được cấp phép
+== Các event authorization được cấp
 
-Vì các ``AuthorizationGrantedEvent`` có khả năng tạo ra nhiều sự kiện gây nhiễu, chúng không được phát hành theo mặc định.
+Vì các ``AuthorizationGrantedEvent`` có khả năng tạo ra khá nhiều event gây nhiễu, chúng không được publish theo mặc định.
 
-Trên thực tế, việc phát hành các sự kiện này có thể sẽ yêu cầu bạn bổ sung một số logic nghiệp vụ để bảo đảm ứng dụng không bị ngập trong quá nhiều sự kiện authorization gây nhiễu.
+Trên thực tế, việc publish các event này có thể sẽ yêu cầu bạn bổ sung một số business logic để bảo đảm application không bị ngập trong quá nhiều event authorization gây nhiễu.
 
-Bạn có thể cung cấp predicate của riêng mình để lọc các sự kiện thành công.
-Ví dụ, publisher sau chỉ phát hành các authorization grant mà `ROLE_ADMIN` được yêu cầu:
+Bạn có thể cung cấp predicate của riêng mình để filter các event thành công.
+Ví dụ, publisher sau chỉ publish các authorization grant mà `ROLE_ADMIN` được yêu cầu:
 
 [tabs]
 ======

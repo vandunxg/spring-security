@@ -1,6 +1,6 @@
 = Kiểm thử HTTP Basic Authentication
 
-Mặc dù việc thực hiện authentication bằng HTTP Basic luôn khả thi, việc ghi nhớ tên header, định dạng và mã hóa các giá trị hơi tẻ nhạt.
+Mặc dù luôn có thể authenticate bằng HTTP Basic, việc phải nhớ tên header, format và encode các value hơi mất công.
 Giờ đây, bạn có thể thực hiện việc này bằng `httpBasic` xref:servlet/test/mockmvc/request-post-processors.adoc[`RequestPostProcessor`] của Spring Security.
 Ví dụ, đoạn mã dưới đây:
 
@@ -24,7 +24,7 @@ mvc.get("/") {
 ----
 ======
 
-sẽ cố gắng sử dụng HTTP Basic để thực hiện authentication cho người dùng có username là "user" và password là "password" bằng cách bảo đảm header sau được điền trong HTTP Request:
+sẽ cố gắng sử dụng HTTP Basic để authenticate một user có username là "user" và password là "password", bằng cách đảm bảo HTTP request chứa header sau:
 
 [source,text]
 ----

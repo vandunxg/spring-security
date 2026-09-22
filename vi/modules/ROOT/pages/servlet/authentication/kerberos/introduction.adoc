@@ -4,7 +4,7 @@
 Spring Security Kerberos {spring-security-version} được xây dựng và kiểm thử với JDK 17,
 Spring Security {spring-security-version} và Spring Framework {spring-core-version}.
 
-Các tọa độ dependency đã thay đổi trong Spring Security 7:
+Các dependency coordinates đã thay đổi trong Spring Security 7:
 
 [tabs]
 ======

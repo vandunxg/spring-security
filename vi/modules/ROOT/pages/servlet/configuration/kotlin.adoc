@@ -2,20 +2,20 @@
 [[kotlin-config]]
 = Cấu hình Kotlin
 
-Cấu hình Kotlin của Spring Security có từ Spring Security 5.3.
-Cấu hình này cho phép người dùng cấu hình Spring Security bằng Kotlin DSL gốc.
+Cấu hình Kotlin của Spring Security đã có từ Spring Security 5.3.
+Cấu hình này cho phép user cấu hình Spring Security bằng native Kotlin DSL.
 
 [NOTE]
 ====
-Spring Security cung cấp https://github.com/spring-projects/spring-security-samples/tree/main/servlet/spring-boot/kotlin/hello-security[một ứng dụng mẫu] để minh họa việc sử dụng Cấu hình Kotlin của Spring Security.
+Spring Security cung cấp https://github.com/spring-projects/spring-security-samples/tree/main/servlet/spring-boot/kotlin/hello-security[một ứng dụng mẫu] để minh họa việc sử dụng Kotlin Configuration của Spring Security.
 ====
 
 [[kotlin-config-httpsecurity]]
 == HttpSecurity
 
-Làm thế nào Spring Security biết rằng chúng ta muốn yêu cầu mọi người dùng phải có authentication?
+Làm thế nào Spring Security biết rằng chúng ta muốn yêu cầu mọi user phải authenticated?
 Làm thế nào Spring Security biết rằng chúng ta muốn hỗ trợ authentication dựa trên form?
-Có một class cấu hình (có tên là `SecurityFilterChain`) được gọi ngầm phía sau.
+Có một configuration class (gọi là `SecurityFilterChain`) được invoke ngầm phía sau.
 Class này được cấu hình bằng implementation mặc định sau:
 
 [source,kotlin]
@@ -38,13 +38,13 @@ open fun filterChain(http: HttpSecurity): SecurityFilterChain {
 [NOTE]
 Hãy nhớ import function `org.springframework.security.config.annotation.web.invoke` để bật Kotlin DSL trong class của bạn, vì IDE không phải lúc nào cũng tự động import method này, dẫn đến lỗi biên dịch.
 
-Configuration mặc định (được trình bày trong ví dụ trước):
+Cấu hình mặc định (được trình bày trong ví dụ trước):
 
-* Đảm bảo mọi request đến ứng dụng đều yêu cầu người dùng có authentication
-* Cho phép người dùng thực hiện authentication bằng form-based login
-* Cho phép người dùng thực hiện authentication bằng HTTP Basic authentication
+* Đảm bảo mọi request đến application đều yêu cầu user phải authenticated
+* Cho phép user authenticate bằng form-based login
+* Cho phép user authenticate bằng HTTP Basic authentication
 
-Lưu ý rằng configuration này tương đương với configuration XML namespace:
+Lưu ý rằng configuration này tương đương với XML namespace configuration:
 
 [source,xml]
 ----
@@ -55,10 +55,10 @@ Lưu ý rằng configuration này tương đương với configuration XML names
 </http>
 ----
 
-=== Nhiều instance HttpSecurity
+=== Nhiều instance của HttpSecurity
 
-Để quản lý security hiệu quả trong một ứng dụng mà một số khu vực cần các mức bảo vệ khác nhau, chúng ta có thể sử dụng nhiều filter chain cùng với method DSL `securityMatcher`.
-Cách tiếp cận này cho phép chúng ta định nghĩa các security configuration riêng biệt, phù hợp với từng phần cụ thể của ứng dụng, từ đó tăng cường security và khả năng kiểm soát tổng thể của ứng dụng.
+Để quản lý security hiệu quả trong một application mà một số khu vực cần các mức bảo vệ khác nhau, chúng ta có thể sử dụng nhiều filter chain cùng với DSL method `securityMatcher`.
+Cách tiếp cận này cho phép chúng ta định nghĩa các security configuration riêng biệt, phù hợp với từng phần cụ thể của application, từ đó tăng cường security và khả năng kiểm soát tổng thể của application.
 
 Chúng ta có thể cấu hình nhiều instance `HttpSecurity`, giống như có thể có nhiều block `<http>` trong XML.
 Điểm mấu chốt là đăng ký nhiều `SecurityFilterChain` ``@Bean``.
@@ -124,10 +124,10 @@ Nếu request không match `SecurityFilterChain` có độ ưu tiên cao hơn (v
 
 [NOTE]
 ====
-Logic match nhiều filter chain được thực hiện bởi xref:servlet/architecture.adoc#servlet-filterchainproxy[`FilterChainProxy`].
+Logic match giữa nhiều filter chain được thực hiện bởi xref:servlet/architecture.adoc#servlet-filterchainproxy[`FilterChainProxy`].
 ====
 
-`RequestMatcher` mặc định match *mọi request* để đảm bảo Spring Security *mặc định bảo vệ mọi request*.
+`RequestMatcher` mặc định match *mọi request* để đảm bảo Spring Security *bảo vệ mọi request theo mặc định*.
 
 [NOTE]
 ====
@@ -173,28 +173,28 @@ class PartialSecurityConfig {
 <1> Các request bắt đầu bằng `/secured/` sẽ được bảo vệ, còn các request khác thì không.
 <2> Request đến `/secured/user` yêu cầu authority `ROLE_USER`.
 <3> Request đến `/secured/admin` yêu cầu authority `ROLE_ADMIN`.
-<4> Mọi request khác (chẳng hạn `/secured/other`) chỉ yêu cầu người dùng có authentication.
+<4> Mọi request khác (chẳng hạn `/secured/other`) chỉ yêu cầu user phải authenticated.
 
 [TIP]
 ====
-_Khuyến nghị_ cung cấp một `SecurityFilterChain` không chỉ định `securityMatcher` để đảm bảo toàn bộ ứng dụng được bảo vệ, như đã minh họa trong <<multiple-httpsecurity-instances-kotlin,ví dụ trước>>.
+_Khuyến nghị_ cung cấp một `SecurityFilterChain` không chỉ định `securityMatcher` để đảm bảo toàn bộ application được bảo vệ, như đã minh họa trong <<multiple-httpsecurity-instances-kotlin,ví dụ trước>>.
 ====
 
 Lưu ý rằng method `requestMatchers` chỉ áp dụng cho từng authorization rule riêng lẻ.
-Mỗi request được liệt kê ở đó cũng phải match `securityMatcher` tổng thể của instance `HttpSecurity` cụ thể được sử dụng để tạo `SecurityFilterChain`.
+Mỗi request được liệt kê ở đó cũng phải match với `securityMatcher` tổng thể của instance `HttpSecurity` cụ thể được sử dụng để tạo `SecurityFilterChain`.
 Trong ví dụ này, việc sử dụng `anyRequest()` sẽ match mọi request khác trong `SecurityFilterChain` cụ thể này (vốn phải bắt đầu bằng `/secured/`).
 
 [NOTE]
 ====
-Xem xref:servlet/authorization/authorize-http-requests.adoc[Authorize HttpServletRequests] để biết thêm thông tin về `requestMatchers`.
+Xem xref:servlet/authorization/authorize-http-requests.adoc[Authorization cho HttpServletRequests] để biết thêm thông tin về `requestMatchers`.
 ====
 
-=== Endpoint của `SecurityFilterChain`
+=== Các endpoint của `SecurityFilterChain`
 
 Một số filter trong `SecurityFilterChain` trực tiếp cung cấp endpoint, chẳng hạn `UsernamePasswordAuthenticationFilter` được thiết lập bởi `http.formLogin()` và cung cấp endpoint `POST /login`.
-Trong <<choosing-security-matcher-request-matchers-kotlin,ví dụ trên>>, endpoint `/login` không được `http.securityMatcher("/secured/**")` match, do đó ứng dụng đó sẽ không có endpoint `GET /login` hoặc `POST /login`.
+Trong <<choosing-security-matcher-request-matchers-kotlin,ví dụ trên>>, endpoint `/login` không match với `http.securityMatcher("/secured/**")`, do đó application đó sẽ không có endpoint `GET /login` hoặc `POST /login`.
 Các request như vậy sẽ trả về `404 Not Found`.
-Điều này thường khiến người dùng bất ngờ.
+Điều này thường khiến user bất ngờ.
 
 Việc chỉ định `http.securityMatcher()` ảnh hưởng đến các request được `SecurityFilterChain` đó match.
 Tuy nhiên, việc này không tự động ảnh hưởng đến các endpoint do filter chain cung cấp.
@@ -249,14 +249,14 @@ class SecuredSecurityConfig {
 }
 ----
 <1> Các request bắt đầu bằng `/secured/` sẽ được filter chain này bảo vệ.
-<2> Các request bắt đầu bằng `/secured/` yêu cầu người dùng có authentication.
+<2> Các request bắt đầu bằng `/secured/` yêu cầu user phải authenticated.
 <3> Tùy chỉnh form login để thêm tiền tố `/secured/` vào URL.
 <4> Tùy chỉnh logout để thêm tiền tố `/secured/` vào URL.
 <5> Mọi request khác sẽ bị từ chối.
 
 [NOTE]
 ====
-Ví dụ này tùy chỉnh các page login và logout, việc này vô hiệu hóa các page được Spring Security tạo.
+Ví dụ này tùy chỉnh login page và logout page, việc này vô hiệu hóa các page được Spring Security tạo.
 Bạn phải xref:servlet/authentication/passwords/form.adoc#servlet-authentication-form-custom[tự cung cấp] các endpoint tùy chỉnh cho `GET /secured/login` và `GET /secured/logout`.
 Lưu ý rằng Spring Security vẫn cung cấp endpoint `POST /secured/login` và `POST /secured/logout` cho bạn.
 ====
@@ -345,23 +345,23 @@ class BankingSecurityConfig {
 <4> Cuối cùng, tạo thêm một instance `SecurityFilterChain` không có annotation `@Order`.
 	Configuration này sẽ xử lý các request không được các filter chain khác bao phủ và được xử lý cuối cùng (không có `@Order` thì mặc định là cuối cùng).
 	Các request match `/`, `/user-login`, `/user-logout`, `/notices`, `/contact` và `/register` được phép truy cập mà không cần authentication.
-	Mọi request khác yêu cầu người dùng có authentication để truy cập bất kỳ URL nào không được cho phép rõ ràng hoặc được các filter chain khác bảo vệ.
+	Mọi request khác yêu cầu user phải authenticated để truy cập bất kỳ URL nào không được cho phép rõ ràng hoặc được các filter chain khác bảo vệ.
 
 
 [[modular-httpsecuritydsl-configuration]]
-== Configuration HttpSecurityDsl dạng module
+== Cấu hình dạng module cho HttpSecurityDsl
 
-Nhiều người dùng muốn Spring Security configuration của họ nằm ở một nơi tập trung và sẽ chọn cấu hình trong một instance `SecurityFilterChain` duy nhất.
-Tuy nhiên, đôi khi người dùng muốn chia configuration thành các module.
+Nhiều user muốn đặt security configuration của họ ở một nơi tập trung và sẽ chọn cấu hình trong một instance `SecurityFilterChain` duy nhất.
+Tuy nhiên, đôi khi user muốn chia configuration thành các module.
 Có thể thực hiện việc này bằng:
 
-* xref:#httpsecuritydsl-bean[Bean HttpSecurityDsl.() -> Unit]
-* xref:#top-level-dsl-bean[Bean Security Dsl cấp cao nhất]
+* xref:#httpsecuritydsl-bean[Các Bean HttpSecurityDsl.() -> Unit]
+* xref:#top-level-dsl-bean[Các Bean Security DSL cấp cao nhất]
 
-NOTE: Vì Spring Security Kotlin Dsl (`HttpSecurityDsl`) sử dụng `HttpSecurity`, toàn bộ xref:./kotlin.adoc#modular-bean-configuration[Tùy chỉnh Bean dạng module] của Java được áp dụng trước xref:#modular-httpsecuritydsl-configuration[Configuration HttpSecurity dạng module].
+NOTE: Vì Kotlin DSL (`HttpSecurityDsl`) của Spring Security sử dụng `HttpSecurity`, toàn bộ xref:./kotlin.adoc#modular-bean-configuration[Tùy chỉnh Bean dạng module] của Java được áp dụng trước xref:#modular-httpsecuritydsl-configuration[Cấu hình HttpSecurity dạng module].
 
 [[httpsecuritydsl-bean]]
-=== Bean HttpSecurityDsl.() -> Unit
+=== Các Bean HttpSecurityDsl.() -> Unit
 
 Nếu muốn chia security configuration thành các module, bạn có thể đặt logic trong một Bean `HttpSecurityDsl.() -> Unit`.
 Ví dụ, configuration sau sẽ đảm bảo mọi instance `HttpSecurityDsl` được cấu hình để:
@@ -373,12 +373,12 @@ include-code::./HttpSecurityDslBeanConfiguration[tag=httpSecurityDslBean,indent=
 
 
 [[top-level-dsl-bean]]
-=== Bean Security Dsl cấp cao nhất
+=== Các Bean Security DSL cấp cao nhất
 
-Nếu muốn security configuration được chia thành nhiều module hơn nữa, Spring Security sẽ tự động áp dụng mọi Bean Security Dsl cấp cao nhất.
+Nếu muốn modularize security configuration hơn nữa, Spring Security sẽ tự động áp dụng mọi Bean Security DSL cấp cao nhất.
 
-Có thể tóm tắt Security Dsl cấp cao nhất là bất kỳ class Dsl nào match `public HttpSecurityDsl.*(<Dsl>)`.
-Điều này có nghĩa là bất kỳ Security Dsl nào là một argument duy nhất của một public method trên `HttpSecurityDsl`.
+Có thể tóm tắt Security DSL cấp cao nhất là bất kỳ class DSL nào match `public HttpSecurityDsl.*(<Dsl>)`.
+Điều này có nghĩa là bất kỳ Security DSL nào là một argument duy nhất của một public method trên `HttpSecurityDsl`.
 
 Một vài ví dụ có thể giúp làm rõ điều này.
 Nếu `ContentTypeOptionsDsl.() -> Unit` được publish dưới dạng Bean, nó sẽ không được tự động áp dụng vì là argument của `HeadersDsl#contentTypeOptions(ContentTypeOptionsDsl.() -> Unit)` và không phải là argument của method được định nghĩa trên `HttpSecurityDsl`.
@@ -391,26 +391,26 @@ include-code::./TopLevelDslBeanConfiguration[tag=headersSecurity,indent=0]
 <1> Đặt xref:servlet/exploits/headers.adoc#servlet-headers-csp[Content Security Policy] thành `object-src 'none'`
 
 [[dsl-bean-ordering]]
-=== Thứ tự Bean Dsl
+=== Thứ tự của các Bean DSL
 
-Đầu tiên, toàn bộ xref:servlet/configuration/java.adoc#modular-httpsecurity-configuration[Configuration HttpSecurity dạng module] được áp dụng vì Kotlin Dsl sử dụng một Bean `HttpSecurity`.
+Đầu tiên, toàn bộ xref:servlet/configuration/java.adoc#modular-httpsecurity-configuration[Cấu hình HttpSecurity dạng module] được áp dụng vì Kotlin DSL sử dụng một Bean `HttpSecurity`.
 
-Thứ hai, mỗi xref:#httpsecuritydsl-bean[Bean HttpSecurityDsl.() -> Unit] được áp dụng bằng {spring-framework-api-url}org/springframework/beans/factory/ObjectProvider.html#orderedStream()[ObjectProvider#orderedStream()].
+Thứ hai, mỗi xref:#httpsecuritydsl-bean[Các Bean HttpSecurityDsl.() -> Unit] được áp dụng bằng {spring-framework-api-url}org/springframework/beans/factory/ObjectProvider.html#orderedStream()[ObjectProvider#orderedStream()].
 Điều này có nghĩa là nếu có nhiều Bean `HttpSecurity.() -> Unit`, có thể thêm annotation {spring-framework-api-url}org/springframework/core/annotation/Order.html[@Order] vào các định nghĩa Bean để kiểm soát thứ tự.
 
-Tiếp theo, mỗi type xref:#top-level-dsl-bean[Bean Security Dsl cấp cao nhất] được tra cứu và áp dụng bằng `ObjectProvider#orderedStream()`.
-Nếu có các type Bean security cấp cao nhất khác nhau (ví dụ `HeadersDsl.() -> Unit` và `HttpsRedirectDsl.() -> Unit`), thứ tự gọi từng type Dsl là không xác định.
-Tuy nhiên, thứ tự của từng instance thuộc cùng một type Bean security cấp cao nhất được xác định bởi `ObjectProvider#orderedStream()` và có thể được kiểm soát bằng `@Order` trên các định nghĩa Bean.
+Tiếp theo, mỗi type xref:#top-level-dsl-bean[Bean Security DSL cấp cao nhất] được lookup và áp dụng bằng `ObjectProvider#orderedStream()`.
+Nếu có các type Bean Security DSL cấp cao nhất khác nhau (ví dụ `HeadersDsl.() -> Unit` và `HttpsRedirectDsl.() -> Unit`), thứ tự gọi từng type DSL là không xác định.
+Tuy nhiên, thứ tự của từng instance thuộc cùng một type Bean Security DSL cấp cao nhất được xác định bởi `ObjectProvider#orderedStream()` và có thể được kiểm soát bằng `@Order` trên các định nghĩa Bean.
 
 Cuối cùng, Bean `HttpSecurityDsl` được inject dưới dạng một Bean.
 Mọi Bean `*Dsl.() -> Unit` được áp dụng trước khi Bean `HttpSecurityDsl` được tạo.
 Điều này cho phép ghi đè các tùy chỉnh do các Bean `*Dsl.() -> Unit` cung cấp.
 
-Ví dụ minh họa thứ tự được trình bày dưới đây:
+Ví dụ dưới đây minh họa thứ tự:
 
 include-code::./DslBeanOrderingConfiguration[tag=sample,indent=0]
 
-<1> Toàn bộ xref:servlet/configuration/java.adoc#modular-httpsecurity-configuration[Configuration HttpSecurity dạng module] được áp dụng vì Kotlin Dsl sử dụng một Bean `HttpSecurity`.
+<1> Toàn bộ xref:servlet/configuration/java.adoc#modular-httpsecurity-configuration[Cấu hình HttpSecurity dạng module] được áp dụng vì Kotlin DSL sử dụng một Bean `HttpSecurity`.
 <2> Mọi instance `HttpSecurity.() -> Unit` được áp dụng.
 Bean `adminAuthorization` có `@Order` cao nhất nên được áp dụng trước.
 Nếu các Bean `HttpSecurity.() -> Unit` không có annotation `@Order`, hoặc các annotation `@Order` có cùng giá trị, thứ tự áp dụng các instance `HttpSecurity.() -> Unit` là không xác định.

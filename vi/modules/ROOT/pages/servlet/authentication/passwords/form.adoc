@@ -2,45 +2,45 @@
 = Form Login
 :figures: servlet/authentication/unpwd
 
-Spring Security hỗ trợ việc cung cấp username và password thông qua form HTML.
-Phần này trình bày chi tiết cách authentication dựa trên form hoạt động trong Spring Security.
+Spring Security hỗ trợ cung cấp username và password thông qua một HTML form.
+Phần này trình bày chi tiết cách form-based authentication hoạt động trong Spring Security.
 // FIXME: mô tả authenticationentrypoint, authenticationfailurehandler, authenticationsuccesshandler
 
-Phần này xem xét cách Form Login dựa trên form hoạt động trong Spring Security.
-Trước hết, hãy xem cách người dùng được redirect đến form đăng nhập:
+Phần này xem xét cách form-based login hoạt động trong Spring Security.
+Trước hết, hãy xem cách user được redirect đến login form:
 
-.Redirect đến trang đăng nhập
+.Redirect đến login page
 [.invert-dark]
 image::{figures}/loginurlauthenticationentrypoint.png[]
 
-Hình minh họa trước được xây dựng dựa trên sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] của chúng ta.
+Hình minh họa trên được xây dựng dựa trên sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] của chúng ta.
 
-image:{icondir}/number_1.png[] Trước tiên, người dùng gửi request chưa authentication đến resource (`/private`) mà người dùng chưa được authorization.
+image:{icondir}/number_1.png[] Trước tiên, user gửi một request chưa được authenticated đến resource (`/private`) mà họ không được authorized.
 
-image:{icondir}/number_2.png[] xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] của Spring Security cho biết request chưa authentication bị __Từ chối__ bằng cách ném `AccessDeniedException`.
+image:{icondir}/number_2.png[] xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] của Spring Security cho biết request chưa được authenticated bị __Từ chối__ bằng cách ném `AccessDeniedException`.
 
-image:{icondir}/number_3.png[] Vì người dùng chưa authentication, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] khởi tạo __Bắt đầu authentication__ và gửi redirect đến trang đăng nhập với xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] đã cấu hình.
+image:{icondir}/number_3.png[] Vì user chưa được authenticated, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] khởi tạo __Bắt đầu authentication__ và gửi redirect đến login page với xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] đã cấu hình.
 Trong hầu hết trường hợp, `AuthenticationEntryPoint` là một instance của javadoc:org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint[].
 
-image:{icondir}/number_4.png[] Trình duyệt gửi request đến trang đăng nhập mà nó được redirect tới.
+image:{icondir}/number_4.png[] Browser gửi request đến login page mà nó được redirect tới.
 
-image:{icondir}/number_5.png[] Một thành phần nào đó trong application phải <<servlet-authentication-form-custom,render trang đăng nhập>>.
+image:{icondir}/number_5.png[] Một thành phần trong application phải <<servlet-authentication-form-custom,render login page>>.
 
 [[servlet-authentication-usernamepasswordauthenticationfilter]]
-Khi username và password được gửi, `UsernamePasswordAuthenticationFilter` tạo một `UsernamePasswordAuthenticationToken`, là một kiểu xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication], bằng cách trích xuất username và password từ instance `HttpServletRequest`.
-`UsernamePasswordAuthenticationFilter` mở rộng xref:servlet/authentication/architecture.adoc#servlet-authentication-abstractprocessingfilter[AbstractAuthenticationProcessingFilter], vì vậy sơ đồ sau đây sẽ khá tương tự:
+Khi username và password được submit, `UsernamePasswordAuthenticationFilter` tạo một `UsernamePasswordAuthenticationToken`, là một kiểu xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication], bằng cách extract username và password từ instance `HttpServletRequest`.
+`UsernamePasswordAuthenticationFilter` mở rộng xref:servlet/authentication/architecture.adoc#servlet-authentication-abstractprocessingfilter[AbstractAuthenticationProcessingFilter], vì vậy sơ đồ sau đây sẽ khá giống:
 
-.Authentication username và password
+.Authenticate username và password
 [.invert-dark]
 image::{figures}/usernamepasswordauthenticationfilter.png[]
 
 Hình minh họa được xây dựng dựa trên sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] của chúng ta.
 
 
-image:{icondir}/number_1.png[] Khi người dùng gửi username và password, `UsernamePasswordAuthenticationFilter` tạo một `UsernamePasswordAuthenticationToken`, là một kiểu xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`], bằng cách trích xuất username và password từ instance `HttpServletRequest`.
+image:{icondir}/number_1.png[] Khi user submit username và password, `UsernamePasswordAuthenticationFilter` tạo một `UsernamePasswordAuthenticationToken`, là một kiểu xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`], bằng cách extract username và password từ instance `HttpServletRequest`.
 
-image:{icondir}/number_2.png[]  Tiếp theo, `UsernamePasswordAuthenticationToken` được truyền vào instance `AuthenticationManager` để được authentication.
-Chi tiết về hình dạng của `AuthenticationManager` phụ thuộc vào cách xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-storage[thông tin người dùng được lưu trữ].
+image:{icondir}/number_2.png[]  Tiếp theo, `UsernamePasswordAuthenticationToken` được truyền cho instance `AuthenticationManager` để authenticate.
+Cấu trúc của `AuthenticationManager` phụ thuộc vào cách xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-storage[thông tin user được lưu trữ].
 
 image:{icondir}/number_3.png[] Nếu authentication thất bại thì __Thất bại__.
 
@@ -53,19 +53,19 @@ Xem class javadoc:org.springframework.security.web.authentication.Authentication
 
 image:{icondir}/number_4.png[] Nếu authentication thành công thì __Thành công__.
 
-. `SessionAuthenticationStrategy` được thông báo về lần login mới.
+. `SessionAuthenticationStrategy` được thông báo về một lần login mới.
 Xem interface javadoc:org.springframework.security.web.authentication.session.SessionAuthenticationStrategy[] trong Javadoc.
-. xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication] được đặt trên xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder].
+. xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[Authentication] được set trong xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[SecurityContextHolder].
 Xem class javadoc:org.springframework.security.web.context.SecurityContextPersistenceFilter[] trong Javadoc.
 . `RememberMeServices.loginSuccess` được gọi.
 Nếu remember-me chưa được cấu hình, thao tác này không làm gì.
 Xem interface javadoc:org.springframework.security.web.authentication.RememberMeServices[] trong Javadoc.
 . `ApplicationEventPublisher` xuất bản một `InteractiveAuthenticationSuccessEvent`.
-. `AuthenticationSuccessHandler` được gọi. Thông thường, đây là một `SimpleUrlAuthenticationSuccessHandler`, redirect đến request được xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] lưu lại khi chúng ta redirect đến trang đăng nhập.
+. `AuthenticationSuccessHandler` được gọi. Thông thường, đây là một `SimpleUrlAuthenticationSuccessHandler`, redirect đến request được xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] lưu lại khi chúng ta redirect đến login page.
 
 [[servlet-authentication-form-min]]
-Theo mặc định, Form Login của Spring Security được bật.
-Tuy nhiên, ngay khi cung cấp bất kỳ cấu hình dựa trên Servlet nào, Form Login phải được cung cấp rõ ràng.
+Theo mặc định, form login của Spring Security được enabled.
+Tuy nhiên, ngay khi cung cấp bất kỳ cấu hình dựa trên Servlet nào, form-based login phải được cấu hình rõ ràng.
 Ví dụ sau đây cho thấy một cấu hình Java rõ ràng, tối thiểu:
 
 .Form Login
@@ -105,13 +105,13 @@ open fun filterChain(http: HttpSecurity): SecurityFilterChain {
 ----
 ======
 
-Trong cấu hình trước, Spring Security render trang đăng nhập mặc định.
-Hầu hết ứng dụng dùng trong production đều yêu cầu form đăng nhập tùy chỉnh.
+Trong cấu hình trên, Spring Security render login page mặc định.
+Hầu hết application chạy trong production đều yêu cầu custom login form.
 
 [[servlet-authentication-form-custom]]
-Cấu hình sau đây minh họa cách cung cấp form đăng nhập tùy chỉnh.
+Cấu hình sau đây minh họa cách cung cấp custom login form.
 
-.Cấu hình form đăng nhập tùy chỉnh
+.Cấu hình custom login form
 [tabs]
 ======
 Java::
@@ -157,17 +157,17 @@ open fun filterChain(http: HttpSecurity): SecurityFilterChain {
 
 [NOTE]
 ====
-URI được truyền cho `loginPage` (và cho `loginProcessingUrl`, nếu được đặt riêng) được đối sánh và redirect nguyên văn.
-Nếu trang đăng nhập tùy chỉnh của bạn được phục vụ bởi một application Servlet được mapping dưới một base path, hãy include prefix đó trong URI bạn truyền cho DSL.
+URI được truyền cho `loginPage` (và cho `loginProcessingUrl`, nếu được set riêng) được match và redirect nguyên văn.
+Nếu custom login page của bạn được serve bởi một Servlet application được map dưới một base path, hãy include prefix đó trong URI bạn truyền cho DSL.
 Ví dụ, nếu dispatcher của bạn ở `/api/*`:
 
 include-code::./FormLoginServletPathConfiguration[tag=loginPage,indent=0]
 ====
 
 [[servlet-authentication-form-custom-html]]
-Khi trang đăng nhập được chỉ định trong cấu hình Spring Security, bạn chịu trách nhiệm render trang đó.
+Khi login page được chỉ định trong cấu hình Spring Security, bạn chịu trách nhiệm render login page đó.
 // FIXME: trang đăng nhập mặc định do Spring Security render
-Template https://www.thymeleaf.org/[Thymeleaf] sau đây tạo ra một form đăng nhập HTML tương thích với trang đăng nhập tại `/login`.:
+Template https://www.thymeleaf.org/[Thymeleaf] sau đây tạo ra một login form HTML tương thích với login page tại `/login`:
 
 .Form đăng nhập - src/main/resources/templates/login.html
 [source,xml]
@@ -196,20 +196,20 @@ Template https://www.thymeleaf.org/[Thymeleaf] sau đây tạo ra một form đ�
 </html>
 ----
 
-Có một số điểm chính về form HTML mặc định:
+Có một số điểm chính về HTML form mặc định:
 
-* Form phải thực hiện `post` đến `/login`.
+* Form phải gửi `post` đến `/login`.
 * Form cần bao gồm xref:servlet/exploits/csrf.adoc#servlet-csrf[CSRF Token], được Thymeleaf xref:servlet/exploits/csrf.adoc#csrf-integration-form[tự động đưa vào].
 * Form phải chỉ định username trong một parameter có tên `username`.
 * Form phải chỉ định password trong một parameter có tên `password`.
-* Nếu tìm thấy HTTP parameter có tên `error`, điều đó cho biết người dùng không cung cấp username hoặc password hợp lệ.
-* Nếu tìm thấy HTTP parameter có tên `logout`, điều đó cho biết người dùng đã logout thành công.
+* Nếu tìm thấy HTTP parameter có tên `error`, điều đó cho biết user không cung cấp username hoặc password hợp lệ.
+* Nếu tìm thấy HTTP parameter có tên `logout`, điều đó cho biết user đã logout thành công.
 
-Nhiều người dùng không cần làm gì nhiều ngoài việc tùy chỉnh trang đăng nhập.
-Tuy nhiên, nếu cần, bạn có thể tùy chỉnh mọi thứ đã trình bày ở trên bằng cấu hình bổ sung.
+Nhiều user không cần làm gì nhiều ngoài việc customize login page.
+Tuy nhiên, nếu cần, bạn có thể customize mọi thứ được trình bày trước đó bằng cấu hình bổ sung.
 
 [[servlet-authentication-form-custom-controller]]
-Nếu sử dụng Spring MVC, bạn cần một controller mapping `GET /login` tới template đăng nhập đã tạo.
+Nếu sử dụng Spring MVC, bạn cần một controller map `GET /login` tới login template đã tạo.
 Ví dụ sau đây cho thấy một `LoginController` tối thiểu:
 
 .LoginController

@@ -9,9 +9,9 @@ Tuy nhiên, bạn có thể tùy chỉnh điều này theo một vài cách.
 === Đọc Bearer Token từ header tùy chỉnh
 
 Ví dụ, bạn có thể cần đọc bearer token từ một header tùy chỉnh.
-Để thực hiện điều này, bạn có thể cung cấp một `DefaultBearerTokenResolver` dưới dạng bean hoặc kết nối một instance vào DSL, như trong ví dụ sau:
+Để làm điều này, bạn có thể publish `DefaultBearerTokenResolver` dưới dạng bean hoặc wire một instance vào DSL, như trong ví dụ sau:
 
-.Header Bearer Token tùy chỉnh
+.Header tùy chỉnh cho Bearer Token
 [tabs]
 ======
 Java::
@@ -55,11 +55,11 @@ Xml::
 
 Hoặc, trong trường hợp provider sử dụng cả header và giá trị tùy chỉnh, bạn có thể dùng `HeaderBearerTokenResolver` thay thế.
 
-=== Đọc Bearer Token từ tham số form
+=== Đọc Bearer Token từ form parameter
 
-Hoặc, bạn có thể muốn đọc token từ một tham số form. Bạn có thể thực hiện điều này bằng cách cấu hình `DefaultBearerTokenResolver`, như bên dưới:
+Hoặc, nếu muốn đọc token từ một form parameter, bạn có thể cấu hình `DefaultBearerTokenResolver` như sau:
 
-.Bearer Token trong tham số form
+.Bearer Token trong form parameter
 [tabs]
 ======
 Java::
@@ -104,7 +104,7 @@ Xml::
 
 == Truyền Bearer Token
 
-Sau khi resource server đã xác thực token, việc truyền token đó đến các downstream service có thể rất hữu ích.
+Sau khi Resource Server đã validate token, việc truyền token đó đến các downstream service có thể hữu ích.
 Điều này khá đơn giản với javadoc:org.springframework.security.oauth2.server.resource.web.reactive.function.client.ServletBearerExchangeFilterFunction[], như trong ví dụ sau:
 
 [tabs]
@@ -134,7 +134,7 @@ fun rest(): WebClient {
 ----
 ======
 
-Khi `WebClient` ở trên được dùng để thực hiện request, Spring Security sẽ tra cứu `Authentication` hiện tại và trích xuất credential javadoc:org.springframework.security.oauth2.core.AbstractOAuth2Token[].
+Khi `WebClient` ở trên được dùng để thực hiện các request, Spring Security sẽ tra cứu `Authentication` hiện tại và trích xuất credential javadoc:org.springframework.security.oauth2.core.AbstractOAuth2Token[].
 Sau đó, nó sẽ truyền token đó trong header `Authorization`.
 
 Ví dụ:
@@ -164,9 +164,9 @@ this.rest.get()
 ----
 ======
 
-Lệnh này sẽ gọi `https://other-service.example.com/endpoint` và tự thêm header `Authorization` chứa bearer token cho bạn.
+Đoạn code trên sẽ gọi `https://other-service.example.com/endpoint` và tự thêm header `Authorization` chứa bearer token cho bạn.
 
-Ở những nơi bạn cần ghi đè hành vi này, chỉ cần tự cung cấp header như sau:
+Ở những nơi bạn cần override behavior này, chỉ cần tự cung cấp header như sau:
 
 [tabs]
 ======
@@ -195,7 +195,7 @@ this.rest.get()
 ----
 ======
 
-Trong trường hợp này, filter sẽ chuyển sang phương án dự phòng và chỉ chuyển tiếp request đến phần còn lại của web filter chain.
+Trong trường hợp này, filter sẽ fallback và chỉ forward request đến phần còn lại của web filter chain.
 
 [NOTE]
 Không giống javadoc:org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction[filter function của OAuth 2.0 Client], filter function này không cố gắng gia hạn token nếu token đã hết hạn.
@@ -203,7 +203,7 @@ Không giống javadoc:org.springframework.security.oauth2.client.web.reactive.f
 
 === Hỗ trợ `RestTemplate`
 
-Hiện tại chưa có thành phần tương đương `RestTemplate` cho `ServletBearerExchangeFilterFunction`, nhưng bạn có thể truyền bearer token của request khá đơn giản bằng interceptor của riêng mình:
+Hiện tại chưa có cách tương đương với `ServletBearerExchangeFilterFunction` cho `RestTemplate`, nhưng bạn có thể propagate bearer token của request khá đơn giản bằng interceptor riêng:
 
 [tabs]
 ======
@@ -265,10 +265,10 @@ Không giống javadoc:org.springframework.security.oauth2.client.OAuth2Authoriz
 [[oauth2resourceserver-bearertoken-failure]]
 == Lỗi Bearer Token
 
-Bearer token có thể không hợp lệ vì nhiều lý do. Ví dụ, token có thể không còn hoạt động.
+Bearer token có thể invalid vì nhiều lý do. Ví dụ, token có thể không còn active.
 
-Trong những trường hợp này, Resource Server ném `InvalidBearerTokenException`.
-Giống như các exception khác, điều này tạo ra một phản hồi lỗi OAuth 2.0 Bearer Token:
+Trong những trường hợp này, Resource Server sẽ throw `InvalidBearerTokenException`.
+Giống như các exception khác, điều này tạo ra error response của OAuth 2.0 Bearer Token:
 
 [source,http request]
 ----
@@ -276,7 +276,7 @@ HTTP/1.1 401 Unauthorized
 WWW-Authenticate: Bearer error_code="invalid_token", error_description="Unsupported algorithm of none", error_uri="https://tools.ietf.org/html/rfc6750#section-3.1"
 ----
 
-Ngoài ra, sự kiện này được phát hành dưới dạng `AuthenticationFailureBadCredentialsEvent`. Bạn có thể xref:servlet/authentication/events.adoc#servlet-events[lắng nghe sự kiện này trong ứng dụng của mình] như sau:
+Ngoài ra, sự kiện này được publish dưới dạng `AuthenticationFailureBadCredentialsEvent`. Bạn có thể xref:servlet/authentication/events.adoc#servlet-events[lắng nghe sự kiện này trong ứng dụng của mình] như sau:
 
 [tabs]
 ======

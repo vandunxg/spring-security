@@ -56,11 +56,11 @@ Trong nhiều trường hợp, các quy tắc authorization của bạn sẽ ph�
 * Tôi muốn <<authorize-requests,ủy quyền request>>
 * Tôi muốn <<match-by-custom,so khớp request bằng chương trình>>
 * Tôi muốn <<authorize-requests,ủy quyền request bằng chương trình>>
-* Tôi muốn <<remote-authorization-manager,ủy quyền request>> cho một policy agent
-* Tôi muốn <<customizing-authorization-managers,tùy chỉnh cách tạo authorization manager>>
+* Tôi muốn <<remote-authorization-manager,ủy thác authorization của request>> cho một policy agent
+* Tôi muốn <<customizing-authorization-managers,tùy chỉnh cách tạo các authorization manager>>
 
 [[request-authorization-architecture]]
-== Tìm hiểu cách các component authorization request hoạt động
+== Tìm hiểu cách các component authorization ở cấp request hoạt động
 
 [NOTE]
 Phần này dựa trên xref:servlet/architecture.adoc#servlet-architecture[Kiến trúc và triển khai Servlet] để đi sâu hơn vào cách xref:servlet/authorization/index.adoc#servlet-authorization[authorization] hoạt động ở cấp request trong các ứng dụng dựa trên Servlet.
@@ -80,7 +80,7 @@ Trong trường hợp này, xref:servlet/architecture.adoc#servlet-exceptiontran
 
 Theo mặc định, `AuthorizationFilter` ở vị trí cuối trong xref:servlet/architecture.adoc#servlet-filterchain-figure[filter chain của Spring Security].
 Điều này có nghĩa là xref:servlet/authentication/index.adoc[các authentication filter], xref:servlet/exploits/index.adoc[các cơ chế bảo vệ khỏi exploit] và các tích hợp filter khác của Spring Security không yêu cầu authorization.
-Nếu thêm filter của riêng bạn trước `AuthorizationFilter`, các filter đó cũng không yêu cầu authorization; nếu không, chúng sẽ yêu cầu.
+Nếu thêm filter của riêng bạn trước `AuthorizationFilter`, các filter đó cũng không yêu cầu authorization; nếu không, chúng sẽ yêu cầu authorization.
 
 Điều này thường trở nên quan trọng khi bạn thêm các endpoint {spring-framework-reference-url}web.html#spring-web[Spring MVC].
 Vì chúng được thực thi bởi {spring-framework-reference-url}web.html#mvc-servlet[`DispatcherServlet`] và servlet này chạy sau `AuthorizationFilter`, các endpoint của bạn cần được <<authorizing-endpoints,đưa vào `authorizeHttpRequests` để được cho phép>>.
@@ -159,7 +159,7 @@ class MyController {
 ----
 ======
 
-thì Boot sẽ dispatch nó tới dispatch `ERROR`.
+thì Boot sẽ dispatch request đó tới dispatch `ERROR`.
 
 Trong trường hợp đó, authorization cũng diễn ra hai lần: một lần để ủy quyền cho `/endpoint` và một lần để dispatch lỗi.
 
@@ -235,7 +235,7 @@ Có thể đọc các quy tắc trên như sau: "nếu request là `/endpoint` t
 
 Spring Security hỗ trợ nhiều pattern và nhiều rule; bạn cũng có thể tạo các pattern và rule của riêng mình bằng chương trình.
 
-Sau khi cấu hình authorization, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
+Sau khi request được authorize, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
 
 .Kiểm thử authorization của endpoint
 [tabs]
@@ -283,7 +283,7 @@ Ant là ngôn ngữ mặc định mà Spring Security sử dụng để so khớ
 Bạn có thể dùng nó để so khớp một endpoint hoặc một thư mục, thậm chí capture placeholder để sử dụng sau.
 Bạn cũng có thể tinh chỉnh nó để so khớp một tập HTTP method cụ thể.
 
-Giả sử thay vì muốn so khớp endpoint `/endpoint`, bạn muốn so khớp mọi endpoint dưới thư mục `/resource`.
+Giả sử thay vì so khớp endpoint `/endpoint`, bạn muốn so khớp mọi endpoint dưới thư mục `/resource`.
 Trong trường hợp đó, bạn có thể thực hiện như sau:
 
 .So khớp bằng Ant
@@ -364,7 +364,7 @@ Xml::
 ----
 ======
 
-Sau khi cấu hình authorization, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
+Sau khi request được authorize, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
 
 .Kiểm thử authorization của thư mục
 [tabs]
@@ -445,7 +445,7 @@ Xml::
 ======
 
 [[match-by-httpmethod]]
-=== So khớp theo Http Method
+=== So khớp theo HTTP method
 
 Bạn cũng có thể so khớp rule theo HTTP method.
 Điều này hữu ích khi ủy quyền theo permission được cấp, chẳng hạn privilege `read` hoặc `write`.
@@ -497,9 +497,9 @@ Các quy tắc authorization này có thể được đọc như sau: "nếu req
 [TIP]
 Từ chối request theo mặc định là một thực hành bảo mật tốt vì nó biến tập rule thành allow list.
 
-Sau khi cấu hình authorization, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
+Sau khi request được authorize, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
 
-.Kiểm thử authorization của Http Method
+.Kiểm thử authorization theo HTTP method
 [tabs]
 ======
 Java::
@@ -545,7 +545,7 @@ Tính năng này hiện chưa được hỗ trợ trong XML
 Như đã nêu ở trên, theo mặc định Spring Security <<_all_dispatches_are_authorized,ủy quyền cho mọi dispatcher type>>.
 Mặc dù xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontext[security context] được thiết lập trên dispatch `REQUEST` được truyền sang các dispatch tiếp theo, những khác biệt nhỏ trong so khớp đôi khi có thể gây ra `AccessDeniedException` ngoài dự kiến.
 
-Để giải quyết điều đó, bạn có thể cấu hình Java configuration của Spring Security cho phép các dispatcher type như `FORWARD` và `ERROR` như sau:
+Để giải quyết điều đó, bạn có thể cấu hình Spring Security bằng Java để cho phép các dispatcher type như `FORWARD` và `ERROR` như sau:
 
 .So khớp theo Dispatcher Type
 [tabs]
@@ -685,7 +685,7 @@ http {
 Vì javadoc:org.springframework.security.web.util.matcher.RequestMatcher[] là một functional interface, bạn có thể cung cấp nó dưới dạng lambda trong DSL.
 Tuy nhiên, nếu muốn trích xuất giá trị từ request, bạn sẽ cần một class cụ thể vì việc đó yêu cầu override một method `default`.
 
-Sau khi cấu hình authorization, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
+Sau khi request được authorize, bạn có thể kiểm thử bằng xref:servlet/test/method.adoc#test-method-withmockuser[test support của Security] như sau:
 
 .Kiểm thử authorization tùy chỉnh
 [tabs]
@@ -771,7 +771,7 @@ Bạn sẽ thấy rằng vì đang sử dụng expression `hasAllAuthorities`, c
 Đây là một chiến lược tốt nếu bạn không muốn vô tình quên cập nhật các quy tắc authorization.
 
 [[customizing-authorization-managers]]
-== Tùy chỉnh Authorization Manager
+== Tùy chỉnh các Authorization Manager
 
 Khi sử dụng DSL `authorizeHttpRequests`, Spring Security sẽ đảm nhiệm việc tạo các instance `AuthorizationManager` phù hợp cho bạn.
 Trong một số trường hợp, bạn có thể muốn tùy chỉnh những gì được tạo để kiểm soát hoàn toàn cách đưa ra quyết định authorization xref:servlet/authorization/architecture.adoc#authz-delegate-authorization-manager[ở cấp framework].
@@ -791,12 +791,12 @@ Xem <<remote-authorization-manager>> để biết ví dụ.
 [[authorization-expressions]]
 == Biểu đạt authorization bằng SpEL
 
-Mặc dù nên sử dụng `AuthorizationManager` cụ thể, có một số trường hợp cần expression, chẳng hạn với `<intercept-url>` hoặc JSP Taglib.
+Mặc dù nên sử dụng `AuthorizationManager` cụ thể, có một số trường hợp cần expression, chẳng hạn với `<intercept-url>` hoặc JSP Taglibs.
 Vì lý do đó, phần này sẽ tập trung vào các ví dụ trong những lĩnh vực đó.
 
 Vì vậy, hãy cùng tìm hiểu sâu hơn một chút về Web Security Authorization SpEL API của Spring Security.
 
-Spring Security đóng gói tất cả field và method authorization trong một tập root object.
+Spring Security đóng gói tất cả field và method authorization trong một tập các root object.
 Root object tổng quát nhất có tên `SecurityExpressionRoot` và là nền tảng của `WebSecurityExpressionRoot`.
 Spring Security cung cấp root object này cho `StandardEvaluationContext` khi chuẩn bị đánh giá một expression authorization.
 
@@ -915,7 +915,7 @@ SecurityFilterChain web(HttpSecurity http, AuthorizationManager<RequestAuthoriza
 
 [[favor-permitall]]
 === Ưu tiên `permitAll` thay vì `ignoring`
-Khi có static resource, bạn có thể muốn cấu hình filter chain bỏ qua các giá trị này.
+Khi có static resource, bạn có thể muốn cấu hình filter chain bỏ qua các resource này.
 Cách tiếp cận an toàn hơn là cho phép chúng bằng `permitAll` như sau:
 
 .Cho phép static resource
@@ -987,7 +987,7 @@ SecurityFilterChain web(HttpSecurity http) throws AuthenticationException {
 
 Điều này cải thiện `authorizeRequests` theo một số cách:
 
-1. Sử dụng API `AuthorizationManager` đơn giản hóa thay vì metadata source, config attribute, decision manager và voter.
+1. Sử dụng API `AuthorizationManager` đơn giản hóa thay vì metadata sources, config attributes, decision managers và voters.
 Điều này đơn giản hóa việc tái sử dụng và tùy chỉnh.
 2. Trì hoãn việc tra cứu `Authentication`.
 Thay vì phải tra cứu authentication cho mọi request, hệ thống chỉ tra cứu trong những request mà quyết định authorization yêu cầu authentication.
@@ -997,7 +997,7 @@ Khi dùng `authorizeHttpRequests` thay cho `authorizeRequests`, javadoc:org.spri
 
 === Di chuyển expression
 
-Khi có thể, bạn nên sử dụng authorization manager type-safe thay vì SpEL.
+Khi có thể, bạn nên sử dụng các authorization manager type-safe thay vì SpEL.
 Với Java configuration, javadoc:org.springframework.security.web.access.expression.WebExpressionAuthorizationManager[] có sẵn để hỗ trợ di chuyển SpEL legacy.
 
 Để sử dụng `WebExpressionAuthorizationManager`, bạn có thể tạo một instance với expression cần di chuyển như sau:
@@ -1093,7 +1093,7 @@ fun authz(): WebExpressionAuthorizationManager.Builder {
 Khi đó, các expression truyền vào builder sẽ có thể tham chiếu tới bean.
 
 [[security-matchers]]
-== Security Matcher
+== Security Matchers
 
 Interface javadoc:org.springframework.security.web.util.matcher.RequestMatcher[] được sử dụng để xác định request có khớp với một rule nhất định hay không.
 Chúng ta sử dụng `securityMatchers` để xác định liệu xref:servlet/configuration/java.adoc#jc-httpsecurity[một `HttpSecurity` nhất định] có nên được áp dụng cho một request nhất định hay không.

@@ -1,10 +1,10 @@
 [[taglibs]]
-= Thư viện thẻ JSP
-Spring Security có taglib riêng, cung cấp hỗ trợ cơ bản để truy cập thông tin bảo mật và áp dụng các ràng buộc bảo mật trong JSP.
+= JSP Tag Libraries
+Spring Security có taglib riêng, cung cấp hỗ trợ cơ bản để truy cập security information và áp dụng các security constraint trong JSP.
 
 
 == Khai báo Taglib
-Để sử dụng bất kỳ thẻ nào, bạn phải khai báo security taglib trong JSP:
+Để sử dụng bất kỳ tag nào, bạn phải khai báo security taglib trong JSP:
 
 [source,xml]
 ----
@@ -13,17 +13,17 @@ Spring Security có taglib riêng, cung cấp hỗ trợ cơ bản để truy c�
 
 [[taglibs-authorize]]
 == Tag authorize
-Thẻ này được dùng để xác định nội dung của nó có được đánh giá hay không.
-Trong Spring Security 3.0, thẻ này có thể được sử dụng theo hai cách.
+Tag này được dùng để xác định nội dung bên trong có được evaluate hay không.
+Trong Spring Security 3.0, tag này có thể được sử dụng theo hai cách.
 
 [NOTE]
 ====
-Các tùy chọn cũ của Spring Security 2.0 cũng được hỗ trợ, nhưng không được khuyến khích.
+Các legacy option của Spring Security 2.0 cũng được hỗ trợ, nhưng không được khuyến khích.
 ====
 
-Cách đầu tiên sử dụng xref:servlet/authorization/authorize-http-requests.adoc#authorization-expressions[biểu thức web-security], được chỉ định trong thuộc tính `access` của thẻ.
-Việc đánh giá biểu thức được ủy quyền cho `SecurityExpressionHandler<FilterInvocation>` được định nghĩa trong ApplicationContext (bạn nên bật web expressions trong cấu hình namespace `<http>` để đảm bảo service này khả dụng).
-Ví dụ, bạn có thể có:
+Cách tiếp cận đầu tiên sử dụng một xref:servlet/authorization/authorize-http-requests.adoc#authorization-expressions[web-security expression], được chỉ định trong attribute `access` của tag.
+Việc evaluate expression được ủy quyền cho `SecurityExpressionHandler<FilterInvocation>` được định nghĩa trong application context (bạn nên enable web expressions trong namespace configuration `<http>` để đảm bảo service này available).
+Ví dụ:
 
 [source,xml]
 ----
@@ -34,7 +34,7 @@ Nội dung này chỉ hiển thị với những user có authority "supervisor"
 </sec:authorize>
 ----
 
-Khi được sử dụng cùng với `PermissionEvaluator` của Spring Security, thẻ này cũng có thể được dùng để kiểm tra permission:
+Khi được sử dụng cùng với `PermissionEvaluator` của Spring Security, tag này cũng có thể được dùng để check permission:
 
 [source,xml]
 ----
@@ -45,10 +45,10 @@ Nội dung này chỉ hiển thị với những user có permission đọc ho�
 </sec:authorize>
 ----
 
-Một yêu cầu phổ biến là chỉ hiển thị một link cụ thể khi user thực sự được phép nhấp vào link đó.
-Làm thế nào để xác định trước một nội dung có được phép hay không? Thẻ này cũng có thể hoạt động ở một chế độ thay thế, cho phép bạn định nghĩa một URL cụ thể làm thuộc tính.
-Nếu user được authorization để gọi URL đó, phần thân thẻ sẽ được đánh giá. Nếu không, phần thân sẽ bị bỏ qua.
-Ví dụ, bạn có thể có:
+Một requirement phổ biến là chỉ hiển thị một link cụ thể khi user thực sự được phép click vào link đó.
+Làm thế nào để xác định trước một nội dung có được phép hay không? Tag này cũng có thể hoạt động ở một mode thay thế, cho phép bạn định nghĩa một URL cụ thể làm attribute.
+Nếu user được phép invoke URL đó, tag body sẽ được evaluate. Nếu không, body sẽ bị bỏ qua.
+Ví dụ:
 
 [source,xml]
 ----
@@ -59,48 +59,48 @@ Nội dung này chỉ hiển thị với những user được authorization đ�
 </sec:authorize>
 ----
 
-Để sử dụng thẻ này, bạn cũng phải có một instance của `WebInvocationPrivilegeEvaluator` trong ApplicationContext.
-Nếu sử dụng namespace, một instance sẽ được tự động đăng ký.
-Đây là một instance của `DefaultWebInvocationPrivilegeEvaluator`, tạo một web request giả cho URL được cung cấp và gọi security interceptor để xem request sẽ thành công hay thất bại.
-Điều này cho phép bạn ủy quyền cho thiết lập access control được định nghĩa bằng các khai báo `intercept-url` trong cấu hình namespace `<http>`, đồng thời không phải sao chép thông tin (chẳng hạn các role bắt buộc) vào JSP.
+Để sử dụng tag này, bạn cũng phải có một instance của `WebInvocationPrivilegeEvaluator` trong application context.
+Nếu sử dụng namespace, một instance sẽ được tự động register.
+Đây là một instance của `DefaultWebInvocationPrivilegeEvaluator`, tạo một dummy web request cho URL được cung cấp và invoke security interceptor để xem request có thành công hay thất bại.
+Điều này cho phép bạn delegate cho access-control setup được định nghĩa bằng các khai báo `intercept-url` trong namespace configuration `<http>`, đồng thời tránh phải duplicate thông tin (chẳng hạn các role bắt buộc) trong JSP.
 
-Nếu có xref:servlet/authorization/authorize-http-requests.adoc#match-by-httpmethod[quy tắc authorization dựa trên method], bạn nên kết hợp cách tiếp cận này với thuộc tính `method` (cung cấp HTTP method, chẳng hạn `POST`) để kích hoạt quy tắc dựa trên method mong muốn.
-Ví dụ, nếu có quy tắc `.requestMatchers(POST, "/admin").hasRole("ADMIN")`, bạn nên dùng `<sec:authorize method="POST" url="/admin">` để đối sánh.
+Nếu có xref:servlet/authorization/authorize-http-requests.adoc#match-by-httpmethod[method-based authorization rule], bạn nên kết hợp approach này với attribute `method` (cung cấp HTTP method, chẳng hạn `POST`) để activate method-based rule mong muốn.
+Ví dụ, nếu có rule `.requestMatchers(POST, "/admin").hasRole("ADMIN")`, bạn nên dùng `<sec:authorize method="POST" url="/admin">` để match.
 
-Bạn có thể lưu kết quả Boolean của việc đánh giá thẻ (dù thẻ cấp hay từ chối quyền truy cập) vào một biến trong scope page context bằng cách đặt thuộc tính `var` thành tên biến, nhờ đó tránh phải sao chép và đánh giá lại điều kiện ở những vị trí khác trong page.
+Bạn có thể lưu kết quả Boolean từ việc evaluate tag (dù tag grant hay deny access) vào một variable trong page context scope bằng cách đặt attribute `var` thành tên variable, tránh phải duplicate và re-evaluate condition ở các vị trí khác trong page.
 
 
-=== Vô hiệu hóa authorization của tag khi kiểm thử
-Việc ẩn một link trên page với user chưa được authorization không ngăn họ truy cập URL.
-Chẳng hạn, họ vẫn có thể nhập trực tiếp URL đó vào trình duyệt.
-Trong quá trình kiểm thử, bạn có thể muốn hiển thị các khu vực bị ẩn để kiểm tra xem các link có thực sự được bảo mật ở back end hay không.
-Nếu đặt system property `spring.security.disableUISecurity` thành `true`, tag `authorize` vẫn chạy nhưng không ẩn nội dung của nó.
-Theo mặc định, tag này cũng bao quanh nội dung bằng các tag `<span class="securityHiddenUI">...</span>`.
-Điều này cho phép bạn hiển thị nội dung "`hidden`" bằng một CSS style cụ thể, chẳng hạn màu nền khác.
-Ví dụ, hãy thử chạy ứng dụng mẫu "`tutorial`" với property này được bật.
+=== Vô hiệu hóa Tag Authorization khi testing
+Việc ẩn một link trong page đối với unauthorized user không ngăn họ access URL.
+Ví dụ, họ vẫn có thể nhập trực tiếp URL đó vào browser.
+Trong quá trình testing, bạn có thể muốn reveal các khu vực đang bị ẩn để kiểm tra các link có thực sự được secure ở backend hay không.
+Nếu đặt system property `spring.security.disableUISecurity` thành `true`, tag `authorize` vẫn chạy nhưng không hide nội dung.
+Theo mặc định, tag này cũng bao quanh content bằng các tag `<span class="securityHiddenUI">...</span>`.
+Điều này cho phép bạn hiển thị content "`hidden`" bằng một CSS style cụ thể, chẳng hạn background color khác.
+Ví dụ, hãy thử chạy sample application "`tutorial`" với property này được enable.
 
-Bạn cũng có thể đặt các property `spring.security.securedUIPrefix` và `spring.security.securedUISuffix` nếu muốn thay đổi phần văn bản bao quanh so với các tag `span` mặc định (hoặc sử dụng chuỗi rỗng để xóa hoàn toàn phần này).
+Bạn cũng có thể set các property `spring.security.securedUIPrefix` và `spring.security.securedUISuffix` nếu muốn thay đổi surrounding text so với các tag `span` mặc định (hoặc dùng empty string để xóa hoàn toàn phần này).
 
 
 == Tag authentication
-Thẻ này cho phép truy cập object `Authentication` hiện tại được lưu trong `SecurityContext`.
-Thẻ render trực tiếp một property của object trong JSP.
-Ví dụ, nếu property `principal` của `Authentication` là một instance của object `UserDetails` của Spring Security, việc sử dụng `<sec:authentication property="principal.username" />` sẽ render tên của user hiện tại.
+Tag này cho phép truy cập object `Authentication` hiện tại được lưu trong security context.
+Tag render trực tiếp một property của object trong JSP.
+Ví dụ, nếu property `principal` của `Authentication` là một `UserDetails` instance của Spring Security, việc dùng `<sec:authentication property="principal.username" />` sẽ render tên của user hiện tại.
 
-Tất nhiên, không nhất thiết phải sử dụng tag JSP cho việc này, và một số người thích giữ logic trong view ở mức tối thiểu.
-Bạn có thể truy cập object `Authentication` trong MVC controller (bằng cách gọi `SecurityContextHolder.getContext().getAuthentication()`) và thêm dữ liệu trực tiếp vào model để view render.
+Tất nhiên, không bắt buộc phải dùng JSP tag cho việc này; một số người thích giữ logic trong view ở mức tối thiểu.
+Bạn có thể truy cập object `Authentication` trong MVC controller (bằng cách gọi `SecurityContextHolder.getContext().getAuthentication()`) và đưa data trực tiếp vào model để view render.
 
 
 == Tag accesscontrollist
-Thẻ này chỉ hợp lệ khi được sử dụng với module ACL của Spring Security.
-Thẻ kiểm tra danh sách permission bắt buộc, được phân tách bằng dấu phẩy, cho một domain object được chỉ định.
-Nếu user hiện tại có tất cả permission đó, phần thân thẻ sẽ được đánh giá.
-Nếu không, phần thân sẽ bị bỏ qua.
+Tag này chỉ hợp lệ khi được dùng với ACL module của Spring Security.
+Tag này check một list các permission bắt buộc, được phân tách bằng dấu phẩy, cho một domain object được chỉ định.
+Nếu current user có tất cả permission đó, tag body sẽ được evaluate.
+Nếu không, body sẽ bị bỏ qua.
 
 [CAUTION]
 ====
-Nhìn chung, thẻ này nên được xem là deprecated.
-Thay vào đó, hãy sử dụng <<taglibs-authorize>>.
+Nhìn chung, tag này nên được xem là deprecated.
+Thay vào đó, dùng <<taglibs-authorize>>.
 ====
 
 Listing sau đây minh họa một ví dụ:
@@ -114,23 +114,23 @@ Listing sau đây minh họa một ví dụ:
 </sec:accesscontrollist>
 ----
 
-Các permission được truyền cho `PermissionFactory` được định nghĩa trong ApplicationContext để chuyển đổi chúng thành các instance ACL `Permission`, vì vậy chúng có thể ở bất kỳ định dạng nào được factory hỗ trợ. Chúng không nhất thiết phải là số nguyên. Chúng có thể là các chuỗi như `READ` hoặc `WRITE`.
-Nếu không tìm thấy `PermissionFactory`, một instance của `DefaultPermissionFactory` sẽ được sử dụng.
-`AclService` từ ApplicationContext được sử dụng để tải instance `Acl` cho object được cung cấp.
-`Acl` được gọi với các permission bắt buộc để kiểm tra xem tất cả chúng có được cấp hay không.
+Các permission được truyền cho `PermissionFactory` được định nghĩa trong application context để convert chúng thành các instance ACL `Permission`, vì vậy chúng có thể ở bất kỳ format nào được factory hỗ trợ. Chúng không nhất thiết phải là integer. Chúng có thể là các string như `READ` hoặc `WRITE`.
+Nếu không tìm thấy `PermissionFactory`, một instance của `DefaultPermissionFactory` sẽ được dùng.
+`AclService` từ application context được dùng để load `Acl` instance cho object được cung cấp.
+`Acl` được invoke với các permission bắt buộc để check xem tất cả chúng đã được grant hay chưa.
 
-Thẻ này cũng hỗ trợ thuộc tính `var`, giống như tag `authorize`.
+Tag này cũng hỗ trợ attribute `var`, giống tag `authorize`.
 
 [[taglibs-csrfinput]]
 == Tag csrfInput
-Nếu bật bảo vệ CSRF, thẻ này chèn một trường form ẩn với tên và giá trị đúng của token bảo vệ CSRF.
-Nếu không bật bảo vệ CSRF, thẻ này không xuất gì.
+Nếu CSRF protection được enable, tag này insert một hidden form field với name và value chính xác của CSRF protection token.
+Nếu CSRF protection không được enable, tag này không output gì.
 
-Thông thường, Spring Security tự động chèn trường form CSRF cho mọi tag `<form:form>` mà bạn sử dụng, nhưng nếu vì lý do nào đó bạn không thể dùng `<form:form>`, `csrfInput` là một phương án thay thế tiện dụng.
+Thông thường, Spring Security tự động insert CSRF form field cho mọi tag `<form:form>` mà bạn sử dụng, nhưng nếu vì lý do nào đó bạn không thể dùng `<form:form>`, `csrfInput` là một replacement tiện dụng.
 
-Bạn nên đặt thẻ này bên trong block HTML `<form></form>`, tại vị trí thường đặt các trường input khác.
-KHÔNG đặt thẻ này bên trong block Spring `<form:form></form:form>`.
-Spring Security tự động xử lý các form Spring.
+Bạn nên đặt tag này bên trong HTML `<form></form>` block, tại vị trí thường đặt các input field khác.
+KHÔNG đặt tag này bên trong Spring `<form:form></form:form>` block.
+Spring Security tự động handle các Spring form.
 Listing sau đây minh họa một ví dụ:
 
 [source,xml]
@@ -145,12 +145,12 @@ Listing sau đây minh họa một ví dụ:
 
 [[taglibs-csrfmeta]]
 == Tag csrfMetaTags
-Nếu bật bảo vệ CSRF, thẻ này chèn các meta tag chứa tên trường form và tên header của token bảo vệ CSRF, cùng giá trị token bảo vệ CSRF.
-Các meta tag này hữu ích để sử dụng bảo vệ CSRF trong JavaScript của ứng dụng.
+Nếu CSRF protection được enable, tag này insert các meta tag chứa form field name và header name của CSRF protection token, cùng với value của token.
+Các meta tag này hữu ích để áp dụng CSRF protection trong JavaScript của application.
 
-Bạn nên đặt `csrfMetaTags` bên trong block HTML `<head></head>`, tại vị trí thường đặt các meta tag khác.
-Sau khi sử dụng thẻ này, bạn có thể truy cập tên trường form, tên header và giá trị token bằng JavaScript.
-Ví dụ này sử dụng JQuery để thực hiện công việc dễ dàng hơn.
+Bạn nên đặt `csrfMetaTags` bên trong HTML `<head></head>` block, tại vị trí thường đặt các meta tag khác.
+Sau khi dùng tag này, bạn có thể access form field name, header name và token value bằng JavaScript.
+Ví dụ này dùng JQuery để thực hiện việc này dễ hơn.
 Listing sau đây minh họa một ví dụ:
 
 [source,xml]
@@ -209,4 +209,4 @@ Listing sau đây minh họa một ví dụ:
 </html>
 ----
 
-Nếu không bật bảo vệ CSRF, `csrfMetaTags` không xuất gì.
+Nếu CSRF protection không được enable, `csrfMetaTags` không output gì.

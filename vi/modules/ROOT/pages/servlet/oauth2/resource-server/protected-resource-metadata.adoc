@@ -1,5 +1,5 @@
 [[oauth2resourceserver-protected-resource-metadata]]
-= Metadata của Protected Resource OAuth 2.0
+= OAuth 2.0 Protected Resource Metadata
 
 `OAuth2ResourceServerConfigurer.ProtectedResourceMetadataConfigurer` cung cấp khả năng tùy chỉnh https://www.rfc-editor.org/rfc/rfc9728.html#section-3[endpoint OAuth 2.0 Protected Resource Metadata].
 Nó định nghĩa một extension point cho phép bạn tùy chỉnh https://www.rfc-editor.org/rfc/rfc9728.html#section-3.2[response OAuth 2.0 Protected Resource Metadata].

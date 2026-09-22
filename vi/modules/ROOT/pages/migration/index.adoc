@@ -2,17 +2,17 @@
 = Di chuyển sang 7.0
 
 Spring Security 6.5 là bản phát hành cuối cùng trong thế hệ 6.x của Spring Security.
-Phiên bản này cung cấp các chiến lược cấu hình những thay đổi gây mất tương thích để sử dụng cách thức của 7.0 trước khi cập nhật.
+Phiên bản này cung cấp các chiến lược để cấu hình các thay đổi gây mất tương thích theo cách của 7.0 trước khi cập nhật.
 Chúng tôi khuyến nghị bạn sử dụng 6.5 và {site-url}/6.5/migration-7/index.html[các bước chuẩn bị] của phiên bản này để đơn giản hóa việc cập nhật lên 7.0.
 
 Sau khi cập nhật lên 6.5, hãy làm theo hướng dẫn này để thực hiện mọi bước di chuyển hoặc dọn dẹp còn lại.
 
-Hãy nhớ rằng nếu gặp vấn đề, hướng dẫn chuẩn bị có các bước tắt tùy chọn để quay lại các hành vi của 5.x.
+Hãy nhớ rằng nếu gặp vấn đề, hướng dẫn chuẩn bị có các bước opt-out để quay lại các hành vi của 5.x.
 
 == Cập nhật lên Spring Security 7
 
-Bước đầu tiên là bảo đảm bạn đang sử dụng bản phát hành bản vá mới nhất của Spring Boot 4.0.
-Tiếp theo, bạn nên bảo đảm mình đang sử dụng bản phát hành bản vá mới nhất của Spring Security 7.
+Bước đầu tiên là bảo đảm bạn đang sử dụng patch release mới nhất của Spring Boot 4.0.
+Tiếp theo, bạn nên bảo đảm mình đang sử dụng patch release mới nhất của Spring Security 7.
 Để xem hướng dẫn cập nhật lên Spring Security 7, hãy truy cập phần xref:getting-spring-security.adoc[] của tài liệu tham khảo.
 
 === Di chuyển từ Jackson 2 sang Jackson 3
@@ -22,11 +22,11 @@ Cấu hình `ObjectMapper` của Jackson 2 với `SecurityJackson2Modules` nên 
 https://github.com/FasterXML/jackson/blob/main/jackson3/MIGRATING_TO_JACKSON_3.md[Hướng dẫn di chuyển Jackson 3] để biết thêm chi tiết.
 
 Bạn nên thay thế cấu hình các module riêng lẻ như `CoreJacksonModule` bằng cơ chế phát hiện module từ
-`SecurityJacksonModules`, vì cơ chế này cho phép tự động đưa thông tin kiểu vào và cấu hình một
-`PolymorphicTypeValidator` xử lý việc xác thực tên class.
+`SecurityJacksonModules`, vì cơ chế này cho phép tự động đưa type information vào và cấu hình một
+`PolymorphicTypeValidator` để xử lý việc validate tên class.
 
-Phần hỗ trợ Jackson 3 sử dụng định dạng tương thích với phần hỗ trợ Jackson 2 hiện đã deprecated, vì vậy các đối tượng của class được tuần tự hóa bằng
-Jackson 2 phải có thể được giải tuần tự hóa bằng phần hỗ trợ Jackson 3.
+Phần hỗ trợ Jackson 3 sử dụng định dạng tương thích với phần hỗ trợ Jackson 2 hiện đã deprecated, vì vậy các instance của class được
+serialize bằng Jackson 2 phải có thể được deserialize bằng phần hỗ trợ Jackson 3.
 
 `spring-security-oauth2-authorization-server` hiện sử dụng Jackson 3 theo mặc định. Nếu muốn tiếp tục
 sử dụng phần hỗ trợ Jackson 2 đã deprecated, phụ thuộc bắc cầu vào Jackson 3 (`tools.jackson.core:jackson-databind`)

@@ -1,4 +1,4 @@
-= Kerberos Migrations
+= Di chuyển Kerberos
 
-For users leveraging Spring Security's Kerberos support, the Maven  and Gradle Coordinates have been changed since the support was moved from an external module into Spring Security.
-See the xref:servlet/authentication/kerberos/introduction.adoc[Keberos documentation] for the new Maven and Gradle coordinates.
+Đối với người dùng sử dụng tính năng hỗ trợ Kerberos của Spring Security, các dependency coordinates cho Maven và Gradle đã thay đổi kể từ khi tính năng hỗ trợ này được chuyển từ một module bên ngoài vào Spring Security.
+Xem xref:servlet/authentication/kerberos/introduction.adoc[tài liệu Kerberos] để biết các dependency coordinates mới cho Maven và Gradle.

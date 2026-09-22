@@ -2,7 +2,7 @@
 = DaoAuthenticationProvider
 :figures: servlet/authentication/unpwd
 
-javadoc:org.springframework.security.authentication.dao.DaoAuthenticationProvider[] là một triển khai của xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationprovider[`AuthenticationProvider`], sử dụng xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[`UserDetailsService`] và xref:servlet/authentication/passwords/password-encoder.adoc#servlet-authentication-password-storage[`PasswordEncoder`] để authentication username và password.
+javadoc:org.springframework.security.authentication.dao.DaoAuthenticationProvider[] là một implementation của xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationprovider[`AuthenticationProvider`], sử dụng xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[`UserDetailsService`] và xref:servlet/authentication/passwords/password-encoder.adoc#servlet-authentication-password-storage[`PasswordEncoder`] để authenticate username và password.
 
 Phần này xem xét cách `DaoAuthenticationProvider` hoạt động trong Spring Security.
 Hình sau giải thích cách thức hoạt động của xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationmanager[`AuthenticationManager`] trong các hình ở phần xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-input[Đọc Username & Password].
@@ -11,13 +11,13 @@ Hình sau giải thích cách thức hoạt động của xref:servlet/authentic
 [.invert-dark]
 image::{figures}/daoauthenticationprovider.png[]
 
-image:{icondir}/number_1.png[] `Filter` authentication từ phần xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-input[Đọc Username & Password] truyền một `UsernamePasswordAuthenticationToken` đến `AuthenticationManager`, được triển khai bởi xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager[`ProviderManager`].
+image:{icondir}/number_1.png[] `Filter` xử lý authentication trong phần xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd-input[Đọc Username & Password] truyền một `UsernamePasswordAuthenticationToken` đến `AuthenticationManager`, được triển khai bởi xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager[`ProviderManager`].
 
 image:{icondir}/number_2.png[] `ProviderManager` được cấu hình để sử dụng một xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationprovider[AuthenticationProvider] thuộc kiểu `DaoAuthenticationProvider`.
 
 image:{icondir}/number_3.png[] `DaoAuthenticationProvider` tra cứu `UserDetails` từ `UserDetailsService`.
 
-image:{icondir}/number_4.png[] `DaoAuthenticationProvider` sử dụng xref:servlet/authentication/passwords/password-encoder.adoc#servlet-authentication-password-storage[`PasswordEncoder`] để xác thực password trên `UserDetails` được trả về ở bước trước.
+image:{icondir}/number_4.png[] `DaoAuthenticationProvider` sử dụng xref:servlet/authentication/passwords/password-encoder.adoc#servlet-authentication-password-storage[`PasswordEncoder`] để validate password của `UserDetails` được trả về ở bước trước.
 
-image:{icondir}/number_5.png[] Khi authentication thành công, xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] được trả về có kiểu `UsernamePasswordAuthenticationToken`, với principal là `UserDetails` do `UserDetailsService` đã cấu hình trả về và một tập authorities chứa ít nhất `FACTOR_PASSWORD`.
-Cuối cùng, `UsernamePasswordAuthenticationToken` được trả về sẽ được `Filter` authentication đặt vào xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`].
+image:{icondir}/number_5.png[] Khi authentication thành công, xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] được trả về có kiểu `UsernamePasswordAuthenticationToken`, có principal là `UserDetails` do `UserDetailsService` đã cấu hình trả về và một tập authorities chứa ít nhất `FACTOR_PASSWORD`.
+Cuối cùng, `UsernamePasswordAuthenticationToken` được trả về sẽ được `Filter` xử lý authentication đặt vào xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`].

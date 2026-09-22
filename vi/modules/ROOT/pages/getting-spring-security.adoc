@@ -1,18 +1,18 @@
 [[getting]]
 [[getting-gradle]]
-= Lấy Spring Security
+= Tải Spring Security
 
-Phần này mô tả cách lấy các tệp nhị phân của Spring Security.
+Phần này mô tả cách lấy các binary của Spring Security.
 Xem xref:community.adoc#community-source[Mã nguồn] để biết cách lấy mã nguồn.
 
 == Đánh số phiên bản
 
 Các phiên bản Spring Security được định dạng theo MAJOR.MINOR.PATCH như sau:
 
-* Các phiên bản MAJOR có thể chứa các thay đổi gây lỗi tương thích.
-Thông thường, những thay đổi này được thực hiện để cải thiện bảo mật nhằm phù hợp với các thực hành bảo mật hiện đại.
-* Các phiên bản MINOR chứa những cải tiến nhưng được xem là các bản cập nhật thụ động.
-* Cấp độ PATCH phải hoàn toàn tương thích theo cả hai chiều, với các phiên bản trước và sau, ngoại trừ khả năng có những thay đổi sửa lỗi.
+* Các phiên bản MAJOR có thể chứa breaking change.
+Thông thường, các thay đổi này được thực hiện để cải thiện bảo mật nhằm phù hợp với các practice bảo mật hiện đại.
+* Các phiên bản MINOR chứa các enhancement nhưng được xem là passive update.
+* Các bản PATCH phải tương thích hoàn toàn theo cả hướng forward và backward, ngoại trừ khả năng có các thay đổi để fix bug.
 
 
 [[maven]]
@@ -25,7 +25,7 @@ Giống như hầu hết các dự án mã nguồn mở, Spring Security triển
 === Spring Boot
 
 Spring Boot cung cấp một starter `spring-boot-starter-security` tập hợp các dependency liên quan đến Spring Security.
-Cách đơn giản nhất và được ưu tiên để sử dụng starter là dùng https://docs.spring.io/initializr/docs/current/reference/html/[Spring Initializr] thông qua tích hợp IDE trong (https://joshlong.com/jl/blogPost/tech_tip_geting_started_with_spring_boot.html[Eclipse] hoặc https://www.jetbrains.com/help/idea/spring-boot.html#d1489567e2[IntelliJ], https://github.com/AlexFalappa/nb-springboot/wiki/Quick-Tour[NetBeans]) hoặc thông qua https://start.spring.io.
+Cách đơn giản nhất và được ưu tiên để dùng starter là dùng https://docs.spring.io/initializr/docs/current/reference/html/[Spring Initializr] thông qua IDE integration của (https://joshlong.com/jl/blogPost/tech_tip_geting_started_with_spring_boot.html[Eclipse], https://www.jetbrains.com/help/idea/spring-boot.html#d1489567e2[IntelliJ] hoặc https://github.com/AlexFalappa/nb-springboot/wiki/Quick-Tour[NetBeans]) hoặc qua https://start.spring.io.
 Ngoài ra, bạn có thể thêm starter theo cách thủ công, như trong ví dụ sau:
 
 [tabs]
@@ -82,7 +82,7 @@ ext['spring-security.version']='{spring-security-version}'
 ----
 ======
 
-Vì Spring Security chỉ thực hiện các thay đổi gây lỗi tương thích trong những bản phát hành major, bạn có thể an toàn sử dụng phiên bản Spring Security mới hơn với Spring Boot.
+Vì Spring Security chỉ thực hiện breaking change trong các release major, bạn có thể an toàn sử dụng phiên bản Spring Security mới hơn với Spring Boot.
 Tuy nhiên, đôi khi bạn cũng cần cập nhật phiên bản Spring Framework.
 Bạn có thể thực hiện việc đó bằng cách thêm một build property như sau:
 
@@ -112,9 +112,9 @@ ext['spring.version']='{spring-core-version}'
 Nếu sử dụng các tính năng bổ sung (chẳng hạn LDAP, OAuth 2 và những tính năng khác), bạn cũng cần bao gồm xref:modules.adoc#modules[Các module và dependency của project] phù hợp.
 
 [[getting-maven-no-boot]]
-=== Cách sử dụng độc lập (Không có Spring Boot)
+=== Sử dụng standalone (Không có Spring Boot)
 
-Khi sử dụng Spring Security không có Spring Boot, cách được ưu tiên là sử dụng BOM của Spring Security để đảm bảo một phiên bản Spring Security nhất quán được sử dụng trong toàn bộ project.
+Khi sử dụng Spring Security không có Spring Boot, cách được ưu tiên là dùng BOM của Spring Security để đảm bảo toàn bộ project sử dụng cùng một phiên bản Spring Security.
 
 [tabs]
 ======
@@ -158,7 +158,7 @@ dependencyManagement {
 [TIP]
 Spring cung cấp https://github.com/spring-gradle-plugins/dependency-management-plugin[`Dependency Management Plugin`] cho Gradle
 
-Một tập dependency Maven tối thiểu cho Spring Security thường có dạng như ví dụ sau:
+Một bộ dependency Maven tối thiểu cho Spring Security thường có dạng như ví dụ sau:
 
 [tabs]
 ======
@@ -196,7 +196,7 @@ dependencies {
 Nếu sử dụng các tính năng bổ sung (chẳng hạn LDAP, OAuth 2 và những tính năng khác), bạn cũng cần bao gồm xref:modules.adoc#modules[Các module và dependency của project] phù hợp.
 
 Spring Security được build dựa trên Spring Framework {spring-core-version} nhưng nhìn chung sẽ hoạt động với mọi phiên bản mới hơn của Spring Framework 5.x.
-Nhiều người dùng có thể gặp vấn đề vì các dependency bắc cầu của Spring Security phân giải thành Spring Framework {spring-core-version}, điều này có thể gây ra những vấn đề bất thường trên classpath.
+Nhiều người dùng có thể gặp vấn đề vì các transitive dependency của Spring Security được resolve thành Spring Framework {spring-core-version}, điều này có thể gây ra các vấn đề khó hiểu trên classpath.
 Cách dễ nhất để giải quyết vấn đề này là sử dụng `spring-framework-bom` trong phần `<dependencyManagement>` của `pom.xml` hoặc phần `dependencyManagement` của `build.gradle`.
 
 [tabs]
@@ -241,19 +241,19 @@ dependencyManagement {
 [TIP]
 Spring cung cấp https://github.com/spring-gradle-plugins/dependency-management-plugin[`Dependency Management Plugin`] cho Gradle
 
-Ví dụ trước đảm bảo rằng tất cả dependency bắc cầu của Spring Security đều sử dụng các module Spring {spring-core-version}.
+Ví dụ trên đảm bảo rằng tất cả transitive dependency của Spring Security đều sử dụng các module Spring {spring-core-version}.
 
 [NOTE]
 ====
 Cách tiếp cận này sử dụng khái niệm "`bill of materials`" (BOM) của Maven và chỉ khả dụng trong Maven 2.0.9+.
-Để biết thêm chi tiết về cách dependency được phân giải, xem https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html[Tài liệu Introduction to the Dependency Mechanism của Maven].
+Để biết thêm chi tiết về cách các dependency được resolve, xem https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html[Tài liệu Introduction to the Dependency Mechanism của Maven].
 ====
 
 [[maven-repositories]]
 === Các repository Maven
-Tất cả https://github.com/spring-projects/spring-security/wiki/Release-Schedule-Guidelines[bản phát hành GA] đều được triển khai lên Maven Central, vì vậy bạn không cần khai báo thêm Maven repository trong cấu hình build.
+Tất cả https://github.com/spring-projects/spring-security/wiki/Release-Schedule-Guidelines[GA release] đều được deploy lên Maven Central, vì vậy bạn không cần khai báo thêm Maven repository trong build configuration.
 
-Đối với Gradle, sử dụng repository `mavenCentral()` là đủ cho các bản phát hành GA.
+Đối với Gradle, sử dụng repository `mavenCentral()` là đủ cho các GA release.
 
 .build.gradle
 [source,groovy]
@@ -263,7 +263,7 @@ repositories {
 }
 ----
 
-Nếu sử dụng một phiên bản SNAPSHOT, bạn cần đảm bảo đã định nghĩa Spring Snapshot repository:
+Nếu sử dụng một version SNAPSHOT, bạn cần đảm bảo đã khai báo Spring Snapshot repository:
 
 [tabs]
 ======
@@ -293,7 +293,7 @@ repositories {
 ----
 ======
 
-Nếu sử dụng một phiên bản milestone hoặc release candidate, bạn cần đảm bảo đã định nghĩa Spring Milestone repository, như ví dụ sau:
+Nếu sử dụng một milestone version hoặc release candidate version, bạn cần đảm bảo đã khai báo Spring Milestone repository, như ví dụ sau:
 
 [tabs]
 ======

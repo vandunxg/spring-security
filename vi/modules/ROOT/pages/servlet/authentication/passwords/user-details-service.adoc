@@ -1,15 +1,15 @@
 [[servlet-authentication-userdetailsservice]]
 = UserDetailsService
 
-javadoc:org.springframework.security.core.userdetails.UserDetailsService[] được xref:servlet/authentication/passwords/dao-authentication-provider.adoc#servlet-authentication-daoauthenticationprovider[`DaoAuthenticationProvider`] sử dụng để truy xuất tên người dùng, mật khẩu và các thuộc tính khác nhằm thực hiện authentication bằng tên người dùng và mật khẩu.
+javadoc:org.springframework.security.core.userdetails.UserDetailsService[] được xref:servlet/authentication/passwords/dao-authentication-provider.adoc#servlet-authentication-daoauthenticationprovider[`DaoAuthenticationProvider`] sử dụng để lấy username, password và các thuộc tính khác nhằm thực hiện authentication bằng username và password.
 Spring Security cung cấp các implementation của `UserDetailsService` cho xref:servlet/authentication/passwords/in-memory.adoc#servlet-authentication-inmemory[lưu trong bộ nhớ], xref:servlet/authentication/passwords/jdbc.adoc#servlet-authentication-jdbc[JDBC] và xref:servlet/authentication/passwords/caching.adoc#servlet-authentication-caching-user-details[bộ nhớ đệm].
 
-Bạn có thể định nghĩa authentication tùy chỉnh bằng cách cung cấp một `UserDetailsService` tùy chỉnh dưới dạng bean.
-Ví dụ, listing sau tùy chỉnh authentication, với giả định rằng `CustomUserDetailsService` triển khai `UserDetailsService`:
+Bạn có thể định nghĩa authentication tùy chỉnh bằng cách expose một `UserDetailsService` tùy chỉnh dưới dạng bean.
+Ví dụ, đoạn code sau tùy chỉnh authentication, với giả định rằng `CustomUserDetailsService` implement `UserDetailsService`:
 
 [NOTE]
 ====
-Điều này chỉ được sử dụng nếu `AuthenticationManagerBuilder` chưa được điền và không có `AuthenticationProviderBean` nào được định nghĩa.
+Điều này chỉ được sử dụng nếu `AuthenticationManagerBuilder` chưa được cấu hình và không có `AuthenticationProviderBean` nào được định nghĩa.
 ====
 
 .Bean UserDetailsService tùy chỉnh

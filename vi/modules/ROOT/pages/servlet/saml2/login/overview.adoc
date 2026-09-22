@@ -2,34 +2,34 @@
 :figures: servlet/saml2
 :icondir: icons
 
-Trước tiên, chúng ta tìm hiểu cách SAML 2.0 Relying Party Authentication hoạt động trong Spring Security.
-Đầu tiên, chúng ta thấy rằng, tương tự <<oauth2login, OAuth 2.0 Login>>, Spring Security đưa người dùng đến một bên thứ ba để thực hiện authentication.
+Trước tiên, chúng ta tìm hiểu cách authentication của SAML 2.0 relying party hoạt động trong Spring Security.
+Tương tự <<oauth2login, OAuth 2.0 Login>>, Spring Security đưa user đến một bên thứ ba để thực hiện authentication.
 Spring Security thực hiện việc này qua một chuỗi redirect:
 
-.Redirect đến Asserting Party Authentication
+.Redirect đến authentication của asserting party
 [.invert-dark]
 image::{figures}/saml2webssoauthenticationrequestfilter.png[]
 
 [NOTE]
 ====
-Hình trên được xây dựng dựa trên các sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] và xref:servlet/authentication/architecture.adoc#servlet-authentication-abstractprocessingfilter[`AbstractAuthenticationProcessingFilter`] của chúng ta:
+Hình trên dựa trên các sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] và xref:servlet/authentication/architecture.adoc#servlet-authentication-abstractprocessingfilter[`AbstractAuthenticationProcessingFilter`]:
 ====
 
-image:{icondir}/number_1.png[] Đầu tiên, người dùng gửi một request chưa được authentication đến resource `/private`, nơi người dùng không có authorization.
+image:{icondir}/number_1.png[] Đầu tiên, user gửi một request chưa được authenticated đến resource `/private`, mà user không được authorized để truy cập.
 
-image:{icondir}/number_2.png[] xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] của Spring Security cho biết request chưa được authentication bị _Từ chối_ bằng cách ném `AccessDeniedException`.
+image:{icondir}/number_2.png[] xref:servlet/authorization/authorize-http-requests.adoc[`AuthorizationFilter`] của Spring Security cho biết request chưa được authenticated bị _Từ chối_ bằng cách ném `AccessDeniedException`.
 
-image:{icondir}/number_3.png[] Vì người dùng thiếu authorization, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] khởi động _Bắt đầu authentication_.
+image:{icondir}/number_3.png[] Vì user thiếu authorization, xref:servlet/architecture.adoc#servlet-exceptiontranslationfilter[`ExceptionTranslationFilter`] khởi động _Bắt đầu authentication_.
 xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] đã cấu hình là một instance của javadoc:org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint[], redirect đến <<servlet-saml2login-sp-initiated-factory,endpoint tạo `<saml2:AuthnRequest>`>>, `Saml2WebSsoAuthenticationRequestFilter`.
-Ngoài ra, nếu bạn đã <<servlet-saml2login-relyingpartyregistrationrepository,cấu hình nhiều asserting party>>, trước tiên nó redirect đến một trang chọn.
+Ngoài ra, nếu bạn đã <<servlet-saml2login-relyingpartyregistrationrepository,cấu hình nhiều asserting party>>, filter trước tiên redirect đến một trang chọn.
 
-image:{icondir}/number_4.png[] Tiếp theo, `Saml2WebSsoAuthenticationRequestFilter` tạo, ký, serialize và encode `<saml2:AuthnRequest>` bằng <<servlet-saml2login-sp-initiated-factory,`Saml2AuthenticationRequestFactory`>> đã cấu hình.
+image:{icondir}/number_4.png[] Tiếp theo, `Saml2WebSsoAuthenticationRequestFilter` tạo, ký, serialize và encode `<saml2:AuthnRequest>` bằng <<servlet-saml2login-sp-initiated-factory,`Saml2AuthenticationRequestFactory`>> được cấu hình cho filter.
 
 image:{icondir}/number_5.png[] Sau đó, browser nhận `<saml2:AuthnRequest>` này và gửi nó đến asserting party.
-Asserting party cố gắng thực hiện authentication cho người dùng.
-Nếu thành công, asserting party trả `<saml2:Response>` về browser.
+Asserting party cố gắng thực hiện authentication cho user.
+Nếu thành công, asserting party gửi `<saml2:Response>` lại cho browser.
 
-image:{icondir}/number_6.png[] Sau đó, browser POST `<saml2:Response>` đến endpoint assertion consumer service.
+image:{icondir}/number_6.png[] Sau đó, browser POST `<saml2:Response>` đến assertion consumer service endpoint.
 
 Hình sau đây cho thấy cách Spring Security thực hiện authentication cho một `<saml2:Response>`.
 
@@ -40,31 +40,31 @@ image::{figures}/saml2webssoauthenticationfilter.png[]
 
 [NOTE]
 ====
-Hình này được xây dựng dựa trên sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`] của chúng ta.
+Hình này dựa trên sơ đồ xref:servlet/architecture.adoc#servlet-securityfilterchain[`SecurityFilterChain`].
 ====
 
 [[servlet-saml2login-authentication-saml2authenticationtokenconverter]]
-image:{icondir}/number_1.png[] Khi browser gửi `<saml2:Response>` đến application, nó xref:servlet/saml2/login/authentication.adoc#servlet-saml2login-authenticate-responses[ủy quyền cho `Saml2WebSsoAuthenticationFilter`].
+image:{icondir}/number_1.png[] Khi browser gửi `<saml2:Response>` đến application, nó xref:servlet/saml2/login/authentication.adoc#servlet-saml2login-authenticate-responses[delegate đến `Saml2WebSsoAuthenticationFilter`].
 Filter này gọi `AuthenticationConverter` đã cấu hình để tạo `Saml2AuthenticationToken` bằng cách trích xuất response từ `HttpServletRequest`.
-Converter này cũng resolve <<servlet-saml2login-relyingpartyregistration, `RelyingPartyRegistration`>> và cung cấp nó cho `Saml2AuthenticationToken`.
+Converter này cũng resolve <<servlet-saml2login-relyingpartyregistration, `RelyingPartyRegistration`>> và cung cấp registration đó cho `Saml2AuthenticationToken`.
 
 image:{icondir}/number_2.png[] Tiếp theo, filter truyền token đến xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager[`AuthenticationManager`] đã cấu hình.
 Theo mặc định, filter sử dụng <<servlet-saml2login-architecture,`OpenSaml5AuthenticationProvider`>>.
 
-image:{icondir}/number_3.png[] Nếu authentication thất bại, thì _Thất bại_.
+image:{icondir}/number_3.png[] Nếu authentication thất bại, kết quả là _Thất bại_.
 
 * xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`] bị xóa.
-* xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] được gọi để khởi động lại quy trình authentication.
+* xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] được gọi để bắt đầu lại quy trình authentication.
 
-image:{icondir}/number_4.png[] Nếu authentication thành công, thì _Thành công_.
+image:{icondir}/number_4.png[] Nếu authentication thành công, kết quả là _Thành công_.
 
 * xref:servlet/authentication/architecture.adoc#servlet-authentication-authentication[`Authentication`] được đặt vào xref:servlet/authentication/architecture.adoc#servlet-authentication-securitycontextholder[`SecurityContextHolder`].
 * `Saml2WebSsoAuthenticationFilter` gọi `FilterChain#doFilter(request,response)` để tiếp tục phần logic còn lại của application.
 
 [[servlet-saml2login-minimaldependencies]]
-== Dependency tối thiểu
+== Dependencies tối thiểu
 
-Tính năng hỗ trợ Service Provider SAML 2.0 nằm trong `spring-security-saml2-service-provider`.
+Tính năng hỗ trợ SAML 2.0 service provider nằm trong `spring-security-saml2-service-provider`.
 Tính năng này được xây dựng dựa trên thư viện OpenSAML, vì vậy bạn cũng phải đưa repository Shibboleth Maven vào cấu hình build.
 Xem https://shibboleth.atlassian.net/wiki/spaces/DEV/pages/1123844333/Use+of+Maven+Central#Publishing-to-Maven-Central[liên kết này] để biết thêm chi tiết về lý do cần một repository riêng.
 
@@ -109,17 +109,17 @@ dependencies {
 [[servlet-saml2login-minimalconfiguration]]
 == Cấu hình tối thiểu
 
-Khi sử dụng https://spring.io/projects/spring-boot[Spring Boot], việc cấu hình một application làm Service Provider gồm hai bước cơ bản:
+Khi sử dụng https://spring.io/projects/spring-boot[Spring Boot], việc cấu hình một application làm service provider gồm hai bước cơ bản:
 . Đưa vào các dependency cần thiết.
 . Chỉ định metadata cần thiết của asserting party.
 
 [NOTE]
-Ngoài ra, cấu hình này giả định rằng bạn đã xref:servlet/saml2/metadata.adoc#servlet-saml2login-metadata[đăng ký Relying Party với asserting party].
+Ngoài ra, cấu hình này giả định rằng bạn đã xref:servlet/saml2/metadata.adoc#servlet-saml2login-metadata[đăng ký relying party với asserting party].
 
 [[saml2-specifying-identity-provider-metadata]]
-=== Chỉ định Metadata của Identity Provider
+=== Chỉ định metadata của identity provider
 
-Trong application Spring Boot, để chỉ định metadata của Identity Provider, hãy tạo cấu hình tương tự như sau:
+Trong application Spring Boot, để chỉ định metadata của identity provider, hãy tạo cấu hình tương tự như sau:
 
 [source,yml]
 ----
@@ -139,22 +139,22 @@ spring:
 
 trong đó:
 
-* `https://idp.example.com/issuer` là giá trị nằm trong thuộc tính `Issuer` của các SAML response do Identity Provider phát hành.
-* `classpath:idp.crt` là vị trí trên classpath của certificate của Identity Provider dùng để xác minh SAML response.
-* `https://idp.example.com/issuer/sso` là endpoint nơi Identity Provider chờ các instance `AuthnRequest`.
+* `https://idp.example.com/issuer` là giá trị trong thuộc tính `Issuer` của các SAML response do identity provider phát hành.
+* `classpath:idp.crt` là vị trí trên classpath của certificate của identity provider, dùng để verify SAML response.
+* `https://idp.example.com/issuer/sso` là endpoint mà identity provider chờ các instance `AuthnRequest`.
 * `adfs` là <<servlet-saml2login-relyingpartyregistrationid,một identifier tùy ý do bạn chọn>>
 
 Vậy là xong!
 
 [NOTE]
 ====
-Identity Provider và Asserting Party là các từ đồng nghĩa, cũng như Service Provider và Relying Party.
-Chúng thường được viết tắt lần lượt là AP và RP.
+Identity Provider và Asserting Party là các thuật ngữ đồng nghĩa, cũng như Service Provider và Relying Party.
+Các thuật ngữ này thường được viết tắt lần lượt là AP và RP.
 ====
 
-=== Kỳ vọng khi chạy
+=== Hành vi khi runtime
 
-Như đã cấu hình <<saml2-specifying-identity-provider-metadata,trước đó>>, application xử lý mọi request `+POST /login/saml2/sso/{registrationId}+` chứa parameter `SAMLResponse`:
+Với cấu hình <<saml2-specifying-identity-provider-metadata,trước đó>>, application xử lý mọi request `+POST /login/saml2/sso/{registrationId}+` có parameter `SAMLResponse`:
 
 [source,http]
 ----
@@ -163,14 +163,14 @@ POST /login/saml2/sso/adfs HTTP/1.1
 SAMLResponse=PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZ...
 ----
 
-Có hai cách để yêu cầu asserting party tạo `SAMLResponse`:
+Có hai cách để khiến asserting party tạo `SAMLResponse`:
 
 * Bạn có thể điều hướng đến asserting party.
 Asserting party có thể có một loại link hoặc button cho mỗi Relying Party đã đăng ký mà bạn có thể nhấp để gửi `SAMLResponse`.
 * Bạn có thể điều hướng đến một trang được bảo vệ trong application, chẳng hạn `http://localhost:8080`.
 Sau đó application redirect đến asserting party đã cấu hình, rồi asserting party gửi `SAMLResponse`.
 
-Từ đây, bạn có thể chuyển đến:
+Từ đây, bạn có thể xem tiếp:
 
 * <<servlet-saml2login-architecture,Cách SAML 2.0 Login tích hợp với OpenSAML>>
 * xref:servlet/saml2/login/authentication.adoc#servlet-saml2login-authenticatedprincipal[Cách sử dụng `Saml2AuthenticatedPrincipal`]
@@ -179,35 +179,35 @@ Từ đây, bạn có thể chuyển đến:
 [[servlet-saml2login-architecture]]
 == Cách SAML 2.0 Login tích hợp với OpenSAML
 
-Tính năng hỗ trợ SAML 2.0 của Spring Security có một vài mục tiêu thiết kế:
+Tính năng hỗ trợ SAML 2.0 của Spring Security có một vài design goal:
 
-* Dựa vào một thư viện cho các thao tác và domain object SAML 2.0.
+* Sử dụng một thư viện cho các thao tác và domain object SAML 2.0.
 Để đạt được điều này, Spring Security sử dụng OpenSAML.
-* Đảm bảo không bắt buộc thư viện này khi sử dụng tính năng hỗ trợ SAML của Spring Security.
-Để đạt được điều này, mọi interface hoặc class mà Spring Security sử dụng OpenSAML trong contract đều được đóng gói.
+* Đảm bảo không bắt buộc phải có thư viện này khi sử dụng tính năng hỗ trợ SAML của Spring Security.
+Để đạt được điều này, mọi interface hoặc class mà Spring Security sử dụng OpenSAML trong contract đều được encapsulate.
 Điều này cho phép bạn thay OpenSAML bằng một thư viện khác hoặc một version OpenSAML không được hỗ trợ.
 
 Do hệ quả tự nhiên của hai mục tiêu này, SAML API của Spring Security khá nhỏ so với các module khác.
-Thay vào đó, các class như `OpenSamlXAuthenticationRequestFactory` và `OpenSamlXAuthenticationProvider` cung cấp các implementation `Converter` để tùy chỉnh nhiều bước khác nhau trong quy trình authentication.
+Thay vào đó, các class như `OpenSamlXAuthenticationRequestFactory` và `OpenSamlXAuthenticationProvider` expose các implementation `Converter` để tùy chỉnh nhiều bước khác nhau trong quy trình authentication.
 
-Ví dụ, sau khi application nhận `SAMLResponse` và ủy quyền cho `Saml2WebSsoAuthenticationFilter`, filter ủy quyền cho `OpenSamlXAuthenticationProvider`:
+Ví dụ, sau khi application nhận `SAMLResponse` và delegate đến `Saml2WebSsoAuthenticationFilter`, filter delegate đến `OpenSamlXAuthenticationProvider`:
 
 .Thực hiện authentication cho một `Response` của OpenSAML
 image:{figures}/opensamlauthenticationprovider.png[]
 
-Hình này được xây dựng dựa trên <<servlet-saml2login-authentication-saml2webssoauthenticationfilter,sơ đồ `Saml2WebSsoAuthenticationFilter`>>.
+Hình này dựa trên <<servlet-saml2login-authentication-saml2webssoauthenticationfilter,sơ đồ `Saml2WebSsoAuthenticationFilter`>>.
 
 image:{icondir}/number_1.png[] `Saml2WebSsoAuthenticationFilter` tạo `Saml2AuthenticationToken` và gọi xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager[`AuthenticationManager`].
 
 image:{icondir}/number_2.png[] xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager[`AuthenticationManager`] gọi authentication provider của OpenSAML.
 
-image:{icondir}/number_3.png[] Authentication provider deserialize response thành `Response` của OpenSAML và kiểm tra signature của response.
+image:{icondir}/number_3.png[] Authentication provider deserialize response thành một `Response` của OpenSAML và kiểm tra signature của response.
 Nếu signature không hợp lệ, authentication thất bại.
 
-image:{icondir}/number_4.png[] Sau đó, provider xref:servlet/saml2/login/authentication.adoc#servlet-saml2login-opensamlauthenticationprovider-decryption[giải mã mọi element `EncryptedAssertion`].
-Nếu bất kỳ thao tác giải mã nào thất bại, authentication thất bại.
+image:{icondir}/number_4.png[] Sau đó, provider xref:servlet/saml2/login/authentication.adoc#servlet-saml2login-opensamlauthenticationprovider-decryption[decrypt mọi element `EncryptedAssertion`].
+Nếu bất kỳ thao tác decrypt nào thất bại, authentication thất bại.
 
-image:{icondir}/number_5.png[] Tiếp theo, provider xác thực các giá trị `Issuer` và `Destination` của response.
+image:{icondir}/number_5.png[] Tiếp theo, provider validate các giá trị `Issuer` và `Destination` của response.
 Nếu chúng không khớp với các giá trị trong `RelyingPartyRegistration`, authentication thất bại.
 
 image:{icondir}/number_6.png[] Sau đó, provider xác minh signature của từng `Assertion`.
@@ -215,25 +215,25 @@ Nếu bất kỳ signature nào không hợp lệ, authentication thất bại.
 Ngoài ra, nếu cả response lẫn các assertion đều không có signature, authentication thất bại.
 Response hoặc tất cả assertion phải có signature.
 
-image:{icondir}/number_7.png[] Sau đó, provider xref:servlet/saml2/login/authentication.adoc#servlet-saml2login-opensamlauthenticationprovider-decryption[giải mã mọi element `EncryptedID` hoặc `EncryptedAttribute`].
-Nếu bất kỳ thao tác giải mã nào thất bại, authentication thất bại.
+image:{icondir}/number_7.png[] Sau đó, provider xref:servlet/saml2/login/authentication.adoc#servlet-saml2login-opensamlauthenticationprovider-decryption[decrypt mọi element `EncryptedID` hoặc `EncryptedAttribute`].
+Nếu bất kỳ thao tác decrypt nào thất bại, authentication thất bại.
 
-image:{icondir}/number_8.png[] Tiếp theo, provider xác thực timestamp `ExpiresAt` và `NotBefore` của từng assertion, `<Subject>` và mọi điều kiện `<AudienceRestriction>`.
-Nếu bất kỳ lần xác thực nào thất bại, authentication thất bại.
+image:{icondir}/number_8.png[] Tiếp theo, provider validate timestamp `ExpiresAt` và `NotBefore` của từng assertion, `<Subject>` và mọi điều kiện `<AudienceRestriction>`.
+Nếu bất kỳ lần validation nào thất bại, authentication thất bại.
 
-image:{icondir}/number_9.png[] Sau đó, provider lấy `AttributeStatement` của assertion đầu tiên và ánh xạ nó thành `Map<String, List<Object>>`.
-Provider cũng cấp các authority `FACTOR_SAML_RESPONSE` và `ROLE_USER`.
+image:{icondir}/number_9.png[] Sau đó, provider lấy `AttributeStatement` của assertion đầu tiên và map nó thành `Map<String, List<Object>>`.
+Provider cũng grant các authority `FACTOR_SAML_RESPONSE` và `ROLE_USER`.
 
-image:{icondir}/number_10.png[] Cuối cùng, provider lấy `NameID` từ assertion đầu tiên, `Map` các attribute và `GrantedAuthority` rồi tạo một `Saml2AuthenticatedPrincipal`.
+image:{icondir}/number_10.png[] Cuối cùng, provider lấy `NameID` từ assertion đầu tiên, `Map` các attribute và `GrantedAuthority` rồi tạo `Saml2AuthenticatedPrincipal`.
 Sau đó, provider đặt principal và các authority đó vào một `Saml2Authentication`.
 
-`Authentication#getPrincipal` thu được là một object `Saml2AuthenticatedPrincipal` của Spring Security, còn `Authentication#getName` ánh xạ đến element `NameID` của assertion đầu tiên.
-`Saml2AuthenticatedPrincipal#getRelyingPartyRegistrationId` chứa <<servlet-saml2login-relyingpartyregistrationid,identifier đến `RelyingPartyRegistration` liên kết>>.
+Kết quả của `Authentication#getPrincipal` là một object `Saml2AuthenticatedPrincipal` của Spring Security, còn `Authentication#getName` map đến element `NameID` của assertion đầu tiên.
+`Saml2AuthenticatedPrincipal#getRelyingPartyRegistrationId` chứa <<servlet-saml2login-relyingpartyregistrationid,identifier của `RelyingPartyRegistration` liên kết>>.
 
 [[servlet-saml2login-opensaml-customization]]
 === Tùy chỉnh cấu hình OpenSAML
 
-Bất kỳ class nào sử dụng cả Spring Security và OpenSAML đều nên khởi tạo tĩnh `OpenSamlInitializationService` ở đầu class:
+Bất kỳ class nào sử dụng cả Spring Security và OpenSAML đều nên thực hiện static initialization cho `OpenSamlInitializationService` ở đầu class:
 
 [tabs]
 ======
@@ -261,10 +261,10 @@ companion object {
 
 Điều này thay thế `InitializationService#initialize` của OpenSAML.
 
-Đôi khi, việc tùy chỉnh cách OpenSAML xây dựng, marshall và unmarshall các SAML object có thể hữu ích.
-Trong những trường hợp này, thay vào đó bạn có thể gọi `OpenSamlInitializationService#requireInitialize(Consumer)`, phương thức cung cấp cho bạn quyền truy cập vào `XMLObjectProviderFactory` của OpenSAML.
+Đôi khi, việc tùy chỉnh cách OpenSAML build, marshall và unmarshall các SAML object có thể hữu ích.
+Trong những trường hợp này, bạn có thể gọi `OpenSamlInitializationService#requireInitialize(Consumer)`, phương thức này cung cấp quyền truy cập vào `XMLObjectProviderFactory` của OpenSAML.
 
-Ví dụ, khi gửi một AuthNRequest không có signature, bạn có thể muốn buộc thực hiện lại authentication.
+Ví dụ, khi gửi một AuthNRequest không có signature, bạn có thể muốn buộc user authentication lại.
 Trong trường hợp đó, bạn có thể đăng ký `AuthnRequestMarshaller` của riêng mình như sau:
 
 [tabs]
@@ -331,10 +331,10 @@ Method `requireInitialize` chỉ được gọi một lần cho mỗi applicatio
 [[servlet-saml2login-sansboot]]
 == Ghi đè hoặc thay thế Boot Auto Configuration
 
-Spring Boot tạo hai object `@Bean` cho một Relying Party.
+Spring Boot tạo hai object `@Bean` cho một relying party.
 
-Đầu tiên là một `SecurityFilterChain` cấu hình application làm Relying Party.
-Khi đưa `spring-security-saml2-service-provider` vào, `SecurityFilterChain` có dạng:
+Đầu tiên là một `SecurityFilterChain` cấu hình application làm relying party.
+Khi thêm `spring-security-saml2-service-provider`, `SecurityFilterChain` có dạng:
 
 .Cấu hình SAML 2.0 Login mặc định
 [tabs]
@@ -371,7 +371,7 @@ open fun filterChain(http: HttpSecurity): SecurityFilterChain {
 ----
 ======
 
-Nếu application không expose bean `SecurityFilterChain`, Spring Boot expose bean mặc định nêu trên.
+Nếu application không expose bean `SecurityFilterChain`, Spring Boot expose bean mặc định ở trên.
 
 Bạn có thể thay thế cấu hình này bằng cách expose bean trong application:
 
@@ -424,8 +424,8 @@ class MyCustomSecurityConfiguration {
 Ví dụ trên yêu cầu role `USER` cho mọi URL bắt đầu bằng `/messages/`.
 
 [[servlet-saml2login-relyingpartyregistrationrepository]]
-`@Bean` thứ hai mà Spring Boot tạo là javadoc:org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository[], đại diện cho metadata của asserting party và Relying Party.
-Metadata này bao gồm những thông tin như vị trí của endpoint SSO mà Relying Party nên sử dụng khi yêu cầu authentication từ asserting party.
+`@Bean` thứ hai mà Spring Boot tạo là javadoc:org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository[], đại diện cho metadata của asserting party và relying party.
+Metadata này bao gồm những thông tin như vị trí của SSO endpoint mà relying party nên sử dụng khi yêu cầu authentication từ asserting party.
 
 Bạn có thể ghi đè mặc định bằng cách publish bean `RelyingPartyRegistrationRepository` của riêng mình.
 Ví dụ, bạn có thể tra cứu cấu hình của asserting party bằng cách gọi metadata endpoint của nó:
@@ -470,11 +470,11 @@ open fun relyingPartyRegistrations(): RelyingPartyRegistrationRepository? {
 
 [[servlet-saml2login-relyingpartyregistrationid]]
 [NOTE]
-`registrationId` là giá trị tùy ý do bạn chọn để phân biệt giữa các registration.
+`registrationId` là giá trị tùy ý do bạn chọn để phân biệt các registration.
 
 Ngoài ra, bạn có thể cung cấp thủ công từng chi tiết:
 
-.Cấu hình thủ công Repository đăng ký Relying Party
+.Cấu hình thủ công Relying Party Registration Repository
 [tabs]
 ======
 Java::
@@ -533,12 +533,12 @@ open fun relyingPartyRegistrations(): RelyingPartyRegistrationRepository {
 
 [NOTE]
 ====
-`X509Support` là một class OpenSAML, được sử dụng trong snippet trước để rút gọn.
+`X509Support` là một class OpenSAML, được sử dụng trong snippet ở trên để rút gọn.
 ====
 
 
 [[servlet-saml2login-relyingpartyregistrationrepository-dsl]]
-Ngoài ra, bạn có thể wire trực tiếp repository bằng DSL, cách này cũng ghi đè `SecurityFilterChain` được auto-configure:
+Ngoài ra, bạn có thể wire repository trực tiếp bằng DSL, cách này cũng ghi đè `SecurityFilterChain` được auto-configure:
 
 .DSL đăng ký Relying Party tùy chỉnh
 [tabs]
@@ -591,13 +591,13 @@ class MyCustomSecurityConfiguration {
 
 [NOTE]
 ====
-Một Relying Party có thể multi-tenant bằng cách đăng ký nhiều hơn một Relying Party trong `RelyingPartyRegistrationRepository`.
+Một relying party có thể multi-tenant bằng cách đăng ký nhiều hơn một relying party trong `RelyingPartyRegistrationRepository`.
 ====
 
 [[servlet-saml2login-relyingpartyregistrationrepository-caching]]
 Nếu muốn metadata có thể được refresh định kỳ, bạn có thể bọc repository bằng `CachingRelyingPartyRegistrationRepository` như sau:
 
-.Repository đăng ký Relying Party có caching
+.Caching Relying Party Registration Repository
 [tabs]
 ======
 Java::
@@ -648,13 +648,13 @@ Bằng cách này, tập hợp ``RelyingPartyRegistration`` sẽ refresh dựa t
 [[servlet-saml2login-relyingpartyregistration]]
 == RelyingPartyRegistration
 Một instance javadoc:org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration[]
-đại diện cho liên kết giữa metadata của một Relying Party và một asserting party.
+đại diện cho liên kết giữa một relying party và metadata của một asserting party.
 
-Trong `RelyingPartyRegistration`, bạn có thể cung cấp metadata của Relying Party như giá trị `Issuer`, nơi Relying Party chờ SAML Response được gửi đến, và mọi credential mà Relying Party sở hữu để ký hoặc giải mã payload.
+Trong `RelyingPartyRegistration`, bạn có thể cung cấp metadata của relying party như giá trị `Issuer`, nơi relying party chờ SAML response được gửi đến, và mọi credential mà relying party sở hữu để ký hoặc decrypt payload.
 
-Bạn cũng có thể cung cấp metadata của asserting party như giá trị `Issuer`, nơi asserting party chờ AuthnRequest được gửi đến, và mọi credential public mà asserting party sở hữu để Relying Party xác minh hoặc mã hóa payload.
+Bạn cũng có thể cung cấp metadata của asserting party như giá trị `Issuer`, nơi asserting party chờ AuthnRequest được gửi đến, và mọi public credential mà asserting party sở hữu để relying party verify hoặc encrypt payload.
 
-`RelyingPartyRegistration` sau đây là cấu hình tối thiểu cần thiết cho hầu hết setup:
+`RelyingPartyRegistration` sau đây là cấu hình tối thiểu cần thiết cho hầu hết các configuration:
 
 [tabs]
 ======
@@ -679,7 +679,7 @@ val relyingPartyRegistration = RelyingPartyRegistrations
 ----
 ======
 
-Lưu ý rằng bạn cũng có thể tạo `RelyingPartyRegistration` từ một source `InputStream` tùy ý.
+Lưu ý rằng bạn cũng có thể tạo `RelyingPartyRegistration` từ một `InputStream` bất kỳ.
 Một ví dụ là khi metadata được lưu trong database:
 
 [source,java]
@@ -693,7 +693,7 @@ try (InputStream source = new ByteArrayInputStream(xml.getBytes())) {
 }
 ----
 
-Cũng có thể sử dụng một setup phức tạp hơn:
+Bạn cũng có thể sử dụng một cấu hình phức tạp hơn:
 
 [tabs]
 ======
@@ -735,30 +735,30 @@ val relyingPartyRegistration =
 
 [TIP]
 ====
-Các method metadata cấp cao nhất là chi tiết về Relying Party.
-Các method bên trong `AssertingPartyMetadata` là chi tiết về asserting party.
+Các metadata method ở top level chứa chi tiết về relying party.
+Các method bên trong `AssertingPartyMetadata` chứa chi tiết về asserting party.
 ====
 
 [NOTE]
 ====
-Vị trí nơi Relying Party chờ SAML Response là Assertion Consumer Service Location.
+Vị trí mà relying party chờ SAML response được gọi là Assertion Consumer Service Location.
 ====
 
-Giá trị mặc định của `entityId` của Relying Party là `+{baseUrl}/saml2/service-provider-metadata/{registrationId}+`.
-Đây là giá trị cần thiết khi cấu hình asserting party để biết về Relying Party của bạn.
+Giá trị mặc định của `entityId` của relying party là `+{baseUrl}/saml2/service-provider-metadata/{registrationId}+`.
+Đây là giá trị cần thiết khi cấu hình asserting party để biết về relying party của bạn.
 
 Giá trị mặc định của `assertionConsumerServiceLocation` là `+/login/saml2/sso/{registrationId}+`.
-Theo mặc định, nó được ánh xạ đến <<servlet-saml2login-authentication-saml2webssoauthenticationfilter,`Saml2WebSsoAuthenticationFilter`>> trong filter chain.
+Theo mặc định, nó được map đến <<servlet-saml2login-authentication-saml2webssoauthenticationfilter,`Saml2WebSsoAuthenticationFilter`>> trong filter chain.
 
 [[servlet-saml2login-rpr-uripatterns]]
-=== Pattern URI
+=== URI Patterns
 
-Có thể bạn đã nhận thấy các placeholder `+{baseUrl}+` và `+{registrationId}+` trong những ví dụ trước.
+Có thể bạn đã nhận thấy các placeholder `+{baseUrl}+` và `+{registrationId}+` trong các ví dụ ở trên.
 
-Các placeholder này hữu ích khi tạo URI. Vì vậy, `entityId` và `assertionConsumerServiceLocation` của Relying Party hỗ trợ các placeholder sau:
+Các placeholder này hữu ích khi tạo URI. Vì vậy, `entityId` và `assertionConsumerServiceLocation` của relying party hỗ trợ các placeholder sau:
 
 * `baseUrl` - scheme, host và port của application đã deploy
-* `registrationId` - registration id của Relying Party này
+* `registrationId` - registration id của relying party này
 * `baseScheme` - scheme của application đã deploy
 * `baseHost` - host của application đã deploy
 * `basePort` - port của application đã deploy
@@ -771,7 +771,7 @@ Trong application đã deploy, nó chuyển thành:
 
 `+/my-login-endpoint/adfs+`
 
-`entityId` được trình bày trước đó được định nghĩa là:
+`entityId` ở trên được định nghĩa là:
 
 `+{baseUrl}/{registrationId}+`
 
@@ -779,29 +779,29 @@ Trong application đã deploy, nó chuyển thành:
 
 `+https://rp.example.com/adfs+`
 
-Các pattern URI thường dùng như sau:
+Các URI pattern phổ biến như sau:
 
 * `+/saml2/authenticate/{registrationId}+` - Endpoint xref:servlet/saml2/login/authentication-requests.adoc[tạo `<saml2:AuthnRequest>`] dựa trên cấu hình của `RelyingPartyRegistration` đó và gửi đến asserting party
-* `+/login/saml2/sso/+` - Endpoint xref:servlet/saml2/login/authentication.adoc[thực hiện authentication cho `<saml2:Response>` của asserting party]; `RelyingPartyRegistration` được tra cứu từ state đã authentication trước đó hoặc issuer của response nếu cần; cũng hỗ trợ `+/login/saml2/sso/{registrationId}+`
-* `+/logout/saml2/sso+` - Endpoint xref:servlet/saml2/logout.adoc[xử lý payload `<saml2:LogoutRequest>` và `<saml2:LogoutResponse>`]; `RelyingPartyRegistration` được tra cứu từ state đã authentication trước đó hoặc issuer của request nếu cần; cũng hỗ trợ `+/logout/saml2/slo/{registrationId}+`
+* `+/login/saml2/sso/+` - Endpoint xref:servlet/saml2/login/authentication.adoc[thực hiện authentication cho `<saml2:Response>` của asserting party]; `RelyingPartyRegistration` được tra cứu từ state của lần authentication trước đó hoặc issuer của response nếu cần; cũng hỗ trợ `+/login/saml2/sso/{registrationId}+`
+* `+/logout/saml2/sso+` - Endpoint xref:servlet/saml2/logout.adoc[xử lý payload `<saml2:LogoutRequest>` và `<saml2:LogoutResponse>`]; `RelyingPartyRegistration` được tra cứu từ state của lần authentication trước đó hoặc issuer của request nếu cần; cũng hỗ trợ `+/logout/saml2/slo/{registrationId}+`
 * `+/saml2/metadata+` - xref:servlet/saml2/metadata.adoc[metadata của Relying Party] cho tập hợp ``RelyingPartyRegistration``; cũng hỗ trợ `+/saml2/metadata/{registrationId}+` hoặc `+/saml2/service-provider-metadata/{registrationId}+` cho một `RelyingPartyRegistration` cụ thể
 
-Vì `registrationId` là identifier chính của `RelyingPartyRegistration`, nó cần có trong URL ở các tình huống chưa authentication.
+Vì `registrationId` là identifier chính của `RelyingPartyRegistration`, nó cần có trong URL ở các tình huống chưa authenticated.
 Nếu muốn xóa `registrationId` khỏi URL vì bất kỳ lý do nào, bạn có thể <<servlet-saml2login-rpr-relyingpartyregistrationresolver,chỉ định một `RelyingPartyRegistrationResolver`>> để cho Spring Security biết cách tra cứu `registrationId`.
 
 [[servlet-saml2login-rpr-credentials]]
-=== Credential
+=== Credentials
 
-Trong ví dụ được trình bày <<servlet-saml2login-relyingpartyregistration,trước đó>>, có thể bạn cũng đã nhận thấy credential được sử dụng.
+Trong ví dụ được trình bày <<servlet-saml2login-relyingpartyregistration,ở trên>>, có thể bạn cũng đã nhận thấy credential được sử dụng.
 
-Thông thường, Relying Party sử dụng cùng một key để ký cũng như giải mã payload.
-Ngoài ra, Relying Party có thể sử dụng cùng một key để xác minh cũng như mã hóa payload.
+Thông thường, relying party sử dụng cùng một key để ký cũng như decrypt payload.
+Ngoài ra, relying party có thể sử dụng cùng một key để verify cũng như encrypt payload.
 
 Vì lý do này, Spring Security cung cấp `Saml2X509Credential`, một credential dành riêng cho SAML giúp đơn giản hóa việc cấu hình cùng một key cho các use case khác nhau.
 
-Tối thiểu, bạn cần có certificate từ asserting party để có thể xác minh các response đã ký của asserting party.
+Tối thiểu, bạn cần có certificate từ asserting party để có thể verify các response đã ký của asserting party.
 
-Để tạo `Saml2X509Credential` dùng để xác minh assertion từ asserting party, bạn có thể load file và sử dụng
+Để tạo `Saml2X509Credential` dùng để verify assertion từ asserting party, bạn có thể load file và sử dụng
 `CertificateFactory`:
 
 [tabs]
@@ -831,11 +831,11 @@ resource.inputStream.use {
 ----
 ======
 
-Giả sử asserting party cũng sẽ mã hóa assertion.
-Trong trường hợp đó, Relying Party cần một private key để giải mã giá trị đã mã hóa.
+Giả sử asserting party cũng sẽ encrypt assertion.
+Trong trường hợp đó, relying party cần một private key để decrypt giá trị đã encrypt.
 
 Trong trường hợp đó, bạn cần một `RSAPrivateKey` cùng với `X509Certificate` tương ứng.
-Bạn có thể load đối tượng thứ nhất bằng utility class `RsaKeyConverters` của Spring Security và load đối tượng thứ hai như trước:
+Bạn có thể load đối tượng đầu tiên bằng utility class `RsaKeyConverters` của Spring Security và load đối tượng thứ hai như trước:
 
 [tabs]
 ======
@@ -870,19 +870,19 @@ Khi chỉ định vị trí của các file này bằng các Spring Boot propert
 ====
 
 [[servlet-saml2login-rpr-duplicated]]
-=== Cấu hình Relying Party trùng lặp
+=== Các cấu hình Relying Party trùng lặp
 
 Khi application sử dụng nhiều asserting party, một số cấu hình bị lặp lại giữa các instance `RelyingPartyRegistration`:
 
 * `entityId` của Relying Party
 * `assertionConsumerServiceLocation` của Relying Party
-* Các credential của Relying Party, chẳng hạn credential ký hoặc giải mã
+* Các credential của relying party, chẳng hạn credential dùng để ký hoặc decrypt
 
-Setup này có thể giúp việc rotate credential cho một số Identity Provider dễ dàng hơn so với các Identity Provider khác.
+Cấu hình này có thể giúp việc rotate credential cho một số identity provider dễ dàng hơn so với các identity provider khác.
 
-Có thể giảm việc trùng lặp bằng một vài cách khác nhau.
+Có thể giảm duplication bằng một vài cách khác nhau.
 
-Thứ nhất, trong YAML, có thể giảm việc này bằng các reference:
+Thứ nhất, trong YAML, có thể giảm duplication bằng các reference:
 
 [source,yaml]
 ----
@@ -969,30 +969,30 @@ open fun relyingPartyRegistrations(): RelyingPartyRegistrationRepository? {
 ======
 
 [[servlet-saml2login-rpr-relyingpartyregistrationresolver]]
-=== Resolve `RelyingPartyRegistration` từ Request
+=== Resolve `RelyingPartyRegistration` từ request
 
 Như đã thấy, Spring Security resolve `RelyingPartyRegistration` bằng cách tìm registration id trong URI path.
 
-Tùy thuộc vào use case, một số strategy khác cũng được sử dụng để suy ra registration.
+Tùy thuộc vào use case, một số strategy khác cũng được sử dụng để xác định registration.
 Ví dụ:
 
 * Để xử lý ``<saml2:Response>``s, `RelyingPartyRegistration` được tra cứu từ `<saml2:AuthRequest>` liên kết hoặc từ element `<saml2:Response#Issuer>`
 * Để xử lý ``<saml2:LogoutRequest>``s, `RelyingPartyRegistration` được tra cứu từ user hiện đang đăng nhập hoặc từ element `<saml2:LogoutRequest#Issuer>`
 * Để publish metadata, các ``RelyingPartyRegistration`` được tra cứu từ bất kỳ repository nào cũng implement `Iterable<RelyingPartyRegistration>`
 
-Khi cần điều chỉnh việc này, bạn có thể sử dụng các component cụ thể cho từng endpoint để tùy chỉnh:
+Khi cần điều chỉnh hành vi này, bạn có thể tùy chỉnh bằng component tương ứng với từng endpoint:
 
 * Với SAML Response, tùy chỉnh `AuthenticationConverter`
 * Với Logout Request, tùy chỉnh `Saml2LogoutRequestValidatorParametersResolver`
 * Với Metadata, tùy chỉnh `Saml2MetadataResponseResolver`
 
 [[federating-saml2-login]]
-=== Đăng nhập federation
+=== Federating Login
 
-Một mô hình phổ biến với SAML 2.0 là Identity Provider có nhiều asserting party.
-Trong trường hợp này, metadata endpoint của Identity Provider trả về nhiều element `<md:IDPSSODescriptor>`.
+Một mô hình phổ biến với SAML 2.0 là identity provider có nhiều asserting party.
+Trong trường hợp này, metadata endpoint của identity provider trả về nhiều element `<md:IDPSSODescriptor>`.
 
-Có thể truy cập các asserting party này trong một lần gọi `RelyingPartyRegistrations` như sau:
+Bạn có thể truy cập các asserting party này trong một lần gọi `RelyingPartyRegistrations` như sau:
 
 [tabs]
 ======
@@ -1027,16 +1027,16 @@ var registrations: Collection<RelyingPartyRegistration> = RelyingPartyRegistrati
 ======
 
 Lưu ý rằng vì registration id được đặt thành một giá trị ngẫu nhiên, một số endpoint SAML 2.0 sẽ trở nên không thể dự đoán.
-Có một số cách để xử lý việc này; ở đây tập trung vào cách phù hợp với use case federation cụ thể.
+Có một số cách để xử lý việc này; ở đây chúng ta tập trung vào cách phù hợp với use case federation cụ thể.
 
-Trong nhiều trường hợp federation, tất cả asserting party dùng chung cấu hình Service Provider.
-Vì theo mặc định Spring Security sẽ đưa `registrationId` vào metadata của Service Provider, một bước khác là thay đổi các URI tương ứng để loại `registrationId`; bạn có thể thấy việc này đã được thực hiện trong sample trên, nơi `entityId` và `assertionConsumerServiceLocation` được cấu hình với một endpoint tĩnh.
+Trong nhiều trường hợp federation, tất cả asserting party dùng chung cấu hình service provider.
+Vì theo mặc định Spring Security sẽ đưa `registrationId` vào metadata của service provider, một bước khác là thay đổi các URI tương ứng để loại bỏ `registrationId`; bạn có thể thấy việc này đã được thực hiện trong sample ở trên, nơi `entityId` và `assertionConsumerServiceLocation` được cấu hình với một endpoint tĩnh.
 
 Bạn có thể xem ví dụ hoàn chỉnh về việc này trong {gh-samples-url}/servlet/spring-boot/java/saml2/saml-extension-federation[ sample `saml-extension-federation` của chúng tôi].
 
 [[using-spring-security-saml-extension-uris]]
 === Sử dụng URI của Spring Security SAML Extension
 
-Nếu bạn đang migration từ Spring Security SAML Extension, việc cấu hình application sử dụng các URI mặc định của SAML Extension có thể mang lại một số lợi ích.
+Nếu bạn đang migrate từ Spring Security SAML Extension, việc cấu hình application sử dụng các URI mặc định của SAML Extension có thể mang lại một số lợi ích.
 
 Để biết thêm thông tin, hãy xem {gh-samples-url}/servlet/spring-boot/java/saml2/saml-extension-urls[ sample `saml-extension-urls` của chúng tôi] và {gh-samples-url}/servlet/spring-boot/java/saml2/saml-extension-federation[ sample `saml-extension-federation` của chúng tôi].

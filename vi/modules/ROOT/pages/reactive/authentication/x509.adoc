@@ -1,20 +1,20 @@
 [[reactive-x509]]
 = Xác thực X.509 Reactive
 
-Tương tự xref:servlet/authentication/x509.adoc#servlet-x509[authentication X.509 của Servlet], filter authentication x509 Reactive cho phép trích xuất authentication token từ chứng chỉ do client cung cấp.
+Tương tự xref:servlet/authentication/x509.adoc#servlet-x509[authentication X.509 trên Servlet], reactive x509 authentication filter cho phép trích xuất authentication token từ certificate do client cung cấp.
 
-Ví dụ sau minh họa cấu hình bảo mật x509 Reactive:
+Ví dụ sau minh họa cấu hình security x509 reactive:
 
 include-code::./DefaultX509Configuration[tag=springSecurity,indent=0]
 
 Trong cấu hình trên, khi không cung cấp cả `principalExtractor` lẫn `authenticationManager`, các giá trị mặc định sẽ được sử dụng.
-principal extractor mặc định là `SubjectX500PrincipalExtractor`, trích xuất trường CN (tên chung) từ chứng chỉ do client cung cấp.
+principal extractor mặc định là `SubjectX500PrincipalExtractor`, trích xuất trường CN (common name) từ certificate do client cung cấp.
 authentication manager mặc định là `ReactivePreAuthenticatedAuthenticationManager`, thực hiện validation tài khoản người dùng, kiểm tra rằng một tài khoản người dùng có tên được trích xuất bởi `principalExtractor` tồn tại và không bị khóa, vô hiệu hóa hoặc hết hạn.
 
 Ví dụ sau minh họa cách ghi đè các giá trị mặc định này:
 
 include-code::./CustomX509Configuration[tag=springSecurity,indent=0]
 
-Trong ví dụ trước, tên người dùng được trích xuất từ trường `emailAddress` của chứng chỉ client thay vì CN, và việc tra cứu tài khoản sử dụng một instance `ReactiveAuthenticationManager` tùy chỉnh.
+Trong ví dụ trước, tên người dùng được trích xuất từ trường `emailAddress` của client certificate thay vì CN, và việc tra cứu account sử dụng một instance `ReactiveAuthenticationManager` custom.
 
-Để xem ví dụ cấu hình Netty và `WebClient` hoặc tool dòng lệnh `curl` để sử dụng mutual TLS và bật authentication X.509, hãy xem https://github.com/spring-projects/spring-security-samples/tree/main/servlet/java-configuration/authentication/x509.
+Để xem ví dụ về cách cấu hình Netty và `WebClient`, hoặc sử dụng tool dòng lệnh `curl`, cho mutual TLS và bật authentication X.509, hãy xem https://github.com/spring-projects/spring-security-samples/tree/main/servlet/java-configuration/authentication/x509.

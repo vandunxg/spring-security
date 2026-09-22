@@ -1,13 +1,13 @@
 [[oauth2-client-additional-features]]
-= [[oauth2Client-additional-features]]Tính năng Authorized Client
+= [[oauth2Client-additional-features]]Các tính năng của Authorized Client
 
-Phần này trình bày các tính năng bổ sung do Spring Security cung cấp cho OAuth2 Client.
+Phần này trình bày các tính năng bổ sung mà Spring Security cung cấp cho OAuth2 Client.
 
 [[oauth2-client-registered-authorized-client]]
-== [[oauth2Client-registered-authorized-client]]Phân giải một Authorized Client
+== [[oauth2Client-registered-authorized-client]]Resolve một Authorized Client
 
-Annotation `@RegisteredOAuth2AuthorizedClient` cho phép phân giải một tham số method thành giá trị đối số có kiểu `OAuth2AuthorizedClient`.
-Đây là một giải pháp thay thế thuận tiện cho việc truy cập `OAuth2AuthorizedClient` bằng `OAuth2AuthorizedClientManager` hoặc `OAuth2AuthorizedClientService`.
+Annotation `@RegisteredOAuth2AuthorizedClient` cung cấp khả năng resolve một method parameter thành một argument value có kiểu `OAuth2AuthorizedClient`.
+Đây là một alternative thuận tiện cho việc access `OAuth2AuthorizedClient` bằng `OAuth2AuthorizedClientManager` hoặc `OAuth2AuthorizedClientService`.
 Ví dụ sau cho thấy cách sử dụng `@RegisteredOAuth2AuthorizedClient`:
 
 [tabs]
@@ -48,22 +48,22 @@ class OAuth2ClientController {
 ----
 ======
 
-Annotation `@RegisteredOAuth2AuthorizedClient` được xử lý bởi `OAuth2AuthorizedClientArgumentResolver`, thành phần sử dụng trực tiếp xref:servlet/oauth2/client/core.adoc#oauth2Client-authorized-manager-provider[`OAuth2AuthorizedClientManager`] và do đó kế thừa các khả năng của nó.
+Annotation `@RegisteredOAuth2AuthorizedClient` được xử lý bởi `OAuth2AuthorizedClientArgumentResolver`, component trực tiếp sử dụng xref:servlet/oauth2/client/core.adoc#oauth2Client-authorized-manager-provider[`OAuth2AuthorizedClientManager`] và do đó kế thừa các capability của nó.
 
 [[oauth2-client-rest-client]]
 == Tích hợp RestClient
 
 Hỗ trợ cho `RestClient` được cung cấp bởi `OAuth2ClientHttpRequestInterceptor`.
-Interceptor này cho phép thực hiện request đến các protected resource bằng cách đặt token `Bearer` vào header `Authorization` của request đi.
+Interceptor này cho phép request các protected resource bằng cách đặt token `Bearer` vào header `Authorization` của request outbound.
 Interceptor sử dụng trực tiếp `OAuth2AuthorizedClientManager` và do đó kế thừa các khả năng sau:
 
-* Thực hiện request OAuth 2.0 Access Token để lấy `OAuth2AccessToken` nếu client chưa được ủy quyền
-** `authorization_code`: Kích hoạt redirect Authorization Request để bắt đầu flow
+* Thực hiện request OAuth 2.0 Access Token để lấy `OAuth2AccessToken` nếu client chưa được authorize
+** `authorization_code`: Kích hoạt redirect của Authorization Request để initiate flow
 ** `client_credentials`: access token được lấy trực tiếp từ Token Endpoint
 ** Các grant type bổ sung được hỗ trợ bằng cách xref:servlet/oauth2/index.adoc#oauth2-client-enable-extension-grant-type[bật các grant type mở rộng]
 * Nếu `OAuth2AccessToken` hiện có hết hạn, token này được refresh (hoặc renew)
 
-Ví dụ sau sử dụng `OAuth2AuthorizedClientManager` mặc định để cấu hình một `RestClient` có khả năng truy cập các protected resource bằng cách đặt token `Bearer` vào header `Authorization` của mỗi request:
+Ví dụ sau sử dụng `OAuth2AuthorizedClientManager` mặc định để configure một `RestClient` có thể truy cập các protected resource bằng cách đặt token `Bearer` vào header `Authorization` của mỗi request:
 
 .Cấu hình `RestClient` với `ClientHttpRequestInterceptor`
 [tabs]
@@ -112,7 +112,7 @@ class RestClientConfig {
 === Cung cấp `clientRegistrationId`
 
 `OAuth2ClientHttpRequestInterceptor` sử dụng `ClientRegistrationIdResolver` để xác định client nào được dùng để lấy access token.
-Theo mặc định, `RequestAttributeClientRegistrationIdResolver` được dùng để phân giải `clientRegistrationId` từ `HttpRequest#attributes()`.
+Theo mặc định, `RequestAttributeClientRegistrationIdResolver` được dùng để resolve `clientRegistrationId` từ `HttpRequest#attributes()`.
 
 Ví dụ sau minh họa cách cung cấp `clientRegistrationId` thông qua attributes:
 
@@ -183,7 +183,7 @@ class ResourceController(private restClient: RestClient) {
 <1> `clientRegistrationId()` là một method `static` trong `RequestAttributeClientRegistrationIdResolver`.
 
 Ngoài ra, có thể cung cấp một `ClientRegistrationIdResolver` tùy chỉnh.
-Ví dụ sau cấu hình một implementation tùy chỉnh để phân giải `clientRegistrationId` từ user hiện tại.
+Ví dụ sau configure một implementation tùy chỉnh để resolve `clientRegistrationId` từ user hiện tại.
 
 .Cấu hình `ClientHttpRequestInterceptor` với `ClientRegistrationIdResolver` tùy chỉnh
 [tabs]
@@ -252,10 +252,10 @@ class RestClientConfig {
 [[oauth2-client-rest-client-principal]]
 === Cung cấp `principal`
 
-`OAuth2ClientHttpRequestInterceptor` sử dụng `PrincipalResolver` để xác định tên principal nào được liên kết với access token, cho phép application chọn cách giới hạn phạm vi của `OAuth2AuthorizedClient` được lưu trữ.
-Theo mặc định, `SecurityContextHolderPrincipalResolver` được dùng để phân giải `principal` hiện tại từ `SecurityContextHolder`.
+`OAuth2ClientHttpRequestInterceptor` sử dụng `PrincipalResolver` để xác định tên principal nào được liên kết với access token, cho phép application chọn cách scope `OAuth2AuthorizedClient` được lưu trữ.
+Theo mặc định, `SecurityContextHolderPrincipalResolver` được dùng để resolve `principal` hiện tại từ `SecurityContextHolder`.
 
-Ngoài ra, có thể phân giải `principal` từ `HttpRequest#attributes()` bằng cách cấu hình `RequestAttributePrincipalResolver`, như ví dụ sau:
+Ngoài ra, có thể resolve `principal` từ `HttpRequest#attributes()` bằng cách configure `RequestAttributePrincipalResolver`, như ví dụ sau:
 
 .Cấu hình `ClientHttpRequestInterceptor` với `RequestAttributePrincipalResolver`
 [tabs]
@@ -302,7 +302,7 @@ class RestClientConfig {
 ----
 =====
 
-Ví dụ sau minh họa cách cung cấp tên `principal` thông qua attributes để giới hạn phạm vi của `OAuth2AuthorizedClient` cho application thay vì user hiện tại:
+Ví dụ sau minh họa cách cung cấp tên `principal` thông qua attributes để scope `OAuth2AuthorizedClient` theo application thay vì user hiện tại:
 
 .Cung cấp tên `principal` thông qua attributes
 [tabs]
@@ -380,7 +380,7 @@ class ResourceController(private restClient: RestClient) {
 Nếu access token không hợp lệ vì bất kỳ lý do nào (ví dụ: token hết hạn), việc xử lý lỗi bằng cách xóa access token để token không thể được sử dụng lại có thể hữu ích.
 Có thể thiết lập interceptor để tự động thực hiện việc này bằng cách cung cấp `OAuth2AuthorizationFailureHandler` nhằm xóa access token.
 
-Ví dụ sau sử dụng `OAuth2AuthorizedClientRepository` để thiết lập `OAuth2AuthorizationFailureHandler` nhằm xóa `OAuth2AuthorizedClient` không hợp lệ *bên trong* context của một `HttpServletRequest`:
+Ví dụ sau sử dụng `OAuth2AuthorizedClientRepository` để thiết lập `OAuth2AuthorizationFailureHandler` nhằm xóa `OAuth2AuthorizedClient` không hợp lệ *trong* context của một `HttpServletRequest`:
 
 .Cấu hình `OAuth2AuthorizationFailureHandler` bằng `OAuth2AuthorizedClientRepository`
 [tabs]
@@ -437,7 +437,7 @@ class RestClientConfig {
 ----
 =====
 
-Ngoài ra, có thể sử dụng `OAuth2AuthorizedClientService` để xóa `OAuth2AuthorizedClient` không hợp lệ *bên ngoài* context của một `HttpServletRequest`, như ví dụ sau:
+Ngoài ra, có thể sử dụng `OAuth2AuthorizedClientService` để xóa `OAuth2AuthorizedClient` không hợp lệ *ngoài* context của một `HttpServletRequest`, như ví dụ sau:
 
 .Cấu hình `OAuth2AuthorizationFailureHandler` bằng `OAuth2AuthorizedClientService`
 [tabs]
@@ -495,24 +495,24 @@ class RestClientConfig {
 =====
 
 [[oauth2-client-rest-client-interface]]
-=== HTTP Service Client
+=== HTTP Service Clients
 
 Hỗ trợ OAuth của Spring Security tích hợp với xref:features/integrations/rest/http-service-client.adoc[].
 
 [[oauth2-client-web-client]]
-== [[oauth2Client-webclient-servlet]]Tích hợp WebClient cho môi trường Servlet
+== [[oauth2Client-webclient-servlet]]WebClient integration cho môi trường Servlet
 
-Hỗ trợ OAuth 2.0 Client tích hợp với `WebClient` bằng cách sử dụng `ExchangeFilterFunction`.
+OAuth 2.0 Client support tích hợp với `WebClient` bằng `ExchangeFilterFunction`.
 
-`ServletOAuth2AuthorizedClientExchangeFilterFunction` cung cấp cơ chế request protected resource bằng cách sử dụng `OAuth2AuthorizedClient` và đưa `OAuth2AccessToken` liên kết vào request dưới dạng Bearer Token.
-Nó sử dụng trực tiếp xref:servlet/oauth2/client/core.adoc#oauth2Client-authorized-manager-provider[`OAuth2AuthorizedClientManager`] và do đó kế thừa các khả năng sau:
+`ServletOAuth2AuthorizedClientExchangeFilterFunction` cung cấp mechanism để request các protected resource bằng cách sử dụng `OAuth2AuthorizedClient` và include `OAuth2AccessToken` liên kết vào request dưới dạng Bearer Token.
+Nó trực tiếp sử dụng xref:servlet/oauth2/client/core.adoc#oauth2Client-authorized-manager-provider[`OAuth2AuthorizedClientManager`] và do đó kế thừa các capability sau:
 
-* Một `OAuth2AccessToken` được request nếu client chưa được ủy quyền.
+* Một `OAuth2AccessToken` được request nếu client chưa được authorize.
 ** `authorization_code`: Kích hoạt redirect Authorization Request để bắt đầu flow.
 ** `client_credentials`: access token được lấy trực tiếp từ Token Endpoint.
-* Nếu `OAuth2AccessToken` hết hạn, token này được refresh (hoặc renew) nếu có `OAuth2AuthorizedClientProvider` để thực hiện authorization
+* Nếu `OAuth2AccessToken` đã expired, nó sẽ được refresh (hoặc renew) nếu có `OAuth2AuthorizedClientProvider` để thực hiện authorization
 
-Đoạn code sau minh họa cách cấu hình `WebClient` với hỗ trợ OAuth 2.0 Client:
+Code sau minh họa cách configure `WebClient` với OAuth 2.0 Client support:
 
 [tabs]
 ======
@@ -547,9 +547,9 @@ fun webClient(authorizedClientManager: OAuth2AuthorizedClientManager?): WebClien
 [[oauth2-client-web-client-authorized-client]]
 === Cung cấp Authorized Client
 
-`ServletOAuth2AuthorizedClientExchangeFilterFunction` xác định client cần sử dụng (cho một request) bằng cách phân giải `OAuth2AuthorizedClient` từ `ClientRequest.attributes()` (request attributes).
+`ServletOAuth2AuthorizedClientExchangeFilterFunction` xác định client cần sử dụng (cho một request) bằng cách resolve `OAuth2AuthorizedClient` từ `ClientRequest.attributes()` (request attributes).
 
-Đoạn code sau cho thấy cách đặt một `OAuth2AuthorizedClient` làm request attribute:
+Code sau minh họa cách set một `OAuth2AuthorizedClient` làm request attribute:
 
 [tabs]
 ======
@@ -598,7 +598,7 @@ fun index(@RegisteredOAuth2AuthorizedClient("okta") authorizedClient: OAuth2Auth
 ======
 <1> `oauth2AuthorizedClient()` là một method `static` trong `ServletOAuth2AuthorizedClientExchangeFilterFunction`.
 
-Đoạn code sau cho thấy cách đặt `ClientRegistration.getRegistrationId()` làm request attribute:
+Code sau minh họa cách set `ClientRegistration.getRegistrationId()` làm request attribute:
 
 [tabs]
 ======
@@ -648,7 +648,7 @@ fun index(): String {
 ======
 <1> `clientRegistrationId()` là một method `static` trong `ServletOAuth2AuthorizedClientExchangeFilterFunction`.
 
-Đoạn code sau cho thấy cách đặt một `Authentication` làm request attribute:
+Code sau minh họa cách set một `Authentication` làm request attribute:
 
 [tabs]
 ======
@@ -708,13 +708,13 @@ Bạn nên thận trọng với tính năng này vì tất cả HTTP request s�
 ====
 
 [[oauth2-client-web-client-default-authorized-client]]
-=== Đặt Authorized Client mặc định
+=== Thiết lập Authorized Client mặc định
 
-Nếu cả `OAuth2AuthorizedClient` lẫn `ClientRegistration.getRegistrationId()` đều không được cung cấp dưới dạng request attribute, `ServletOAuth2AuthorizedClientExchangeFilterFunction` có thể xác định client _mặc định_ cần sử dụng tùy theo cấu hình của nó.
+Nếu cả `OAuth2AuthorizedClient` và `ClientRegistration.getRegistrationId()` đều không được cung cấp dưới dạng request attribute, `ServletOAuth2AuthorizedClientExchangeFilterFunction` có thể xác định client _default_ cần sử dụng tùy theo configuration của nó.
 
-Nếu `setDefaultOAuth2AuthorizedClient(true)` được cấu hình và user đã authentication bằng `HttpSecurity.oauth2Login()`, `OAuth2AccessToken` liên kết với `OAuth2AuthenticationToken` hiện tại sẽ được sử dụng.
+Nếu `setDefaultOAuth2AuthorizedClient(true)` được configure và user đã authenticated bằng `HttpSecurity.oauth2Login()`, `OAuth2AccessToken` liên kết với `OAuth2AuthenticationToken` hiện tại sẽ được sử dụng.
 
-Đoạn code sau cho thấy cấu hình cụ thể:
+Code sau minh họa configuration cụ thể:
 
 [tabs]
 ======
@@ -753,9 +753,9 @@ fun webClient(authorizedClientManager: OAuth2AuthorizedClientManager?): WebClien
 Hãy thận trọng với tính năng này vì tất cả HTTP request đều nhận access token.
 ====
 
-Ngoài ra, nếu `setDefaultClientRegistrationId("okta")` được cấu hình với một `ClientRegistration` hợp lệ, `OAuth2AccessToken` liên kết với `OAuth2AuthorizedClient` sẽ được sử dụng.
+Ngoài ra, nếu `setDefaultClientRegistrationId("okta")` được configure với một `ClientRegistration` hợp lệ, `OAuth2AccessToken` liên kết với `OAuth2AuthorizedClient` sẽ được sử dụng.
 
-Đoạn code sau cho thấy cấu hình cụ thể:
+Code sau minh họa configuration cụ thể:
 
 [tabs]
 ======

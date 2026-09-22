@@ -6,7 +6,7 @@ Spring Security cung cấp hỗ trợ Jackson 3 để lưu trữ các class liê
 
 [NOTE]
 ====
-Hỗ trợ Jackson 2 vẫn khả dụng nhưng đã deprecated để loại bỏ, vì vậy bạn được khuyến khích di chuyển sang Jackson 3.
+Hỗ trợ Jackson 2 vẫn khả dụng nhưng đã deprecated và sẽ bị loại bỏ, vì vậy bạn được khuyến khích di chuyển sang Jackson 3.
 ====
 
 Để sử dụng, hãy đăng ký `SecurityJacksonModules.getModules(ClassLoader)` với `JsonMapper.Builder` (https://github.com/FasterXML/jackson-databind[jackson-databind]):
@@ -47,10 +47,10 @@ val json: String = mapper.writeValueAsString(context)
 [NOTE]
 ====
 Việc sử dụng `SecurityJacksonModules` như trên cho phép tự động đưa thông tin kiểu vào và cấu hình một
-`PolymorphicTypeValidator` xử lý việc xác thực tên class.
+`PolymorphicTypeValidator` để xử lý validation tên class.
 ====
 
-Nếu cần, bạn có thể thêm các class tùy chỉnh vào quá trình xử lý xác thực.
+Nếu cần, bạn có thể thêm các class tùy chỉnh vào quá trình validation.
 
 [tabs]
 ======

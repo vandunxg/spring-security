@@ -5,18 +5,18 @@
 Tài liệu Spring Security có thể được {site-url}/spring-security-docs.zip[tải xuống] dưới dạng tệp zip.
 ====
 
-Spring Security là một framework cung cấp xref:features/authentication/index.adoc[authentication], xref:features/authorization/index.adoc[authorization] và xref:features/exploits/index.adoc[khả năng bảo vệ khỏi các cuộc tấn công phổ biến].
-Với hỗ trợ hàng đầu cho việc bảo mật cả các ứng dụng xref:servlet/index.adoc[imperative] và xref:reactive/index.adoc[reactive], đây là tiêu chuẩn trên thực tế để bảo mật các ứng dụng dựa trên Spring.
+Spring Security là một framework cung cấp xref:features/authentication/index.adoc[authentication], xref:features/authorization/index.adoc[authorization] và xref:features/exploits/index.adoc[bảo vệ khỏi các cuộc tấn công phổ biến].
+Với first-class support cho việc bảo mật cả các ứng dụng xref:servlet/index.adoc[imperative] và xref:reactive/index.adoc[reactive], đây là tiêu chuẩn trên thực tế để bảo mật các ứng dụng dựa trên Spring.
 
-Để xem danh sách đầy đủ các tính năng, hãy xem phần xref:features/index.adoc[Tính năng] trong tài liệu tham khảo.
+Để xem danh sách đầy đủ các tính năng, hãy xem phần xref:features/index.adoc[Features] trong reference.
 
 == Bắt đầu
 
-Nếu bạn đã sẵn sàng bắt đầu bảo mật một ứng dụng, hãy xem các phần Bắt đầu cho xref:servlet/getting-started.adoc[servlet] và xref:reactive/getting-started.adoc[reactive]. Các phần này sẽ hướng dẫn bạn tạo các ứng dụng Spring Security đầu tiên.
+Nếu bạn đã sẵn sàng bắt đầu bảo mật một ứng dụng, hãy xem các phần Getting Started cho xref:servlet/getting-started.adoc[servlet] và xref:reactive/getting-started.adoc[reactive]. Các phần này sẽ hướng dẫn bạn tạo các ứng dụng Spring Security đầu tiên.
 
 Nếu bạn muốn hiểu cách Spring Security hoạt động, bạn có thể tham khảo phần xref:servlet/architecture.adoc[Kiến trúc].
-// FIXME thêm liên kết đến kiến trúc reactive
+// FIXME thêm link đến reactive architecture
 
-Nếu bạn đã quen thuộc với Spring Security hoặc đang nâng cấp, hãy xem xref:whats-new.adoc[có gì mới trong bản phát hành mới nhất].
+Nếu bạn đã quen thuộc với Spring Security hoặc đang nâng cấp, hãy xem xref:whats-new.adoc[có gì mới trong release mới nhất].
 
 Nếu bạn có bất kỳ câu hỏi nào, có một xref:community.adoc[cộng đồng] tuyệt vời luôn sẵn lòng trợ giúp bạn!

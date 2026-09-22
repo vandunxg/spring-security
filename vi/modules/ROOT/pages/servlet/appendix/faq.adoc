@@ -31,7 +31,7 @@ Hãy xem https://www.owasp.org/[website OWASP] để biết thông tin về nh�
 === Tại sao không sử dụng security của web.xml?
 
 Giả sử bạn đang phát triển một enterprise application dựa trên Spring.
-Thông thường, bạn cần xử lý bốn vấn đề security: authentication, security cho web request, security ở service layer (các method triển khai business logic) và security cho instance của domain object (các domain object khác nhau có thể có permission khác nhau). Với các yêu cầu điển hình này, chúng ta có những cân nhắc sau:
+Thông thường, bạn cần xử lý bốn khía cạnh security: authentication, security cho web request, security ở service layer (các method triển khai business logic) và security cho instance của domain object (các domain object khác nhau có thể có permission khác nhau). Với các yêu cầu điển hình này, chúng ta có những cân nhắc sau:
 
 * _Authentication_: servlet specification cung cấp một cách tiếp cận cho authentication.
 Tuy nhiên, bạn cần cấu hình container để thực hiện authentication, việc này thường yêu cầu chỉnh sửa các thiết lập "`realm`" dành riêng cho container.
@@ -54,7 +54,7 @@ Thông thường, developer hoặc bỏ qua các yêu cầu này hoặc triển 
 MVC controller hoặc view triển khai code authorization khiến việc test cả controller lẫn logic authorization khó hơn, debug khó hơn và thường dẫn đến trùng lặp code.
 
 ** _Hỗ trợ rich client và web service:_ Nếu cuối cùng cần hỗ trợ thêm một loại client, mọi code authorization được nhúng trong web layer đều không thể tái sử dụng.
-Cần lưu ý rằng Spring remoting exporter chỉ export bean ở service layer (không export MVC controller). Do đó, logic authorization cần được đặt ở service layer để hỗ trợ nhiều loại client.
+Cần lưu ý rằng Spring remoting exporter chỉ export các bean ở service layer (không export MVC controller). Do đó, logic authorization cần được đặt ở service layer để hỗ trợ nhiều loại client.
 
 ** _Vấn đề phân tầng:_ MVC controller hoặc view là architectural layer không phù hợp để triển khai các quyết định authorization liên quan đến method ở service layer hoặc instance của domain object.
 Mặc dù có thể truyền principal vào service layer để layer này đưa ra quyết định authorization, cách đó sẽ thêm một argument vào mọi method ở service layer.
@@ -80,21 +80,21 @@ Nó cũng phải tương thích với application sử dụng Spring 2.5.x.
 [[appendix-faq-start-simple]]
 ==== Tôi có một scenario phức tạp. Có thể đã sai ở đâu?
 
-(Câu trả lời này đề cập chung đến các scenario phức tạp thông qua một scenario cụ thể.)
+(Câu trả lời này xử lý các scenario phức tạp nói chung bằng cách xét một scenario cụ thể.)
 
-Giả sử bạn mới dùng Spring Security và cần xây dựng một application hỗ trợ CAS single sign-on qua HTTPS, đồng thời cho phép basic authentication cục bộ đối với một số URL và authentication dựa trên nhiều nguồn thông tin user back end (LDAP và JDBC). Bạn đã sao chép một số file cấu hình nhưng phát hiện nó không hoạt động. Có thể đã sai ở đâu?
+Giả sử bạn mới dùng Spring Security và cần xây dựng một application hỗ trợ CAS single sign-on qua HTTPS, đồng thời cho phép basic authentication cục bộ đối với một số URL và thực hiện authentication dựa trên nhiều source thông tin user backend (LDAP và JDBC). Bạn đã sao chép một số file cấu hình nhưng phát hiện nó không hoạt động. Có thể đã sai ở đâu?
 
 Bạn cần hiểu các công nghệ định sử dụng trước khi có thể xây dựng application thành công với chúng.
 Security rất phức tạp.
 Thiết lập một cấu hình đơn giản bằng login form và một số user hard-code với namespace của Spring Security tương đối dễ dàng.
 Chuyển sang dùng database JDBC làm backend cũng khá dễ.
 Tuy nhiên, nếu cố nhảy thẳng vào một deployment scenario phức tạp như trên, gần như chắc chắn bạn sẽ thất vọng.
-Đường cong học tập để thiết lập các hệ thống như CAS, cấu hình LDAP server và cài đặt SSL certificate đúng cách có bước nhảy rất lớn.
+Để thiết lập các hệ thống như CAS, cấu hình LDAP server và cài đặt SSL certificate đúng cách, bạn cần vượt qua một đường cong học tập rất lớn.
 Vì vậy, bạn cần thực hiện từng bước một.
 
 Từ góc nhìn Spring Security, điều đầu tiên bạn nên làm là theo hướng dẫn "`Getting Started`" trên website.
 Hướng dẫn này đưa bạn qua một loạt bước để bắt đầu chạy được và có một số hình dung về cách framework hoạt động.
-Nếu sử dụng các công nghệ khác mà bạn chưa quen, bạn nên nghiên cứu và thử bảo đảm có thể sử dụng chúng độc lập trước khi kết hợp vào một hệ thống phức tạp.
+Nếu sử dụng các công nghệ khác mà bạn chưa quen, bạn nên nghiên cứu và cố gắng bảo đảm có thể sử dụng chúng độc lập trước khi kết hợp vào một hệ thống phức tạp.
 
 [[appendix-faq-common-problems]]
 == Vấn đề thường gặp
@@ -125,7 +125,7 @@ Phần này đề cập đến những vấn đề thường gặp nhất khi s�
 === Khi cố đăng nhập, tôi nhận được thông báo lỗi "`Bad Credentials`". Có vấn đề gì?
 
 Điều này có nghĩa là authentication đã thất bại.
-Thông báo không cho biết lý do, vì tránh cung cấp chi tiết có thể giúp attacker đoán tên account hoặc password là một practice tốt.
+Thông báo không cho biết lý do, vì việc tránh cung cấp chi tiết có thể giúp attacker đoán tên account hoặc password là một practice tốt.
 
 Điều này cũng có nghĩa là nếu hỏi câu này trên mạng, bạn không nên mong đợi nhận được câu trả lời trừ khi cung cấp thêm thông tin.
 Như với mọi vấn đề, bạn nên kiểm tra output từ debug log và ghi nhận mọi exception stacktrace cùng các message liên quan.
@@ -137,7 +137,7 @@ Nếu dùng hashed password, hãy bảo đảm value được lưu trong databas
 [[appendix-faq-login-loop]]
 === Application của tôi rơi vào "`endless loop`" khi cố đăng nhập. Chuyện gì đang xảy ra?
 
-Một vấn đề phổ biến khiến user gặp vòng lặp vô hạn và bị redirect về login page là do vô tình cấu hình login page thành resource "`secured`".
+Một vấn đề phổ biến là user gặp vòng lặp vô hạn và bị redirect về login page vì login page vô tình được cấu hình thành resource "`secured`".
 Hãy bảo đảm cấu hình của bạn cho phép anonymous access đến login page.
 Bạn có thể làm điều đó bằng DSL xref:servlet/authorization/authorize-http-requests.adoc[`authorizeHttpRequests`].
 
@@ -165,7 +165,7 @@ at org.springframework.security.intercept.AbstractSecurityInterceptor.beforeInvo
 [[appendix-faq-cached-secure-page]]
 === Tại sao tôi vẫn thấy secured page ngay cả sau khi đã logout khỏi application?
 
-Lý do phổ biến nhất là browser đã cache page và bạn đang xem một bản sao được lấy từ browser cache.
+Lý do phổ biến nhất là browser đã cache page và bạn đang xem một bản sao được lấy từ cache của browser.
 Hãy xác minh bằng cách kiểm tra browser có thực sự gửi request hay không (kiểm tra server access log và debug log, hoặc dùng browser debugging plugin phù hợp, chẳng hạn "`Tamper Data`" cho Firefox). Điều này không liên quan đến Spring Security; bạn nên cấu hình application hoặc server để đặt các response header `Cache-Control` phù hợp.
 Lưu ý rằng SSL request không bao giờ được cache.
 
@@ -256,7 +256,7 @@ Vì vậy, nếu đăng nhập lại trong một window hoặc tab khác, bạn 
 Vì vậy, nếu đăng nhập lại trong một window hoặc tab khác, bạn đang re-authenticate trong cùng session.
 Server không biết gì về tab, window hoặc browser instance.
 Nó chỉ thấy các HTTP request và gắn chúng với một session cụ thể dựa trên value của cookie `JSESSIONID` chứa trong request.
-Khi user authenticate trong một session, concurrent session control của Spring Security kiểm tra số _session đã authenticate khác_ mà user đó có.
+Khi user authenticate trong một session, concurrent session control của Spring Security kiểm tra số _session khác đã được authenticated_ của user đó.
 Nếu user đã authenticate bằng cùng session, việc re-authenticate không có tác dụng.
 
 
@@ -290,7 +290,7 @@ Nếu cần thêm lý do thuyết phục, hãy xem một tool như https://githu
 
 === Tôi không chuyển đổi giữa HTTP và HTTPS, nhưng session vẫn bị mất. Chuyện gì đã xảy ra?
 
-Session được duy trì bằng cách trao đổi session cookie hoặc thêm parameter `jsessionid` vào URL (việc này tự động xảy ra nếu bạn dùng JSTL để output URL hoặc gọi `HttpServletResponse.encodeUrl` trên URL (ví dụ trước một redirect). Nếu client tắt cookie và bạn không rewrite URL để bao gồm `jsessionid`, session sẽ bị mất.
+Session được duy trì bằng cách trao đổi session cookie hoặc thêm parameter `jsessionid` vào URL (việc này tự động xảy ra nếu bạn dùng JSTL để output URL hoặc gọi `HttpServletResponse.encodeUrl` trên URL, ví dụ trước một redirect). Nếu client tắt cookie và bạn không rewrite URL để bao gồm `jsessionid`, session sẽ bị mất.
 Lưu ý rằng sử dụng cookie được ưu tiên vì lý do security, vì nó không làm lộ thông tin session trong URL.
 
 [[appendix-faq-session-listener-missing]]
@@ -325,7 +325,7 @@ Nếu HTTP POST trả về lỗi HTTP 403 Forbidden nhưng HTTP GET hoạt độ
 [[appendix-faq-no-security-on-forward]]
 === Tôi forward request đến URL khác bằng RequestDispatcher nhưng các security constraint không được áp dụng.
 
-Mặc định, filter không được áp dụng cho forward hoặc include.
+Mặc định, các filter không được áp dụng cho forward hoặc include.
 Nếu thực sự muốn security filter được áp dụng cho forward hoặc include, bạn phải cấu hình rõ ràng trong file `web.xml` bằng element `<dispatcher>`, là child element của element `<filter-mapping>`.
 
 
@@ -333,10 +333,10 @@ Nếu thực sự muốn security filter được áp dụng cho forward hoặc 
 === Tôi đã thêm element <global-method-security> của Spring Security vào application context, nhưng khi thêm security annotation vào Spring MVC controller bean (Struts action, v.v.), chúng dường như không có tác dụng. Tại sao?
 
 Trong một Spring web application, application context chứa các Spring MVC bean cho dispatcher servlet thường tách biệt với main application context.
-Context này thường được định nghĩa trong file có tên `myapp-servlet.xml`, trong đó `myapp` là tên gán cho Spring `DispatcherServlet` trong file `web.xml`. Một application có thể có nhiều instance `DispatcherServlet`, mỗi instance có application context tách biệt riêng.
+Context này thường được định nghĩa trong file có tên `myapp-servlet.xml`, trong đó `myapp` là tên được gán cho Spring `DispatcherServlet` trong file `web.xml`. Một application có thể có nhiều instance `DispatcherServlet`, mỗi instance có application context tách biệt riêng.
 Các bean trong những context "`child`" này không hiển thị với phần còn lại của application.
 Application context "`parent`" được load bởi `ContextLoaderListener` mà bạn định nghĩa trong file `web.xml` và hiển thị với tất cả child context.
-Parent context này thường là nơi bạn định nghĩa security configuration, bao gồm element `<global-method-security>`. Do đó, mọi security constraint áp dụng cho method trong các web bean này không được thực thi, vì các bean không thể được nhìn thấy từ `DispatcherServlet` context.
+Parent context này thường là nơi bạn định nghĩa security configuration, bao gồm element `<global-method-security>`. Do đó, mọi security constraint áp dụng cho method trong các web bean này không được thực thi, vì các bean không được nhìn thấy từ `DispatcherServlet` context.
 Bạn cần chuyển declaration `<global-method-security>` sang web context hoặc chuyển các bean cần được bảo vệ vào main application context.
 
 Nhìn chung, chúng tôi khuyến nghị áp dụng method security ở service layer thay vì trên từng web controller.
@@ -371,7 +371,7 @@ Phần này đề cập đến các câu hỏi thường gặp về Spring Secur
 [[appendix-faq-where-is-class-x]]
 === Làm thế nào để biết class X nằm trong package nào?
 
-Cách tốt nhất để tìm class là cài source Spring Security vào IDE. Distribution bao gồm source jar cho từng module mà project được chia thành.
+Cách tốt nhất để tìm class là cài source Spring Security vào IDE. Distribution bao gồm source jar cho từng module trong project.
 Thêm các source jar này vào source path của project, sau đó bạn có thể điều hướng trực tiếp đến các class Spring Security (`Ctrl-Shift-T` trong Eclipse). Điều này cũng giúp debug dễ hơn và cho phép troubleshoot exception bằng cách xem trực tiếp code tại nơi chúng xảy ra để hiểu chuyện gì đang diễn ra.
 
 [[appendix-faq-namespace-to-bean-mapping]]
@@ -391,20 +391,20 @@ Authority có tiền tố `ROLE_` nghĩa là authority đó là một role, có 
 Có tiền tố cho phép phân biệt rõ với OAuth 2.0 scope (sử dụng `SCOPE_`) cũng như authority được cấp từ các source khác.
 
 Bạn có thể chọn không thêm tiền tố cho authority.
-Các authorization component hiện đại của Spring Security cho phép bạn cung cấp toàn bộ authority name, khiến tiền tố trở nên không cần thiết.
+Các authorization component hiện đại của Spring Security cho phép bạn cung cấp toàn bộ tên authority, khiến tiền tố trở nên không cần thiết.
 Ví dụ là xref:servlet/authorization/authorize-http-requests.adoc[`authorizeHttpRequests`] và xref:servlet/authorization/method-security.adoc[`@PreAuthorize`] cho phép bạn gọi `hasAuthority` hoặc `hasRole`.
 
 [[appendix-faq-what-dependencies]]
 === Làm thế nào để biết cần thêm dependency nào vào application để làm việc với Spring Security?
 
 Điều này phụ thuộc vào feature bạn sử dụng và loại application bạn đang phát triển.
-Trong Spring Security 3.0, các project jar được chia thành những vùng chức năng tách biệt rõ ràng, vì vậy dễ xác định các Spring Security jar cần thiết từ yêu cầu của application.
+Trong Spring Security 3.0, các jar của project được chia thành những vùng chức năng tách biệt rõ ràng, vì vậy dễ xác định các Spring Security jar cần thiết từ yêu cầu của application.
 Mọi application đều cần jar `spring-security-core`.
 Nếu phát triển web application, bạn cần jar `spring-security-web`.
 Nếu sử dụng security namespace configuration, bạn cần jar `spring-security-config`. Để hỗ trợ LDAP, bạn cần jar `spring-security-ldap`, v.v.
 
 Với third-party jar, tình hình không phải lúc nào cũng rõ ràng như vậy.
-Một điểm bắt đầu tốt là sao chép chúng từ thư mục `WEB-INF/lib` của một trong các sample application được build sẵn.
+Một điểm bắt đầu tốt là sao chép các jar đó từ thư mục `WEB-INF/lib` của một trong các sample application được build sẵn.
 Với application cơ bản, bạn có thể bắt đầu từ tutorial sample.
 Với application cơ bản, bạn có thể bắt đầu từ tutorial sample.
 Nếu muốn sử dụng LDAP với embedded test server, hãy dùng LDAP sample làm điểm bắt đầu.
@@ -475,7 +475,7 @@ Phần này đề cập đến các câu hỏi how-to thường gặp về Sprin
 
 
 [[appendix-faq-extra-login-fields]]
-=== Tôi cần đăng nhập với nhiều thông tin hơn chỉ username. Làm thế nào để thêm hỗ trợ cho login field bổ sung (chẳng hạn tên công ty)?
+=== Tôi cần đăng nhập với thông tin không chỉ gồm username. Làm thế nào để thêm hỗ trợ cho login field bổ sung (chẳng hạn tên công ty)?
 
 Câu hỏi này được đặt đi đặt lại nhiều lần, vì vậy bạn có thể tìm thêm thông tin bằng cách search online.
 
@@ -485,7 +485,7 @@ Bạn cũng cần tùy chỉnh authentication process thực tế.
 Ví dụ, nếu dùng custom authentication token class, bạn phải viết một `AuthenticationProvider` (hoặc extend `DaoAuthenticationProvider` tiêu chuẩn) để xử lý nó. Nếu đã nối các field, bạn có thể triển khai `UserDetailsService` của riêng mình để tách chúng ra và load user data phù hợp cho authentication.
 
 [[appendix-faq-matching-url-fragments]]
-=== Làm thế nào để áp dụng các intercept-url constraint khác nhau khi chỉ fragment value của URL được request khác nhau (chẳng hạn /thing1#thing2 và /thing1#thing3)?
+=== Làm thế nào để áp dụng các intercept-url constraint khác nhau khi các URL được request chỉ khác nhau ở fragment (chẳng hạn /thing1#thing2 và /thing1#thing3)?
 
 Bạn không thể làm vậy, vì fragment không được truyền từ browser đến server.
 Từ góc nhìn server, các URL là giống hệt nhau.
@@ -634,10 +634,10 @@ companion object {
 
 
 [[appendix-faq-ldap-authorities]]
-=== Làm thế nào để authenticate dựa trên LDAP nhưng load user role từ database?
+=== Làm thế nào để authenticate với LDAP nhưng load các role của user từ database?
 
-Bean `LdapAuthenticationProvider` (xử lý LDAP authentication thông thường trong Spring Security) được cấu hình với hai strategy interface riêng biệt: một interface thực hiện authentication và một interface load authority của user, lần lượt có tên `LdapAuthenticator` và `LdapAuthoritiesPopulator`.
-`DefaultLdapAuthoritiesPopulator` load authority của user từ LDAP directory và có nhiều configuration parameter để bạn chỉ định cách truy xuất chúng.
+Bean `LdapAuthenticationProvider` (xử lý LDAP authentication thông thường trong Spring Security) được cấu hình với hai strategy interface riêng biệt: một interface thực hiện authentication và một interface load các authority của user, lần lượt có tên `LdapAuthenticator` và `LdapAuthoritiesPopulator`.
+`DefaultLdapAuthoritiesPopulator` load các authority của user từ LDAP directory và có nhiều configuration parameter để bạn chỉ định cách truy xuất chúng.
 
 Để sử dụng JDBC thay thế, bạn có thể tự triển khai interface bằng SQL phù hợp với schema của mình:
 
@@ -693,7 +693,7 @@ class MyAuthoritiesPopulator : LdapAuthoritiesPopulator {
 ----
 ======
 
-Sau đó, bạn thêm một bean thuộc type này vào application context và inject nó vào `LdapAuthenticationProvider`. Việc này được đề cập trong phần cấu hình LDAP bằng explicit Spring bean ở chapter LDAP của reference manual.
+Sau đó, bạn thêm một bean thuộc kiểu này vào application context và inject nó vào `LdapAuthenticationProvider`. Việc này được đề cập trong phần cấu hình LDAP bằng explicit Spring bean ở chapter LDAP của reference manual.
 Lưu ý rằng trong trường hợp này bạn không thể sử dụng namespace để cấu hình.
 Bạn cũng nên tham khảo xref:attachment$api/java/index.html[Javadoc] cho các class và interface liên quan.
 
@@ -757,4 +757,4 @@ class CustomBeanPostProcessor : BeanPostProcessor {
 ======
 
 Sau đó, bạn đăng ký bean này trong application context.
-Spring tự động invoke nó trên các bean được định nghĩa trong application context.
+Spring tự động invoke processor này trên các bean được định nghĩa trong application context.

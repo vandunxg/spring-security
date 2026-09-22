@@ -12,15 +12,15 @@ Phần này mô tả cách Spring Security tích hợp với đặc tả Servlet
 [[servletapi-remote-user]]
 === HttpServletRequest.getRemoteUser()
 https://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html#getRemoteUser()[`HttpServletRequest.getRemoteUser()`] trả về kết quả của `SecurityContextHolder.getContext().getAuthentication().getName()`, thường là username hiện tại. Điều này có thể hữu ích nếu bạn muốn hiển thị username hiện tại trong ứng dụng.
-Ngoài ra, bạn có thể kiểm tra giá trị này có phải là null hay không để xác định user đã authentication hay đang anonymous.
-Biết user đã authentication hay chưa có thể hữu ích để xác định một số thành phần UI có nên được hiển thị hay không (ví dụ: liên kết logout chỉ nên được hiển thị khi user đã authentication).
+Ngoài ra, bạn có thể kiểm tra giá trị này có phải là null hay không để xác định user đã được authenticated hay đang anonymous.
+Việc xác định user đã được authenticated hay chưa có thể hữu ích để quyết định có hiển thị một số thành phần UI hay không (ví dụ: chỉ hiển thị logout link khi user đã được authenticated).
 
 
 [[servletapi-user-principal]]
 === HttpServletRequest.getUserPrincipal()
 https://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html#getUserPrincipal()[`HttpServletRequest.getUserPrincipal()`] trả về kết quả của `SecurityContextHolder.getContext().getAuthentication()`.
-Điều này có nghĩa đây là một `Authentication`, thường là một instance của `UsernamePasswordAuthenticationToken` khi sử dụng authentication dựa trên username và password.
-Điều này có thể hữu ích nếu bạn cần thêm thông tin về user của mình.
+Điều này có nghĩa giá trị này là một `Authentication`, thường là một instance của `UsernamePasswordAuthenticationToken` khi sử dụng authentication dựa trên username và password.
+Điều này có thể hữu ích nếu bạn cần thêm thông tin về user.
 Ví dụ: bạn có thể đã tạo một `UserDetailsService` tùy chỉnh trả về một `UserDetails` tùy chỉnh chứa tên và họ của user.
 Bạn có thể lấy thông tin này như sau:
 
@@ -55,7 +55,7 @@ val lastName: String = userDetails.lastName
 [NOTE]
 ====
 Cần lưu ý rằng việc thực hiện quá nhiều logic rải rác trong ứng dụng thường là một practice không tốt.
-Thay vào đó, nên tập trung logic này để giảm coupling giữa Spring Security và Servlet API.
+Thay vào đó, nên centralize logic này để giảm coupling giữa Spring Security và Servlet API.
 ====
 
 [[servletapi-user-in-role]]
@@ -91,14 +91,14 @@ Phần sau mô tả các method của Servlet 3 mà Spring Security tích hợp.
 
 [[servletapi-authenticate]]
 === HttpServletRequest.authenticate(HttpServletResponse)
-Bạn có thể sử dụng method https://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html#authenticate%28javax.servlet.http.HttpServletResponse%29[`HttpServletRequest.authenticate(HttpServletResponse)`] để đảm bảo user đã authentication.
-Nếu user chưa authentication, `AuthenticationEntryPoint` đã cấu hình sẽ được sử dụng để yêu cầu user authentication (redirect đến trang login).
+Bạn có thể sử dụng method https://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html#authenticate%28javax.servlet.http.HttpServletResponse%29[`HttpServletRequest.authenticate(HttpServletResponse)`] để đảm bảo user đã được authenticated.
+Nếu user chưa được authenticated, `AuthenticationEntryPoint` đã cấu hình sẽ được sử dụng để yêu cầu user authenticate (redirect đến trang login).
 
 
 [[servletapi-login]]
 === HttpServletRequest.login(String,String)
-Bạn có thể sử dụng method https://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html#login%28java.lang.String,%20java.lang.String%29[`HttpServletRequest.login(String,String)`] để authentication user bằng `AuthenticationManager` hiện tại.
-Ví dụ: đoạn sau sẽ thử authentication với username là `user` và password là `password`:
+Bạn có thể sử dụng method https://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html#login%28java.lang.String,%20java.lang.String%29[`HttpServletRequest.login(String,String)`] để authenticate user bằng `AuthenticationManager` hiện tại.
+Ví dụ: đoạn sau sẽ thử authenticate với username là `user` và password là `password`:
 
 [tabs]
 ======
@@ -109,7 +109,7 @@ Java::
 try {
 httpServletRequest.login("user","password");
 } catch(ServletException ex) {
-// authentication không thành công
+// authenticate thất bại
 }
 ----
 
@@ -120,14 +120,14 @@ Kotlin::
 try {
     httpServletRequest.login("user", "password")
 } catch (ex: ServletException) {
-    // authentication không thành công
+    // authenticate thất bại
 }
 ----
 ======
 
 [NOTE]
 ====
-Bạn không cần catch `ServletException` nếu muốn Spring Security xử lý lần authentication thất bại.
+Bạn không cần catch `ServletException` nếu muốn Spring Security xử lý việc authentication thất bại.
 ====
 
 [[servletapi-logout]]
@@ -135,15 +135,15 @@ Bạn không cần catch `ServletException` nếu muốn Spring Security xử l�
 Bạn có thể sử dụng method https://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html#logout%28%29[`HttpServletRequest.logout()`] để logout user hiện tại.
 
 Thông thường, điều này có nghĩa là `SecurityContextHolder` được clear, `HttpSession` bị invalidate, mọi authentication "`Remember Me`" được cleanup, v.v.
-Tuy nhiên, các implementation của `LogoutHandler` đã cấu hình sẽ khác nhau, tùy thuộc vào cấu hình Spring Security của bạn.
-Lưu ý rằng sau khi gọi `HttpServletRequest.logout()`, bạn vẫn phải tự ghi response.
+Tuy nhiên, các implementation của `LogoutHandler` đã cấu hình sẽ khác nhau, tùy thuộc vào Spring Security configuration của bạn.
+Lưu ý rằng sau khi gọi `HttpServletRequest.logout()`, bạn vẫn phải tự write response.
 Thông thường, việc này sẽ bao gồm redirect đến trang welcome.
 
 [[servletapi-start-runnable]]
 === AsyncContext.start(Runnable)
 Method https://docs.oracle.com/javaee/6/api/javax/servlet/AsyncContext.html#start%28java.lang.Runnable%29[`AsyncContext.start(Runnable)`] đảm bảo credential của bạn được propagate đến `Thread` mới.
-Bằng cách sử dụng concurrency support của Spring Security, Spring Security override `AsyncContext.start(Runnable)` để đảm bảo `SecurityContext` hiện tại được sử dụng khi xử lý Runnable.
-Ví dụ sau output Authentication của user hiện tại:
+Nhờ concurrency support của Spring Security, Spring Security override `AsyncContext.start(Runnable)` để đảm bảo `SecurityContext` hiện tại được sử dụng khi xử lý Runnable.
+Ví dụ sau output `Authentication` của user hiện tại:
 
 [tabs]
 ======
@@ -187,10 +187,10 @@ async.start {
 ======
 
 [[servletapi-async]]
-=== Hỗ trợ Servlet bất đồng bộ
-Nếu sử dụng cấu hình dựa trên Java, bạn không cần thực hiện thêm bước nào.
-Nếu sử dụng cấu hình XML, cần thực hiện một vài cập nhật.
-Bước đầu tiên là đảm bảo bạn đã cập nhật file `web.xml` để sử dụng schema tối thiểu là 3.0:
+=== Hỗ trợ Async Servlet
+Nếu sử dụng Java-based configuration, bạn không cần thực hiện thêm bước nào.
+Nếu sử dụng XML configuration, cần thực hiện một vài cập nhật.
+Bước đầu tiên là đảm bảo bạn đã cập nhật file `web.xml` để sử dụng schema 3.0 trở lên:
 
 [source,xml]
 ----
@@ -202,7 +202,7 @@ version="3.0">
 </web-app>
 ----
 
-Tiếp theo, bạn cần đảm bảo `springSecurityFilterChain` được thiết lập để xử lý request bất đồng bộ:
+Tiếp theo, bạn cần đảm bảo `springSecurityFilterChain` được thiết lập để xử lý async request:
 
 [source,xml]
 ----
@@ -221,12 +221,12 @@ Tiếp theo, bạn cần đảm bảo `springSecurityFilterChain` được thi�
 </filter-mapping>
 ----
 
-Lúc này, Spring Security cũng đảm bảo `SecurityContext` của bạn được propagate trên các request bất đồng bộ.
+Lúc này, Spring Security cũng đảm bảo `SecurityContext` của bạn được propagate trên các async request.
 
 Vậy cơ chế này hoạt động như thế nào? Nếu không thực sự quan tâm, bạn có thể bỏ qua phần còn lại của section này.
-Phần lớn cơ chế này đã được tích hợp trong đặc tả Servlet, nhưng Spring Security vẫn thực hiện một chút điều chỉnh để đảm bảo mọi thứ hoạt động đúng với các request bất đồng bộ.
+Phần lớn cơ chế này đã được tích hợp trong đặc tả Servlet, nhưng Spring Security vẫn thực hiện một vài điều chỉnh để đảm bảo mọi thứ hoạt động đúng với các async request.
 Trước Spring Security 3.2, `SecurityContext` từ `SecurityContextHolder` được tự động lưu ngay khi `HttpServletResponse` được commit.
-Điều này có thể gây ra vấn đề trong môi trường bất đồng bộ.
+Điều này có thể gây ra vấn đề trong môi trường async.
 Hãy xem xét ví dụ sau:
 
 [tabs]
@@ -281,7 +281,7 @@ Kể từ version 3.2, Spring Security đủ thông minh để không còn tự 
 
 [[servletapi-31]]
 == Tích hợp Servlet 3.1+
-Phần sau mô tả các method của Servlet 3.1 mà Spring Security tích hợp.
+Phần sau mô tả các method của Servlet 3.1 được Spring Security tích hợp.
 
 [[servletapi-change-session-id]]
 === HttpServletRequest#changeSessionId()

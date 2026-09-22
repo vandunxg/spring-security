@@ -1,10 +1,10 @@
 [[webflux-observability]]
-= Khả năng quan sát
+= Observability
 
-Spring Security tích hợp sẵn với Spring Observability cho tracing; tuy nhiên, việc cấu hình để thu thập metrics cũng khá đơn giản.
+Spring Security tích hợp sẵn với Spring Observability để tracing; việc cấu hình thu thập metrics cũng khá đơn giản.
 
 [[webflux-observability-tracing]]
-== Truy vết
+== Tracing
 
 Khi có bean `ObservationRegistry`, Spring Security tạo trace cho:
 
@@ -15,7 +15,7 @@ Khi có bean `ObservationRegistry`, Spring Security tạo trace cho:
 [[webflux-observability-tracing-boot]]
 === Tích hợp Boot
 
-Ví dụ, hãy xem xét một ứng dụng Boot đơn giản:
+Ví dụ, dưới đây là một ứng dụng Boot đơn giản:
 
 [tabs]
 ======
@@ -77,14 +77,14 @@ class MyApplication {
 ----
 ======
 
-Và request tương ứng:
+Và request tương ứng là:
 
 [source,bash]
 ----
 ?> http -a user:password :8080
 ----
 
-Sẽ tạo ra output sau (thêm thụt lề để dễ đọc):
+Kết quả là output sau (đã thêm thụt lề để dễ đọc):
 
 [source,bash]
 ----
@@ -105,7 +105,7 @@ STOP - name='http.server.requests', contextualName='null', error='null', lowCard
 [[webflux-observability-tracing-manual-configuration]]
 === Cấu hình thủ công
 
-Đối với ứng dụng không phải Spring Boot, hoặc để ghi đè cấu hình Boot hiện có, bạn có thể cung cấp `ObservationRegistry` của riêng mình và Spring Security vẫn sẽ sử dụng nó.
+Đối với ứng dụng không phải Spring Boot hoặc để ghi đè cấu hình Boot hiện có, bạn có thể cung cấp `ObservationRegistry` của riêng mình; Spring Security vẫn sẽ nhận và sử dụng registry đó.
 
 [tabs]
 ======
@@ -182,10 +182,10 @@ Xml::
 ======
 
 [[webflux-observability-tracing-disable]]
-=== Vô hiệu hóa khả năng quan sát
+=== Vô hiệu hóa Observability
 
-Nếu không muốn bất kỳ observation nào của Spring Security, trong ứng dụng Spring Boot bạn có thể cung cấp một `@Bean` `ObservationRegistry.NOOP`.
-Tuy nhiên, cách này có thể tắt observation không chỉ của Spring Security.
+Nếu không muốn Spring Security tạo bất kỳ observation nào, trong ứng dụng Spring Boot, bạn có thể cung cấp `ObservationRegistry.NOOP` dưới dạng `@Bean`.
+Tuy nhiên, cách này có thể tắt cả các observation khác ngoài Spring Security.
 
 Thay vào đó, bạn có thể cung cấp một `SecurityObservationSettings` như sau:
 
@@ -212,14 +212,14 @@ fun noSpringSecurityObservations(): SecurityObservationSettings {
 ----
 ======
 
-và khi đó Spring Security sẽ không bọc filter chain, authentication hoặc authorization nào bằng các đối tượng tương ứng `ObservationXXX`.
+và khi đó Spring Security sẽ không bọc bất kỳ filter chain, authentication hoặc authorization nào bằng đối tượng `ObservationXXX` tương ứng.
 
 [TIP]
-Không có cơ chế để vô hiệu hóa observation bằng hỗ trợ XML.
+Không có cơ chế vô hiệu hóa observation thông qua XML.
 Thay vào đó, chỉ cần không thiết lập thuộc tính `observation-registry-ref`.
 
-Bạn cũng có thể chỉ vô hiệu hóa các observation của Security cho một tập con.
-Ví dụ, bean `SecurityObservationSettings` loại trừ observation của filter chain theo mặc định.
+Bạn cũng có thể chỉ vô hiệu hóa một tập con các observation của Security.
+Ví dụ, bean `SecurityObservationSettings` mặc định không bao gồm observation của filter chain.
 Vì vậy, bạn cũng có thể làm như sau:
 
 [tabs]
@@ -274,7 +274,7 @@ fun allSpringSecurityObservations(): SecurityObservationSettings {
 
 [NOTE]
 =====
-Để đảm bảo khả năng tương thích ngược, tất cả observation của Spring Security đều được tạo trừ khi một `SecurityObservationSettings` được cung cấp.
+Để tương thích ngược, tất cả observation của Spring Security đều được tạo trừ khi một `SecurityObservationSettings` được cung cấp.
 =====
 
 [[webflux-observability-tracing-listing]]
@@ -283,9 +283,9 @@ fun allSpringSecurityObservations(): SecurityObservationSettings {
 Spring Security theo dõi các span sau trên mỗi request:
 
 1. `spring.security.http.requests` - một span bọc toàn bộ filter chain, bao gồm request
-2. `spring.security.http.chains.before` - một span bọc phần tiếp nhận của các filter bảo mật
-3. `spring.security.http.chains.after` - một span bọc phần trả về của các filter bảo mật
-4. `spring.security.http.secured.requests` - một span bọc request của ứng dụng hiện đã được bảo vệ
+2. `spring.security.http.chains.before` - một span bọc phần tiếp nhận của các security filter
+3. `spring.security.http.chains.after` - một span bọc phần trả về của các security filter
+4. `spring.security.http.secured.requests` - một span bọc request của ứng dụng đã được bảo vệ
 5. `spring.security.http.unsecured.requests` - một span bọc các request mà Spring Security không bảo vệ
 6. `spring.security.authentications` - một span bọc các lần thử authentication
 7. `spring.security.authorizations` - một span bọc các lần thử authorization

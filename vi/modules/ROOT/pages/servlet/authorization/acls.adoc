@@ -1,12 +1,12 @@
 [[domain-acls]]
-= Bảo mật đối tượng miền (ACL)
+= Bảo mật domain object (ACL)
 
-Phần này mô tả cách Spring Security cung cấp bảo mật đối tượng miền với Access Control Lists (ACL).
+Phần này mô tả cách Spring Security cung cấp security cho domain object bằng Access Control Lists (ACL).
 
 [[domain-acls-overview]]
-Các ứng dụng phức tạp thường cần định nghĩa permission truy cập vượt ra ngoài cấp request web hoặc lời gọi method.
-Thay vào đó, các quyết định bảo mật cần bao gồm ai (`Authentication`), ở đâu (`MethodInvocation`) và cái gì (`SomeDomainObject`).
-Nói cách khác, các quyết định authorization cũng cần xem xét instance đối tượng miền thực tế là đối tượng của một lời gọi method.
+Các ứng dụng phức tạp thường cần định nghĩa permission truy cập vượt ra ngoài cấp web request hoặc method invocation.
+Thay vào đó, các quyết định security cần bao gồm ai (`Authentication`), ở đâu (`MethodInvocation`) và cái gì (`SomeDomainObject`).
+Nói cách khác, các quyết định authorization cũng cần xem xét instance domain object thực tế mà method invocation tác động đến.
 
 Hãy hình dung bạn đang thiết kế một ứng dụng cho một phòng khám thú cưng.
 Có hai nhóm người dùng chính trong ứng dụng dựa trên Spring của bạn: nhân viên phòng khám thú cưng và khách hàng của phòng khám.
@@ -14,23 +14,23 @@ Nhân viên nên có quyền truy cập vào toàn bộ dữ liệu, còn khách
 Để vấn đề thú vị hơn một chút, khách hàng có thể cho phép người dùng khác xem hồ sơ của họ, chẳng hạn như người hướng dẫn "`puppy preschool`" hoặc chủ tịch "`Pony Club`" địa phương của họ.
 Khi sử dụng Spring Security làm nền tảng, bạn có một số cách tiếp cận khả dĩ:
 
-* Viết các business method để thực thi bảo mật.
-Bạn có thể kiểm tra một collection bên trong instance đối tượng miền `Customer` để xác định người dùng nào có quyền truy cập.
-Bằng cách sử dụng `SecurityContextHolder.getContext().getAuthentication()`, bạn có thể truy cập object `Authentication`.
-* Viết một `AuthorizationManager` để thực thi bảo mật dựa trên các instance `GrantedAuthority[]` được lưu trong object `Authentication`.
-Điều này có nghĩa là `AuthenticationManager` của bạn cần nạp vào `Authentication` các object `GrantedAuthority[]` tùy chỉnh để biểu diễn từng instance đối tượng miền `Customer` mà principal có quyền truy cập.
-* Viết một `AuthorizationManager` để thực thi bảo mật và mở trực tiếp đối tượng miền `Customer` đích.
+* Viết các business method để thực thi security.
+Bạn có thể kiểm tra một collection bên trong instance domain object `Customer` để xác định user nào có quyền truy cập.
+Bằng cách sử dụng `SecurityContextHolder.getContext().getAuthentication()`, bạn có thể truy cập `Authentication` object.
+* Viết một `AuthorizationManager` để thực thi security dựa trên các instance `GrantedAuthority[]` được lưu trong object `Authentication`.
+Điều này có nghĩa là `AuthenticationManager` của bạn cần nạp vào `Authentication` các object `GrantedAuthority[]` tùy chỉnh để biểu diễn từng instance domain object `Customer` mà principal có quyền truy cập.
+* Viết một `AuthorizationManager` để thực thi security và truy xuất trực tiếp domain object `Customer` đích.
 Điều này có nghĩa là voter của bạn cần truy cập vào một DAO cho phép nó truy xuất object `Customer`.
-Sau đó, nó có thể truy cập collection những người dùng được phê duyệt của object `Customer` và đưa ra quyết định phù hợp.
+Sau đó, nó có thể truy cập collection các user đã được approve của object `Customer` và đưa ra quyết định phù hợp.
 
 Mỗi cách tiếp cận này đều hoàn toàn hợp lệ.
 Tuy nhiên, cách đầu tiên gắn việc kiểm tra authorization với business code của bạn.
-Các vấn đề chính bao gồm việc unit test khó hơn đáng kể và việc tái sử dụng logic authorization của `Customer` ở nơi khác cũng khó hơn.
-Lấy các instance `GrantedAuthority[]` từ object `Authentication` cũng ổn, nhưng sẽ không mở rộng tốt khi có số lượng lớn object `Customer`.
-Nếu một người dùng có thể truy cập 5.000 object `Customer` (trường hợp này khó xảy ra, nhưng hãy hình dung đó là một bác sĩ thú y nổi tiếng phục vụ một Pony Club lớn!) thì lượng memory tiêu thụ và thời gian cần thiết để tạo object `Authentication` sẽ không phù hợp.
-Cách cuối cùng, mở trực tiếp `Customer` từ code bên ngoài, có lẽ là tốt nhất trong ba cách.
-Cách này đạt được separation of concerns và không sử dụng lãng phí memory hay chu kỳ CPU, nhưng vẫn không hiệu quả vì cả `AuthorizationManager` và business method thực tế đều thực hiện một lần gọi đến DAO chịu trách nhiệm truy xuất object `Customer`.
-Hai lần truy cập cho mỗi lời gọi method rõ ràng là không mong muốn.
+Các vấn đề chính là unit test khó hơn đáng kể và khó tái sử dụng logic authorization của `Customer` ở nơi khác.
+Lấy các instance `GrantedAuthority[]` từ object `Authentication` cũng ổn, nhưng sẽ không mở rộng tốt khi có số lượng lớn domain object `Customer`.
+Nếu một user có thể truy cập 5.000 domain object `Customer` (trường hợp này khó xảy ra, nhưng hãy hình dung đó là một bác sĩ thú y nổi tiếng phục vụ một Pony Club lớn!) thì lượng memory tiêu thụ và thời gian cần để tạo object `Authentication` sẽ không phù hợp.
+Cách cuối cùng, truy xuất trực tiếp `Customer` từ code bên ngoài, có lẽ là tốt nhất trong ba cách.
+Cách này đạt được separation of concerns và không sử dụng lãng phí memory hoặc CPU cycle, nhưng vẫn kém hiệu quả vì cả `AuthorizationManager` và business method thực tế đều thực hiện một lần gọi đến DAO chịu trách nhiệm truy xuất object `Customer`.
+Hai lần truy cập cho mỗi method invocation rõ ràng là không mong muốn.
 Ngoài ra, với mọi cách tiếp cận được liệt kê, bạn phải tự viết persistence cho access control list (ACL) và business logic từ đầu.
 
 May mắn là còn một lựa chọn khác, được thảo luận ở phần sau.
@@ -38,26 +38,26 @@ May mắn là còn một lựa chọn khác, được thảo luận ở phần s
 [[domain-acls-key-concepts]]
 == Khái niệm chính
 Các service ACL của Spring Security được cung cấp trong `spring-security-acl-xxx.jar`.
-Bạn cần thêm JAR này vào classpath để sử dụng các khả năng bảo mật instance đối tượng miền của Spring Security.
+Bạn cần thêm JAR này vào classpath để sử dụng các khả năng security cho instance domain object của Spring Security.
 
 [NOTE]
 ====
 Nếu cần truy cập Access API legacy có chứa `AclEntryVoter`, hãy thêm cả `spring-security-access-xxx.jar`.
 ====
 
-Các khả năng bảo mật instance đối tượng miền của Spring Security xoay quanh khái niệm access control list (ACL).
-Mỗi instance đối tượng miền trong hệ thống có ACL riêng, và ACL ghi lại chi tiết ai có thể hoặc không thể làm việc với đối tượng miền đó.
+Các khả năng security cho instance domain object của Spring Security xoay quanh concept access control list (ACL).
+Mỗi instance domain object trong hệ thống có ACL riêng, và ACL ghi lại chi tiết ai có thể hoặc không thể thao tác với domain object đó.
 Với điều này, Spring Security cung cấp cho ứng dụng của bạn ba khả năng chính liên quan đến ACL:
 
-* Một cách truy xuất hiệu quả các entry ACL cho tất cả đối tượng miền (và sửa đổi các ACL đó)
-* Một cách bảo đảm một principal nhất định được phép làm việc với các object của bạn trước khi các method được gọi
-* Một cách bảo đảm một principal nhất định được phép làm việc với các object của bạn (hoặc thứ mà chúng trả về) sau khi các method được gọi
+* Một cách truy xuất hiệu quả các entry ACL cho tất cả domain object (và sửa đổi các ACL đó)
+* Một cách bảo đảm một principal nhất định được phép thao tác với các object của bạn trước khi các method được gọi
+* Một cách bảo đảm một principal nhất định được phép thao tác với các object của bạn (hoặc thứ mà chúng trả về) sau khi các method được gọi
 
 Như bullet đầu tiên đã chỉ ra, một trong những khả năng chính của module ACL của Spring Security là cung cấp cách truy xuất ACL hiệu năng cao.
-Khả năng repository ACL này cực kỳ quan trọng, vì mỗi instance đối tượng miền trong hệ thống có thể có vài access control entry, và mỗi ACL có thể kế thừa từ các ACL khác theo cấu trúc dạng cây (Spring Security hỗ trợ điều này và nó được sử dụng rất phổ biến).
-Khả năng ACL của Spring Security được thiết kế cẩn thận để cung cấp việc truy xuất ACL hiệu năng cao, cùng với caching có thể cắm, cập nhật database giảm thiểu deadlock, độc lập với framework ORM (chúng tôi sử dụng trực tiếp JDBC), đóng gói phù hợp và cập nhật database minh bạch.
+Khả năng của ACL repository này cực kỳ quan trọng, vì mỗi instance domain object trong hệ thống có thể có vài access control entry, và mỗi ACL có thể kế thừa từ các ACL khác theo cấu trúc dạng cây (Spring Security hỗ trợ điều này và nó được sử dụng rất phổ biến).
+Khả năng ACL của Spring Security được thiết kế cẩn thận để cung cấp việc truy xuất ACL hiệu năng cao, cùng với caching có thể plug-in, cập nhật database giúp giảm deadlock, độc lập với framework ORM (chúng tôi sử dụng trực tiếp JDBC), đóng gói phù hợp và cập nhật database minh bạch.
 
-Vì database đóng vai trò trung tâm trong hoạt động của module ACL, chúng ta cần tìm hiểu bốn table chính được sử dụng mặc định trong implementation.
+Vì database đóng vai trò trung tâm trong hoạt động của module ACL, chúng ta cần tìm hiểu bốn table chính được dùng mặc định trong implementation.
 Các table được trình bày theo thứ tự kích thước trong một deployment ACL điển hình của Spring Security, table có nhiều row nhất được liệt kê cuối cùng:
 
 [[acl_tables]]
@@ -66,36 +66,36 @@ Các column duy nhất là ID, biểu diễn dạng văn bản của SID và m�
 Do đó, có một row duy nhất cho mỗi principal hoặc `GrantedAuthority` riêng biệt.
 Khi được sử dụng trong ngữ cảnh nhận một permission, SID thường được gọi là một "`recipient`".
 
-* `ACL_CLASS` cho phép chúng ta nhận diện duy nhất mọi class đối tượng miền trong hệ thống.
+* `ACL_CLASS` cho phép chúng ta nhận diện duy nhất mọi domain object class trong hệ thống.
 Các column duy nhất là ID và tên class Java.
 Do đó, có một row duy nhất cho mỗi Class riêng biệt mà chúng ta muốn lưu các permission ACL.
 
-* `ACL_OBJECT_IDENTITY` lưu thông tin cho mỗi instance đối tượng miền riêng biệt trong hệ thống.
-Các column bao gồm ID, foreign key đến table ACL_CLASS, một identifier duy nhất để chúng ta biết instance ACL_CLASS mà mình cung cấp thông tin, parent, foreign key đến table ACL_SID để biểu diễn owner của instance đối tượng miền và việc có cho phép các entry ACL kế thừa từ ACL parent nào hay không.
-Chúng ta có một row duy nhất cho mỗi instance đối tượng miền mà mình lưu các permission ACL.
+* `ACL_OBJECT_IDENTITY` lưu thông tin cho mỗi instance domain object riêng biệt trong hệ thống.
+Các column bao gồm ID, foreign key đến table ACL_CLASS, một identifier duy nhất để xác định instance ACL_CLASS mà thông tin này mô tả, parent, foreign key đến table ACL_SID để biểu diễn owner của instance domain object và việc có cho phép các entry ACL kế thừa từ bất kỳ ACL parent nào hay không.
+Chúng ta có một row duy nhất cho mỗi instance domain object mà mình lưu các permission ACL.
 
 * Cuối cùng, `ACL_ENTRY` lưu các permission riêng lẻ được gán cho từng recipient.
 Các column bao gồm foreign key đến `ACL_OBJECT_IDENTITY`, recipient (tức là foreign key đến ACL_SID), việc có audit hay không và integer bit mask biểu diễn permission thực tế đang được cấp hoặc từ chối.
-Chúng ta có một row duy nhất cho mỗi recipient nhận được permission để làm việc với một đối tượng miền.
+Chúng ta có một row duy nhất cho mỗi recipient nhận được permission để thao tác với một domain object.
 
 
 
 
-Như đã đề cập ở đoạn cuối, hệ thống ACL sử dụng integer bit masking.
-Tuy nhiên, bạn không cần biết các chi tiết nhỏ hơn của bit shifting để sử dụng hệ thống ACL.
+Như đã đề cập ở đoạn trước, hệ thống ACL sử dụng integer bit masking.
+Tuy nhiên, bạn không cần biết các chi tiết sâu hơn về bit shifting để sử dụng hệ thống ACL.
 Chỉ cần biết rằng chúng ta có 32 bit có thể bật hoặc tắt.
 Mỗi bit này biểu diễn một permission. Mặc định, các permission là read (bit 0), write (bit 1), create (bit 2), delete (bit 3) và administer (bit 4).
 Bạn có thể triển khai instance `Permission` của riêng mình nếu muốn sử dụng các permission khác, và phần còn lại của framework ACL hoạt động mà không cần biết về các extension của bạn.
 
-Bạn nên hiểu rằng số lượng đối tượng miền trong hệ thống hoàn toàn không liên quan đến việc chúng ta chọn sử dụng integer bit masking.
-Dù có 32 bit dành cho permission, bạn vẫn có thể có hàng tỷ instance đối tượng miền (nghĩa là hàng tỷ row trong ACL_OBJECT_IDENTITY và có thể cả ACL_ENTRY).
-Chúng tôi nhấn mạnh điều này vì nhận thấy đôi khi mọi người nhầm tưởng rằng họ cần một bit cho mỗi đối tượng miền có thể có, nhưng không phải vậy.
+Bạn nên hiểu rằng số lượng domain object trong hệ thống hoàn toàn không liên quan đến việc chúng ta chọn sử dụng integer bit masking.
+Dù có 32 bit dành cho permission, bạn vẫn có thể có hàng tỷ instance domain object (nghĩa là hàng tỷ row trong ACL_OBJECT_IDENTITY và có thể cả ACL_ENTRY).
+Chúng tôi nhấn mạnh điều này vì nhận thấy đôi khi mọi người nhầm tưởng rằng họ cần một bit cho mỗi domain object có thể có, nhưng không phải vậy.
 
-Sau khi đã cung cấp tổng quan cơ bản về chức năng của hệ thống ACL và diện mạo của nó ở cấp cấu trúc table, chúng ta cần tìm hiểu các interface chính:
+Sau khi đã cung cấp tổng quan cơ bản về chức năng của hệ thống ACL và diện mạo của nó ở cấp độ cấu trúc table, chúng ta cần tìm hiểu các interface chính:
 
 
-* `Acl`: Mỗi đối tượng miền có duy nhất một object `Acl`, object này giữ các object `AccessControlEntry` bên trong và biết owner của `Acl`.
-Một Acl không tham chiếu trực tiếp đến đối tượng miền mà thay vào đó tham chiếu đến một `ObjectIdentity`.
+* `Acl`: Mỗi domain object có duy nhất một object `Acl`, object này giữ các object `AccessControlEntry` bên trong và biết owner của `Acl`.
+Một Acl không tham chiếu trực tiếp đến domain object mà thay vào đó tham chiếu đến một `ObjectIdentity`.
 `Acl` được lưu trong table `ACL_OBJECT_IDENTITY`.
 
 * `AccessControlEntry`: Một `Acl` giữ nhiều object `AccessControlEntry`, thường được viết tắt là ACE trong framework.
@@ -111,7 +111,7 @@ Một mức indirection được cung cấp bởi interface `Sid`. ("`SID`" là 
 Các class phổ biến bao gồm `PrincipalSid` (để biểu diễn principal bên trong object `Authentication`) và `GrantedAuthoritySid`.
 Thông tin security identity được lưu trong table `ACL_SID`.
 
-* `ObjectIdentity`: Mỗi đối tượng miền được biểu diễn nội bộ trong module ACL bằng một `ObjectIdentity`.
+* `ObjectIdentity`: Mỗi domain object được biểu diễn nội bộ trong module ACL bằng một `ObjectIdentity`.
 Implementation mặc định có tên là `ObjectIdentityImpl`.
 
 * `AclService`: Truy xuất `Acl` áp dụng cho một `ObjectIdentity` nhất định.
@@ -140,7 +140,7 @@ Bạn cũng cần nạp vào database <<acl_tables,bốn table dành riêng cho 
 
 Sau khi tạo schema cần thiết và khởi tạo `JdbcMutableAclService`, bạn cần bảo đảm domain model hỗ trợ khả năng interoperability với package ACL của Spring Security.
 Hy vọng `ObjectIdentityImpl` là đủ dùng, vì nó cung cấp nhiều cách sử dụng khác nhau.
-Hầu hết mọi người có các đối tượng miền chứa method `public Serializable getId()`.
+Hầu hết mọi người có các domain object chứa method `public Serializable getId()`.
 Nếu kiểu trả về là `long` hoặc tương thích với `long` (chẳng hạn `int`), bạn có thể không cần cân nhắc thêm về các vấn đề `ObjectIdentity`.
 Nhiều phần của module ACL phụ thuộc vào identifier kiểu long.
 Nếu không sử dụng `long` (hoặc `int`, `byte` và tương tự), có lẽ bạn cần reimplement một số class.
@@ -194,7 +194,7 @@ aclService.updateAcl(acl)
 ----
 ======
 
-Trong ví dụ trên, chúng ta truy xuất ACL liên kết với đối tượng miền `Foo` có identifier là 44.
+Trong ví dụ trên, chúng ta truy xuất ACL liên kết với domain object `Foo` có identifier là 44.
 Sau đó, chúng ta thêm một ACE để principal có tên "`Samantha`" có thể "`administer`" object.
 Đoạn code tương đối dễ hiểu, ngoại trừ method `insertAce`.
 Argument đầu tiên của method `insertAce` xác định vị trí trong Acl nơi entry mới được chèn vào.
@@ -203,17 +203,17 @@ Argument cuối cùng là Boolean cho biết ACE đang cấp hay từ chối.
 Phần lớn thời gian nó cấp (`true`). Tuy nhiên, nếu từ chối (`false`), các permission sẽ bị chặn trên thực tế.
 
 Spring Security không cung cấp integration đặc biệt nào để tự động tạo, cập nhật hoặc xóa ACL như một phần của operation DAO hoặc repository.
-Thay vào đó, bạn cần viết code tương tự ví dụ trên cho từng đối tượng miền.
-Bạn nên cân nhắc sử dụng AOP trên services layer để tự động tích hợp thông tin ACL với các operation của services layer.
+Thay vào đó, bạn cần viết code tương tự ví dụ trên cho từng domain object.
+Bạn nên cân nhắc sử dụng AOP trên services layer để tự động tích hợp thông tin ACL với các operation của layer này.
 Chúng tôi nhận thấy cách tiếp cận này hiệu quả.
 
 == Sử dụng PermissionEvaluator
 
-Sau khi sử dụng các kỹ thuật được mô tả ở đây để lưu một số thông tin ACL trong database, bước tiếp theo là thực sự sử dụng thông tin ACL như một phần của logic quyết định authorization.
+Sau khi sử dụng các kỹ thuật được mô tả ở đây để lưu một số thông tin ACL trong database, bước tiếp theo là thực sự sử dụng thông tin ACL như một phần của logic ra quyết định authorization.
 
 Bạn có một số lựa chọn, trong đó lựa chọn chính là sử dụng `AclPermissionEvaluator` trong các biểu thức annotation `@PreAuthorize`, `@PostAuthorize`, `@PreFilter` và `@PostFilter`.
 
-Đây là danh sách mẫu các component cần thiết để wire một `AclPersmissionEvaluator` vào logic authorization của bạn:
+Đây là danh sách mẫu các component cần thiết để wire một `AclPermissionEvaluator` vào logic authorization của bạn:
 
 [tabs]
 ======

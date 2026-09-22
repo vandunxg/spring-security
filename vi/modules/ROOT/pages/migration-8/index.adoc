@@ -2,8 +2,8 @@
 = Chuẩn bị cho 8.0
 :page-section-summary-toc: 1
 
-Mặc dù Spring Security 8.0 chưa có ngày phát hành, điều quan trọng là bắt đầu chuẩn bị ngay từ bây giờ.
+Mặc dù Spring Security 8.0 chưa có release date, điều quan trọng là bắt đầu chuẩn bị ngay từ bây giờ.
 
 Hướng dẫn chuẩn bị này nhằm tóm tắt những thay đổi lớn nhất trong Spring Security 8.0 và cung cấp các bước để chuẩn bị cho chúng.
 
-Điều quan trọng là giữ ứng dụng của bạn luôn được cập nhật với các bản phát hành mới nhất của Spring Security 7 và Spring Boot 4.
+Điều quan trọng là giữ ứng dụng của bạn luôn up to date với các release mới nhất của Spring Security 7 và Spring Boot 4.

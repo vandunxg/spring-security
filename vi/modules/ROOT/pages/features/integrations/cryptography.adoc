@@ -2,16 +2,16 @@
 = Mô-đun Spring Security Crypto
 
 [[spring-security-crypto-introduction]]
-Mô-đun Spring Security Crypto cung cấp hỗ trợ cho mã hóa đối xứng, sinh khóa và mã hóa mật khẩu.
+Mô-đun Spring Security Crypto cung cấp hỗ trợ cho mã hóa đối xứng, sinh khóa và password encoding.
 Mã nguồn được phân phối như một phần của mô-đun core nhưng không phụ thuộc vào bất kỳ mã nguồn nào khác của Spring Security (hoặc Spring).
 
 
 [[spring-security-crypto-encryption]]
-== Bộ mã hóa
-Spring Security cung cấp javadoc:org.springframework.security.crypto.encrypt.AesGcmBytesEncryptor[] và javadoc:org.springframework.security.crypto.encrypt.AesCbcBytesEncryptor[] để xây dựng các bộ mã hóa đối xứng.
-Các bộ mã hóa này có thể được dùng để mã hóa dữ liệu ở dạng `byte[]` thô.
+== Encryptors
+Spring Security cung cấp javadoc:org.springframework.security.crypto.encrypt.AesGcmBytesEncryptor[] và javadoc:org.springframework.security.crypto.encrypt.AesCbcBytesEncryptor[] để xây dựng các symmetric encryptor.
+Các encryptor này có thể được dùng để mã hóa dữ liệu ở dạng `byte[]` raw.
 Bạn cũng có thể xây dựng các instance javadoc:org.springframework.security.crypto.encrypt.TextEncryptor[] để mã hóa các chuỗi văn bản.
-Các bộ mã hóa đều an toàn trong môi trường đa luồng.
+Các encryptor đều thread-safe.
 
 [NOTE]
 ====
@@ -31,7 +31,7 @@ Mật khẩu được dùng để tạo SecretKey phải được lưu giữ ở
 Salt được dùng để ngăn các cuộc tấn công từ điển nhằm vào khóa trong trường hợp dữ liệu đã mã hóa của bạn bị xâm phạm.
 Một vector khởi tạo ngẫu nhiên dài 16 byte cũng được áp dụng để mỗi thông điệp đã mã hóa là duy nhất.
 
-Salt được cung cấp phải ở dạng String mã hóa hex, có tính ngẫu nhiên và dài ít nhất 8 byte.
+Salt được cung cấp phải ở dạng String được encode dưới dạng hex, có tính ngẫu nhiên và dài ít nhất 8 byte.
 Bạn có thể sinh salt như vậy bằng cách sử dụng một `KeyGenerator`:
 
 .Sinh khóa
@@ -53,46 +53,46 @@ Sử dụng `AesCbcBytesEncryptor` để mã hóa dữ liệu văn bản:
 .TextEncryptor
 include-code::./CryptoEncryptionTests[tag=aes-cbc-bytes-encryptor,indent=0]
 
-`AesCbcBytesEncryptor` mã hóa dữ liệu dưới dạng byte thô.
-Bạn có thể mã hóa hex kết quả để dễ lưu trữ trên hệ thống tệp hoặc trong cơ sở dữ liệu.
+`AesCbcBytesEncryptor` mã hóa dữ liệu dưới dạng raw bytes.
+Bạn có thể encode kết quả dưới dạng hex để dễ lưu trữ trên hệ thống tệp hoặc trong cơ sở dữ liệu.
 
 NOTE: Mã hóa văn bản có thể truy vấn (mã hóa sao cho cùng một văn bản rõ luôn tạo ra cùng một bản mã) không còn được khuyến nghị, vì nó dựa trên một vector khởi tạo cố định và không cung cấp mức bảo mật đầy đủ.
-Thay vào đó, hãy tìm trong kho dữ liệu của bạn một cơ chế để truy vấn dữ liệu đã mã hóa.
+Thay vào đó, hãy tìm trong data store của bạn một cơ chế để truy vấn dữ liệu đã mã hóa.
 
 [[spring-security-crypto-keygenerators]]
 == Bộ sinh khóa
-Class javadoc:org.springframework.security.crypto.keygen.KeyGenerators[] cung cấp một số method factory tiện dụng để xây dựng các loại bộ sinh khóa khác nhau.
+class javadoc:org.springframework.security.crypto.keygen.KeyGenerators[] cung cấp một số factory method tiện dụng để xây dựng các loại bộ sinh khóa khác nhau.
 Bằng cách sử dụng class này, bạn có thể tạo một javadoc:org.springframework.security.crypto.keygen.BytesKeyGenerator[] để sinh các khóa `byte[]`.
 Bạn cũng có thể xây dựng một javadoc:org.springframework.security.crypto.keygen.StringKeyGenerator[] để sinh các khóa dạng chuỗi.
-`KeyGenerators` là một class an toàn trong môi trường đa luồng.
+`KeyGenerators` là một class thread-safe.
 
 === BytesKeyGenerator
-Bạn có thể sử dụng các method factory `KeyGenerators.secureRandom` để sinh một `BytesKeyGenerator` được hỗ trợ bởi một instance `SecureRandom`:
+Bạn có thể sử dụng các factory method `KeyGenerators.secureRandom` để sinh một `BytesKeyGenerator` dựa trên một instance `SecureRandom`:
 
 .BytesKeyGenerator
 include-code::./CryptoKeyGeneratorTests[tag=bytes-key-generator,indent=0]
 
 Độ dài khóa mặc định là 8 byte.
-Một biến thể `KeyGenerators.secureRandom` cho phép kiểm soát độ dài khóa:
+Một biến thể của `KeyGenerators.secureRandom` cho phép kiểm soát độ dài khóa:
 
 .KeyGenerators.secureRandom
 include-code::./CryptoKeyGeneratorTests[tag=bytes-key-generator-custom-length,indent=0]
 
-Sử dụng method factory `KeyGenerators.shared` để xây dựng một BytesKeyGenerator luôn trả về cùng một khóa trong mọi lần gọi:
+Sử dụng factory method `KeyGenerators.shared` để xây dựng một BytesKeyGenerator luôn trả về cùng một khóa trong mọi lần gọi:
 
 .KeyGenerators.shared
 include-code::./CryptoKeyGeneratorTests[tag=bytes-key-generator-shared,indent=0]
 
 === StringKeyGenerator
-Bạn có thể sử dụng method factory `KeyGenerators.string` để xây dựng một `KeyGenerator` 8 byte, `SecureRandom`, mã hóa hex từng khóa thành một `String`:
+Bạn có thể sử dụng factory method `KeyGenerators.string` để xây dựng một `KeyGenerator` 8 byte dựa trên `SecureRandom`, trong đó mỗi khóa được encode dưới dạng hex thành một `String`:
 
 .StringKeyGenerator
 include-code::./CryptoKeyGeneratorTests[tag=string-key-generator,indent=0]
 
 [[spring-security-crypto-passwordencoders]]
-== Mã hóa mật khẩu
-Package `password` của mô-đun `spring-security-crypto` cung cấp hỗ trợ cho việc mã hóa mật khẩu.
-`PasswordEncoder` là interface service trung tâm và có khai báo sau:
+== Password Encoding
+Package `password` của mô-đun `spring-security-crypto` cung cấp hỗ trợ cho password encoding.
+`PasswordEncoder` là service interface trung tâm với signature sau:
 
 [source,java]
 ----
@@ -107,7 +107,7 @@ public interface PasswordEncoder {
 }
 ----
 
-Method `matches` trả về true nếu `rawPassword`, sau khi được mã hóa, bằng `encodedPassword`.
+Method `matches` trả về true nếu `rawPassword`, sau khi được encode, bằng `encodedPassword`.
 Method này được thiết kế để hỗ trợ các cơ chế authentication dựa trên mật khẩu.
 
 Implementation `BCryptPasswordEncoder` sử dụng thuật toán "`bcrypt`" được hỗ trợ rộng rãi để băm mật khẩu.
@@ -115,7 +115,7 @@ Bcrypt sử dụng một giá trị salt ngẫu nhiên dài 16 byte và là mộ
 Bạn có thể điều chỉnh lượng công việc mà nó thực hiện bằng cách sử dụng parameter `strength`, nhận một giá trị từ 4 đến 31.
 Giá trị càng cao thì càng cần thực hiện nhiều công việc hơn để tính giá trị băm.
 Giá trị mặc định là `10`.
-Bạn có thể thay đổi giá trị này trong hệ thống đã triển khai mà không ảnh hưởng đến các mật khẩu hiện có, vì giá trị này cũng được lưu trong hash đã mã hóa.
+Bạn có thể thay đổi giá trị này trong hệ thống đã triển khai mà không ảnh hưởng đến các mật khẩu hiện có, vì giá trị này cũng được lưu trong hash đã encode.
 Ví dụ sau sử dụng `BCryptPasswordEncoder`:
 
 .BCryptPasswordEncoder

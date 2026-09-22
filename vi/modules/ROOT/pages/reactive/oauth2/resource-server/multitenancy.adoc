@@ -1,21 +1,21 @@
-= Đa tenant của OAuth 2.0 Resource Server
+= Multi-tenancy trong OAuth 2.0 Resource Server
 
 [[webflux-oauth2resourceserver-multitenancy]]
-== Đa tenant
+== Multi-tenancy
 
-Một Resource Server được xem là đa tenant khi có nhiều strategy để xác minh Bearer Token, được định danh bằng một tenant identifier nào đó.
+Một resource server được xem là multi-tenant khi có nhiều strategy để verify bearer token, với mỗi strategy được gắn với một tenant identifier.
 
-Ví dụ, Resource Server của bạn có thể chấp nhận Bearer Token từ hai Authorization Server khác nhau.
-Hoặc Authorization Server của bạn có thể đại diện cho nhiều issuer.
+Ví dụ, resource server của bạn có thể accept bearer token từ hai authorization server khác nhau.
+Hoặc authorization server của bạn có thể đại diện cho nhiều issuer.
 
-Trong mỗi trường hợp, cần thực hiện hai việc và cách bạn chọn thực hiện chúng sẽ đi kèm với các đánh đổi:
+Trong cả hai trường hợp, cần thực hiện hai việc; cách bạn chọn thực hiện mỗi việc sẽ đi kèm với những trade-off:
 
-. Phân giải tenant.
-. Truyền tenant.
+. Resolve tenant.
+. Propagate tenant.
 
-=== Phân giải tenant bằng claim
+=== Resolve tenant bằng claim
 
-Một cách để phân biệt các tenant là sử dụng issuer claim. Vì issuer claim đi kèm với JWT đã ký, bạn có thể thực hiện việc này bằng `JwtIssuerReactiveAuthenticationManagerResolver`:
+Một cách để phân biệt các tenant là dựa trên issuer claim. Vì issuer claim nằm trong signed JWT, bạn có thể dùng `JwtIssuerReactiveAuthenticationManagerResolver` để thực hiện việc này:
 
 [tabs]
 ======
@@ -53,14 +53,14 @@ return http {
 ----
 ======
 
-Điều này hữu ích vì các issuer endpoint được tải lazy.
-Trên thực tế, `JwtReactiveAuthenticationManager` tương ứng chỉ được khởi tạo khi request đầu tiên với issuer tương ứng được gửi đi.
-Điều này cho phép ứng dụng khởi động mà không phụ thuộc vào việc các Authorization Server đó đang hoạt động và sẵn sàng.
+Điểm thuận tiện của cách này là các issuer endpoint được load lazily.
+Trên thực tế, `JwtReactiveAuthenticationManager` tương ứng chỉ được instantiate khi request đầu tiên mang issuer tương ứng được gửi đến.
+Nhờ đó, application có thể startup độc lập với việc các authorization server đó có đang up và available hay không.
 
 ==== Tenant động
 
-Bạn có thể không muốn khởi động lại ứng dụng mỗi khi thêm tenant mới.
-Trong trường hợp này, bạn có thể cấu hình `JwtIssuerReactiveAuthenticationManagerResolver` với một repository chứa các instance `ReactiveAuthenticationManager`, repository này có thể được chỉnh sửa trong runtime:
+Có thể bạn không muốn restart application mỗi khi thêm tenant mới.
+Trong trường hợp này, bạn có thể configure `JwtIssuerReactiveAuthenticationManagerResolver` bằng một repository chứa các instance `ReactiveAuthenticationManager`; repository này có thể được chỉnh sửa at runtime:
 
 [tabs]
 ======
@@ -117,11 +117,11 @@ return http {
 ----
 ======
 
-Trong trường hợp này, bạn khởi tạo `JwtIssuerReactiveAuthenticationManagerResolver` với một strategy để lấy `ReactiveAuthenticationManager` tương ứng với issuer.
-Cách tiếp cận này cho phép chúng ta thêm và xóa các phần tử khỏi repository (được thể hiện dưới dạng `Map` trong snippet trước đó) trong runtime.
+Trong trường hợp này, bạn construct `JwtIssuerReactiveAuthenticationManagerResolver` với một strategy để lấy `ReactiveAuthenticationManager` tương ứng với issuer.
+Cách này cho phép chúng ta thêm và xóa các phần tử khỏi repository (được biểu diễn dưới dạng `Map` trong snippet trước) at runtime.
 
 [NOTE]
 ====
-Sẽ không an toàn nếu đơn giản lấy bất kỳ issuer nào và khởi tạo một `ReactiveAuthenticationManager` từ issuer đó.
-Issuer phải là giá trị mà code có thể xác minh từ một nguồn đáng tin cậy, chẳng hạn như danh sách issuer được cho phép.
+Sẽ không an toàn nếu chỉ lấy bất kỳ issuer nào rồi construct một `ReactiveAuthenticationManager` từ issuer đó.
+Issuer phải là issuer mà code có thể verify từ một trusted source, chẳng hạn như allowlist các issuer.
 ====

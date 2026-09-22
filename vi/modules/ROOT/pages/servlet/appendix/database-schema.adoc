@@ -1,15 +1,15 @@
 [[appendix-schema]]
-= Lược đồ cơ sở dữ liệu của Security
-Framework sử dụng nhiều lược đồ cơ sở dữ liệu khác nhau. Phụ lục này cung cấp một nơi tham chiếu duy nhất cho tất cả các lược đồ đó.
-Bạn chỉ cần cung cấp các bảng cho những khu vực chức năng mà bạn yêu cầu.
+= Database Schema của Spring Security
+Framework sử dụng nhiều database schema khác nhau. Phụ lục này cung cấp một nơi tham chiếu duy nhất cho tất cả các schema đó.
+Bạn chỉ cần cung cấp các table cho những functionality mình yêu cầu.
 
-Các câu lệnh DDL được cung cấp cho cơ sở dữ liệu HSQLDB.
-Bạn có thể sử dụng chúng làm hướng dẫn để định nghĩa lược đồ cho cơ sở dữ liệu mà bạn đang sử dụng.
+Các DDL statement được cung cấp cho HSQLDB database.
+Bạn có thể dùng chúng làm guideline khi định nghĩa schema cho database mình đang sử dụng.
 
 
-== Lược đồ User
-Triển khai JDBC tiêu chuẩn của `UserDetailsService` (`JdbcDaoImpl`) yêu cầu các bảng để tải password, trạng thái tài khoản (`enabled` hoặc `disabled`) và danh sách authority (role) của user.
-Bạn có thể sử dụng chúng làm hướng dẫn để định nghĩa lược đồ cho cơ sở dữ liệu mà bạn sử dụng.
+== User Schema
+JDBC implementation tiêu chuẩn của `UserDetailsService` (`JdbcDaoImpl`) yêu cầu các table để load password, account status (`enabled` hoặc `disabled`) và danh sách authority (role) của user.
+Bạn có thể dùng chúng làm guideline khi định nghĩa schema cho database mình sử dụng.
 
 [source]
 ----
@@ -28,9 +28,9 @@ create table authorities (
 create unique index ix_auth_username on authorities (username,authority);
 ----
 
-=== Đối với cơ sở dữ liệu Oracle
+=== Với Oracle database
 
-Danh sách sau đây trình bày biến thể Oracle của các câu lệnh tạo lược đồ:
+Listing sau đây trình bày Oracle variant của các statement dùng để tạo schema:
 
 [source]
 ----
@@ -49,10 +49,10 @@ ALTER TABLE AUTHORITIES ADD CONSTRAINT AUTHORITIES_UNIQUE UNIQUE (USERNAME, AUTH
 ALTER TABLE AUTHORITIES ADD CONSTRAINT AUTHORITIES_FK1 FOREIGN KEY (USERNAME) REFERENCES USERS (USERNAME) ENABLE;
 ----
 
-=== Authority theo nhóm
-Spring Security 2.0 đã giới thiệu hỗ trợ authority theo nhóm trong `JdbcDaoImpl`.
-Cấu trúc bảng khi các nhóm được bật như sau.
-Bạn cần điều chỉnh lược đồ sau cho phù hợp với dialect cơ sở dữ liệu mà bạn sử dụng:
+=== Group Authorities
+Spring Security 2.0 đã giới thiệu support cho group authorities trong `JdbcDaoImpl`.
+Cấu trúc table khi enable group như sau.
+Bạn cần điều chỉnh schema sau cho phù hợp với database dialect đang sử dụng:
 
 [source]
 ----
@@ -76,14 +76,14 @@ create table group_members (
 );
 ----
 
-Hãy nhớ rằng các bảng này chỉ bắt buộc nếu bạn sử dụng triển khai JDBC `UserDetailsService` được cung cấp.
-Nếu bạn tự viết triển khai của mình hoặc chọn triển khai `AuthenticationProvider` mà không có `UserDetailsService`, bạn hoàn toàn tự do trong cách lưu trữ dữ liệu, miễn là đáp ứng được hợp đồng của interface.
+Hãy nhớ rằng các table này chỉ cần thiết nếu bạn sử dụng JDBC implementation `UserDetailsService` được cung cấp.
+Nếu tự viết implementation hoặc chọn implement `AuthenticationProvider` mà không dùng `UserDetailsService`, bạn hoàn toàn tự do về cách store data, miễn là đáp ứng interface contract.
 
 
-== Lược đồ Persistent Login (Remember-Me)
-Bảng này được sử dụng để lưu trữ dữ liệu mà triển khai remember-me <<remember-me-persistent-token,persistent token>> an toàn hơn sử dụng.
-Nếu bạn sử dụng `JdbcTokenRepositoryImpl` trực tiếp hoặc thông qua namespace, bạn cần bảng này.
-Hãy nhớ điều chỉnh lược đồ này cho phù hợp với dialect cơ sở dữ liệu mà bạn sử dụng:
+== Persistent Login (Remember-Me) Schema
+Table này được dùng để lưu data cho remember-me implementation sử dụng <<remember-me-persistent-token,persistent token>>, vốn an toàn hơn.
+Nếu sử dụng `JdbcTokenRepositoryImpl` trực tiếp hoặc thông qua namespace, bạn cần table này.
+Hãy nhớ điều chỉnh schema này cho phù hợp với database dialect đang sử dụng:
 
 [source]
 ----
@@ -98,26 +98,26 @@ create table persistent_logins (
 ----
 
 [[dbschema-acl]]
-== Lược đồ ACL
-Triển khai xref:servlet/authorization/acls.adoc#domain-acls[ACL] của Spring Security sử dụng bốn bảng.
+== ACL Schema
+Implementation xref:servlet/authorization/acls.adoc#domain-acls[ACL] của Spring Security sử dụng bốn table.
 
-* `acl_sid` lưu trữ các security identity được hệ thống ACL nhận diện.
-Các identity này có thể là principal hoặc authority duy nhất, và có thể áp dụng cho nhiều principal.
-* `acl_class` định nghĩa các kiểu domain object mà ACL áp dụng.
-Cột `class` lưu trữ tên Java class của object.
-* `acl_object_identity` lưu trữ các định nghĩa object identity của những domain object cụ thể.
-* `acl_entry` lưu trữ các ACL permission, mỗi permission áp dụng cho một object identity và security identity cụ thể.
+* `acl_sid` lưu các security identity được ACL system nhận diện.
+Các identity này có thể là các principal hoặc authority riêng lẻ, và có thể áp dụng cho nhiều principal.
+* `acl_class` định nghĩa các type của domain object mà ACL áp dụng.
+Column `class` lưu Java class name của object.
+* `acl_object_identity` lưu các object identity definition của những domain object cụ thể.
+* `acl_entry` lưu các ACL permission; mỗi permission áp dụng cho một object identity và security identity cụ thể.
 
-Chúng tôi giả định rằng cơ sở dữ liệu tự động tạo primary key cho từng identity.
-`JdbcMutableAclService` phải có khả năng truy xuất các khóa này sau khi tạo một row mới trong bảng `acl_sid` hoặc `acl_class`.
-Nó có hai property định nghĩa SQL cần thiết để truy xuất các giá trị này là `classIdentityQuery` và `sidIdentityQuery`.
+Giả định rằng database tự động generate primary key cho từng identity.
+`JdbcMutableAclService` phải có khả năng retrieve các key này sau khi tạo một row mới trong table `acl_sid` hoặc `acl_class`.
+Nó có hai property định nghĩa SQL cần thiết để retrieve các value này: `classIdentityQuery` và `sidIdentityQuery`.
 Cả hai đều mặc định là `call identity()`
 
-ACL artifact JAR chứa các file để tạo lược đồ ACL trong HyperSQL (HSQLDB), PostgreSQL, MySQL/MariaDB, Microsoft SQL Server và Oracle Database.
-Các lược đồ này cũng được minh họa trong các phần sau.
+ACL artifact JAR chứa các file để tạo ACL schema trong HyperSQL (HSQLDB), PostgreSQL, MySQL/MariaDB, Microsoft SQL Server và Oracle Database.
+Các schema này cũng được minh họa trong các section sau.
 
 === HyperSQL
-Lược đồ mặc định hoạt động với cơ sở dữ liệu HSQLDB được nhúng, vốn được sử dụng trong các unit test của framework.
+Default schema hoạt động với embedded HSQLDB database, vốn được sử dụng trong các unit test của framework.
 
 [source,ddl]
 ----
@@ -164,7 +164,7 @@ create table acl_entry(
 
 === PostgreSQL
 
-Đối với PostgreSQL, bạn phải đặt các property `classIdentityQuery` và `sidIdentityQuery` của `JdbcMutableAclService` lần lượt thành các giá trị sau:
+Đối với PostgreSQL, bạn phải set các property `classIdentityQuery` và `sidIdentityQuery` của `JdbcMutableAclService` lần lượt thành các value sau:
 
 * `select currval(pg_get_serial_sequence('acl_class', 'id'))`
 * `select currval(pg_get_serial_sequence('acl_sid', 'id'))`
@@ -371,9 +371,9 @@ END;
 ----
 
 [[dbschema-oauth2-client]]
-== Lược đồ OAuth 2.0 Client
-Triển khai JDBC của xref:servlet/oauth2/client/core.adoc#oauth2Client-authorized-repo-service[ `OAuth2AuthorizedClientService`] (`JdbcOAuth2AuthorizedClientService`) yêu cầu một bảng để lưu các instance `OAuth2AuthorizedClient`.
-Bạn sẽ cần điều chỉnh lược đồ này cho phù hợp với dialect cơ sở dữ liệu mà bạn sử dụng.
+== OAuth 2.0 Client Schema
+JDBC implementation của xref:servlet/oauth2/client/core.adoc#oauth2Client-authorized-repo-service[ `OAuth2AuthorizedClientService`] (`JdbcOAuth2AuthorizedClientService`) yêu cầu một table để persist các instance `OAuth2AuthorizedClient`.
+Bạn sẽ cần điều chỉnh schema này cho phù hợp với database dialect đang sử dụng.
 
 [source,ddl]
 ----

@@ -3,7 +3,7 @@
 :figures: servlet/authentication/kerberos
 
 Phần này của tài liệu tham khảo giới thiệu các dự án mẫu. Có thể biên
-dịch các mẫu thủ công bằng cách xây dựng bản phân phối chính từ
+dịch các mẫu thủ công bằng cách build main distribution từ
 https://github.com/spring-projects/spring-security-kerberos.
 
 [IMPORTANT]
@@ -14,10 +14,10 @@ cấu hình chính xác. Xem các ghi chú bên dưới cho từng mẫu cụ th
 
 <<samples-sec-server-win-auth>> mẫu cho môi trường Windows
 
-<<samples-sec-server-client-auth>> mẫu sử dụng trình xác thực phía server
+<<samples-sec-server-client-auth>> mẫu sử dụng server-side authenticator
 
-<<samples-sec-server-spnego-form-auth>> mẫu sử dụng việc kiểm tra tính hợp lệ của ticket
-với spnego và form
+<<samples-sec-server-spnego-form-auth>> mẫu sử dụng ticket validation
+với Spnego và form
 
 <<samples-sec-client-rest-template>> mẫu cho KerberosRestTemplate
 
@@ -82,8 +82,8 @@ image::{figures}/ff3.png[]
 
 [[samples-sec-server-client-auth]]
 == Mẫu xác thực phía server của Security Server
-Mẫu này minh họa cách server có thể thực hiện authentication cho người dùng
-với môi trường Kerberos bằng credential của họ được truyền qua form login.
+Mẫu này minh họa cách server có thể authenticate user trong môi trường Kerberos
+bằng credential của user được truyền qua form login.
 
 Chạy một server.
 [source,text,subs="attributes"]
@@ -100,8 +100,8 @@ server:
 [[samples-sec-server-spnego-form-auth]]
 == Mẫu xác thực Spnego và Form của Security Server
 Mẫu này minh họa cách cấu hình server để chấp nhận thương lượng dựa trên
-Spnego từ trình duyệt, đồng thời vẫn có thể chuyển về authentication
-dựa trên form.
+Spnego từ trình duyệt, đồng thời vẫn có thể fallback về form-based
+authentication.
 
 Sử dụng principal `user1`, xref:servlet/authentication/kerberos/appendix.adoc#setupmitkerberos[Thiết lập MIT Kerberos],
 thực hiện đăng nhập Kerberos thủ công bằng credential.

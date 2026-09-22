@@ -3,11 +3,11 @@
 
 == Authentication
 
-* https://github.com/spring-projects/spring-security/issues/17655[gh-17655] - Đặt việc xref:servlet/authentication/onetimetoken.adoc#validating-account-status[kiểm tra trạng thái tài khoản] của One-Time Token thành tùy chọn
+* https://github.com/spring-projects/spring-security/issues/17655[gh-17655] - Đặt việc xref:servlet/authentication/onetimetoken.adoc#validating-account-status[kiểm tra trạng thái tài khoản] của One-Time Token ở chế độ opt-in
 
 == Web
 
-* Vì `HttpMethod#valueOf` của Spring Framework hiện chuẩn hóa cách viết hoa/thường, `StrictServerWebExchangeFirewall` không còn phát hiện một phương thức HTTP có cách viết hoa/thường không chuẩn (ví dụ `get` thay vì `GET`) là một giá trị riêng biệt; các request như vậy được xử lý theo phương thức chuẩn thay vì bị từ chối. Các ứng dụng đã tùy chỉnh `ServerExchangeRejectedHandler` cần lưu ý rằng handler này không còn được gọi trong trường hợp này.
+* Vì `HttpMethod#valueOf` của Spring Framework hiện chuẩn hóa casing, `StrictServerWebExchangeFirewall` không còn detect một HTTP method có casing không canonical (ví dụ `get` thay vì `GET`) là một value riêng biệt; các request như vậy được process theo canonical method thay vì bị reject. Các application đã customize `ServerExchangeRejectedHandler` cần lưu ý rằng handler này không còn được invoke trong trường hợp này.
 
 == OAuth 2.0
 

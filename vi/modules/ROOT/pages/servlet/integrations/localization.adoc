@@ -1,16 +1,16 @@
 [[localization]]
 = Bản địa hóa
-Spring Security hỗ trợ bản địa hóa các thông báo ngoại lệ mà người dùng cuối có thể nhìn thấy.
-Nếu ứng dụng của bạn được thiết kế cho người dùng nói tiếng Anh, bạn không cần làm gì vì theo mặc định, tất cả thông báo Security đều bằng tiếng Anh.
+Spring Security hỗ trợ bản địa hóa các exception message mà người dùng cuối có khả năng nhìn thấy.
+Nếu ứng dụng của bạn được thiết kế cho người dùng nói tiếng Anh, bạn không cần làm gì vì theo mặc định, tất cả message của Spring Security đều bằng tiếng Anh.
 Nếu cần hỗ trợ các locale khác, phần này cung cấp mọi thông tin bạn cần biết.
 
-Tất cả thông báo ngoại lệ, bao gồm các thông báo liên quan đến lỗi authentication và việc bị từ chối truy cập (lỗi authorization), đều có thể được bản địa hóa.
-Các ngoại lệ và thông báo logging tập trung vào developer hoặc người triển khai hệ thống (bao gồm thuộc tính không chính xác, vi phạm contract của interface, sử dụng constructor không chính xác, validation lúc khởi động và logging mức debug) không được bản địa hóa mà được ghi cứng bằng tiếng Anh trong code của Spring Security.
+Tất cả exception message đều có thể được bản địa hóa, bao gồm các message liên quan đến authentication failure và access bị từ chối (authorization failure).
+Các exception và logging message dành cho developer hoặc người deploy system (bao gồm attribute không chính xác, vi phạm interface contract, sử dụng constructor không chính xác, validation tại startup và logging ở debug level) không được bản địa hóa mà được hard-code bằng tiếng Anh trong code của Spring Security.
 
-Trong `spring-security-core-xx.jar`, bạn sẽ tìm thấy package `org.springframework.security`, package này chứa file `messages.properties` cùng các phiên bản được bản địa hóa cho một số ngôn ngữ phổ biến.
-`ApplicationContext` của bạn nên tham chiếu đến file này, vì các class của Spring Security implement interface `MessageSourceAware` của Spring và mong đợi message resolver được dependency injection vào lúc application context khởi động.
-Thông thường, tất cả việc bạn cần làm là đăng ký một bean bên trong application context để tham chiếu đến các thông báo.
-Đoạn liệt kê sau đây cho thấy một ví dụ:
+Trong `spring-security-core-xx.jar`, bạn sẽ tìm thấy package `org.springframework.security`, package này chứa file `messages.properties` cùng các phiên bản đã được bản địa hóa cho một số ngôn ngữ phổ biến.
+`ApplicationContext` của bạn nên tham chiếu đến file này, vì các class của Spring Security implement interface `MessageSourceAware` của Spring và mong đợi message resolver được inject vào application context bằng dependency injection khi application context khởi động.
+Thông thường, tất cả việc bạn cần làm là đăng ký một bean trong application context để tham chiếu đến các message.
+Ví dụ sau đây cho thấy cách thực hiện:
 
 [source,xml]
 ----
@@ -20,17 +20,17 @@ Thông thường, tất cả việc bạn cần làm là đăng ký một bean b
 </bean>
 ----
 
-File `messages.properties` được đặt tên theo quy ước của resource bundle tiêu chuẩn và đại diện cho ngôn ngữ mặc định được các thông báo của Spring Security hỗ trợ.
+File `messages.properties` được đặt tên theo quy ước của resource bundle tiêu chuẩn và đại diện cho ngôn ngữ mặc định của các message được Spring Security hỗ trợ.
 File mặc định này bằng tiếng Anh.
 
-Để tùy chỉnh file `messages.properties` hoặc hỗ trợ các ngôn ngữ khác, bạn nên sao chép file, đổi tên file cho phù hợp rồi đăng ký file bên trong bean definition ở trên.
-File này không chứa quá nhiều message key, vì vậy không nên xem việc bản địa hóa là một nỗ lực lớn.
-Nếu thực hiện bản địa hóa file này, hãy cân nhắc chia sẻ công việc của bạn với cộng đồng bằng cách tạo một JIRA task và đính kèm phiên bản `messages.properties` đã được bản địa hóa với tên phù hợp.
+Để tùy chỉnh file `messages.properties` hoặc hỗ trợ các ngôn ngữ khác, bạn nên sao chép file, đổi tên file cho phù hợp rồi đăng ký file trong bean definition ở trên.
+File này không có nhiều message key, vì vậy không nên xem việc bản địa hóa là một công việc lớn.
+Nếu thực hiện bản địa hóa file này, hãy cân nhắc chia sẻ công việc của bạn với cộng đồng bằng cách log một JIRA task và đính kèm bản `messages.properties` đã được bản địa hóa, được đặt tên phù hợp.
 
-Spring Security dựa vào khả năng hỗ trợ bản địa hóa của Spring để thực sự tra cứu thông báo phù hợp.
-Để điều này hoạt động, bạn phải bảo đảm locale từ request đến được lưu trong `org.springframework.context.i18n.LocaleContextHolder` của Spring.
+Spring Security dựa vào cơ chế hỗ trợ bản địa hóa của Spring để thực sự tra cứu message phù hợp.
+Để điều này hoạt động, bạn phải bảo đảm locale của incoming request được lưu trong `org.springframework.context.i18n.LocaleContextHolder` của Spring.
 `DispatcherServlet` của Spring MVC tự động thực hiện việc này cho ứng dụng của bạn. Tuy nhiên, vì các filter của Spring Security được gọi trước thời điểm đó, `LocaleContextHolder` cần được thiết lập để chứa `Locale` chính xác trước khi các filter được gọi.
-Bạn có thể tự thực hiện việc này trong một filter (filter này phải đứng trước các filter của Spring Security trong `web.xml`) hoặc sử dụng `RequestContextFilter` của Spring.
+Bạn có thể tự thực hiện việc này trong một filter (filter này phải được đặt trước các filter của Spring Security trong `web.xml`) hoặc sử dụng `RequestContextFilter` của Spring.
 Xem tài liệu Spring Framework để biết thêm chi tiết về việc sử dụng bản địa hóa với Spring.
 
-Ứng dụng mẫu `contacts` được thiết lập để sử dụng các thông báo đã được bản địa hóa.
+Ứng dụng mẫu `contacts` được thiết lập để sử dụng các message đã được bản địa hóa.

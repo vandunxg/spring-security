@@ -2,22 +2,22 @@
 = Authentication
 
 Spring Security cung cấp hỗ trợ toàn diện cho xref:features/authentication/index.adoc#authentication[Authentication].
-Chúng ta bắt đầu bằng việc thảo luận về xref:servlet/authentication/architecture.adoc[Kiến trúc Authentication của Servlet] tổng thể.
-Như bạn có thể mong đợi, phần này mang tính trừu tượng hơn, mô tả kiến trúc mà không thảo luận nhiều về cách kiến trúc này áp dụng vào các luồng cụ thể.
+Chúng ta bắt đầu bằng việc thảo luận tổng thể về xref:servlet/authentication/architecture.adoc[Kiến trúc Authentication trong Servlet].
+Như bạn mong đợi, phần này mang tính trừu tượng hơn, mô tả kiến trúc mà không đi sâu vào cách kiến trúc này áp dụng cho các flow cụ thể.
 
-Nếu muốn, bạn có thể tham khảo <<servlet-authentication-mechanisms,Các cơ chế Authentication>> để biết những cách cụ thể người dùng có thể thực hiện authentication.
-Các phần này tập trung vào những cách cụ thể mà bạn có thể muốn sử dụng để thực hiện authentication và dẫn ngược về các phần kiến trúc để mô tả cách những luồng cụ thể hoạt động.
+Nếu muốn, bạn có thể tham khảo <<servlet-authentication-mechanisms,Các cơ chế Authentication>> để biết những cách cụ thể mà user có thể authenticate.
+Các phần này tập trung vào những cách cụ thể mà bạn có thể muốn dùng để authenticate, đồng thời tham chiếu ngược đến các phần về kiến trúc để mô tả cách các flow cụ thể hoạt động.
 
 [[servlet-authentication-mechanisms]]
 == Các cơ chế Authentication
 
 // FIXME: mô tả ngắn
 
-* xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd[Tên người dùng và mật khẩu] - cách thực hiện authentication bằng tên người dùng/mật khẩu
+* xref:servlet/authentication/passwords/index.adoc#servlet-authentication-unpwd[Tên người dùng và mật khẩu] - cách authenticate bằng username/password
 * xref:servlet/oauth2/login/index.adoc#oauth2login[Đăng nhập OAuth 2.0] - Đăng nhập OAuth 2.0 với OpenID Connect và OAuth 2.0 Login không theo chuẩn (tức là GitHub)
 * xref:servlet/saml2/index.adoc#servlet-saml2[Đăng nhập SAML 2.0] - Đăng nhập SAML 2.0
 * xref:servlet/authentication/cas.adoc#servlet-cas[Central Authentication Server (CAS)] - Hỗ trợ Central Authentication Server (CAS)
-* xref:servlet/authentication/rememberme.adoc#servlet-rememberme[remember-me] - cách ghi nhớ người dùng sau khi session hết hạn
-* xref:servlet/authentication/jaas.adoc#servlet-jaas[JAAS Authentication] - thực hiện authentication bằng JAAS
-* xref:servlet/authentication/preauth.adoc#servlet-preauth[Các kịch bản Pre-Authentication] - thực hiện authentication bằng một cơ chế bên ngoài như https://www.siteminder.com/[SiteMinder] hoặc bảo mật Java EE nhưng vẫn sử dụng Spring Security cho authorization và bảo vệ khỏi các khai thác phổ biến.
-* xref:servlet/authentication/x509.adoc#servlet-x509[X509 Authentication] - Authentication X509
+* xref:servlet/authentication/rememberme.adoc#servlet-rememberme[Remember Me] - cách ghi nhớ user sau khi session hết hạn
+* xref:servlet/authentication/jaas.adoc#servlet-jaas[JAAS Authentication] - authenticate bằng JAAS
+* xref:servlet/authentication/preauth.adoc#servlet-preauth[Các kịch bản Pre-Authentication] - authenticate bằng một cơ chế bên ngoài như https://www.siteminder.com/[SiteMinder] hoặc bảo mật Java EE nhưng vẫn sử dụng Spring Security cho authorization và bảo vệ khỏi các khai thác phổ biến.
+* xref:servlet/authentication/x509.adoc#servlet-x509[X509 Authentication] - X509 Authentication

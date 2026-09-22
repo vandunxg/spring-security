@@ -2,9 +2,9 @@
 = OAuth 2.0 Client
 :page-section-summary-toc: 1
 
-Các tính năng OAuth 2.0 Client cung cấp hỗ trợ cho vai trò Client được định nghĩa trong https://tools.ietf.org/html/rfc6749#section-1.1[OAuth 2.0 Authorization Framework].
+Các tính năng của OAuth 2.0 Client hỗ trợ vai trò Client được định nghĩa trong https://tools.ietf.org/html/rfc6749#section-1.1[OAuth 2.0 Authorization Framework].
 
-Ở mức tổng quan, các tính năng cốt lõi hiện có gồm:
+Ở mức khái quát, các tính năng cốt lõi gồm:
 
 .Hỗ trợ Authorization Grant
 * xref:servlet/oauth2/client/authorization-grants.adoc#oauth2-client-authorization-code[Authorization Code]
@@ -16,12 +16,12 @@ Các tính năng OAuth 2.0 Client cung cấp hỗ trợ cho vai trò Client đư
 .Hỗ trợ Client Authentication
 * xref:servlet/oauth2/client/client-authentication.adoc#oauth2-client-authentication-jwt-bearer[JWT Bearer]
 
-.Hỗ trợ HTTP Client (để yêu cầu các tài nguyên được bảo vệ)
+.Hỗ trợ HTTP Client (để request các resource được bảo vệ)
 * xref:servlet/oauth2/client/authorized-clients.adoc#oauth2-client-rest-client[Tích hợp `RestClient`]
 * xref:servlet/oauth2/client/authorized-clients.adoc#oauth2-client-web-client[Tích hợp `WebClient` cho môi trường Servlet]
 
 DSL `HttpSecurity.oauth2Client()` cung cấp một số tùy chọn cấu hình để tùy chỉnh các thành phần cốt lõi được OAuth 2.0 Client sử dụng.
-Ngoài ra, `HttpSecurity.oauth2Client().authorizationCodeGrant()` cho phép tùy chỉnh Authorization Code grant.
+Ngoài ra, `HttpSecurity.oauth2Client().authorizationCodeGrant()` cho phép tùy chỉnh grant Authorization Code.
 
 Đoạn mã sau đây cho thấy đầy đủ các tùy chọn cấu hình do DSL `HttpSecurity.oauth2Client()` cung cấp:
 

@@ -2,15 +2,15 @@
 = [[oauth2Client-client-auth-support]]Hỗ trợ Client Authentication
 
 [[oauth2-client-authentication-client-credentials]]
-== [[oauth2Client-client-credentials-auth]]Credential của client
+== [[oauth2Client-client-credentials-auth]]Client Credentials
 
 [[oauth2-client-authentication-client-credentials-client-secret-basic]]
-=== Xác thực bằng `client_secret_basic`
+=== Authentication bằng `client_secret_basic`
 
-Client Authentication với HTTP Basic được hỗ trợ sẵn và không cần tùy chỉnh để bật tính năng này.
-Triển khai mặc định được cung cấp bởi `DefaultOAuth2TokenRequestHeadersConverter`.
+Client Authentication với HTTP Basic được hỗ trợ sẵn, không cần tùy chỉnh để bật tính năng này.
+Implementation mặc định được cung cấp bởi `DefaultOAuth2TokenRequestHeadersConverter`.
 
-Với các property Spring Boot sau đây dành cho một đăng ký client OAuth 2.0:
+Với các property Spring Boot sau đây cho một OAuth 2.0 client registration:
 
 [source,yaml]
 ----
@@ -27,7 +27,7 @@ spring:
             ...
 ----
 
-Ví dụ sau cho thấy cách cấu hình `RestClientAuthorizationCodeTokenResponseClient` để tắt việc mã hóa URL cho credential của client:
+Ví dụ sau đây cho thấy cách cấu hình `RestClientAuthorizationCodeTokenResponseClient` để tắt URL encoding đối với client credentials:
 
 [tabs]
 ======
@@ -57,11 +57,11 @@ tokenResponseClient.setHeadersConverter(headersConverter)
 ======
 
 [[oauth2-client-authentication-client-credentials-client-secret-post]]
-=== Xác thực bằng `client_secret_post`
+=== Authentication bằng `client_secret_post`
 
-Client Authentication với credential của client được đưa vào request body được hỗ trợ sẵn và không cần tùy chỉnh để bật tính năng này.
+Client Authentication với client credentials được đưa vào request body được hỗ trợ sẵn, không cần tùy chỉnh để bật tính năng này.
 
-Các property Spring Boot sau đây dành cho một đăng ký client OAuth 2.0 minh họa cấu hình này:
+Các property Spring Boot sau đây cho một OAuth 2.0 client registration minh họa cấu hình này:
 
 [source,yaml]
 ----
@@ -83,20 +83,20 @@ spring:
 
 [NOTE]
 ====
-Tham khảo Hồ sơ JSON Web Token (JWT) cho Client Authentication và các Authorization Grant của OAuth 2.0 để biết thêm chi tiết về https://datatracker.ietf.org/doc/html/rfc7523#section-2.2[JWT Bearer] Client Authentication.
+Tham khảo JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants để biết thêm chi tiết về https://datatracker.ietf.org/doc/html/rfc7523#section-2.2[JWT Bearer] Client Authentication.
 ====
 
-Triển khai mặc định cho JWT Bearer Client Authentication là `NimbusJwtClientAuthenticationParametersConverter`,
-đây là một `Converter` tùy chỉnh các tham số Token Request bằng cách thêm
-một JSON Web Token (JWS) đã ký vào tham số `client_assertion`.
+Implementation mặc định cho JWT Bearer Client Authentication là `NimbusJwtClientAuthenticationParametersConverter`,
+đây là một `Converter` tùy chỉnh các parameters của Token Request bằng cách thêm
+một JSON Web Token (JWS) đã ký vào parameter `client_assertion`.
 
 `java.security.PrivateKey` hoặc `javax.crypto.SecretKey` được dùng để ký JWS
 được cung cấp bởi resolver `com.nimbusds.jose.jwk.JWK` liên kết với `NimbusJwtClientAuthenticationParametersConverter`.
 
 [[oauth2-client-authentication-jwt-bearer-private-key-jwt]]
-=== Xác thực bằng `private_key_jwt`
+=== Authentication bằng `private_key_jwt`
 
-Với các property Spring Boot sau đây dành cho một đăng ký Client OAuth 2.0:
+Với các property Spring Boot sau đây cho một OAuth 2.0 Client registration:
 
 [source,yaml]
 ----
@@ -165,9 +165,9 @@ tokenResponseClient.addParametersConverter(
 ======
 
 [[oauth2-client-authentication-jwt-bearer-client-secret-jwt]]
-=== Xác thực bằng `client_secret_jwt`
+=== Authentication bằng `client_secret_jwt`
 
-Với các property Spring Boot sau đây dành cho một đăng ký Client OAuth 2.0:
+Với các property Spring Boot sau đây cho một OAuth 2.0 Client registration:
 
 [source,yaml]
 ----
@@ -271,11 +271,11 @@ converter.setJwtClientAssertionCustomizer { context ->
 ======
 
 [[oauth2-client-authentication-public]]
-== [[oauth2Client-public-auth]]Authentication công khai
+== [[oauth2Client-public-auth]]Public Authentication
 
-Authentication của Public Client được hỗ trợ sẵn và không cần tùy chỉnh để bật tính năng này.
+Public Client Authentication được hỗ trợ sẵn và không cần tùy chỉnh để bật tính năng này.
 
-Các property Spring Boot sau đây dành cho một đăng ký client OAuth 2.0 minh họa cấu hình này:
+Các property Spring Boot sau đây cho một OAuth 2.0 client registration minh họa cấu hình này:
 
 [source,yaml]
 ----
@@ -293,6 +293,6 @@ spring:
 
 [NOTE]
 ====
-Public Client được hỗ trợ bằng https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange] (PKCE).
+Public Clients được hỗ trợ bằng cách sử dụng https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange] (PKCE).
 PKCE sẽ được tự động sử dụng khi `client-authentication-method` được đặt thành "none" (`ClientAuthenticationMethod.NONE`).
 ====

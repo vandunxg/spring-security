@@ -1,8 +1,8 @@
-= Di chuyển SAML 2.0 Extension
+= Migration SAML 2.0 Extension
 
-Tài liệu này cung cấp hướng dẫn chuyển các Service Provider SAML 2.0 từ Spring Security SAML Extensions 1.x sang Spring Security. Vì Spring Security không cung cấp hỗ trợ Identity Provider, việc di chuyển một Identity Provider của Spring Security SAML Extensions nằm ngoài phạm vi tài liệu này.
+Tài liệu này cung cấp hướng dẫn thực hiện migration cho các SAML 2.0 Service Provider từ Spring Security SAML Extensions 1.x sang Spring Security. Vì Spring Security không cung cấp hỗ trợ cho Identity Provider, migration cho một Identity Provider của Spring Security SAML Extensions nằm ngoài phạm vi tài liệu này.
 
-Do hai cách tiếp cận khác nhau đáng kể, tài liệu này thường tập trung vào các mẫu hơn là các bước tìm và thay thế chính xác.
+Do hai cách tiếp cận rất khác nhau, tài liệu này sẽ tập trung vào các pattern hơn là các bước search-and-replace cụ thể.
 
 [[saml2-login-logout]]
 == Đăng nhập & Đăng xuất
@@ -11,26 +11,26 @@ Do hai cách tiếp cận khác nhau đáng kể, tài liệu này thường t�
 
 https://github.com/spring-projects/spring-security[Spring Security] có cách tiếp cận hơi khác https://github.com/spring-projects/spring-security-saml[Spring Security SAML Extensions] theo một số khía cạnh đáng chú ý.
 
-==== Bật đơn giản hơn
+==== Enable đơn giản hơn
 
-Hỗ trợ Service Provider của Spring Security SAML Extensions được cung cấp bởi một loạt filter, được bật bằng cách thêm thủ công từng filter theo đúng thứ tự vào nhiều filter chain của Spring Security.
+Hỗ trợ Service Provider của Spring Security SAML Extensions được cung cấp bởi một loạt filter, được enable bằng cách thêm thủ công từng filter theo đúng thứ tự vào các Spring Security filter chain khác nhau.
 
-Hỗ trợ Service Provider SAML 2.0 của Spring Security được bật thông qua các method DSL của Spring Security:
+Hỗ trợ SAML 2.0 Service Provider của Spring Security được enable thông qua các method DSL của Spring Security:
 xref:servlet/saml2/login/index.adoc[`saml2Login`],
 xref:servlet/saml2/logout.adoc[`saml2Logout`], và
-xref:servlet/saml2/metadata.adoc[`saml2Metadata`]. Hỗ trợ này chọn các filter phù hợp để thêm và đặt chúng vào vị trí thích hợp trong filter chain.
+xref:servlet/saml2/metadata.adoc[`saml2Metadata`]. Cấu hình này chọn các filter phù hợp để thêm và đặt chúng vào vị trí thích hợp trong filter chain.
 
-==== Đóng gói chặt chẽ hơn
+==== Encapsulation chặt chẽ hơn
 
-Giống như Spring Security SAML Extensions, Spring Security xây dựng hỗ trợ SAML dựa trên OpenSAML. Dự án Extensions cung cấp OpenSAML thông qua các interface public, làm mờ ranh giới giữa hai dự án, trên thực tế buộc phải sử dụng OpenSAML và khiến việc nâng cấp lên các phiên bản OpenSAML mới hơn phức tạp hơn.
+Giống như Spring Security SAML Extensions, Spring Security xây dựng hỗ trợ SAML dựa trên OpenSAML. Dự án Extensions expose OpenSAML qua các public interface, làm mờ ranh giới giữa hai dự án, qua đó về thực chất buộc các ứng dụng phải sử dụng OpenSAML và khiến việc upgrade lên các version OpenSAML mới hơn phức tạp hơn.
 
-Spring Security cung cấp cơ chế đóng gói chặt chẽ hơn. Không có interface public nào công khai các thành phần OpenSAML và mọi class công khai OpenSAML trong public API của mình đều được đặt tên với tiền tố `OpenSaml` để rõ ràng hơn.
+Spring Security cung cấp encapsulation chặt chẽ hơn. Không có public interface nào expose các OpenSAML component và mọi class expose OpenSAML trong public API của mình đều được đặt tên với tiền tố `OpenSaml` để rõ ràng hơn.
 
 ==== Multitenancy tích hợp sẵn
 
-Spring Security SAML Extensions cung cấp một số hỗ trợ đơn giản cho việc khai báo nhiều hơn một Identity Provider và truy cập chúng tại thời điểm đăng nhập bằng tham số request `idp`. Điều này hạn chế khả năng thay đổi trong thời gian chạy và cũng không cho phép mối quan hệ nhiều-nhiều giữa các Relying Party và Asserting Party.
+Spring Security SAML Extensions cung cấp một số hỗ trợ đơn giản cho việc khai báo nhiều hơn một Identity Provider và truy cập chúng khi login bằng request parameter `idp`. Điều này hạn chế khả năng thay đổi khi runtime và cũng không cho phép mối quan hệ many-to-many giữa các Relying Party và Asserting Party.
 
-Spring Security tích hợp multitenancy SAML 2.0 vào các URL mặc định và thành phần cơ bản dưới dạng một `RelyingPartyRegistration`. Thành phần này hoạt động như một liên kết giữa metadata của một Relying Party và metadata của một Asserting Party, và mọi cặp đều có thể tra cứu trong một `RelyingPartyRegistrationRepository`. Mỗi URL đại diện cho một cặp đăng ký duy nhất để truy xuất.
+Spring Security tích hợp multitenancy SAML 2.0 vào các URL mặc định và component cơ bản dưới dạng một `RelyingPartyRegistration`. Component này hoạt động như một liên kết giữa metadata của một Relying Party và metadata của một Asserting Party, và mọi cặp đều có thể lookup trong một `RelyingPartyRegistrationRepository`. Mỗi URL đại diện cho một registration pair duy nhất để lookup.
 
 Dù là AuthnRequests, Responses, LogoutRequests, LogoutResponses hay EntityDescriptors, mỗi filter đều dựa trên `RelyingPartyRegistrationRepository` và vì vậy về bản chất là multi-tenant.
 
@@ -53,15 +53,15 @@ Bạn cũng có thể xem một ví dụ minh họa trong dự án GitHub của 
 
 [NOTE]
 ====
-Spring Security không hỗ trợ binding HTTP-Redirect cho các Response SAML 2.0.
-Theo đặc tả SAML, binding HTTP-Redirect không được phép dùng cho các SAML Response do giới hạn về độ dài URL và chữ ký. Việc cố sử dụng binding này có thể dẫn đến lỗi không mong muốn.
-Thay vào đó, hãy sử dụng binding HTTP-POST khi cấu hình Identity Provider.
+Spring Security không hỗ trợ HTTP-Redirect binding cho các SAML 2.0 Response.
+Theo đặc tả SAML, HTTP-Redirect binding không được phép dùng cho các SAML Response do giới hạn về độ dài URL và chữ ký. Việc cố sử dụng binding này có thể dẫn đến lỗi không mong muốn.
+Thay vào đó, hãy sử dụng HTTP-POST binding khi cấu hình Identity Provider.
 ====
 
 [[saml2-unported]]
-== Các tính năng chưa chuyển đổi
+== Các tính năng chưa được port
 
-Có một số tính năng chưa được chuyển đổi và hiện vẫn chưa có kế hoạch chuyển đổi chúng:
+Có một số tính năng chưa được port và hiện vẫn chưa có kế hoạch port chúng:
 
-* binding HTTP-Redirect cho các Response SAML 2.0
-* Hỗ trợ binding Artifact
+* HTTP-Redirect binding cho các SAML 2.0 Response
+* Hỗ trợ Artifact binding

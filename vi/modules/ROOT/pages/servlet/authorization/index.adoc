@@ -2,19 +2,18 @@
 = Authorization
 :page-section-summary-toc: 1
 
-Sau khi đã xác lập xref:servlet/authentication/index.adoc[cách người dùng sẽ thực hiện authentication], bạn cũng cần cấu hình các quy tắc authorization cho ứng dụng.
+Sau khi đã xác định xref:servlet/authentication/index.adoc[cách người dùng sẽ authenticate], bạn cũng cần cấu hình các authorization rule cho application.
 
 Các khả năng authorization nâng cao trong Spring Security là một trong những lý do thuyết phục nhất khiến framework này được ưa chuộng.
-Bất kể bạn chọn authentication như thế nào (dù sử dụng cơ chế và provider do Spring Security cung cấp hay tích hợp với một container hoặc authority authentication khác không thuộc Spring Security), các dịch vụ authorization đều có thể được sử dụng trong ứng dụng theo cách nhất quán và đơn giản.
+Bất kể bạn chọn cách authenticate nào (dù sử dụng mechanism và provider do Spring Security cung cấp hay tích hợp với một container hoặc một authentication authority khác không thuộc Spring Security), các authorization service đều có thể được sử dụng trong application theo cách nhất quán và đơn giản.
 
-Bạn nên cân nhắc gắn các quy tắc authorization vào xref:servlet/authorization/authorize-http-requests.adoc[URI của request] và xref:servlet/authorization/method-security.adoc[các method] ngay từ đầu.
-Trong cả hai trường hợp, bạn có thể lắng nghe và phản ứng với các xref:servlet/authorization/events.adoc[event authorization] được phát hành bởi mỗi lần kiểm tra authorization.
-Dưới đây cũng có nhiều thông tin chi tiết về xref:servlet/authorization/architecture.adoc[cách Spring Security thực hiện authorization] và cách tinh chỉnh nó sau khi đã thiết lập mô hình cơ bản.
+Bạn nên cân nhắc gắn các authorization rule vào xref:servlet/authorization/authorize-http-requests.adoc[request URI] và xref:servlet/authorization/method-security.adoc[method] ngay từ đầu.
+Trong cả hai trường hợp, bạn có thể lắng nghe và phản ứng với các xref:servlet/authorization/events.adoc[authorization event] được publish bởi mỗi authorization check.
+Phần dưới đây cũng có nhiều thông tin chi tiết về xref:servlet/authorization/architecture.adoc[cách Spring Security thực hiện authorization] và cách fine-tune authorization sau khi đã thiết lập mô hình cơ bản.
 
 [NOTE]
 ====
-Kể từ Spring Security 7, Access API (`AccessDecisionManager`, `AccessDecisionVoter`, etc.) được chuyển vào một module legacy là `spring-security-access`.
-Đối với ứng dụng mới, không cần đưa dependency này vào.
-Đối với các ứng dụng cũ chưa migration sang Authorization API, module này được cung cấp để hỗ trợ tiếp tục quá trình migration của bạn.
+Kể từ Spring Security 7, Access API (`AccessDecisionManager`, `AccessDecisionVoter`, etc.) được chuyển sang một legacy module là `spring-security-access`.
+Đối với application mới, bạn không cần include dependency này.
+Đối với các application cũ chưa migrate sang Authorization API, module này được cung cấp để hỗ trợ bạn tiếp tục migration.
 ====
-

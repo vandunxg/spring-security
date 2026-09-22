@@ -2,7 +2,7 @@
 = OAuth2 WebFlux
 
 Spring Security cung cấp hỗ trợ toàn diện cho OAuth 2.0.
-Phần này trình bày cách tích hợp OAuth 2.0 vào ứng dụng Reactive của bạn.
+Phần này trình bày cách tích hợp OAuth 2.0 vào ứng dụng reactive của bạn.
 
 [[oauth2-overview]]
 == Tổng quan
@@ -14,16 +14,16 @@ Hỗ trợ OAuth 2.0 của Spring Security gồm hai nhóm tính năng chính:
 
 [NOTE]
 ====
-<<oauth2-client-log-users-in,OAuth2 Login>> là một tính năng OAuth2 Client rất mạnh, xứng đáng có một phần riêng trong tài liệu tham khảo.
+<<oauth2-client-log-users-in,OAuth2 Login>> là một tính năng OAuth2 Client rất mạnh, xứng đáng có một mục riêng trong tài liệu tham khảo.
 Tuy nhiên, tính năng này không tồn tại độc lập mà cần OAuth2 Client để hoạt động.
 ====
 
 Các nhóm tính năng này bao quát vai trò _resource server_ và _client_ được định nghĩa trong https://tools.ietf.org/html/rfc6749#section-1.1[OAuth 2.0 Authorization Framework], còn vai trò _authorization server_ được https://docs.spring.io/spring-authorization-server/reference/index.html[Spring Authorization Server] đảm nhiệm. Đây là một dự án riêng được xây dựng trên xref:index.adoc[Spring Security].
 
-Các vai trò _resource server_ và _client_ trong OAuth2 thường được đại diện bởi một hoặc nhiều ứng dụng phía máy chủ.
-Ngoài ra, vai trò _authorization server_ có thể được đại diện bởi một hoặc nhiều bên thứ ba (như khi tập trung quản lý danh tính và/hoặc authentication trong một tổ chức) *-hoặc-* có thể được đại diện bởi một ứng dụng (như trường hợp của Spring Authorization Server).
+Các vai trò _resource server_ và _client_ trong OAuth2 thường do một hoặc nhiều ứng dụng phía server đảm nhiệm.
+Ngoài ra, vai trò _authorization server_ có thể do một hoặc nhiều bên thứ ba đảm nhiệm (như khi tập trung quản lý identity và/hoặc authentication trong một tổ chức) *-hoặc-* do một ứng dụng đảm nhiệm (như trường hợp của Spring Authorization Server).
 
-Ví dụ, một kiến trúc microservices dựa trên OAuth2 điển hình có thể gồm một ứng dụng client hướng tới người dùng, một số resource server backend cung cấp REST API và một authorization server của bên thứ ba để quản lý người dùng và các vấn đề authentication.
+Ví dụ, một kiến trúc microservices dựa trên OAuth2 điển hình có thể gồm một ứng dụng client phục vụ người dùng, một số resource server backend cung cấp REST API và một authorization server của bên thứ ba để quản lý user và authentication.
 Cũng thường gặp trường hợp một ứng dụng chỉ đại diện cho một trong các vai trò này nhưng cần tích hợp với một hoặc nhiều bên thứ ba cung cấp các vai trò còn lại.
 
 Spring Security xử lý các kịch bản này và nhiều kịch bản khác.
@@ -78,15 +78,15 @@ Hãy xem xét các trường hợp sử dụng sau của OAuth2 Resource Server:
 Việc bảo vệ quyền truy cập API bằng OAuth2 access token rất phổ biến.
 Trong hầu hết trường hợp, Spring Security chỉ yêu cầu cấu hình tối thiểu để bảo mật một ứng dụng bằng OAuth2.
 
-Spring Security hỗ trợ hai loại token `Bearer`, mỗi loại sử dụng một component khác nhau để validation:
+Spring Security hỗ trợ hai loại `Bearer` token, mỗi loại sử dụng một component khác nhau để validate:
 
-* <<oauth2-resource-server-access-token-jwt,Hỗ trợ JWT>> sử dụng bean `ReactiveJwtDecoder` để validation chữ ký và giải mã token
+* <<oauth2-resource-server-access-token-jwt,Hỗ trợ JWT>> sử dụng bean `ReactiveJwtDecoder` để validate signature và decode token
 * <<oauth2-resource-server-access-token-opaque,Hỗ trợ opaque token>> sử dụng bean `ReactiveOpaqueTokenIntrospector` để introspect token
 
 [[oauth2-resource-server-access-token-jwt]]
 ==== Hỗ trợ JWT
 
-Ví dụ sau cấu hình bean `ReactiveJwtDecoder` bằng các configuration properties của Spring Boot:
+Ví dụ sau cấu hình bean `ReactiveJwtDecoder` bằng configuration properties của Spring Boot:
 
 [source,yaml]
 ----
@@ -166,7 +166,7 @@ class SecurityConfig {
 [[oauth2-resource-server-access-token-opaque]]
 ==== Hỗ trợ Opaque Token
 
-Ví dụ sau cấu hình bean `ReactiveOpaqueTokenIntrospector` bằng các configuration properties của Spring Boot:
+Ví dụ sau cấu hình bean `ReactiveOpaqueTokenIntrospector` bằng configuration properties của Spring Boot:
 
 [source,yaml]
 ----
@@ -251,13 +251,13 @@ class SecurityConfig {
 [[oauth2-resource-server-custom-jwt]]
 === Bảo vệ quyền truy cập bằng custom JWT
 
-Bảo vệ quyền truy cập API bằng JWT là một nhu cầu khá phổ biến, đặc biệt khi frontend được phát triển dưới dạng single-page application.
-Hỗ trợ OAuth2 Resource Server trong Spring Security có thể dùng cho mọi loại token `Bearer`, bao gồm custom JWT.
+Bảo vệ quyền truy cập API bằng JWT là một nhu cầu khá phổ biến, đặc biệt khi frontend được xây dựng dưới dạng single-page application.
+Hỗ trợ OAuth2 Resource Server trong Spring Security có thể dùng cho bất kỳ loại `Bearer` token nào, bao gồm custom JWT.
 
-Để bảo vệ API bằng JWT, chỉ cần bean `ReactiveJwtDecoder`, được dùng để validation chữ ký và giải mã token.
-Spring Security sẽ tự động sử dụng bean được cung cấp để cấu hình việc bảo vệ trong `SecurityWebFilterChain`.
+Để bảo vệ API bằng JWT, chỉ cần một bean `ReactiveJwtDecoder`, dùng để validate signature và decode token.
+Spring Security sẽ tự động sử dụng bean được cung cấp để cấu hình bảo vệ trong `SecurityWebFilterChain`.
 
-Ví dụ sau cấu hình bean `ReactiveJwtDecoder` bằng các configuration properties của Spring Boot:
+Ví dụ sau cấu hình bean `ReactiveJwtDecoder` bằng configuration properties của Spring Boot:
 
 [source,yaml]
 ----
@@ -398,15 +398,15 @@ Hãy xem xét các trường hợp sử dụng sau của OAuth2 Client:
 * Tôi muốn <<oauth2-client-access-protected-resources-current-user,thực hiện cả hai việc>> (đăng nhập người dùng _và_ truy cập API của bên thứ ba)
 * Tôi muốn <<oauth2-client-enable-extension-grant-type,bật extension grant type>>
 * Tôi muốn <<oauth2-client-customize-existing-grant-type,tùy chỉnh grant type hiện có>>
-* Tôi muốn <<oauth2-client-customize-request-parameters,tùy chỉnh các token request parameter>>
-* Tôi muốn <<oauth2-client-customize-web-client,tùy chỉnh `WebClient` được các component OAuth2 Client sử dụng>>
+* Tôi muốn <<oauth2-client-customize-request-parameters,tùy chỉnh token request parameters>>
+* Tôi muốn <<oauth2-client-customize-web-client,tùy chỉnh `WebClient` mà các component OAuth2 Client sử dụng>>
 
 [[oauth2-client-log-users-in]]
 === Đăng nhập người dùng bằng OAuth2
 
-Yêu cầu người dùng đăng nhập thông qua OAuth2 là việc rất phổ biến.
+Việc yêu cầu người dùng đăng nhập qua OAuth2 rất phổ biến.
 https://openid.net/specs/openid-connect-core-1_0.html[OpenID Connect 1.0] cung cấp một token đặc biệt gọi là `id_token`, được thiết kế để cho phép OAuth2 Client xác minh danh tính người dùng và đăng nhập người dùng.
-Trong một số trường hợp, OAuth2 có thể được dùng trực tiếp để đăng nhập người dùng (như với các nhà cung cấp social login phổ biến không triển khai OpenID Connect, chẳng hạn GitHub và Facebook).
+Trong một số trường hợp, OAuth2 có thể được dùng trực tiếp để đăng nhập người dùng (như trường hợp các nhà cung cấp social login phổ biến không triển khai OpenID Connect, chẳng hạn GitHub và Facebook).
 
 Ví dụ sau cấu hình ứng dụng hoạt động như một OAuth2 Client có khả năng đăng nhập người dùng bằng OAuth2 hoặc OpenID Connect:
 
@@ -454,8 +454,8 @@ class SecurityConfig {
 ----
 =====
 
-Ngoài cấu hình trên, ứng dụng yêu cầu phải cấu hình ít nhất một `ClientRegistration` thông qua bean `ReactiveClientRegistrationRepository`.
-Ví dụ sau cấu hình bean `InMemoryReactiveClientRegistrationRepository` bằng các configuration properties của Spring Boot:
+Ngoài cấu hình trên, ứng dụng cần cấu hình ít nhất một `ClientRegistration` thông qua bean `ReactiveClientRegistrationRepository`.
+Ví dụ sau cấu hình bean `InMemoryReactiveClientRegistrationRepository` bằng configuration properties của Spring Boot:
 
 [source,yaml]
 ----
@@ -478,22 +478,22 @@ spring:
 Với cấu hình trên, ứng dụng hiện hỗ trợ thêm hai endpoint:
 
 1. Login endpoint (ví dụ `/oauth2/authorization/my-oidc-client`) được dùng để bắt đầu đăng nhập và redirect đến authorization server của bên thứ ba.
-2. Redirection endpoint (ví dụ `/login/oauth2/code/my-oidc-client`) được authorization server dùng để redirect trở lại ứng dụng client, và sẽ chứa parameter `code` dùng để lấy `id_token` và/hoặc `access_token` thông qua access token request.
+2. Redirection endpoint (ví dụ `/login/oauth2/code/my-oidc-client`) được authorization server dùng để redirect về client application, đồng thời chứa parameter `code` dùng để lấy `id_token` và/hoặc `access_token` thông qua access token request.
 
 [NOTE]
 ====
 Sự hiện diện của scope `openid` trong cấu hình trên cho biết cần sử dụng OpenID Connect 1.0.
-Điều này hướng dẫn Spring Security sử dụng các component dành riêng cho OIDC (chẳng hạn `OidcReactiveOAuth2UserService`) trong quá trình xử lý request.
+Điều này chỉ định Spring Security sử dụng các component dành riêng cho OIDC (chẳng hạn `OidcReactiveOAuth2UserService`) khi xử lý request.
 Nếu không có scope này, Spring Security sẽ sử dụng các component dành riêng cho OAuth2 (chẳng hạn `DefaultReactiveOAuth2UserService`).
 ====
 
 [[oauth2-client-access-protected-resources]]
 === Truy cập tài nguyên được bảo vệ
 
-Gửi request đến API của bên thứ ba được bảo vệ bởi OAuth2 là một trường hợp sử dụng cốt lõi của OAuth2 Client.
-Việc này được thực hiện bằng cách authorize một client (được đại diện bởi class `OAuth2AuthorizedClient` trong Spring Security) và truy cập tài nguyên được bảo vệ bằng cách đặt token `Bearer` vào header `Authorization` của request gửi đi.
+Request đến API của bên thứ ba được bảo vệ bởi OAuth2 là một use case cốt lõi của OAuth2 Client.
+Việc này được thực hiện bằng cách authorize một client (được biểu diễn bằng class `OAuth2AuthorizedClient` trong Spring Security) và truy cập tài nguyên được bảo vệ bằng cách đặt `Bearer` token vào header `Authorization` của outbound request.
 
-Ví dụ sau cấu hình ứng dụng hoạt động như một OAuth2 Client có khả năng request tài nguyên được bảo vệ từ API của bên thứ ba:
+Ví dụ sau cấu hình ứng dụng hoạt động như một OAuth2 Client có thể request tài nguyên được bảo vệ từ API của bên thứ ba:
 
 .Cấu hình OAuth2 Client
 [tabs]
@@ -546,8 +546,8 @@ Bạn có thể sử dụng bất kỳ cơ chế login nào khác (chẳng hạn
 Xem <<oauth2-client-access-protected-resources-current-user,phần tiếp theo>> để biết ví dụ kết hợp `oauth2Client()` với `oauth2Login()`.
 ====
 
-Ngoài cấu hình trên, ứng dụng yêu cầu phải cấu hình ít nhất một `ClientRegistration` thông qua bean `ReactiveClientRegistrationRepository`.
-Ví dụ sau cấu hình bean `InMemoryReactiveClientRegistrationRepository` bằng các configuration properties của Spring Boot:
+Ngoài cấu hình trên, ứng dụng cần cấu hình ít nhất một `ClientRegistration` thông qua bean `ReactiveClientRegistrationRepository`.
+Ví dụ sau cấu hình bean `InMemoryReactiveClientRegistrationRepository` bằng configuration properties của Spring Boot:
 
 [source,yaml]
 ----
@@ -575,9 +575,9 @@ Spring Security cung cấp các implementation của `ReactiveOAuth2AuthorizedCl
 Spring Security đăng ký bean `ReactiveOAuth2AuthorizedClientManager` mặc định cho bạn khi chưa có bean nào tồn tại.
 ====
 
-Cách dễ nhất để sử dụng `ReactiveOAuth2AuthorizedClientManager` là thông qua `ExchangeFilterFunction`, component intercept request qua `WebClient`.
+Cách dễ nhất để sử dụng `ReactiveOAuth2AuthorizedClientManager` là thông qua `ExchangeFilterFunction`, một component intercept request thông qua `WebClient`.
 
-Ví dụ sau sử dụng `ReactiveOAuth2AuthorizedClientManager` mặc định để cấu hình `WebClient` có khả năng truy cập tài nguyên được bảo vệ bằng cách đặt token `Bearer` vào header `Authorization` của mỗi request:
+Ví dụ sau sử dụng `ReactiveOAuth2AuthorizedClientManager` mặc định để cấu hình `WebClient` có thể truy cập tài nguyên được bảo vệ bằng cách đặt `Bearer` token vào header `Authorization` của mỗi request:
 
 .Cấu hình `WebClient` với `ExchangeFilterFunction`
 [tabs]
@@ -620,7 +620,7 @@ class WebClientConfig {
 ----
 =====
 
-`WebClient` đã cấu hình này có thể được sử dụng như trong ví dụ sau:
+`WebClient` đã được cấu hình ở trên có thể được sử dụng như trong ví dụ sau:
 
 [[oauth2-client-accessing-protected-resources-example]]
 .Sử dụng `WebClient` để truy cập tài nguyên được bảo vệ
@@ -683,8 +683,8 @@ class MessagesController(private val webClient: WebClient) {
 [[oauth2-client-access-protected-resources-current-user]]
 === Truy cập tài nguyên được bảo vệ cho người dùng hiện tại
 
-Khi người dùng đăng nhập qua OAuth2 hoặc OpenID Connect, authorization server có thể cung cấp access token có thể dùng trực tiếp để truy cập tài nguyên được bảo vệ.
-Điều này thuận tiện vì chỉ cần cấu hình một `ClientRegistration` cho đồng thời cả hai trường hợp sử dụng.
+Khi người dùng đăng nhập qua OAuth2 hoặc OpenID Connect, authorization server có thể cung cấp access token dùng trực tiếp để truy cập tài nguyên được bảo vệ.
+Điều này thuận tiện vì chỉ cần cấu hình một `ClientRegistration` cho cả hai use case.
 
 [NOTE]
 ====
@@ -741,8 +741,8 @@ class SecurityConfig {
 ----
 =====
 
-Ngoài cấu hình trên, ứng dụng yêu cầu phải cấu hình ít nhất một `ClientRegistration` thông qua bean `ReactiveClientRegistrationRepository`.
-Ví dụ sau cấu hình bean `InMemoryReactiveClientRegistrationRepository` bằng các configuration properties của Spring Boot:
+Ngoài cấu hình trên, ứng dụng cần cấu hình ít nhất một `ClientRegistration` thông qua bean `ReactiveClientRegistrationRepository`.
+Ví dụ sau cấu hình bean `InMemoryReactiveClientRegistrationRepository` bằng configuration properties của Spring Boot:
 
 [source,yaml]
 ----
@@ -764,7 +764,7 @@ spring:
 
 [NOTE]
 ====
-Điểm khác biệt chính giữa các ví dụ trước (<<oauth2-client-log-users-in>>,  <<oauth2-client-access-protected-resources>>) và ví dụ này là cấu hình thông qua property `scope`, kết hợp các scope chuẩn `openid` và `profile` với các scope tùy chỉnh `message.read` và `message.write`.
+Điểm khác biệt chính giữa các ví dụ trước (<<oauth2-client-log-users-in>>, <<oauth2-client-access-protected-resources>>) và ví dụ này là giá trị được cấu hình qua property `scope`, kết hợp các scope chuẩn `openid` và `profile` với các scope tùy chỉnh `message.read` và `message.write`.
 ====
 
 Ngoài việc cấu hình Spring Security để hỗ trợ các tính năng OAuth2 Client, bạn cũng cần quyết định cách truy cập tài nguyên được bảo vệ và cấu hình ứng dụng tương ứng.
@@ -775,9 +775,9 @@ Spring Security cung cấp các implementation của `ReactiveOAuth2AuthorizedCl
 Spring Security đăng ký bean `ReactiveOAuth2AuthorizedClientManager` mặc định cho bạn khi chưa có bean nào tồn tại.
 ====
 
-Cách dễ nhất để sử dụng `ReactiveOAuth2AuthorizedClientManager` là thông qua `ExchangeFilterFunction`, component intercept request qua `WebClient`.
+Cách dễ nhất để sử dụng `ReactiveOAuth2AuthorizedClientManager` là thông qua `ExchangeFilterFunction`, một component intercept request thông qua `WebClient`.
 
-Ví dụ sau sử dụng `ReactiveOAuth2AuthorizedClientManager` mặc định để cấu hình `WebClient` có khả năng truy cập tài nguyên được bảo vệ bằng cách đặt token `Bearer` vào header `Authorization` của mỗi request:
+Ví dụ sau sử dụng `ReactiveOAuth2AuthorizedClientManager` mặc định để cấu hình `WebClient` có thể truy cập tài nguyên được bảo vệ bằng cách đặt `Bearer` token vào header `Authorization` của mỗi request:
 
 .Cấu hình `WebClient` với `ExchangeFilterFunction`
 [tabs]
@@ -820,7 +820,7 @@ class WebClientConfig {
 ----
 =====
 
-`WebClient` đã cấu hình này có thể được sử dụng như trong ví dụ sau:
+`WebClient` đã được cấu hình ở trên có thể được sử dụng như trong ví dụ sau:
 
 [[oauth2-client-accessing-protected-resources-current-user-example]]
 .Sử dụng `WebClient` để truy cập tài nguyên được bảo vệ (người dùng hiện tại)
@@ -876,17 +876,17 @@ class MessagesController(private val webClient: WebClient) {
 
 [NOTE]
 ====
-Khác với <<oauth2-client-accessing-protected-resources-example,ví dụ trước>>, lưu ý rằng chúng ta không cần cho Spring Security biết `clientRegistrationId` muốn sử dụng.
-Đó là vì giá trị này có thể được suy ra từ người dùng hiện đang đăng nhập.
+Khác với <<oauth2-client-accessing-protected-resources-example,ví dụ trước>>, lưu ý rằng chúng ta không cần chỉ định `clientRegistrationId` muốn sử dụng cho Spring Security.
+Đó là vì giá trị này có thể được suy ra từ người dùng hiện đã đăng nhập.
 ====
 
 [[oauth2-client-enable-extension-grant-type]]
 === Bật Extension Grant Type
 
-Một trường hợp sử dụng phổ biến là bật và/hoặc cấu hình extension grant type.
-Ví dụ, Spring Security hỗ trợ các grant type `jwt-bearer` và `token-exchange`, nhưng không bật chúng theo mặc định vì chúng không thuộc specification OAuth 2.0 cốt lõi.
+Một use case phổ biến là bật và/hoặc cấu hình extension grant type.
+Ví dụ, Spring Security hỗ trợ các grant type `jwt-bearer` và `token-exchange`, nhưng không bật chúng theo mặc định vì chúng không thuộc core specification của OAuth 2.0.
 
-Với Spring Security 6.3 trở lên, chúng ta chỉ cần publish bean cho một hoặc nhiều `ReactiveOAuth2AuthorizedClientProvider`, và chúng sẽ được tự động nhận diện.
+Với Spring Security 6.3 trở lên, chúng ta chỉ cần publish bean cho một hoặc nhiều `ReactiveOAuth2AuthorizedClientProvider`, và các bean này sẽ được tự động nhận diện.
 Ví dụ sau chỉ bật grant type `jwt-bearer`:
 
 .Bật Grant Type `jwt-bearer`
@@ -923,15 +923,15 @@ class SecurityConfig {
 ----
 =====
 
-Spring Security sẽ tự động publish `ReactiveOAuth2AuthorizedClientManager` mặc định khi chưa có bean nào được cung cấp.
+Spring Security sẽ tự động publish `ReactiveOAuth2AuthorizedClientManager` mặc định khi chưa có bean nào được cung cấp trước đó.
 
 [TIP]
 ====
-Bất kỳ bean `OAuth2AuthorizedClientProvider` tùy chỉnh nào cũng sẽ được nhận diện và áp dụng cho `ReactiveOAuth2AuthorizedClientManager` đã cung cấp, sau các grant type mặc định.
+Bất kỳ bean `OAuth2AuthorizedClientProvider` tùy chỉnh nào cũng sẽ được nhận diện và áp dụng cho `ReactiveOAuth2AuthorizedClientManager` được cung cấp, sau các grant type mặc định.
 ====
 
-Để đạt được cấu hình trên trước Spring Security 6.3, chúng ta phải tự publish bean này và đồng thời bảo đảm bật lại các grant type mặc định.
-Để hiểu những gì được cấu hình phía sau, cấu hình có thể đã có dạng như sau:
+Trong các phiên bản trước Spring Security 6.3, chúng ta phải tự publish bean này và đồng thời bảo đảm bật lại các grant type mặc định.
+Để hiểu những gì được cấu hình phía sau, cấu hình có thể như sau:
 
 .Bật Grant Type `jwt-bearer` (trước 6.3)
 [tabs]
@@ -1001,7 +1001,7 @@ class SecurityConfig {
 [[oauth2-client-customize-existing-grant-type]]
 === Tùy chỉnh Grant Type hiện có
 
-Khả năng <<oauth2-client-enable-extension-grant-type,bật extension grant type>> bằng cách publish bean cũng cho phép tùy chỉnh grant type hiện có mà không cần định nghĩa lại các giá trị mặc định.
+Khả năng <<oauth2-client-enable-extension-grant-type,bật extension grant type>> bằng cách publish bean cũng cho phép tùy chỉnh grant type hiện có mà không cần định nghĩa lại cấu hình mặc định.
 Ví dụ, nếu muốn tùy chỉnh clock skew của `ReactiveOAuth2AuthorizedClientProvider` cho grant `client_credentials`, chúng ta chỉ cần publish bean như sau:
 
 .Tùy chỉnh Grant Type Client Credentials
@@ -1045,16 +1045,16 @@ class SecurityConfig {
 =====
 
 [[oauth2-client-customize-request-parameters]]
-=== Tùy chỉnh Token Request Parameter
+=== Tùy chỉnh Token Request Parameters
 
-Nhu cầu tùy chỉnh request parameter khi lấy access token khá phổ biến.
-Ví dụ, giả sử chúng ta muốn thêm parameter tùy chỉnh `audience` vào token request vì provider yêu cầu parameter này cho grant `authorization_code`.
+Việc tùy chỉnh request parameters khi lấy access token khá phổ biến.
+Ví dụ, giả sử chúng ta muốn thêm custom parameter `audience` vào token request vì provider yêu cầu parameter này cho grant `authorization_code`.
 
-Chúng ta chỉ cần publish bean có kiểu `ReactiveOAuth2AccessTokenResponseClient` với generic type `OAuth2AuthorizationCodeGrantRequest`, và Spring Security sẽ sử dụng bean này để cấu hình các component OAuth2 Client.
+Chúng ta chỉ cần publish bean kiểu `ReactiveOAuth2AccessTokenResponseClient` với generic type `OAuth2AuthorizationCodeGrantRequest`, và Spring Security sẽ sử dụng bean này để cấu hình các component OAuth2 Client.
 
-Ví dụ sau tùy chỉnh token request parameter cho grant `authorization_code`:
+Ví dụ sau tùy chỉnh token request parameters cho grant `authorization_code`:
 
-.Tùy chỉnh Token Request Parameter cho Authorization Code Grant
+.Tùy chỉnh Token Request Parameters cho Authorization Code Grant
 [tabs]
 =====
 Java::
@@ -1118,7 +1118,7 @@ Lưu ý rằng trong trường hợp này chúng ta không cần tùy chỉnh be
 Nếu sử dụng Spring Boot mà không có tùy chỉnh bổ sung, thực tế chúng ta có thể bỏ hoàn toàn bean `SecurityWebFilterChain`.
 ====
 
-Như bạn thấy, cung cấp `ReactiveOAuth2AccessTokenResponseClient` dưới dạng bean khá thuận tiện.
+Như vậy, cung cấp `ReactiveOAuth2AccessTokenResponseClient` dưới dạng bean khá thuận tiện.
 Khi sử dụng trực tiếp Spring Security DSL, chúng ta cần bảo đảm tùy chỉnh này được áp dụng cho cả OAuth2 Login (nếu sử dụng tính năng này) và các component OAuth2 Client.
 Để hiểu những gì được cấu hình phía sau, cấu hình khi dùng DSL sẽ có dạng như sau:
 
@@ -1215,9 +1215,9 @@ class SecurityConfig {
 =====
 
 Đối với các grant type khác, chúng ta có thể publish thêm các bean `ReactiveOAuth2AccessTokenResponseClient` để ghi đè cấu hình mặc định.
-Ví dụ, để tùy chỉnh token request cho grant `client_credentials`, chúng ta có thể publish bean sau:
+Ví dụ, để tùy chỉnh các token request cho grant `client_credentials`, chúng ta có thể publish bean sau:
 
-.Tùy chỉnh Token Request Parameter cho Client Credentials Grant
+.Tùy chỉnh Token Request Parameters cho Client Credentials Grant
 [tabs]
 =====
 Java::
@@ -1285,12 +1285,12 @@ Publish bean có kiểu `ReactiveOAuth2AccessTokenResponseClient<TokenExchangeGr
 ====
 
 [[oauth2-client-customize-web-client]]
-=== Tùy chỉnh `WebClient` được các Component OAuth2 Client sử dụng
+=== Tùy chỉnh `WebClient` mà các component OAuth2 Client sử dụng
 
-Một trường hợp sử dụng phổ biến khác là cần tùy chỉnh `WebClient` được dùng khi lấy access token.
-Chúng ta có thể cần làm vậy để tùy chỉnh thư viện HTTP client bên dưới (thông qua `ClientHttpConnector` tùy chỉnh), nhằm cấu hình SSL hoặc áp dụng proxy setting cho mạng doanh nghiệp.
+Một use case phổ biến khác là tùy chỉnh `WebClient` được dùng để lấy access token.
+Chúng ta có thể cần làm vậy để tùy chỉnh HTTP client library bên dưới (thông qua `ClientHttpConnector` tùy chỉnh), nhằm cấu hình SSL hoặc áp dụng proxy settings cho mạng doanh nghiệp.
 
-Với Spring Security 6.3 trở lên, chúng ta chỉ cần publish các bean có kiểu `ReactiveOAuth2AccessTokenResponseClient`, và Spring Security sẽ cấu hình rồi publish bean `ReactiveOAuth2AuthorizedClientManager` cho chúng ta.
+Với Spring Security 6.3 trở lên, chúng ta chỉ cần publish các bean kiểu `ReactiveOAuth2AccessTokenResponseClient`, và Spring Security sẽ tự động cấu hình và publish bean `ReactiveOAuth2AuthorizedClientManager` cho chúng ta.
 
 Ví dụ sau tùy chỉnh `WebClient` cho tất cả grant type được hỗ trợ:
 
@@ -1421,9 +1421,9 @@ Lưu ý rằng trong trường hợp này chúng ta không cần tùy chỉnh be
 Nếu sử dụng Spring Boot mà không có tùy chỉnh bổ sung, thực tế chúng ta có thể bỏ hoàn toàn bean `SecurityWebFilterChain`.
 ====
 
-Trước Spring Security 6.3, chúng ta phải tự bảo đảm tùy chỉnh này được áp dụng cho các component OAuth2 Client.
+Trước Spring Security 6.3, chúng ta phải tự áp dụng tùy chỉnh này cho các component OAuth2 Client.
 Mặc dù có thể publish bean kiểu `ReactiveOAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest>` cho grant `authorization_code`, chúng ta phải publish bean kiểu `ReactiveOAuth2AuthorizedClientManager` cho các grant type khác.
-Để hiểu những gì được cấu hình phía sau, cấu hình có thể đã có dạng như sau:
+Để hiểu những gì được cấu hình phía sau, cấu hình có thể như sau:
 
 .Tùy chỉnh `WebClient` cho OAuth2 Client (trước 6.3)
 [tabs]

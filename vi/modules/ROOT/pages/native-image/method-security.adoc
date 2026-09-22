@@ -1,15 +1,15 @@
 [[native-image-method-security]]
-= method security trong GraalVM Native Image
+= Method Security trong GraalVM Native Image
 
-Mặc dù xref:servlet/authorization/method-security.adoc[method security] được hỗ trợ trong GraalVM Native Image, một số trường hợp sử dụng cần application cung cấp thêm hint.
+Mặc dù xref:servlet/authorization/method-security.adoc[Method Security] được hỗ trợ trong GraalVM Native Image, một số use case yêu cầu application cung cấp thêm hint.
 
 == Sử dụng các annotation `@PreAuthorize` và `@PostAuthorize`
 
-Việc sử dụng các annotation `@PreAuthorize` và `@PostAuthorize` yêu cầu thêm hint nếu bạn có implementation tùy chỉnh của các class `UserDetails` hoặc `Authentication`.
+Việc sử dụng các annotation `@PreAuthorize` và `@PostAuthorize` yêu cầu thêm hint nếu bạn có custom implementation của các class `UserDetails` hoặc `Authentication`.
 
-Hãy xem ví dụ bạn có một implementation tùy chỉnh của class `UserDetails` như sau và implementation đó được `UserDetailsService` trả về:
+Ví dụ, bạn có một custom implementation của class `UserDetails` như sau và implementation đó được `UserDetailsService` trả về:
 
-.Implementation tùy chỉnh của UserDetails
+.Custom implementation của `UserDetails`
 [source,java]
 ----
 public class CustomUserDetails implements UserDetails {
@@ -28,9 +28,9 @@ public class CustomUserDetails implements UserDetails {
 }
 ----
 
-Và bạn muốn sử dụng method `isAdmin()` bên trong annotation `@PreAuthorize` như sau:
+Bạn muốn sử dụng method `isAdmin()` bên trong annotation `@PreAuthorize` như sau:
 
-.Sử dụng isAdmin() để bảo vệ một method
+.Sử dụng `isAdmin()` để bảo vệ một method
 [source,java]
 ----
 @PreAuthorize("principal?.isAdmin()")
@@ -41,10 +41,10 @@ public String hello() {
 
 [NOTE]
 ====
-Hãy nhớ rằng bạn cần xref:servlet/authorization/method-security.adoc#jc-enable-method-security[thêm annotation `@EnableMethodSecurity`] vào class cấu hình để bật các annotation method security.
+Hãy nhớ rằng bạn cần xref:servlet/authorization/method-security.adoc#jc-enable-method-security[thêm annotation `@EnableMethodSecurity`] vào class cấu hình để enable các annotation của Method Security.
 ====
 
-Nếu bạn {spring-boot-reference-url}how-to/native-image/developing-your-first-application.html[chạy native image] của ứng dụng với cấu hình trên, bạn sẽ nhận được lỗi tương tự sau khi cố gọi method `hello()`:
+Nếu bạn {spring-boot-reference-url}how-to/native-image/developing-your-first-application.html[chạy native image] của application với cấu hình trên, bạn sẽ nhận được lỗi tương tự sau khi cố invoke method `hello()`:
 
 [source]
 ----
@@ -53,15 +53,15 @@ org.springframework.expression.spel.SpelEvaluationException: EL1004E: Method cal
 ----
 
 Điều này có nghĩa là không tìm thấy method `isAdmin()` trên class `CustomUserDetails`.
-Nguyên nhân là Spring Security sử dụng reflection để gọi method `isAdmin()`, còn GraalVM Native Image không hỗ trợ reflection theo mặc định.
+Nguyên nhân là Spring Security sử dụng reflection để invoke method `isAdmin()`, còn GraalVM Native Image không hỗ trợ reflection theo mặc định.
 
 Để khắc phục vấn đề này, bạn cần cung cấp hint cho GraalVM Native Image để cho phép reflection trên method `CustomUserDetails#isAdmin()`.
-Chúng ta có thể thực hiện việc này bằng cách cung cấp {spring-boot-reference-url}reference/packaging/native-image/advanced-topics.html#packaging.native-image.advanced.custom-hints[hint tùy chỉnh].
+Bạn có thể thực hiện việc này bằng cách cung cấp {spring-boot-reference-url}reference/packaging/native-image/advanced-topics.html#packaging.native-image.advanced.custom-hints[custom hint].
 Trong ví dụ này, chúng ta sẽ sử dụng {spring-framework-reference-url}core/aot.html#aot.hints.register-reflection[annotation `@RegisterReflectionForBinding`].
 
 [NOTE]
 ====
-Bạn có thể cần đăng ký tất cả các class mà bạn muốn sử dụng trong các annotation `@PreAuthorize` và `@PostAuthorize`.
+Bạn có thể cần register tất cả các class mà bạn muốn sử dụng trong các annotation `@PreAuthorize` và `@PostAuthorize`.
 ====
 
 .Sử dụng @RegisterReflectionForBinding
@@ -74,4 +74,4 @@ public class MyConfiguration {
 }
 ----
 
-Vậy là xong; giờ bạn có thể chạy native image của ứng dụng và ứng dụng sẽ hoạt động như mong đợi.
+Vậy là xong; giờ bạn có thể chạy native image của application và application sẽ hoạt động như mong đợi.

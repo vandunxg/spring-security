@@ -7,14 +7,14 @@ Nếu bạn mới bắt đầu với Spring Security Authorization Server, các 
 [[oauth2AuthorizationServer-system-requirements]]
 == Yêu cầu hệ thống
 
-Spring Security Authorization Server yêu cầu Môi trường Runtime Java 17 trở lên.
+Spring Security Authorization Server yêu cầu môi trường runtime Java 17 trở lên.
 
 [[oauth2AuthorizationServer-installing-spring-security-authorization-server]]
 == Cài đặt Spring Security Authorization Server
 
 Cách dễ nhất để bắt đầu sử dụng Spring Security Authorization Server là tạo một ứng dụng dựa trên https://spring.io/projects/spring-boot[Spring Boot].
-Bạn có thể sử dụng https://start.spring.io[start.spring.io] để tạo một project cơ bản hoặc dùng https://github.com/spring-projects/spring-authorization-server/tree/main/samples/default-authorizationserver[mẫu Authorization Server mặc định] làm hướng dẫn.
-Sau đó thêm starter của Spring Boot cho Spring Security Authorization Server làm dependency:
+Bạn có thể sử dụng https://start.spring.io[start.spring.io] để tạo một dự án cơ bản hoặc dùng https://github.com/spring-projects/spring-authorization-server/tree/main/samples/default-authorizationserver[mẫu Authorization Server mặc định] làm hướng dẫn.
+Sau đó thêm starter của Spring Boot cho Spring Security Authorization Server dưới dạng dependency:
 
 [tabs]
 ======
@@ -40,7 +40,7 @@ implementation "org.springframework.boot:spring-boot-starter-oauth2-authorizatio
 
 TIP: Xem {spring-boot-reference-url}installing.html[Cài đặt Spring Boot] để biết thêm thông tin về cách sử dụng Spring Boot với Maven hoặc Gradle.
 
-Ngoài ra, bạn có thể thêm Spring Security Authorization Server mà không cần Spring Boot bằng ví dụ sau:
+Ngoài ra, bạn có thể thêm Spring Security Authorization Server mà không cần Spring Boot như trong ví dụ sau:
 
 [tabs]
 ======
@@ -108,7 +108,7 @@ spring:
             require-authorization-consent: true
 ----
 
-Nếu muốn tùy chỉnh cấu hình `HttpSecurity` mặc định, bạn có thể ghi đè auto-configuration của Spring Boot bằng ví dụ sau:
+Nếu muốn tùy chỉnh cấu hình `HttpSecurity` mặc định, bạn có thể ghi đè auto-configuration của Spring Boot như trong ví dụ sau:
 
 [[oauth2AuthorizationServer-minimal-sample-gettingstarted]]
 .SecurityConfig.java
@@ -128,7 +128,7 @@ public class SecurityConfig {
 			.formLogin(Customizer.withDefaults())
 			.oauth2AuthorizationServer((authorizationServer) ->
 				authorizationServer
-					.oidc(Customizer.withDefaults())	// Enable OpenID Connect 1.0
+					.oidc(Customizer.withDefaults())	// Bật OpenID Connect 1.0
 			);
 		return http.build();
 	}
@@ -136,12 +136,12 @@ public class SecurityConfig {
 }
 ----
 
-TIP: Sau phần Bắt đầu, hầu hết người dùng sẽ muốn tùy chỉnh cấu hình mặc định. xref:servlet/oauth2/authorization-server/getting-started.adoc#oauth2AuthorizationServer-defining-required-components[Phần tiếp theo] minh họa cách tự cung cấp tất cả các bean cần thiết.
+TIP: Ngoài phần Bắt đầu, hầu hết người dùng sẽ muốn tùy chỉnh cấu hình mặc định. xref:servlet/oauth2/authorization-server/getting-started.adoc#oauth2AuthorizationServer-defining-required-components[Phần tiếp theo] minh họa cách tự cung cấp tất cả các bean cần thiết.
 
 [[oauth2AuthorizationServer-defining-required-components]]
 == Định nghĩa các component bắt buộc
 
-Nếu muốn tùy chỉnh cấu hình mặc định (bất kể bạn có sử dụng Spring Boot hay không), bạn có thể định nghĩa các component tối thiểu cần thiết dưới dạng một `@Bean` trong một `@Configuration` của Spring.
+Nếu muốn tùy chỉnh cấu hình mặc định (bất kể bạn có sử dụng Spring Boot hay không), bạn có thể định nghĩa các component tối thiểu cần thiết dưới dạng một `@Bean` trong một Spring `@Configuration`.
 
 Bạn có thể định nghĩa các component này như sau:
 
@@ -163,14 +163,14 @@ public class SecurityConfig {
 			.oauth2AuthorizationServer((authorizationServer) -> {
 				http.securityMatcher(authorizationServer.getEndpointsMatcher());
 				authorizationServer
-					.oidc(Customizer.withDefaults());	// Enable OpenID Connect 1.0
+					.oidc(Customizer.withDefaults());	// Bật OpenID Connect 1.0
 			})
 			.authorizeHttpRequests((authorize) ->
 				authorize
 					.anyRequest().authenticated()
 			)
-			// Redirect to the login page when not authenticated from the
-			// authorization endpoint
+			// Chuyển hướng đến trang đăng nhập khi request từ authorization endpoint
+			// chưa được authenticate
 			.exceptionHandling((exceptions) -> exceptions
 				.defaultAuthenticationEntryPointFor(
 					new LoginUrlAuthenticationEntryPoint("/login"),
@@ -191,7 +191,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests((authorize) -> authorize
 				.anyRequest().authenticated()
 			)
-			// Form login handles the redirect to the login page from the
+			// Form login xử lý việc chuyển hướng đến trang đăng nhập từ
 			// authorization server filter chain
 			.formLogin(Customizer.withDefaults());
 		// @formatter:on
@@ -273,11 +273,11 @@ public class SecurityConfig {
 }
 ----
 
-Đây là cấu hình tối thiểu để nhanh chóng bắt đầu. Để hiểu mỗi component được sử dụng cho mục đích gì, hãy xem các mô tả sau:
+Đây là cấu hình tối thiểu để nhanh chóng bắt đầu. Để hiểu mỗi component được dùng để làm gì, hãy xem các mô tả sau:
 
 <1> Một Spring Security filter chain dành cho xref:servlet/oauth2/authorization-server/protocol-endpoints.adoc[các endpoint giao thức].
 <2> Một Spring Security filter chain dành cho xref:servlet/authentication/index.adoc#servlet-authentication[authentication].
-<3> Một instance của javadoc:org.springframework.security.core.userdetails.UserDetailsService[] để truy xuất các user cần được authentication.
+<3> Một instance của javadoc:org.springframework.security.core.userdetails.UserDetailsService[] để truy xuất các user cần được authenticate.
 <4> Một instance của xref:servlet/oauth2/authorization-server/core-model-components.adoc#oauth2AuthorizationServer-registered-client-repository[`RegisteredClientRepository`] để quản lý các client.
 <5> Một instance của `com.nimbusds.jose.jwk.source.JWKSource` để ký access token.
 <6> Một instance của `java.security.KeyPair` với các key được tạo khi startup, dùng để tạo `JWKSource` nêu trên.

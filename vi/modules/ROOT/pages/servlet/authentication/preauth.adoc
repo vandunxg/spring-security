@@ -1,31 +1,31 @@
 [[servlet-preauth]]
-= Các kịch bản Pre-Authentication
-Có những tình huống bạn muốn sử dụng Spring Security cho authorization, nhưng người dùng đã được một hệ thống bên ngoài authentication một cách đáng tin cậy trước khi truy cập ứng dụng.
+= Các kịch bản pre-authentication
+Có những tình huống bạn muốn sử dụng Spring Security cho authorization, nhưng user đã được một system bên ngoài authenticated một cách đáng tin cậy trước khi truy cập ứng dụng.
 Chúng tôi gọi những tình huống này là các kịch bản "`pre-authenticated`".
-Các ví dụ bao gồm X.509, Siteminder và authentication bởi Java EE container nơi ứng dụng chạy.
+Các ví dụ bao gồm X.509, Siteminder và authentication do Java EE container nơi ứng dụng chạy thực hiện.
 Khi sử dụng pre-authentication, Spring Security phải:
 
-* Xác định người dùng thực hiện request.
-* Lấy các authority của người dùng.
+* Xác định user thực hiện request.
+* Lấy các authority của user.
 
 Chi tiết phụ thuộc vào cơ chế authentication bên ngoài.
-Trong trường hợp X.509, người dùng có thể được xác định bằng thông tin certificate của họ; trong trường hợp Siteminder, người dùng có thể được xác định bằng HTTP request header.
-Nếu dựa vào authentication của container, người dùng được xác định bằng cách gọi method `getUserPrincipal()` trên HTTP request đến.
-Trong một số trường hợp, cơ chế bên ngoài có thể cung cấp thông tin role và authority của người dùng. Tuy nhiên, trong các trường hợp khác, bạn phải lấy các authority từ một nguồn riêng, chẳng hạn như một `UserDetailsService`.
+Trong trường hợp X.509, user có thể được xác định bằng thông tin certificate; trong trường hợp Siteminder, user có thể được xác định bằng HTTP request header.
+Nếu dựa vào authentication của container, user được xác định bằng cách gọi method `getUserPrincipal()` trên HTTP request nhận được.
+Trong một số trường hợp, cơ chế bên ngoài có thể cung cấp thông tin role và authority của user. Tuy nhiên, trong các trường hợp khác, bạn phải lấy authority từ một nguồn riêng, chẳng hạn như một `UserDetailsService`.
 
-== Các class của framework Pre-Authentication
-Vì hầu hết cơ chế pre-authentication đều tuân theo cùng một mẫu, Spring Security cung cấp một tập hợp class làm framework nội bộ để triển khai các authentication provider pre-authenticated.
-Điều này loại bỏ sự trùng lặp và cho phép thêm các implementation mới theo cách có cấu trúc, mà không phải viết mọi thứ từ đầu.
-Bạn không cần biết về các class này nếu muốn sử dụng một tính năng như xref:servlet/authentication/x509.adoc#servlet-x509[X.509 authentication], vì tính năng này đã có tùy chọn cấu hình namespace đơn giản hơn để sử dụng và bắt đầu.
+== Các class framework pre-authentication
+Vì hầu hết cơ chế pre-authentication đều tuân theo cùng một mẫu, Spring Security cung cấp một tập hợp class tạo thành framework nội bộ để triển khai các authentication provider cho pre-authentication.
+Điều này loại bỏ sự trùng lặp và cho phép bổ sung các implementation mới theo cách có cấu trúc mà không phải viết mọi thứ từ đầu.
+Bạn không cần biết về các class này nếu muốn sử dụng một tính năng như xref:servlet/authentication/x509.adoc#servlet-x509[X.509 authentication], vì tính năng này đã có tùy chọn cấu hình namespace đơn giản hơn, giúp bạn dễ sử dụng và bắt đầu hơn.
 Nếu cần sử dụng cấu hình bean tường minh hoặc dự định tự viết implementation, bạn cần hiểu cách các implementation được cung cấp hoạt động.
 Bạn có thể tìm thấy các class trong `org.springframework.security.web.authentication.preauth`.
-Ở đây chúng tôi chỉ trình bày khái quát, vì vậy bạn nên tham khảo Javadoc và source khi thích hợp.
+Ở đây chúng tôi chỉ trình bày khái quát, vì vậy bạn nên tham khảo Javadoc và source code khi thích hợp.
 
 === AbstractPreAuthenticatedProcessingFilter
-Class này kiểm tra nội dung hiện tại của security context và, nếu rỗng, cố gắng trích xuất thông tin người dùng từ HTTP request rồi gửi thông tin đó đến `AuthenticationManager`.
+Class này kiểm tra nội dung hiện tại của security context và, nếu context rỗng, cố gắng trích xuất thông tin user từ HTTP request rồi gửi thông tin đó đến `AuthenticationManager`.
 Các subclass override những method sau để lấy thông tin này.
 
-.Ghi đè AbstractPreAuthenticatedProcessingFilter
+.Override AbstractPreAuthenticatedProcessingFilter
 [tabs]
 ======
 Java::
@@ -48,28 +48,28 @@ protected abstract fun getPreAuthenticatedCredentials(request: HttpServletReques
 ======
 
 
-Sau khi gọi các method này, filter tạo một `PreAuthenticatedAuthenticationToken` chứa dữ liệu được trả về và gửi token đó đi authentication.
-Ở đây, "`authentication`" thực sự chỉ có nghĩa là xử lý tiếp để có thể tải các authority của người dùng, nhưng kiến trúc authentication tiêu chuẩn của Spring Security vẫn được tuân theo.
+Sau khi gọi các method này, filter tạo một `PreAuthenticatedAuthenticationToken` chứa dữ liệu được trả về và gửi token đó để thực hiện authentication.
+Ở đây, "`authentication`" thực sự chỉ có nghĩa là xử lý tiếp để có thể tải authority của user, nhưng kiến trúc authentication tiêu chuẩn của Spring Security vẫn được tuân theo.
 
-Giống như các authentication filter khác của Spring Security, pre-authentication filter có property `authenticationDetailsSource`; theo mặc định, property này tạo một object `WebAuthenticationDetails` để lưu thông tin bổ sung, chẳng hạn như session identifier và IP address ban đầu, trong property `details` của object `Authentication`.
-Trong trường hợp có thể lấy thông tin role của người dùng từ cơ chế pre-authentication, dữ liệu cũng được lưu trong property này, với details triển khai interface `GrantedAuthoritiesContainer`.
-Điều này cho phép authentication provider đọc các authority đã được cấp cho người dùng từ bên ngoài.
+Giống các authentication filter khác của Spring Security, pre-authentication filter có property `authenticationDetailsSource`; theo mặc định, property này tạo một object `WebAuthenticationDetails` để lưu thông tin bổ sung, chẳng hạn như session identifier và IP address nguồn, trong property `details` của object `Authentication`.
+Trong trường hợp có thể lấy thông tin role của user từ cơ chế pre-authentication, dữ liệu cũng được lưu trong property này, trong đó details triển khai interface `GrantedAuthoritiesContainer`.
+Điều này cho phép authentication provider đọc các authority đã được cấp cho user từ bên ngoài.
 Tiếp theo, chúng ta xem một ví dụ cụ thể.
 
 
 [[j2ee-preauth-details]]
 ==== J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource
-Nếu filter được cấu hình với một `authenticationDetailsSource` là instance của class này, thông tin authority được lấy bằng cách gọi method `isUserInRole(String role)` cho từng role trong một tập hợp "`mappable roles`" được xác định trước.
+Nếu filter được cấu hình với một `authenticationDetailsSource` là instance của class này, thông tin authority được lấy bằng cách gọi method `isUserInRole(String role)` cho từng role trong một tập hợp "`mappable roles`" đã được xác định trước.
 Class này lấy các role đó từ một `MappableAttributesRetriever` đã cấu hình.
-Các implementation khả dĩ bao gồm hard-code một danh sách trong application context và đọc thông tin role từ thông tin `<security-role>` trong file `web.xml`.
+Các implementation khả dĩ bao gồm hard-code một danh sách trong application context và đọc thông tin role từ các khai báo `<security-role>` trong file `web.xml`.
 Ứng dụng mẫu về pre-authentication sử dụng cách tiếp cận sau.
 
-Có thêm một giai đoạn trong đó các role (hoặc attribute) được ánh xạ thành các object `GrantedAuthority` của Spring Security bằng cách sử dụng `Attributes2GrantedAuthoritiesMapper` đã cấu hình.
+Có thêm một giai đoạn trong đó các role (hoặc attribute) được map thành các object `GrantedAuthority` của Spring Security bằng cách sử dụng `Attributes2GrantedAuthoritiesMapper` đã cấu hình.
 Mặc định chỉ thêm prefix `ROLE_` thông thường vào tên, nhưng cho phép bạn toàn quyền kiểm soát hành vi.
 
 
 === PreAuthenticatedAuthenticationProvider
-Pre-authenticated provider chủ yếu chỉ tải object `UserDetails` cho người dùng.
+Pre-authenticated provider chủ yếu chỉ tải object `UserDetails` cho user.
 Provider thực hiện việc này bằng cách ủy quyền cho một `AuthenticationUserDetailsService`.
 Service này tương tự `UserDetailsService` tiêu chuẩn nhưng nhận một object `Authentication` thay vì chỉ nhận user name:
 
@@ -85,22 +85,22 @@ Class `PreAuthenticatedGrantedAuthoritiesUserDetailsService` thực hiện việ
 Ngoài ra, service có thể ủy quyền cho một `UserDetailsService` tiêu chuẩn thông qua implementation `UserDetailsByNameServiceWrapper`.
 
 === Http403ForbiddenEntryPoint
-xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] chịu trách nhiệm khởi động quy trình authentication cho người dùng chưa authentication (khi họ cố gắng truy cập một resource được bảo vệ). Tuy nhiên, điều này không áp dụng trong trường hợp pre-authenticated.
-Bạn chỉ cấu hình `ExceptionTranslationFilter` với một instance của class này nếu không sử dụng pre-authentication kết hợp với các cơ chế authentication khác.
-Nó được gọi nếu người dùng bị `AbstractPreAuthenticatedProcessingFilter` từ chối, dẫn đến authentication là null.
-Nó luôn trả về response code `403`-forbidden nếu được gọi.
+xref:servlet/authentication/architecture.adoc#servlet-authentication-authenticationentrypoint[`AuthenticationEntryPoint`] chịu trách nhiệm khởi động quy trình authentication cho user chưa được authenticated (khi họ cố gắng truy cập một resource được bảo vệ). Tuy nhiên, điều này không áp dụng trong trường hợp pre-authenticated.
+Bạn chỉ nên cấu hình `ExceptionTranslationFilter` với một instance của class này khi không kết hợp pre-authentication với các cơ chế authentication khác.
+Nó được gọi nếu user bị `AbstractPreAuthenticatedProcessingFilter` từ chối, khiến authentication là null.
+Nó luôn trả về mã response `403` Forbidden nếu được gọi.
 
 
 == Các implementation cụ thể
 X.509 authentication được trình bày trong xref:servlet/authentication/x509.adoc#servlet-x509[chương riêng].
-Ở đây, chúng ta xem xét một số class hỗ trợ các kịch bản pre-authenticated khác.
+Ở đây, chúng ta xem xét một số class hỗ trợ các kịch bản pre-authentication khác.
 
 
-=== Authentication bằng Request Header (Siteminder)
+=== Authentication bằng request header (Siteminder)
 Một hệ thống authentication bên ngoài có thể cung cấp thông tin cho ứng dụng bằng cách thiết lập các header cụ thể trên HTTP request.
 Một ví dụ nổi tiếng là Siteminder, truyền username trong một header có tên `SM_USER`.
-Cơ chế này được hỗ trợ bởi class `RequestHeaderAuthenticationFilter`, class này chỉ trích xuất username từ header.
-Theo mặc định, class sử dụng `SM_USER` làm tên header.
+Cơ chế này được hỗ trợ bởi class `RequestHeaderAuthenticationFilter`, chỉ trích xuất username từ header.
+Theo mặc định, class này sử dụng `SM_USER` làm tên header.
 Xem Javadoc để biết thêm chi tiết.
 
 [TIP]
@@ -139,11 +139,11 @@ Ví dụ sau minh họa một cấu hình điển hình sử dụng filter này:
 ----
 
 Ở đây, chúng tôi giả định đang sử dụng xref:servlet/configuration/xml-namespace.adoc#ns-config[security namespace] để cấu hình.
-Chúng tôi cũng giả định bạn đã thêm một `UserDetailsService` (có tên là "userDetailsService") vào cấu hình để tải các role của người dùng.
+Chúng tôi cũng giả định bạn đã thêm một `UserDetailsService` (có tên là "userDetailsService") vào cấu hình để tải các role của user.
 
 
-=== Authentication của Java EE Container
+=== Authentication bằng Java EE container
 Class `J2eePreAuthenticatedProcessingFilter` trích xuất username từ property `userPrincipal` của `HttpServletRequest`.
 Việc sử dụng filter này thường được kết hợp với việc sử dụng các role của Java EE, như đã mô tả trước đó trong <<j2ee-preauth-details>>.
 
-Trong codebase có một {gh-old-samples-url}/xml/preauth[ứng dụng mẫu] sử dụng cách tiếp cận này, vì vậy nếu quan tâm, bạn có thể lấy code từ Github và xem file application context.
+Trong codebase có một {gh-old-samples-url}/xml/preauth[ứng dụng mẫu] sử dụng cách tiếp cận này, vì vậy nếu quan tâm, bạn có thể lấy code từ GitHub và xem file application context.

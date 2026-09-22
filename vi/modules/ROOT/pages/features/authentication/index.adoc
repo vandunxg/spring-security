@@ -2,10 +2,10 @@
 = Authentication
 
 Spring Security cung cấp hỗ trợ toàn diện cho https://en.wikipedia.org/wiki/Authentication[authentication].
-Authentication là cách chúng ta xác minh danh tính của người đang cố gắng truy cập một tài nguyên cụ thể.
-Một cách phổ biến để thực hiện authentication cho người dùng là yêu cầu người dùng nhập tên người dùng và mật khẩu.
-Sau khi authentication được thực hiện, chúng ta biết được danh tính và có thể thực hiện authorization.
+Authentication là cách chúng ta xác minh danh tính của người đang cố gắng truy cập một resource cụ thể.
+Một cách phổ biến để authenticate user là yêu cầu user nhập username và password.
+Sau khi authentication hoàn tất, chúng ta biết được danh tính và có thể thực hiện authorization.
 
-Spring Security cung cấp hỗ trợ tích hợp sẵn cho việc thực hiện authentication người dùng.
-Phần này dành cho hỗ trợ authentication chung áp dụng trong cả môi trường Servlet và WebFlux.
+Spring Security cung cấp built-in support để authenticate user.
+Phần này dành cho generic authentication support áp dụng trong cả môi trường Servlet và WebFlux.
 Tham khảo các phần về authentication cho xref:servlet/authentication/index.adoc[Servlet] và xref:reactive/authentication/index.adoc[WebFlux] để biết chi tiết về những gì được hỗ trợ cho từng ngăn xếp.

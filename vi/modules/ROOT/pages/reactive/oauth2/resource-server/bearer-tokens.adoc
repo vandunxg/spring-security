@@ -1,15 +1,15 @@
-= Bearer Token của Resource Server OAuth 2.0
+= Bearer Token của OAuth 2.0 Resource Server
 
 [[webflux-oauth2resourceserver-bearertoken-resolver]]
-== Phân giải Bearer Token
+== Bearer Token Resolution
 
 Theo mặc định, Resource Server tìm bearer token trong header `Authorization`.
 Tuy nhiên, bạn có thể xác minh token này.
 
 Ví dụ, bạn có thể cần đọc bearer token từ một header tùy chỉnh.
-Để làm vậy, bạn có thể kết nối một instance của `ServerBearerTokenAuthenticationConverter` vào DSL:
+Để làm vậy, bạn có thể wire một instance của `ServerBearerTokenAuthenticationConverter` vào DSL:
 
-.Header Bearer Token tùy chỉnh
+.Header tùy chỉnh cho Bearer Token
 [tabs]
 ======
 Java::
@@ -38,10 +38,10 @@ return http {
 ----
 ======
 
-== Truyền Bearer Token
+== Bearer Token Propagation
 
 Bây giờ bạn đã có một bearer token, bạn có thể truyền token đó đến các downstream service.
-Điều này có thể thực hiện bằng javadoc:org.springframework.security.oauth2.server.resource.web.reactive.function.client.ServerBearerExchangeFilterFunction[]:
+Điều này có thể được thực hiện bằng javadoc:org.springframework.security.oauth2.server.resource.web.reactive.function.client.ServerBearerExchangeFilterFunction[]:
 
 [tabs]
 ======
@@ -125,7 +125,7 @@ rest.get()
 ----
 ======
 
-Trong trường hợp này, filter sẽ chuyển sang phương án dự phòng và chuyển tiếp request đến phần còn lại của web filter chain.
+Trong trường hợp này, filter sẽ fallback và forward request đến phần còn lại của web filter chain.
 
 [NOTE]
 ====

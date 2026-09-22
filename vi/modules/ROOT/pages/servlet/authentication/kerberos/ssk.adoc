@@ -5,11 +5,11 @@
 Phần này của tài liệu tham khảo giải thích chức năng cốt lõi
 mà Spring Security Kerberos cung cấp cho mọi ứng dụng dựa trên Spring.
 
-<<ssk-authprovider>> mô tả hỗ trợ authentication provider.
+<<ssk-authprovider>> mô tả việc hỗ trợ authentication provider.
 
-<<ssk-spnego>> mô tả hỗ trợ negotiate Spnego.
+<<ssk-spnego>> mô tả việc hỗ trợ Spnego Negotiate.
 
-<<ssk-resttemplate>> mô tả hỗ trợ RestTemplate.
+<<ssk-resttemplate>> mô tả việc hỗ trợ cho RestTemplate.
 
 
 [[ssk-authprovider]]
@@ -35,17 +35,16 @@ include::example$kerberos/SpnegoConfig.java[tags=snippetA]
 [[ssk-resttemplate]]
 == Sử dụng KerberosRestTemplate
 
-Nếu cần truy cập theo cách lập trình vào các tài nguyên web được Kerberos bảo vệ,
-chúng ta có `KerberosRestTemplate`, class này mở rộng
-`RestTemplate` và thực hiện các hành động đăng nhập cần thiết trước khi ủy quyền
-cho các method thực tế của `RestTemplate`. Về cơ bản, bạn có một số tùy chọn để
-cấu hình template này.
+Nếu cần truy cập bằng code vào các web resource được Kerberos bảo vệ, bạn có thể
+sử dụng `KerberosRestTemplate`; class này mở rộng `RestTemplate` và thực hiện các
+thao tác login cần thiết trước khi chuyển việc xử lý cho các method thực tế của
+`RestTemplate`. Về cơ bản, bạn có một số tùy chọn để cấu hình template này.
 
 - Để trống keyTabLocation và userPrincipal nếu bạn muốn
-  sử dụng ticket đã được cache.
+  sử dụng ticket đã cache.
 - Sử dụng keyTabLocation và userPrincipal nếu bạn muốn dùng
   file keytab.
-- Sử dụng loginOptions nếu bạn muốn tùy chỉnh các tùy chọn của Krb5LoginModule.
+- Sử dụng loginOptions nếu bạn muốn tùy chỉnh các option của Krb5LoginModule.
 - Sử dụng httpClient đã được tùy chỉnh.
 
 Với ticket cache.
@@ -61,17 +60,17 @@ include::example$kerberos/KerberosRestTemplateConfig.java[tags=snippetB]
 ----
 
 [[ssk-kerberosldap]]
-== Authentication với dịch vụ LDAP
+== Authentication với LDAP service
 
 Trong hầu hết các sample, chúng tôi sử dụng `DummyUserDetailsService`
-vì không nhất thiết phải truy vấn thông tin của một user thực sau khi
+vì không nhất thiết phải query thông tin của một user thực sau khi
 authentication bằng Kerberos thành công, và chúng ta có thể sử dụng thông tin
-principal của Kerberos để tạo user giả đó. Tuy nhiên, vẫn có cách an toàn để
-truy cập các dịch vụ LDAP được Kerberos bảo vệ và truy vấn thông tin user
+principal của Kerberos để tạo dummy user đó. Tuy nhiên, vẫn có cách an toàn để
+truy cập các LDAP service được Kerberos bảo vệ và query thông tin user
 từ đó.
 
 `KerberosLdapContextSource` có thể được sử dụng để bind vào LDAP thông qua Kerberos,
-và đã được chứng minh là hoạt động tốt với các dịch vụ Windows AD.
+và đã được chứng minh là hoạt động tốt với các Windows AD service.
 
 [source,java,indent=0]
 ----
@@ -81,5 +80,5 @@ include::example$kerberos/KerberosLdapContextSourceConfig.java[tags=snippetA]
 [TIP]
 ====
 Mẫu xref:servlet/authentication/kerberos/samples.adoc#samples-sec-server-win-auth[Mẫu Security Server Windows Auth]
-hiện được cấu hình để truy vấn thông tin user từ AD nếu authentication xảy ra qua Kerberos.
+hiện được cấu hình để query thông tin user từ AD nếu authentication diễn ra qua Kerberos.
 ====

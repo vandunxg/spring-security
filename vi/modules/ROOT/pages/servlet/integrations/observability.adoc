@@ -1,12 +1,12 @@
 [[observability]]
-= Khả năng quan sát
+= Observability
 
 Spring Security tích hợp sẵn với Spring Observability cho tracing; tuy nhiên, việc cấu hình để thu thập metrics cũng khá đơn giản.
 
 [[observability-tracing]]
-== Truy vết
+== Tracing
 
-Khi có bean `ObservationRegistry`, Spring Security tạo trace cho:
+Khi có bean `ObservationRegistry`, Spring Security tạo các trace cho:
 
 * filter chain
 * `AuthenticationManager`, và
@@ -187,7 +187,7 @@ Xml::
 ======
 
 [[observability-tracing-disable]]
-==== Vô hiệu hóa khả năng quan sát
+==== Tắt Observability
 
 Nếu không muốn bất kỳ observation nào của Spring Security, trong ứng dụng Spring Boot bạn có thể cung cấp một `@Bean` `ObservationRegistry.NOOP`.
 Tuy nhiên, cách này có thể tắt observation không chỉ của Spring Security.
@@ -223,7 +223,7 @@ và khi đó Spring Security sẽ không bọc filter chain, authentication ho�
 Không có cơ chế để vô hiệu hóa observation bằng hỗ trợ XML.
 Thay vào đó, chỉ cần không thiết lập thuộc tính `observation-registry-ref`.
 
-Bạn cũng có thể chỉ vô hiệu hóa các observation của Security cho một tập con.
+Bạn cũng có thể chỉ vô hiệu hóa một phần các observation của Spring Security.
 Ví dụ, bean `SecurityObservationSettings` loại trừ observation của filter chain theo mặc định.
 Vì vậy, bạn cũng có thể làm như sau:
 
@@ -288,8 +288,8 @@ fun allSpringSecurityObservations(): SecurityObservationSettings {
 Spring Security theo dõi các span sau trên mỗi request:
 
 1. `spring.security.http.requests` - một span bọc toàn bộ filter chain, bao gồm request
-2. `spring.security.http.chains.before` - một span bọc phần tiếp nhận của các filter bảo mật
-3. `spring.security.http.chains.after` - một span bọc phần trả về của các filter bảo mật
+2. `spring.security.http.chains.before` - một span bọc phần tiếp nhận của các security filter
+3. `spring.security.http.chains.after` - một span bọc phần trả về của các security filter
 4. `spring.security.http.secured.requests` - một span bọc request của ứng dụng hiện đã được bảo vệ
 5. `spring.security.http.unsecured.requests` - một span bọc các request mà Spring Security không bảo vệ
 6. `spring.security.authentications` - một span bọc các lần thử authentication

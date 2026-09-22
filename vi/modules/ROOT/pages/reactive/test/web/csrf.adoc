@@ -1,6 +1,6 @@
-= Kiểm thử với CSRF
+= Kiểm thử CSRF
 
-Spring Security cũng cung cấp hỗ trợ kiểm thử CSRF với `WebTestClient` -- ví dụ:
+Spring Security cũng hỗ trợ kiểm thử CSRF với `WebTestClient`, ví dụ:
 
 [tabs]
 ======

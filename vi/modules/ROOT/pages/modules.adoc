@@ -21,7 +21,7 @@ Khi một module phụ thuộc vào module Spring Security khác, các dependenc
 
 [[spring-security-core]]
 == Core -- `spring-security-core.jar`
-Module này chứa các class và interface authentication và kiểm soát truy cập cốt lõi, hỗ trợ remoting và các provisioning API cơ bản.
+Module này chứa các class và interface authentication và access control cốt lõi, hỗ trợ remoting và các provisioning API cơ bản.
 Nó được yêu cầu bởi mọi ứng dụng sử dụng Spring Security.
 Nó hỗ trợ ứng dụng độc lập, remote client, method security (service layer) và JDBC user provisioning.
 Nó chứa các top-level package sau:
@@ -85,12 +85,12 @@ Package chính là `org.springframework.security.remoting`.
 
 | spring-web
 |
-| Bắt buộc cho client sử dụng hỗ trợ HTTP remoting.
+| Bắt buộc cho client sử dụng HTTP remoting support.
 |===
 
 [[spring-security-web]]
 == Web -- `spring-security-web.jar`
-Module này chứa các filter và code infrastructure web-security liên quan.
+Module này chứa các filter và code infrastructure liên quan đến web-security.
 Nó chứa mọi thành phần có dependency Servlet API.
 Bạn cần module này nếu yêu cầu các service web authentication của Spring Security và kiểm soát truy cập dựa trên URL.
 Package chính là `org.springframework.security.web`.
@@ -105,7 +105,7 @@ Package chính là `org.springframework.security.web`.
 
 | spring-web
 |
-| Bắt buộc cho client sử dụng hỗ trợ HTTP remoting.
+| Bắt buộc cho client sử dụng HTTP remoting support.
 
 | spring-jdbc
 |
@@ -118,7 +118,7 @@ Package chính là `org.springframework.security.web`.
 
 [[spring-security-config]]
 == Config -- `spring-security-config.jar`
-Module này chứa code phân tích security namespace và code Java configuration.
+Module này chứa code parsing security namespace và code Java Configuration.
 Bạn cần module này nếu sử dụng Spring Security XML namespace để cấu hình hoặc sử dụng hỗ trợ Java Configuration của Spring Security.
 Package chính là `org.springframework.security.config`.
 Không class nào được thiết kế để sử dụng trực tiếp trong ứng dụng.
@@ -192,8 +192,8 @@ Top-level package là `org.springframework.security.oauth2.core`.
 
 [[spring-security-oauth2-jose]]
 == OAuth 2.0 JOSE -- `spring-security-oauth2-jose.jar`
-`spring-security-oauth2-jose.jar` chứa phần hỗ trợ của Spring Security cho framework JOSE (Javascript Object Signing and Encryption).
-Framework JOSE được thiết kế để cung cấp một phương thức truyền claim an toàn giữa các bên.
+`spring-security-oauth2-jose.jar` chứa phần support của Spring Security cho framework JOSE (Javascript Object Signing and Encryption).
+Framework JOSE được thiết kế để cung cấp một phương thức truyền claims an toàn giữa các bên.
 Nó được xây dựng từ một tập hợp các specification:
 
 * JSON Web Token (JWT)
@@ -208,8 +208,8 @@ Nó chứa các top-level package sau:
 
 [[spring-security-oauth2-resource-server]]
 == OAuth 2.0 Resource Server -- `spring-security-oauth2-resource-server.jar`
-`spring-security-oauth2-resource-server.jar` chứa phần hỗ trợ của Spring Security cho OAuth 2.0 Resource Server.
-Nó được sử dụng để bảo vệ API bằng OAuth 2.0 Bearer Token.
+`spring-security-oauth2-resource-server.jar` chứa phần support của Spring Security cho các OAuth 2.0 Resource Server.
+Nó được sử dụng để bảo vệ API bằng các OAuth 2.0 Bearer Token.
 Top-level package là `org.springframework.security.oauth2.server.resource`.
 
 [[spring-security-acl]]
@@ -241,7 +241,7 @@ Top-level package là `org.springframework.security.acls`.
 
 [[spring-security-cas]]
 == CAS -- `spring-security-cas.jar`
-Module này chứa integration CAS client của Spring Security.
+Module này chứa CAS client integration của Spring Security.
 Bạn nên sử dụng module này nếu muốn sử dụng web authentication của Spring Security với CAS single sign-on server.
 Top-level package là `org.springframework.security.cas`.
 
@@ -260,7 +260,7 @@ Top-level package là `org.springframework.security.cas`.
 | cas-client-core
 | 3.1.12
 | JA-SIG CAS Client.
-Đây là nền tảng của integration Spring Security.
+Đây là nền tảng cho CAS client integration của Spring Security.
 
 | ehcache
 | 1.6.2
@@ -294,5 +294,5 @@ Cung cấp các implementation JSP tag của Spring Security.
 
 | spring-expression
 |
-| Bắt buộc nếu sử dụng expression SPEL trong access constraint của tag.
+| Bắt buộc nếu sử dụng SpEL expression trong access constraint của tag.
 |===

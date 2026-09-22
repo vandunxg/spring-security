@@ -1,9 +1,9 @@
 [[webflux-cors]]
 = CORS
 
-Spring Framework cung cấp {spring-framework-reference-url}web/webflux-cors.html#webflux-cors-intro[hỗ trợ hàng đầu cho CORS].
+Spring Framework cung cấp {spring-framework-reference-url}web/webflux-cors.html#webflux-cors-intro[hỗ trợ hạng nhất cho CORS].
 CORS phải được xử lý trước Spring Security, vì pre-flight request không chứa cookie nào (cụ thể là `JSESSIONID`).
-Nếu request không chứa cookie nào và Spring Security được xử lý trước, Spring Security sẽ xác định rằng người dùng chưa được authentication (vì request không có cookie nào) và từ chối request đó.
+Nếu request không chứa cookie nào và Spring Security được xử lý trước, Spring Security sẽ xác định rằng người dùng chưa được authenticated (vì request không có cookie nào) và từ chối request đó.
 
 Cách dễ nhất để đảm bảo CORS được xử lý trước là sử dụng `CorsWebFilter`.
 Bạn có thể tích hợp `CorsWebFilter` với Spring Security bằng cách cung cấp một `CorsConfigurationSource`.

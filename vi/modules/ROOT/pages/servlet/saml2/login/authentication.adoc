@@ -6,7 +6,7 @@
 Bạn có thể cấu hình việc này theo một số cách, bao gồm:
 
 1. Thay đổi cách tra cứu `RelyingPartyRegistration`
-2. Thiết lập độ lệch đồng hồ khi xác thực timestamp
+2. Thiết lập clock skew để validate timestamp
 3. Ánh xạ response thành một danh sách các instance `GrantedAuthority`
 4. Tùy chỉnh chiến lược xác thực assertion
 5. Tùy chỉnh chiến lược giải mã các phần tử response và assertion
@@ -75,9 +75,9 @@ relyingPartyRegistrationBuilder.assertionConsumerServiceLocation("/saml/SSO")
 ======
 
 [[relyingpartyregistrationresolver-apply]]
-== Thay đổi việc tra cứu `RelyingPartyRegistration`
+== Thay đổi cách tra cứu `RelyingPartyRegistration`
 
-Theo mặc định, converter này sẽ đối chiếu với bất kỳ `<saml2:AuthnRequest>` liên quan nào hoặc bất kỳ `registrationId` nào mà nó tìm thấy trong URL.
+Theo mặc định, converter này sẽ match với bất kỳ `<saml2:AuthnRequest>` liên quan nào hoặc bất kỳ `registrationId` nào mà nó tìm thấy trong URL.
 Hoặc nếu không tìm thấy trong cả hai trường hợp đó, nó sẽ thử tra cứu bằng phần tử `<saml2:Response#Issuer>`.
 
 Có một số trường hợp bạn có thể cần cách xử lý tinh vi hơn, chẳng hạn khi hỗ trợ binding `ARTIFACT`.
@@ -120,7 +120,7 @@ fun securityFilters(val http: HttpSecurity, val converter: AuthenticationConvert
 ======
 
 [[servlet-saml2login-opensamlauthenticationprovider-clockskew]]
-== Thiết lập độ lệch đồng hồ
+== Thiết lập clock skew
 
 Không hiếm trường hợp asserting party và Relying Party có đồng hồ hệ thống không được đồng bộ hoàn toàn.
 Vì lý do đó, bạn có thể cấu hình `OpenSaml5AuthenticationProvider.AssertionValidator` như sau:
@@ -183,7 +183,7 @@ class SecurityConfig {
 
 == Chuyển đổi một `Assertion` thành một `Authentication`
 
-`OpenSamlXAuthenticationProvider#setResponseAuthenticationConverter` cung cấp cách để bạn thay đổi cách nó chuyển đổi assertion thành một instance `Authentication`.
+`OpenSamlXAuthenticationProvider#setResponseAuthenticationConverter` cho phép bạn thay đổi cách chuyển đổi assertion thành một instance `Authentication`.
 
 Bạn có thể thiết lập một converter tùy chỉnh như sau:
 
@@ -244,12 +244,12 @@ open class SecurityConfig {
 ----
 ======
 
-Các ví dụ tiếp theo đều dựa trên cấu trúc chung này để minh họa những cách khác nhau mà converter này có thể hữu ích.
+Các ví dụ tiếp theo đều dựa trên cấu trúc chung này để minh họa những trường hợp khác nhau mà converter này hữu ích.
 
 [[servlet-saml2login-opensamlauthenticationprovider-userdetailsservice]]
-== Phối hợp với một `UserDetailsService`
+== Kết hợp với một `UserDetailsService`
 
-Hoặc có thể bạn muốn đưa thông tin user từ một `UserDetailsService` cũ vào.
+Hoặc có thể bạn muốn đưa user details từ một `UserDetailsService` legacy vào.
 Trong trường hợp đó, response authentication converter có thể hữu ích như minh họa dưới đây:
 
 [tabs]
@@ -307,11 +307,11 @@ open class MyUserDetailsResponseAuthenticationConverter(private val userDetailsS
 ======
 <1> Thứ nhất, gọi converter mặc định, converter này trích xuất attributes và authorities từ response
 <2> Thứ hai, gọi xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[`UserDetailsService`] bằng thông tin liên quan
-<3> Thứ ba, trả về một authentication có chứa thông tin user
+<3> Thứ ba, trả về một authentication có chứa user details
 
 [TIP]
 ====
-Nếu `UserDetailsService` của bạn trả về một giá trị cũng implements `AuthenticatedPrincipal`, bạn không cần một authentication implementation tùy chỉnh.
+Nếu `UserDetailsService` của bạn trả về một giá trị cũng implement `AuthenticatedPrincipal`, bạn không cần một authentication implementation tùy chỉnh.
 ====
 
 [NOTE]
@@ -357,7 +357,7 @@ fun authenticationConverter(): ResponseAuthenticationConverter {
 === Cấu hình Granted Authorities của Principal
 
 Spring Security tự động cấp `ROLE_USER` khi sử dụng `OpenSamlXAuhenticationProvider`.
-Với `OpenSaml5AuthenticationProvider`, bạn có thể cấu hình một tập granted authorities khác như sau:
+Với `OpenSaml5AuthenticationProvider`, bạn có thể cấu hình một tập hợp granted authorities khác như sau:
 
 [tabs]
 ======
@@ -535,7 +535,7 @@ provider.setAssertionElementsDecrypter { assertionToken -> decryptionService.dec
 ----
 ======
 
-LƯU Ý: Có hai decrypter riêng biệt vì assertion có thể được ký riêng với response.
+NOTE: Có hai decrypter riêng biệt vì assertion có thể được ký riêng với response.
 Cố gắng giải mã các phần tử của assertion đã ký trước khi xác minh signature có thể làm signature mất hiệu lực.
 Nếu asserting party của bạn chỉ ký response, thì có thể giải mã an toàn mọi phần tử chỉ bằng response decrypter.
 
@@ -600,7 +600,7 @@ open class SecurityConfig {
 == Sử dụng `Saml2AuthenticatedPrincipal`
 
 Khi Relying Party được cấu hình chính xác cho một asserting party cụ thể, nó đã sẵn sàng chấp nhận các assertion.
-Sau khi Relying Party xác thực một assertion, kết quả là một `Saml2Authentication` với một `Saml2AuthenticatedPrincipal`.
+Sau khi Relying Party validate một assertion, kết quả là một `Saml2Authentication` với một `Saml2AuthenticatedPrincipal`.
 
 Điều này có nghĩa là bạn có thể truy cập principal trong controller như sau:
 

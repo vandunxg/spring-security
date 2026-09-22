@@ -7,9 +7,9 @@ Spring Security hỗ trợ bảo vệ các endpoint bằng cách cung cấp hai 
 * Opaque Tokens
 
 Điều này hữu ích trong các trường hợp ứng dụng đã ủy quyền việc quản lý authority của mình cho một https://tools.ietf.org/html/rfc6749[Authorization Server] (ví dụ: Okta hoặc Ping Identity).
-Các Resource Server có thể tham vấn Authorization Server này để authorization các request.
+Các Resource Server có thể tham vấn Authorization Server này để thực hiện authorization cho các request.
 
 [NOTE]
 ====
-Một ví dụ hoàn chỉnh cho {gh-samples-url}/reactive/webflux/java/oauth2/resource-server[JWT] có sẵn trong {gh-samples-url}[repository Spring Security].
+Một ví dụ hoàn chỉnh cho {gh-samples-url}/reactive/webflux/java/oauth2/resource-server[JWT] có sẵn trong {gh-samples-url}[repository của Spring Security].
 ====

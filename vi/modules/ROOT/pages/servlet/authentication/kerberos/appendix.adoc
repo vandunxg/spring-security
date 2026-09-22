@@ -41,7 +41,7 @@ bản, `KDC` có key riêng của nó và các key khác dành cho user trong do
 
 image::{figures}/drawio-kerb-cc2.png[]
 
-Khi client muốn tự authentication với một `resource`, trước hết nó cần
+Khi client muốn thực hiện authentication với một `resource`, trước hết nó cần
 giao tiếp với một `KDC`. `Client` sẽ tạo một package đặc biệt gồm các phần
 được mã hóa và không được mã hóa. Phần không được mã hóa chứa, chẳng hạn,
 thông tin về một user; phần được mã hóa chứa các thông tin khác thuộc về
@@ -108,7 +108,7 @@ kadmin: Client not found in Kerberos database while initializing
 kadmin interface
 ----
 
-Hãy dùng command `kadmin.local` để tạo một admin user.
+Hãy dùng command `kadmin.local` để tạo một admin principal.
 
 [source,text,indent=0]
 ----
@@ -130,8 +130,8 @@ Re-enter password for principal "root/admin@EXAMPLE.ORG":
 Principal "root/admin@EXAMPLE.ORG" created.
 ----
 
-Sau đó, bật admin bằng cách sửa file `kadm5.acl` và khởi động lại các
-service Kerberos.
+Sau đó, bật quyền quản trị bằng cách sửa file `kadm5.acl` và khởi động lại
+các Kerberos service.
 
 [source,text,indent=0]
 ----
@@ -202,12 +202,12 @@ https://social.technet.microsoft.com/wiki/contents/articles/12370.windows-server
 Technet].
 ====
 
-- Đã thiết lập domain controller và active directory thông thường.
-- Sử dụng dns domain `example.org` và windows domain `EXAMPLE`.
+- Đã thiết lập domain controller và Active Directory theo cách thông thường.
+- Sử dụng DNS domain `example.org` và Windows domain `EXAMPLE`.
 - Đã tạo nhiều domain user như `user1`, `user2`, `user3`, `tomcat` và đặt
   password là `Password#`.
 
-Cuối cùng, tôi cũng thêm toàn bộ IP của các VM vào dns server của AD để
+Cuối cùng, tôi cũng thêm toàn bộ IP của các VM vào DNS server của AD để
 không gây ra vấn đề nào.
 
 [source,text]
@@ -254,7 +254,7 @@ lỗi đánh máy có thể có. Việc thiết lập Kerberos thường khá mo
 không phải lúc nào cũng dễ debug để xác định vấn đề nằm ở đâu.
 ====
 
-.Không tìm thấy key có type phù hợp để giải mã
+.Không tìm thấy key có encryption type phù hợp để decrypt
 
 [source,text]
 ----
@@ -263,9 +263,9 @@ Invalid argument (400) - Cannot find key of appropriate type to
 decrypt AP REP - RC4 with HMAC)
 ----
 
-Nếu bạn thấy lỗi trên cho biết thiếu key type, lỗi này sẽ xảy ra trong hai
+Nếu bạn thấy lỗi trên cho biết thiếu key có type phù hợp, lỗi này sẽ xảy ra trong hai
 trường hợp khác nhau. Trước tiên, JVM của bạn có thể không hỗ trợ encryption
-type phù hợp hoặc type này bị vô hiệu hóa trong file `krb5.conf`.
+type phù hợp hoặc encryption type này bị vô hiệu hóa trong file `krb5.conf`.
 
 [source,text]
 ----
@@ -278,18 +278,18 @@ cùng lỗi. `GSSException` cụ thể này cũng được ném ra nếu bạn �
 không có encryption key bắt buộc; nguyên nhân có thể là server Kerberos
 được cấu hình sai hoặc principal có lỗi đánh máy.
 
-.Sử dụng cấu hình kerberos sai
+.Sử dụng sai cấu hình Kerberos
 
 {zwsp} +
 
-Trong hầu hết system, tất cả command và library sẽ tìm cấu hình kerberos
+Trong hầu hết các system, tất cả command và library sẽ tìm cấu hình Kerberos
 từ các vị trí mặc định hoặc các vị trí đặc biệt như vị trí của JDK. Rất dễ
 bị nhầm lẫn, đặc biệt khi làm việc từ các system Unix vốn có thể đã có
-setting mặc định để làm việc với MIT kerberos, rồi chuyển sang các Windows
+setting mặc định để làm việc với MIT Kerberos, rồi chuyển sang các Windows
 domain.
 
 Đây là một ví dụ cụ thể về điều xảy ra khi `ldapsearch` cố query Windows AD
-bằng authentication Kerberos.
+bằng Kerberos authentication.
 
 [source,text]
 ----
@@ -313,8 +313,8 @@ klist: Credentials cache file '/tmp/krb5cc_1000' not found
 Chúng ta đã có một file keytab được export từ Windows AD để dùng với tomcat
 đang chạy trên Linux. Hãy thử dùng file đó để authentication với Windows AD.
 
-Bạn có thể có một file config riêng, thường được dùng với các command native
-của Linux và JVM thông qua system property.
+Bạn có thể có một file config chuyên dụng, thường được dùng với các command native
+của Linux và các JVM thông qua system property.
 
 [source,text]
 ----
@@ -366,7 +366,7 @@ ldap_sasl_interactive_bind_s: Local error (-2)
 sai. Bạn có thể yêu cầu `ldapsearch` dùng config khác thông qua biến môi
 trường `KRB5_CONFIG`, giống như chúng ta đã làm với `kinit`. Bạn cũng có thể
 dùng `KRB5_TRACE=/dev/stderr` để xem output chi tiết hơn về hoạt động của
-các library native.
+các native library.
 
 [source,text]
 ----
@@ -403,11 +403,11 @@ dn: CN=test user,DC=example,DC=org
 
 [appendix]
 [[browserspnegoconfig]]
-== Cấu hình Browser cho Spnego Negotiation
+== Cấu hình browser cho SPNEGO negotiation
 
 === Firefox
 Thực hiện các bước sau để đảm bảo browser Firefox của bạn được bật để
-thực hiện authentication Spnego.
+thực hiện SPNEGO authentication.
 
 - Mở Firefox.
 - Trong thanh địa chỉ, nhập *about:config*.
@@ -419,7 +419,7 @@ thực hiện authentication Spnego.
 
 === Chrome
 Với Google Chrome, nhìn chung bạn cần đặt các command-line parameter để
-đưa các server mà Chrome sẽ negotiate vào allowlist.
+đưa các server mà Chrome sẽ negotiate với vào allowlist.
 
 - trên các máy Windows (client): Chrome dùng chung configuration với
   Internet Explorer, vì vậy nếu mọi thay đổi đã được áp dụng cho IE (như
@@ -454,9 +454,9 @@ Chrome trên Linux cũng sẽ đọc các policy file từ thư mục
 
 === Internet Explorer
 Thực hiện các bước sau để đảm bảo browser Internet Explorer của bạn được
-bật để thực hiện authentication Spnego.
+bật để thực hiện SPNEGO authentication.
 
 - Mở Internet Explorer.
-- Nhấp vào tab *Tools > Intenet Options > Security*.
+- Nhấp vào tab *Tools > Internet Options > Security*.
 - Trong phần *Local intranet*, hãy bảo đảm server của bạn được tin cậy,
   chẳng hạn bằng cách thêm server vào danh sách.

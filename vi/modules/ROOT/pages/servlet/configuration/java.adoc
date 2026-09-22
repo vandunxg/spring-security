@@ -2,22 +2,22 @@
 [[jc]]
 = Cấu hình Java
 
-Hỗ trợ tổng quát cho {spring-framework-reference-url}core/beans/java.html[cấu hình Java] được thêm vào Spring Framework trong Spring 3.1.
+Hỗ trợ chung cho {spring-framework-reference-url}core/beans/java.html[cấu hình Java] được thêm vào Spring Framework trong Spring 3.1.
 Spring Security 3.2 giới thiệu cấu hình Java để người dùng có thể cấu hình Spring Security mà không cần sử dụng XML.
 
-Nếu bạn đã quen với xref:servlet/configuration/xml-namespace.adoc#ns-config[Cấu hình Namespace của Security], bạn sẽ thấy khá nhiều điểm tương đồng giữa cách đó và cấu hình Java của Spring Security.
+Nếu bạn đã quen với xref:servlet/configuration/xml-namespace.adoc#ns-config[Security Namespace Configuration], bạn sẽ thấy khá nhiều điểm tương đồng giữa cách đó và Java configuration của Spring Security.
 
 [NOTE]
 ====
-Spring Security cung cấp https://github.com/spring-projects/spring-security-samples/tree/main/servlet/java-configuration[nhiều ứng dụng mẫu] để minh họa cách sử dụng Cấu hình Java của Spring Security.
+Spring Security cung cấp https://github.com/spring-projects/spring-security-samples/tree/main/servlet/java-configuration[nhiều ứng dụng mẫu] để minh họa cách sử dụng Java Configuration của Spring Security.
 ====
 
 [[jc-hello-wsca]]
-== Cấu hình Java Web Security Hello
+== Cấu hình Java cho Hello Web Security
 
-Bước đầu tiên là tạo Cấu hình Java cho Spring Security.
-Cấu hình này tạo một Servlet Filter có tên là `springSecurityFilterChain`, chịu trách nhiệm cho toàn bộ chức năng bảo mật (bảo vệ URL của ứng dụng, xác thực username và password được gửi lên, chuyển hướng đến form đăng nhập, v.v.) trong ứng dụng của bạn.
-Ví dụ sau đây cho thấy ví dụ cơ bản nhất về Cấu hình Java của Spring Security:
+Bước đầu tiên là tạo Java Configuration cho Spring Security.
+Cấu hình này tạo một Servlet Filter có tên là `springSecurityFilterChain`, chịu trách nhiệm cho toàn bộ chức năng security (bảo vệ URL của ứng dụng, validate username và password được submit, chuyển hướng đến form đăng nhập, v.v.) trong application của bạn.
+Ví dụ sau đây là cấu hình Java cơ bản nhất của Spring Security:
 
 [source,java]
 ----
@@ -42,19 +42,19 @@ public class WebSecurityConfig {
 
 Cấu hình này không phức tạp hay dài dòng, nhưng thực hiện được nhiều việc:
 
-* Yêu cầu authentication cho mọi URL trong ứng dụng
+* Yêu cầu authentication trên mọi URL trong application
 * Tự động tạo form đăng nhập
-* Cho phép người dùng có *Username* là `user` và *Password* là `password` thực hiện authentication dựa trên form
-* Cho phép người dùng logout
-* Ngăn chặn https://en.wikipedia.org/wiki/Cross-site_request_forgery[tấn công CSRF]
-* Bảo vệ chống https://en.wikipedia.org/wiki/Session_fixation[Session Fixation]
+* Cho phép user có *Username* là `user` và *Password* là `password` authenticate bằng form-based authentication
+* Cho phép user logout
+* Ngăn chặn https://en.wikipedia.org/wiki/Cross-site_request_forgery[CSRF attack]
+* Bảo vệ khỏi https://en.wikipedia.org/wiki/Session_fixation[Session Fixation]
 * Tích hợp Security Header:
-** https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security[HTTP Strict Transport Security] cho các request bảo mật
+** https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security[HTTP Strict Transport Security] cho các secure request
 ** Tích hợp https://msdn.microsoft.com/en-us/library/ie/gg622941(v=vs.85).aspx[X-Content-Type-Options]
 ** Cache Control (sau này bạn có thể ghi đè trong ứng dụng để cho phép cache các tài nguyên tĩnh)
 ** Tích hợp https://msdn.microsoft.com/en-us/library/dd565647(v=vs.85).aspx[X-XSS-Protection]
 ** Tích hợp X-Frame-Options để giúp ngăn chặn https://en.wikipedia.org/wiki/Clickjacking[Clickjacking]
-* Tích hợp với các method Servlet API sau:
+* Tích hợp với các method sau của Servlet API:
 ** https://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html#getRemoteUser()[`HttpServletRequest#getRemoteUser()`]
 ** https://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html#getUserPrincipal()[`HttpServletRequest#getUserPrincipal()`]
 ** https://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html#isUserInRole(java.lang.String)[`HttpServletRequest#isUserInRole(java.lang.String)`]
@@ -63,18 +63,18 @@ Cấu hình này không phức tạp hay dài dòng, nhưng thực hiện đư�
 
 === AbstractSecurityWebApplicationInitializer
 
-Bước tiếp theo là đăng ký `springSecurityFilterChain` với file WAR.
-Bạn có thể thực hiện việc này bằng cấu hình Java với {spring-framework-reference-url}web/webmvc/mvc-servlet/container-config.html[hỗ trợ `WebApplicationInitializer` của Spring] trong môi trường Servlet 3.0+.
+Bước tiếp theo là đăng ký `springSecurityFilterChain` vào WAR file.
+Bạn có thể thực hiện việc này bằng Java configuration với {spring-framework-reference-url}web/webmvc/mvc-servlet/container-config.html[hỗ trợ `WebApplicationInitializer` của Spring] trong môi trường Servlet 3.0+.
 Không có gì ngạc nhiên khi Spring Security cung cấp một base class (`AbstractSecurityWebApplicationInitializer`) để đảm bảo `springSecurityFilterChain` được đăng ký cho bạn.
 Cách sử dụng `AbstractSecurityWebApplicationInitializer` khác nhau tùy thuộc vào việc ứng dụng đã sử dụng Spring hay Spring Security là component Spring duy nhất trong ứng dụng.
 
-* <<abstractsecuritywebapplicationinitializer-without-existing-spring>> - Sử dụng các hướng dẫn này nếu ứng dụng chưa sử dụng Spring
-* <<abstractsecuritywebapplicationinitializer-with-spring-mvc>> - Sử dụng các hướng dẫn này nếu ứng dụng đã sử dụng Spring
+* <<abstractsecuritywebapplicationinitializer-without-existing-spring>> - Sử dụng các hướng dẫn này nếu application chưa sử dụng Spring
+* <<abstractsecuritywebapplicationinitializer-with-spring-mvc>> - Sử dụng các hướng dẫn này nếu application đã sử dụng Spring
 
 [[abstractsecuritywebapplicationinitializer-without-existing-spring]]
-=== AbstractSecurityWebApplicationInitializer không có Spring hiện hữu
+=== AbstractSecurityWebApplicationInitializer khi chưa có Spring
 
-Nếu bạn không sử dụng Spring hoặc Spring MVC, bạn cần truyền `WebSecurityConfig` cho superclass để đảm bảo cấu hình được nhận diện:
+Nếu bạn không sử dụng Spring hoặc Spring MVC, bạn cần truyền `WebSecurityConfig` cho superclass để đảm bảo configuration được load:
 
 [source,java]
 ----
@@ -91,14 +91,14 @@ public class SecurityWebApplicationInitializer
 
 `SecurityWebApplicationInitializer` sẽ:
 
-* Tự động đăng ký Filter `springSecurityFilterChain` cho mọi URL trong ứng dụng.
-* Thêm một `ContextLoaderListener` tải <<jc-hello-wsca,WebSecurityConfig>>.
+* Tự động đăng ký Filter `springSecurityFilterChain` cho mọi URL trong application.
+* Thêm một `ContextLoaderListener` load <<jc-hello-wsca,WebSecurityConfig>>.
 
 [[abstractsecuritywebapplicationinitializer-with-spring-mvc]]
 === AbstractSecurityWebApplicationInitializer với Spring MVC
 
-Nếu sử dụng Spring ở nơi khác trong ứng dụng, có lẽ chúng ta đã có một `WebApplicationInitializer` đang tải Cấu hình Spring.
-Nếu sử dụng cấu hình trước đó, chúng ta sẽ gặp lỗi.
+Nếu sử dụng Spring ở nơi khác trong application, có lẽ chúng ta đã có một `WebApplicationInitializer` đang load Spring configuration.
+Nếu sử dụng configuration trước đó, chúng ta sẽ gặp lỗi.
 Thay vào đó, chúng ta nên đăng ký Spring Security với `ApplicationContext` hiện có.
 Ví dụ, nếu sử dụng Spring MVC, `SecurityWebApplicationInitializer` có thể trông như sau:
 
@@ -112,8 +112,8 @@ public class SecurityWebApplicationInitializer
 }
 ----
 
-Việc này chỉ đăng ký `springSecurityFilterChain` cho mọi URL trong ứng dụng.
-Sau đó, chúng ta cần đảm bảo `WebSecurityConfig` được tải trong `ApplicationInitializer` hiện có.
+Việc này chỉ đăng ký `springSecurityFilterChain` cho mọi URL trong application.
+Sau đó, chúng ta cần đảm bảo `WebSecurityConfig` được load trong `ApplicationInitializer` hiện có.
 Ví dụ, nếu sử dụng Spring MVC, nó được thêm vào `getServletConfigClasses()`:
 
 [[message-web-application-inititializer-java]]
@@ -131,7 +131,7 @@ public class MvcWebApplicationInitializer extends
 }
 ----
 
-Lý do là Spring Security cần có khả năng kiểm tra một số cấu hình Spring MVC để cấu hình thích hợp xref:servlet/authorization/authorize-http-requests.adoc#authorizing-endpoints[các request matcher bên dưới], vì vậy chúng cần nằm trong cùng một application context.
+Lý do là Spring Security cần inspect một số Spring MVC configuration để cấu hình chính xác xref:servlet/authorization/authorize-http-requests.adoc#authorizing-endpoints[các request matcher tương ứng], vì vậy chúng cần nằm trong cùng một application context.
 Đặt Spring Security trong `getRootConfigClasses` sẽ đưa nó vào một application context cha, nơi có thể không tìm thấy `PathPatternParser` của Spring MVC.
 
 ==== Cấu hình cho nhiều Spring MVC Dispatcher
@@ -162,10 +162,10 @@ public class MvcWebApplicationInitializer extends
 [[jc-httpsecurity]]
 == HttpSecurity
 
-Cho đến nay, <<jc-hello-wsca,`WebSecurityConfig`>> của chúng ta chỉ chứa thông tin về cách thực hiện authentication cho người dùng.
-Làm thế nào Spring Security biết chúng ta muốn yêu cầu tất cả người dùng phải được authenticated?
+Cho đến nay, <<jc-hello-wsca,`WebSecurityConfig`>> của chúng ta chỉ chứa thông tin về cách authenticate user.
+Làm thế nào Spring Security biết chúng ta muốn yêu cầu mọi user phải authenticated?
 Làm thế nào Spring Security biết chúng ta muốn hỗ trợ authentication dựa trên form?
-Thực tế có một configuration class (được gọi là `SecurityFilterChain`) được gọi ở phía sau.
+Thực ra có một configuration class (được gọi là `SecurityFilterChain`) được invoke ngầm phía sau.
 Nó được cấu hình bằng implementation mặc định sau:
 
 [source,java]
@@ -182,11 +182,11 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 }
 ----
 
-Configuration mặc định (được minh họa trong ví dụ trước):
+Cấu hình mặc định (được minh họa trong ví dụ trước):
 
-* Đảm bảo mọi request đến ứng dụng đều yêu cầu user phải được authenticated
-* Cho phép user thực hiện authentication bằng Form Login
-* Cho phép user thực hiện authentication bằng Basic Authentication
+* Đảm bảo mọi request đến application đều yêu cầu user phải authenticated
+* Cho phép user authenticate bằng form-based login
+* Cho phép user authenticate bằng HTTP Basic authentication
 
 Lưu ý rằng cấu hình này tương đương với cấu hình XML namespace:
 
@@ -201,12 +201,12 @@ Lưu ý rằng cấu hình này tương đương với cấu hình XML namespace
 
 === Nhiều instance HttpSecurity
 
-Để quản lý bảo mật hiệu quả trong ứng dụng mà một số khu vực cần mức bảo vệ khác nhau, chúng ta có thể sử dụng nhiều filter chain cùng với DSL method `securityMatcher`.
-Cách tiếp cận này cho phép định nghĩa các cấu hình bảo mật riêng biệt phù hợp với từng phần cụ thể của ứng dụng, qua đó tăng cường bảo mật và khả năng kiểm soát tổng thể.
+Để quản lý security hiệu quả trong một application mà một số khu vực cần mức bảo vệ khác nhau, chúng ta có thể sử dụng nhiều filter chain cùng với DSL method `securityMatcher`.
+Cách tiếp cận này cho phép định nghĩa các security configuration riêng biệt phù hợp với từng phần cụ thể của application, qua đó tăng cường security và khả năng kiểm soát tổng thể.
 
 Chúng ta có thể cấu hình nhiều instance `HttpSecurity`, tương tự như có nhiều block `<http>` trong XML.
 Điểm cốt lõi là đăng ký nhiều `SecurityFilterChain` ``@Bean``.
-Ví dụ sau có một cấu hình khác dành cho các URL bắt đầu bằng `/api/`:
+Ví dụ sau có configuration khác dành cho các URL bắt đầu bằng `/api/`:
 
 [[multiple-httpsecurity-instances-java]]
 [source,java]
@@ -246,12 +246,12 @@ public class MultiHttpSecurityConfig {
 	}
 }
 ----
-<1> Cấu hình Authentication như thường lệ.
+<1> Cấu hình Authentication như bình thường.
 <2> Tạo một instance `SecurityFilterChain` có `@Order` để chỉ định `SecurityFilterChain` nào được xem xét trước.
 <3> `http.securityMatcher()` cho biết `HttpSecurity` này chỉ áp dụng cho các URL bắt đầu bằng `/api/`.
 <4> Tạo một instance `SecurityFilterChain` khác.
-Nếu URL không bắt đầu bằng `/api/`, cấu hình này sẽ được sử dụng.
-Cấu hình này được xem xét sau `apiFilterChain` vì có giá trị `@Order` sau `1` (không có `@Order` thì mặc định được xử lý sau cùng).
+Nếu URL không bắt đầu bằng `/api/`, configuration này sẽ được sử dụng.
+Configuration này được xem xét sau `apiFilterChain` vì có giá trị `@Order` sau `1` (không có `@Order` thì mặc định được xử lý sau cùng).
 
 === Chọn `securityMatcher` hay `requestMatchers`
 
@@ -259,15 +259,15 @@ Một câu hỏi thường gặp là:
 
 > Sự khác nhau giữa method `http.securityMatcher()` và `requestMatchers()` được sử dụng cho request authorization (tức là bên trong `http.authorizeHttpRequests()`) là gì?
 
-Để trả lời câu hỏi này, cần hiểu rằng mỗi instance `HttpSecurity` được sử dụng để xây dựng một `SecurityFilterChain` đều chứa một `RequestMatcher` để match các request đến.
-Nếu một request không match `SecurityFilterChain` có độ ưu tiên cao hơn (ví dụ `@Order(1)`), request đó có thể được thử với filter chain có độ ưu tiên thấp hơn (ví dụ không có `@Order`).
+Để trả lời câu hỏi này, cần hiểu rằng mỗi instance `HttpSecurity` được sử dụng để xây dựng một `SecurityFilterChain` đều chứa một `RequestMatcher` để match các request gửi đến.
+Nếu một request không match `SecurityFilterChain` có độ ưu tiên cao hơn (ví dụ `@Order(1)`), request đó có thể được đem match với filter chain có độ ưu tiên thấp hơn (ví dụ không có `@Order`).
 
 [NOTE]
 ====
 Logic matching cho nhiều filter chain được thực hiện bởi xref:servlet/architecture.adoc#servlet-filterchainproxy[`FilterChainProxy`].
 ====
 
-`RequestMatcher` mặc định match *mọi request* để đảm bảo Spring Security *mặc định bảo vệ mọi request*.
+`RequestMatcher` mặc định match *mọi request* để đảm bảo Spring Security *bảo vệ mọi request theo mặc định*.
 
 [NOTE]
 ====
@@ -311,11 +311,11 @@ public class PartialSecurityConfig {
 <1> Các request bắt đầu bằng `/secured/` sẽ được bảo vệ, còn các request khác thì không.
 <2> Request đến `/secured/user` yêu cầu authority `ROLE_USER`.
 <3> Request đến `/secured/admin` yêu cầu authority `ROLE_ADMIN`.
-<4> Mọi request khác (chẳng hạn `/secured/other`) chỉ yêu cầu user đã được authenticated.
+<4> Mọi request khác (chẳng hạn `/secured/other`) chỉ yêu cầu user phải authenticated.
 
 [TIP]
 ====
-_Khuyến nghị_ cung cấp một `SecurityFilterChain` không chỉ định `securityMatcher` để đảm bảo toàn bộ ứng dụng được bảo vệ, như minh họa trong <<multiple-httpsecurity-instances-java,ví dụ trước đó>>.
+_Khuyến nghị_ cung cấp một `SecurityFilterChain` không chỉ định `securityMatcher` để đảm bảo toàn bộ application được bảo vệ, như minh họa trong <<multiple-httpsecurity-instances-java,ví dụ trước đó>>.
 ====
 
 Lưu ý rằng method `requestMatchers` chỉ áp dụng cho từng authorization rule riêng lẻ.
@@ -324,13 +324,13 @@ Trong ví dụ này, `anyRequest()` match tất cả request còn lại bên tro
 
 [NOTE]
 ====
-Xem xref:servlet/authorization/authorize-http-requests.adoc[Ủy quyền cho HttpServletRequests] để biết thêm thông tin về `requestMatchers`.
+Xem xref:servlet/authorization/authorize-http-requests.adoc[Authorization cho HttpServletRequests] để biết thêm thông tin về `requestMatchers`.
 ====
 
 === Các endpoint của `SecurityFilterChain`
 
 Một số filter trong `SecurityFilterChain` trực tiếp cung cấp endpoint, chẳng hạn `UsernamePasswordAuthenticationFilter` được thiết lập bởi `http.formLogin()` và cung cấp endpoint `POST /login`.
-Trong <<choosing-security-matcher-request-matchers-java,ví dụ trên>>, endpoint `/login` không match `http.securityMatcher("/secured/**")`, vì vậy ứng dụng đó sẽ không có endpoint `GET /login` hoặc `POST /login`.
+Trong <<choosing-security-matcher-request-matchers-java,ví dụ trên>>, endpoint `/login` không match `http.securityMatcher("/secured/**")`, vì vậy application đó sẽ không có endpoint `GET /login` hoặc `POST /login`.
 Các request như vậy sẽ trả về `404 Not Found`.
 Điều này thường khiến người dùng bất ngờ.
 
@@ -338,7 +338,7 @@ Việc chỉ định `http.securityMatcher()` ảnh hưởng đến các request
 Tuy nhiên, nó không tự động ảnh hưởng đến các endpoint do filter chain cung cấp.
 Trong những trường hợp đó, bạn có thể cần tùy chỉnh URL của các endpoint mà bạn muốn filter chain cung cấp.
 
-Ví dụ sau minh họa một cấu hình bảo vệ các request bắt đầu bằng `/secured/` và từ chối mọi request khác, đồng thời tùy chỉnh các endpoint do `SecurityFilterChain` cung cấp:
+Ví dụ sau minh họa một configuration bảo vệ các request bắt đầu bằng `/secured/` và từ chối mọi request khác, đồng thời tùy chỉnh các endpoint do `SecurityFilterChain` cung cấp:
 
 [[security-filter-chain-endpoints-java]]
 [source,java]
@@ -464,14 +464,14 @@ public class BankingSecurityConfig {
     }
 }
 ----
-<1> Bắt đầu bằng việc cấu hình các thiết lập authentication.
+<1> Bắt đầu bằng việc cấu hình authentication settings.
 <2> Định nghĩa một instance `SecurityFilterChain` với `@Order(1)`, nghĩa là filter chain này có độ ưu tiên cao nhất.
     Filter chain này chỉ áp dụng cho các request bắt đầu bằng `/accounts/approvals/`, `/loans/approvals/` hoặc `/credit-cards/approvals/`.
-	Request đến filter chain này yêu cầu authority `ROLE_ADMIN` và cho phép HTTP Basic Authentication.
+	Các request được filter chain này xử lý yêu cầu authority `ROLE_ADMIN` và cho phép HTTP Basic Authentication.
 <3> Tiếp theo, tạo một instance `SecurityFilterChain` khác với `@Order(2)`, được xem xét thứ hai.
     Filter chain này chỉ áp dụng cho các request bắt đầu bằng `/accounts/`, `/loans/`, `/credit-cards/` hoặc `/balances/`.
 	Lưu ý rằng vì filter chain này được xem xét thứ hai, mọi request chứa `/approvals/` sẽ match filter chain trước đó và *không* được filter chain này match.
-	Request đến filter chain này yêu cầu authority `ROLE_USER`.
+	Các request được filter chain này xử lý yêu cầu authority `ROLE_USER`.
 	Filter chain này không định nghĩa authentication nào vì filter chain tiếp theo (mặc định) chứa cấu hình đó.
 <4> Cuối cùng, tạo thêm một instance `SecurityFilterChain` không có annotation `@Order`.
     Cấu hình này sẽ xử lý các request không được các filter chain khác bao phủ và được xử lý sau cùng (không có `@Order` thì mặc định xử lý sau cùng).
@@ -481,7 +481,7 @@ public class BankingSecurityConfig {
 [[jc-custom-dsls]]
 == DSL tùy chỉnh
 
-Bạn có thể cung cấp DSL tùy chỉnh của riêng mình trong Spring Security:
+Bạn có thể cung cấp DSL tùy chỉnh riêng trong Spring Security:
 
 [tabs]
 ======
@@ -554,10 +554,10 @@ class MyCustomDsl : AbstractHttpConfigurer<MyCustomDsl, HttpSecurity>() {
 
 [NOTE]
 ====
-Thực tế, các method như `HttpSecurity.authorizeHttpRequests()` được triển khai theo cách này.
+Thực ra, các method như `HttpSecurity.authorizeHttpRequests()` được triển khai theo cách này.
 ====
 
-Sau đó bạn có thể sử dụng DSL tùy chỉnh:
+Sau đó, bạn có thể sử dụng DSL tùy chỉnh:
 
 [tabs]
 ======
@@ -602,11 +602,11 @@ class Config {
 ----
 ======
 
-Code được gọi theo thứ tự sau:
+Code được invoke theo thứ tự sau:
 
-* Code trong method `Config.filterChain` được gọi
-* Code trong method `MyCustomDsl.init` được gọi
-* Code trong method `MyCustomDsl.configure` được gọi
+* Code trong method `Config.filterChain` được invoke
+* Code trong method `MyCustomDsl.init` được invoke
+* Code trong method `MyCustomDsl.configure` được invoke
 
 Nếu muốn, bạn có thể để `HttpSecurity` mặc định thêm `MyCustomDsl` bằng cách sử dụng `SpringFactories`.
 Ví dụ, bạn có thể tạo một resource trên classpath có tên `META-INF/spring.factories` với nội dung sau:
@@ -664,22 +664,22 @@ class Config {
 ======
 
 [[modular-httpsecurity-configuration]]
-== Cấu hình HttpSecurity theo module
+== Cấu hình HttpSecurity dạng module
 
-Nhiều người dùng muốn cấu hình Spring Security nằm ở một nơi tập trung và sẽ chọn cấu hình trong một instance `SecurityFilterChain` duy nhất.
+Nhiều người dùng muốn tập trung Spring Security configuration tại một nơi và sẽ chọn cấu hình trong một instance `SecurityFilterChain` duy nhất.
 Tuy nhiên, có những lúc người dùng muốn cấu hình được chia thành các module.
 Có thể thực hiện việc này bằng:
 
 * xref:#httpsecurity-customizer-bean[Các bean Customizer<HttpSecurity>]
 * xref:#top-level-customizer-bean[Các bean HttpSecurity Customizer cấp cao nhất]
 
-NOTE: Nếu bạn đang sử dụng xref:servlet/configuration/kotlin.adoc[] của Spring Security, bạn cũng có thể expose các bean `*Dsl -> Unit` như đã nêu trong xref:./kotlin.adoc#modular-httpsecuritydsl-configuration[Cấu hình HttpSecurityDsl theo module].
+NOTE: Nếu bạn đang sử dụng xref:servlet/configuration/kotlin.adoc[] của Spring Security, bạn cũng có thể expose các bean `*Dsl -> Unit` như đã nêu trong xref:./kotlin.adoc#modular-httpsecuritydsl-configuration[Modular HttpSecurityDsl Configuration].
 
 
 [[httpsecurity-customizer-bean]]
-=== Bean Customizer<HttpSecurity>
+=== Các bean Customizer<HttpSecurity>
 
-Nếu muốn chia cấu hình bảo mật thành các module, bạn có thể đặt logic trong một bean `Customizer<HttpSecurity>`.
+Nếu muốn module hóa security configuration, bạn có thể đặt logic trong một bean `Customizer<HttpSecurity>`.
 Ví dụ, cấu hình sau sẽ đảm bảo tất cả instance `HttpSecurity` được cấu hình để:
 
 include-code::./HttpSecurityCustomizerBeanConfiguration[tag=httpSecurityCustomizer,indent=0]
@@ -689,32 +689,32 @@ include-code::./HttpSecurityCustomizerBeanConfiguration[tag=httpSecurityCustomiz
 
 
 [[top-level-customizer-bean]]
-=== Bean HttpSecurity Customizer cấp cao nhất
+=== Các bean Customizer cấp cao nhất của HttpSecurity
 
-Nếu muốn tiếp tục chia nhỏ cấu hình bảo mật thành các module, Spring Security sẽ tự động áp dụng mọi bean `Customizer` cấp cao nhất của `HttpSecurity`.
+Nếu muốn module hóa thêm security configuration, Spring Security sẽ tự động áp dụng mọi bean `Customizer` cấp cao nhất của `HttpSecurity`.
 
-Có thể hiểu type `Customizer` cấp cao nhất của `HttpSecurity` là mọi `Customizer<T>` khớp với `public HttpSecurity.*(Customizer<T>)`.
-Điều này có nghĩa là mọi `Customizer<T>` là một argument duy nhất của một public method trên javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity[].
+Có thể hiểu type `Customizer` cấp cao nhất của `HttpSecurity` là bất kỳ `Customizer<T>` nào khớp với `public HttpSecurity.*(Customizer<T>)`.
+Điều này tương đương với mọi `Customizer<T>` là một argument duy nhất của một public method trên javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity[].
 
 Một vài ví dụ có thể giúp làm rõ điều này.
-Nếu `Customizer<ContentTypeOptionsConfig>` được công bố dưới dạng bean, nó sẽ không được tự động áp dụng vì đó là một argument của javadoc:org.springframework.security.config.annotation.web.configurers.HeadersConfigurer#contentTypeOptions(org.springframework.security.config.Customizer)[], vốn không phải method được định nghĩa trên `HttpSecurity`.
-Tuy nhiên, nếu `Customizer<HeadersConfigurer<HttpSecurity>>` được công bố dưới dạng bean, nó sẽ được tự động áp dụng vì đó là một argument của javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity#headers(org.springframework.security.config.Customizer)[].
+Nếu `Customizer<ContentTypeOptionsConfig>` được expose dưới dạng bean, nó sẽ không được tự động áp dụng vì đó là một argument của javadoc:org.springframework.security.config.annotation.web.configurers.HeadersConfigurer#contentTypeOptions(org.springframework.security.config.Customizer)[], vốn không phải method được định nghĩa trên `HttpSecurity`.
+Tuy nhiên, nếu `Customizer<HeadersConfigurer<HttpSecurity>>` được expose dưới dạng bean, nó sẽ được tự động áp dụng vì đó là một argument của javadoc:org.springframework.security.config.annotation.web.builders.HttpSecurity#headers(org.springframework.security.config.Customizer)[].
 
 Ví dụ, cấu hình sau sẽ đảm bảo xref:servlet/exploits/headers.adoc#servlet-headers-csp[Content Security Policy] được đặt thành `object-src 'none'`:
 
 include-code::./TopLevelCustomizerBeanConfiguration[tag=headersCustomizer,indent=0]
 
 [[customizer-bean-ordering]]
-=== Thứ tự bean Customizer
+=== Thứ tự của bean Customizer
 
 Trước tiên, mỗi xref:#httpsecurity-customizer-bean[bean Customizer<HttpSecurity>] được áp dụng bằng {spring-framework-api-url}org/springframework/beans/factory/ObjectProvider.html#orderedStream()[ObjectProvider#orderedStream()].
 Điều này có nghĩa là nếu có nhiều bean `Customizer<HttpSecurity>`, có thể thêm annotation {spring-framework-api-url}org/springframework/core/annotation/Order.html[@Order] vào các định nghĩa bean để kiểm soát thứ tự.
 
-Tiếp theo, mỗi type xref:#top-level-customizer-bean[bean HttpSecurity Customizer cấp cao nhất] được tra cứu và áp dụng bằng `ObjectProvider#orderedStream()`.
+Tiếp theo, từng type xref:#top-level-customizer-bean[bean HttpSecurity Customizer cấp cao nhất] được lookup và áp dụng bằng `ObjectProvider#orderedStream()`.
 Nếu có hai bean `Customizer<HeadersConfigurer<HttpSecurity>>` và hai instance `Customizer<HttpsRedirectConfigurer<HttpSecurity>>`, thứ tự gọi từng type `Customizer` là không xác định.
 Tuy nhiên, thứ tự của từng instance `Customizer<HttpsRedirectConfigurer<HttpSecurity>>` được xác định bởi `ObjectProvider#orderedStream()` và có thể được kiểm soát bằng `@Order` trên các định nghĩa bean.
 
-Cuối cùng, bean `HttpSecurity` được inject dưới dạng một bean.
+Cuối cùng, `HttpSecurity` được inject như một bean.
 Tất cả instance `Customizer` được áp dụng trước khi bean `HttpSecurity` được tạo.
 Điều này cho phép ghi đè các tùy chỉnh do các bean `Customizer` cung cấp.
 
@@ -729,18 +729,18 @@ Nếu các bean `Customizer<HttpSecurity>` không có annotation `@Order` hoặc
 <3> Thứ tự của các type `Customizer` là không xác định.
 Trong ví dụ này, thứ tự của `contentSecurityPolicy`, `contentTypeOptions` và `httpsRedirect` là không xác định.
 Nếu thêm `@Order(Ordered.HIGHEST_PRECEDENCE)` vào `contentTypeOptions`, chúng ta sẽ biết `contentTypeOptions` đứng trước `contentSecurityPolicy` (chúng cùng type), nhưng không biết `httpsRedirect` đứng trước hay sau các bean `Customizer<HeadersConfigurer<HttpSecurity>>`.
-<4> Sau khi tất cả bean `Customizer` được áp dụng, `HttpSecurity` được truyền vào dưới dạng một bean.
+<4> Sau khi tất cả bean `Customizer` được áp dụng, `HttpSecurity` được truyền vào như một bean.
 
 
 [[post-processing-configured-objects]]
-== Xử lý hậu kỳ các Object đã cấu hình
+== Post-process các object đã được cấu hình
 
-Cấu hình Java của Spring Security không expose mọi property của mọi object mà nó cấu hình.
+Java configuration của Spring Security không expose mọi property của mọi object mà nó cấu hình.
 Điều này đơn giản hóa việc cấu hình cho phần lớn người dùng.
 Suy cho cùng, nếu mọi property đều được expose, người dùng có thể sử dụng cấu hình bean tiêu chuẩn.
 
 Mặc dù có những lý do chính đáng để không expose trực tiếp mọi property, người dùng vẫn có thể cần các tùy chọn cấu hình nâng cao hơn.
-Để giải quyết vấn đề này, Spring Security giới thiệu khái niệm `ObjectPostProcessor`, có thể được sử dụng để sửa đổi hoặc thay thế nhiều instance `Object` được tạo bởi Cấu hình Java.
+Để giải quyết vấn đề này, Spring Security giới thiệu khái niệm `ObjectPostProcessor`, có thể được sử dụng để sửa đổi hoặc thay thế nhiều instance `Object` được tạo bởi Java configuration.
 Ví dụ, để cấu hình property `filterSecurityPublishAuthorizationSuccess` trên `FilterSecurityInterceptor`, bạn có thể sử dụng như sau:
 
 [source,java]

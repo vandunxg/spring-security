@@ -1,7 +1,7 @@
 = SecurityMockMvcResultHandlers
 
-Spring Security cung cấp một vài triển khai ``ResultHandler``.
-Để sử dụng các triển khai ``ResultHandler`` của Spring Security, hãy đảm bảo sử dụng static import sau:
+Spring Security cung cấp một số implementation của ``ResultHandler``.
+Để sử dụng các implementation của ``ResultHandler`` trong Spring Security, hãy đảm bảo sử dụng static import sau:
 
 [source,java]
 ----
@@ -38,8 +38,8 @@ List<String> userMessages = messageRepository.findAllUserMessages();
 assertThat(userMessages).hasSize(1);
 ----
 
-Bài test này sẽ không thành công vì sau khi request của chúng ta hoàn tất, `SecurityContextHolder` sẽ bị filter chain xóa.
-Sau đó, chúng ta có thể xuất `TestSecurityContextHolder` vào `SecurityContextHolder` và sử dụng nó theo nhu cầu:
+Bài test này sẽ không thành công vì sau khi request của chúng ta hoàn tất, `SecurityContextHolder` sẽ bị filter chain clear.
+Sau đó, chúng ta có thể export `TestSecurityContextHolder` sang `SecurityContextHolder` và sử dụng nó theo nhu cầu:
 
 [source,java]
 ----
@@ -57,5 +57,5 @@ assertThat(userMessages).hasSize(1);
 
 [NOTE]
 ====
-Hãy nhớ xóa `SecurityContextHolder` giữa các test, nếu không nó có thể rò rỉ giữa các test
+Hãy nhớ clear `SecurityContextHolder` giữa các test, nếu không context có thể bị rò rỉ từ test này sang test khác
 ====

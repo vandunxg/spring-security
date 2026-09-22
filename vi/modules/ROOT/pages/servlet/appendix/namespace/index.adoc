@@ -2,8 +2,8 @@
 = Namespace Security
 :page-section-summary-toc: 1
 
-Phụ lục này cung cấp tài liệu tham khảo về các phần tử khả dụng trong namespace security và thông tin về các bean nền tảng mà chúng tạo ra (giả định bạn đã nắm được các class riêng lẻ và cách chúng phối hợp với nhau - bạn có thể tìm thêm thông tin trong Javadoc của project và các phần khác của tài liệu này).
-Nếu bạn chưa từng sử dụng namespace, hãy đọc xref:servlet/configuration/xml-namespace.adoc#ns-config[chương giới thiệu] về cấu hình namespace, vì phần này được viết để bổ sung cho thông tin ở đó.
+Phụ lục này cung cấp tài liệu tham khảo về các phần tử có trong namespace security và thông tin về các bean bên dưới do chúng tạo ra (giả định rằng bạn đã biết các class riêng lẻ và cách chúng phối hợp với nhau; bạn có thể tìm thêm thông tin trong Javadoc của project và các phần khác của tài liệu này).
+Nếu bạn chưa từng sử dụng namespace, hãy đọc xref:servlet/configuration/xml-namespace.adoc#ns-config[chương giới thiệu] về cấu hình namespace, vì phần này nhằm bổ sung cho thông tin ở đó.
 Khuyến nghị sử dụng một XML editor chất lượng tốt khi chỉnh sửa cấu hình dựa trên schema, vì công cụ này sẽ cung cấp thông tin theo ngữ cảnh về các phần tử và attribute khả dụng, cũng như các comment giải thích mục đích của chúng.
-Namespace được viết ở định dạng Compact của https://relaxng.org/[RELAX NG] và sau đó được chuyển đổi thành một XSD schema.
-Nếu quen với định dạng này, bạn có thể muốn xem trực tiếp https://raw.githubusercontent.com/spring-projects/spring-security/main/config/src/main/resources/org/springframework/security/config/spring-security-7.2.rnc[file schema].
+Namespace được viết bằng định dạng Compact của https://relaxng.org/[RELAX NG] và sau đó được chuyển đổi thành một XSD schema.
+Nếu đã quen với định dạng này, bạn có thể muốn xem trực tiếp https://raw.githubusercontent.com/spring-projects/spring-security/main/config/src/main/resources/org/springframework/security/config/spring-security-7.2.rnc[file schema].

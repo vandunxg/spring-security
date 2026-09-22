@@ -16,7 +16,7 @@ Phần này trình bày cách cấu hình {gh-samples-url}/servlet/spring-boot/j
 [[oauth2login-sample-initial-setup]]
 === Thiết lập ban đầu
 
-Để sử dụng hệ thống authentication OAuth 2.0 của Google cho việc đăng nhập, bạn phải thiết lập một dự án trong Google API Console để lấy credential OAuth 2.0.
+Để sử dụng hệ thống authentication OAuth 2.0 của Google để đăng nhập, bạn phải thiết lập một dự án trong Google API Console để lấy các OAuth 2.0 credentials.
 
 [NOTE]
 ====
@@ -25,20 +25,20 @@ https://developers.google.com/identity/protocols/OpenIDConnect[Triển khai OAut
 
 Làm theo hướng dẫn trên trang https://developers.google.com/identity/protocols/OpenIDConnect[OpenID Connect], bắt đầu từ phần "`Thiết lập OAuth 2.0`".
 
-Sau khi hoàn tất hướng dẫn "`Lấy credential OAuth 2.0`", bạn sẽ có một OAuth Client mới với credential gồm Client ID và Client Secret.
+Sau khi hoàn tất hướng dẫn "`Lấy OAuth 2.0 credentials`", bạn sẽ có một OAuth Client mới với credentials bao gồm Client ID và Client Secret.
 
 
 [[oauth2login-sample-redirect-uri]]
 === Thiết lập redirect URI
 
-redirect URI là path trong application mà user-agent của người dùng cuối được chuyển hướng trở lại sau khi họ đã authentication với Google và cấp quyền truy cập cho OAuth Client (<<oauth2login-sample-initial-setup,được tạo ở bước trước>>) trên trang Consent.
+redirect URI là path trong application mà user-agent của end-user được redirect về sau khi họ đã authenticated với Google và được cấp quyền truy cập vào OAuth Client (<<oauth2login-sample-initial-setup,được tạo ở bước trước>>) trên trang Consent.
 
 Trong phần "`Thiết lập redirect URI`", đảm bảo trường *Authorized redirect URIs* được đặt thành `http://localhost:8080/login/oauth2/code/google`.
 
 [TIP]
 ====
-Mẫu redirect URI mặc định là `+{baseUrl}/login/oauth2/code/{registrationId}+`.
-`registrationId` là identifier duy nhất cho xref:servlet/oauth2/client/index.adoc#oauth2Client-client-registration[`ClientRegistration`].
+Template redirect URI mặc định là `+{baseUrl}/login/oauth2/code/{registrationId}+`.
+`registrationId` là identifier duy nhất của xref:servlet/oauth2/client/index.adoc#oauth2Client-client-registration[`ClientRegistration`].
 ====
 
 [IMPORTANT]
@@ -51,7 +51,7 @@ Ngoài ra, xem các xref:servlet/oauth2/client/authorization-grants.adoc#oauth2C
 [[oauth2login-sample-application-config]]
 === Cấu hình application.yml
 
-Bây giờ bạn đã có OAuth Client mới với Google, bạn cần cấu hình application để sử dụng OAuth Client cho _authentication flow_.
+Bây giờ bạn đã có một OAuth Client mới cho Google, bạn cần cấu hình application để sử dụng OAuth Client cho _authentication flow_.
 Để thực hiện việc đó:
 
 . Mở `application.yml` và đặt cấu hình sau:
@@ -70,30 +70,30 @@ spring:
 +
 .Thuộc tính OAuth Client
 <1> `spring.security.oauth2.client.registration` là tiền tố thuộc tính cơ sở cho các thuộc tính OAuth Client.
-<2> Sau tiền tố thuộc tính cơ sở là ID của xref:servlet/oauth2/client/index.adoc#oauth2Client-client-registration[`ClientRegistration`], chẳng hạn như Google.
+<2> Theo sau tiền tố thuộc tính cơ sở là ID của xref:servlet/oauth2/client/index.adoc#oauth2Client-client-registration[`ClientRegistration`], chẳng hạn như Google.
 
-. Thay thế các giá trị trong thuộc tính `client-id` và `client-secret` bằng credential OAuth 2.0 bạn đã tạo trước đó.
+. Thay thế các giá trị trong thuộc tính `client-id` và `client-secret` bằng các OAuth 2.0 credentials bạn đã tạo trước đó.
 
 
 [[oauth2login-sample-boot-application]]
 === Khởi động ứng dụng
 
-Khởi chạy ví dụ Spring Boot và truy cập `http://localhost:8080`.
-Sau đó, bạn được chuyển hướng đến trang login _auto-generated_ mặc định, trang này hiển thị một liên kết tới Google.
+Khởi chạy ứng dụng mẫu Spring Boot và truy cập `http://localhost:8080`.
+Sau đó, bạn được chuyển hướng đến trang login mặc định được _auto-generated_, trang này hiển thị một liên kết tới Google.
 
-Nhấp vào liên kết Google, sau đó bạn được chuyển hướng đến Google để authentication.
+Nhấp vào liên kết Google, sau đó bạn được chuyển hướng đến Google để thực hiện authentication.
 
-Sau khi authentication bằng credential tài khoản Google, bạn sẽ thấy màn hình Consent.
-Màn hình Consent yêu cầu bạn cho phép hoặc từ chối quyền truy cập của OAuth Client đã tạo trước đó.
+Sau khi authenticated bằng credentials của tài khoản Google, bạn sẽ thấy màn hình Consent.
+Màn hình Consent yêu cầu bạn cho phép hoặc từ chối quyền truy cập vào OAuth Client đã tạo trước đó.
 Nhấp *Allow* để ủy quyền cho OAuth Client truy cập địa chỉ email và thông tin profile cơ bản của bạn.
 
-Tại thời điểm này, OAuth Client truy xuất địa chỉ email và thông tin profile cơ bản của bạn từ https://openid.net/specs/openid-connect-core-1_0.html#UserInfo[UserInfo Endpoint] và thiết lập một session đã authentication.
+Tại thời điểm này, OAuth Client truy xuất địa chỉ email và thông tin profile cơ bản của bạn từ https://openid.net/specs/openid-connect-core-1_0.html#UserInfo[UserInfo Endpoint] và thiết lập một session authenticated.
 
 
 [[oauth2login-boot-property-mappings]]
 == Ánh xạ thuộc tính Spring Boot
 
-Bảng sau phác thảo ánh xạ các thuộc tính OAuth Client của Spring Boot tới các thuộc tính xref:servlet/oauth2/client/index.adoc#oauth2Client-client-registration[ClientRegistration].
+Bảng sau trình bày ánh xạ giữa các thuộc tính OAuth Client của Spring Boot và các thuộc tính xref:servlet/oauth2/client/index.adoc#oauth2Client-client-registration[ClientRegistration].
 
 |===
 |Spring Boot |ClientRegistration
@@ -146,7 +146,7 @@ Bảng sau phác thảo ánh xạ các thuộc tính OAuth Client của Spring B
 
 [TIP]
 ====
-Bạn có thể cấu hình ban đầu một `ClientRegistration` bằng cách sử dụng discovery của https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig[Configuration endpoint] của OpenID Connect Provider hoặc https://tools.ietf.org/html/rfc8414#section-3[Metadata endpoint] của Authorization Server, bằng cách chỉ định thuộc tính `spring.security.oauth2.client.provider._[providerId]_.issuer-uri`.
+Bạn có thể cấu hình ban đầu một `ClientRegistration` bằng discovery từ https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig[Configuration endpoint] của OpenID Connect Provider hoặc https://tools.ietf.org/html/rfc8414#section-3[Metadata endpoint] của Authorization Server, bằng cách chỉ định thuộc tính `spring.security.oauth2.client.provider._[providerId]_.issuer-uri`.
 ====
 
 
@@ -156,11 +156,11 @@ Bạn có thể cấu hình ban đầu một `ClientRegistration` bằng cách s
 `CommonOAuth2Provider` định nghĩa sẵn một tập các thuộc tính client mặc định cho một số provider phổ biến: Google, GitHub, Facebook, X và Okta.
 
 Ví dụ, `authorization-uri`, `token-uri` và `user-info-uri` thường không thay đổi đối với một provider.
-Vì vậy, cung cấp các giá trị mặc định là hợp lý, giúp giảm cấu hình cần thiết.
+Vì vậy, việc cung cấp các giá trị mặc định là hợp lý để giảm cấu hình cần thiết.
 
-Như đã trình bày trước đó, khi chúng ta <<oauth2login-sample-application-config,đã cấu hình một client Google>>, chỉ cần các thuộc tính `client-id` và `client-secret`.
+Như đã trình bày trước đó, khi chúng ta <<oauth2login-sample-application-config,đã cấu hình một Google client>>, chỉ cần các thuộc tính `client-id` và `client-secret`.
 
-Danh sách sau đây cho thấy một ví dụ:
+Đoạn cấu hình sau đây là một ví dụ:
 
 [source,yaml]
 ----
@@ -175,11 +175,11 @@ spring:
 ----
 
 [TIP]
-Việc tự động áp dụng giá trị mặc định cho các thuộc tính client hoạt động liền mạch ở đây vì `registrationId` (`google`) khớp với `enum` `GOOGLE` (không phân biệt hoa thường) trong `CommonOAuth2Provider`.
+Việc tự động đặt giá trị mặc định cho các thuộc tính client hoạt động liền mạch ở đây vì `registrationId` (`google`) khớp với `enum` `GOOGLE` (không phân biệt hoa thường) trong `CommonOAuth2Provider`.
 
-Trong trường hợp bạn muốn chỉ định một `registrationId` khác, chẳng hạn như `google-login`, bạn vẫn có thể tận dụng việc tự động áp dụng giá trị mặc định cho các thuộc tính client bằng cách cấu hình thuộc tính `provider`.
+Trong trường hợp bạn muốn chỉ định một `registrationId` khác, chẳng hạn như `google-login`, bạn vẫn có thể sử dụng cơ chế tự động đặt giá trị mặc định cho các thuộc tính client bằng cách cấu hình thuộc tính `provider`.
 
-Danh sách sau đây cho thấy một ví dụ:
+Đoạn cấu hình sau đây là một ví dụ:
 
 [source,yaml]
 ----
@@ -194,18 +194,18 @@ spring:
             client-secret: google-client-secret
 ----
 <1> `registrationId` được đặt thành `google-login`.
-<2> Thuộc tính `provider` được đặt thành `google`, thuộc tính này sẽ tận dụng việc tự động áp dụng giá trị mặc định cho các thuộc tính client được thiết lập trong `CommonOAuth2Provider.GOOGLE.getBuilder()`.
+<2> Thuộc tính `provider` được đặt thành `google`, qua đó sử dụng cơ chế tự động đặt giá trị mặc định cho các thuộc tính client được thiết lập bởi `CommonOAuth2Provider.GOOGLE.getBuilder()`.
 
 [[oauth2login-custom-provider-properties]]
-== Cấu hình thuộc tính Provider tùy chỉnh
+== Cấu hình thuộc tính provider tùy chỉnh
 
-Có một số Provider OAuth 2.0 hỗ trợ multi-tenancy, dẫn đến các endpoint protocol khác nhau cho mỗi tenant (hoặc sub-domain).
+Có một số provider OAuth 2.0 hỗ trợ multi-tenancy, dẫn đến các protocol endpoint khác nhau cho mỗi tenant (hoặc sub-domain).
 
-Ví dụ, một OAuth Client được đăng ký với Okta được gán cho một sub-domain cụ thể và có các endpoint protocol riêng.
+Ví dụ, một OAuth Client được đăng ký với Okta được gán cho một sub-domain cụ thể và có các protocol endpoint riêng.
 
 Trong các trường hợp này, Spring Boot cung cấp thuộc tính cơ sở sau để cấu hình các thuộc tính provider tùy chỉnh: `spring.security.oauth2.client.provider._[providerId]_`.
 
-Danh sách sau đây cho thấy một ví dụ:
+Đoạn cấu hình sau đây là một ví dụ:
 
 [source,yaml]
 ----
@@ -225,12 +225,12 @@ spring:
             user-name-attribute: sub
             jwk-set-uri: https://your-subdomain.oktapreview.com/oauth2/v1/keys
 ----
-<1> Thuộc tính cơ sở (`spring.security.oauth2.client.provider.okta`) cho phép cấu hình tùy chỉnh các vị trí endpoint protocol.
+<1> Thuộc tính cơ sở (`spring.security.oauth2.client.provider.okta`) cho phép cấu hình tùy chỉnh địa chỉ của các protocol endpoint.
 
 [[oauth2login-override-boot-autoconfig]]
 == Ghi đè auto-configuration của Spring Boot
 
-Class auto-configuration của Spring Boot cho hỗ trợ OAuth Client là `OAuth2ClientAutoConfiguration`.
+Class auto-configuration của Spring Boot để hỗ trợ OAuth Client là `OAuth2ClientAutoConfiguration`.
 
 Nó thực hiện các tác vụ sau:
 

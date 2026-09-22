@@ -2,20 +2,20 @@
 = Đăng nhập SAML 2.0
 :page-section-summary-toc: 1
 
-Tính năng Đăng nhập SAML 2.0 cung cấp cho một ứng dụng khả năng hoạt động như một Relying Party SAML 2.0, cho phép người dùng https://wiki.shibboleth.net/confluence/display/CONCEPT/FlowsAndConfig[đăng nhập] vào ứng dụng bằng tài khoản hiện có của họ tại một Asserting Party SAML 2.0 (Okta, ADFS và các bên khác).
+Tính năng Đăng nhập SAML 2.0 cho phép application hoạt động như một SAML 2.0 relying party, để người dùng https://wiki.shibboleth.net/confluence/display/CONCEPT/FlowsAndConfig[đăng nhập] vào application bằng account hiện có tại một SAML 2.0 asserting party (Okta, ADFS và các bên khác).
 
 [NOTE]
 ====
-Đăng nhập SAML 2.0 được triển khai bằng cách sử dụng *Web Browser SSO Profile*, như được quy định trong
-https://www.oasis-open.org/committees/download.php/35389/sstc-saml-profiles-errata-2.0-wd-06-diff.pdf#page=15[Các Profile SAML 2].
+SAML 2.0 Login được implement bằng *Web Browser SSO Profile*, theo đặc tả trong
+https://www.oasis-open.org/committees/download.php/35389/sstc-saml-profiles-errata-2.0-wd-06-diff.pdf#page=15[các SAML 2 Profile].
 ====
 
 [[servlet-saml2login-spring-security-history]]
-Kể từ năm 2009, hỗ trợ cho Relying Party đã tồn tại dưới dạng một https://github.com/spring-projects/spring-security-saml/tree/1e013b07a7772defd6a26fcfae187c9bf661ee8f#spring-saml[dự án mở rộng].
-Năm 2019, quá trình chuyển tính năng này vào https://github.com/spring-projects/spring-security[Spring Security] chính thức bắt đầu.
-Quá trình này tương tự quá trình bắt đầu vào năm 2017 cho xref:servlet/oauth2/index.adoc[hỗ trợ OAuth 2.0 của Spring Security].
+Từ năm 2009, support cho relying party đã tồn tại dưới dạng một https://github.com/spring-projects/spring-security-saml/tree/1e013b07a7772defd6a26fcfae187c9bf661ee8f#spring-saml[extension project].
+Năm 2019, quá trình port tính năng này vào https://github.com/spring-projects/spring-security[Spring Security] chính thức bắt đầu.
+Quá trình này tương tự quá trình bắt đầu vào năm 2017 đối với xref:servlet/oauth2/index.adoc[OAuth 2.0 support của Spring Security].
 
 [NOTE]
 ====
-Một bản mẫu hoạt động cho {gh-samples-url}/servlet/spring-boot/java/saml2/login[Đăng nhập SAML 2.0] có sẵn trong {gh-samples-url}[kho lưu trữ Spring Security Samples].
+Một working sample cho {gh-samples-url}/servlet/spring-boot/java/saml2/login[Đăng nhập SAML 2.0] có sẵn trong {gh-samples-url}[Spring Security Samples repository].
 ====

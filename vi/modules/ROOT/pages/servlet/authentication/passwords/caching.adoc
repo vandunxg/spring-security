@@ -1,20 +1,20 @@
 [[servlet-authentication-caching-user-details]]
 = Caching `UserDetails`
 
-Spring Security provides support for caching `UserDetails` with <<servlet-authentication-caching-user-details-service,`CachingUserDetailsService`>>.
-Alternatively, you can use Spring Framework's <<servlet-authentication-caching-user-details-cacheable,`@Cacheable`>> annotation.
-In either case, you will need to <<servlet-authentication-caching-user-details-credential-erasure,disable credential erasure>> in order to validate passwords retrieved from the cache.
+Spring Security cung cấp hỗ trợ caching `UserDetails` bằng <<servlet-authentication-caching-user-details-service,`CachingUserDetailsService`>>.
+Ngoài ra, bạn có thể sử dụng annotation <<servlet-authentication-caching-user-details-cacheable,`@Cacheable`>> của Spring Framework.
+Trong cả hai trường hợp, bạn cần <<servlet-authentication-caching-user-details-credential-erasure,vô hiệu hóa việc xóa credential>> để validate các password được retrieve từ cache.
 
 [[servlet-authentication-caching-user-details-service]]
 == `CachingUserDetailsService`
 
-Spring Security's `CachingUserDetailsService` implements xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[UserDetailsService] to provide support for caching `UserDetails`.
-`CachingUserDetailsService` provides caching support for `UserDetails` by delegating to the provided `UserDetailsService`.
-The result is then stored in a `UserCache` to reduce computation in subsequent calls.
+`CachingUserDetailsService` của Spring Security triển khai xref:servlet/authentication/passwords/user-details-service.adoc#servlet-authentication-userdetailsservice[UserDetailsService] để cung cấp hỗ trợ caching `UserDetails`.
+`CachingUserDetailsService` cung cấp hỗ trợ caching `UserDetails` bằng cách delegate cho `UserDetailsService` được cung cấp.
+Kết quả sau đó được lưu vào một `UserCache` để giảm lượng computation cần thực hiện trong các lần gọi tiếp theo.
 
-The following example simply defines a `@Bean` that encapsulates a concrete implementation of `UserDetailsService` and a `UserCache` for caching the `UserDetails`:
+Ví dụ sau chỉ cần định nghĩa một `@Bean` đóng gói một implementation cụ thể của `UserDetailsService` và một `UserCache` để caching `UserDetails`:
 
-.Provide a `CachingUserDetailsService` `@Bean`
+.Cung cấp một `CachingUserDetailsService` `@Bean`
 [tabs]
 ======
 Java::
@@ -47,12 +47,12 @@ fun cachingUserDetailsService(userCache: UserCache): CachingUserDetailsService {
 [[servlet-authentication-caching-user-details-cacheable]]
 == `@Cacheable`
 
-An alternative approach would be to use Spring Framework's {spring-framework-reference-url}integration.html#cache-annotations-cacheable[`@Cacheable`] in your `UserDetailsService` implementation to cache `UserDetails` by `username`.
-The benefit to this approach is simpler configuration, especially if you are already using caching elsewhere in your application.
+Một cách tiếp cận khác là sử dụng {spring-framework-reference-url}integration.html#cache-annotations-cacheable[`@Cacheable`] của Spring Framework trong implementation `UserDetailsService` để cache `UserDetails` theo `username`.
+Lợi ích của cách tiếp cận này là configuration đơn giản hơn, đặc biệt nếu application của bạn đã sử dụng caching ở nơi khác.
 
-The following example assumes caching is already configured, and annotates the `loadUserByUsername` with `@Cacheable`:
+Ví dụ sau giả định caching đã được cấu hình và annotate `loadUserByUsername` bằng `@Cacheable`:
 
-.`UserDetailsService` annotated with `@Cacheable`
+.`UserDetailsService` được annotate bằng `@Cacheable`
 [tabs]
 ======
 Java::
@@ -88,12 +88,12 @@ class MyCustomUserDetailsImplementation : UserDetailsService {
 ======
 
 [[servlet-authentication-caching-user-details-credential-erasure]]
-== Disable Credential Erasure
+== Vô hiệu hóa việc xóa credential
 
-Whether you use <<servlet-authentication-caching-user-details-service,`CachingUserDetailsService`>> or <<servlet-authentication-caching-user-details-cacheable,`@Cacheable`>>, you will need to disable xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager-erasing-credentials[credential erasure] so that the `UserDetails` will contain a `password` to be validated when retrieved from the cache.
-The following example disables credential erasure for the global `AuthenticationManager` by configuring the `AuthenticationManagerBuilder` provided by Spring Security:
+Dù sử dụng <<servlet-authentication-caching-user-details-service,`CachingUserDetailsService`>> hay <<servlet-authentication-caching-user-details-cacheable,`@Cacheable`>>, bạn cần vô hiệu hóa xref:servlet/authentication/architecture.adoc#servlet-authentication-providermanager-erasing-credentials[việc xóa credential] để `UserDetails` chứa `password` dùng để validate khi được retrieve từ cache.
+Ví dụ sau vô hiệu hóa việc xóa credential đối với `AuthenticationManager` toàn cục bằng cách configure `AuthenticationManagerBuilder` do Spring Security cung cấp:
 
-.Disable credential erasure for the global `AuthenticationManager`
+.Vô hiệu hóa việc xóa credential đối với `AuthenticationManager` toàn cục
 [tabs]
 =====
 Java::
